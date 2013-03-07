@@ -47,7 +47,7 @@ Requires:   ntpdate
 Requires:   net-tools
 Requires:   nautilus-actions
 Requires:   qubes-core-vm-kernel-placeholder
-Requires:   qubes-core-libs
+Requires:   qubes-qrexec-vm
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
