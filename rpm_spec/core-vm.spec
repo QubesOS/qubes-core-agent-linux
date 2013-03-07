@@ -20,7 +20,7 @@
 #
 #
 
-%{!?version: %define version %(cat version_vm)}
+%{!?version: %define version %(cat version)}
 
 Name:		qubes-core-vm
 Version:	%{version}
@@ -71,8 +71,6 @@ ln -sf . %{name}-%{version}
 %setup -T -D
 
 %build
-(cd vchan; make -f Makefile.linux)
-(cd qrexec; make)
 for dir in qubes_rpc misc; do
   (cd $dir; make)
 done
@@ -189,10 +187,6 @@ install -d $RPM_BUILD_ROOT/usr/share/file-manager/actions
 install -m 0644 qubes_rpc/*-gnome.desktop $RPM_BUILD_ROOT/usr/share/file-manager/actions
 
 install -D misc/nautilus-actions.conf $RPM_BUILD_ROOT/etc/xdg/nautilus-actions/nautilus-actions.conf
-
-install qrexec/qrexec_agent $RPM_BUILD_ROOT/usr/lib/qubes
-install qrexec/qrexec_client_vm $RPM_BUILD_ROOT/usr/lib/qubes
-install qrexec/qubes_rpc_multiplexer $RPM_BUILD_ROOT/usr/lib/qubes
 
 install misc/meminfo-writer $RPM_BUILD_ROOT/usr/lib/qubes
 install -d $RPM_BUILD_ROOT/mnt/removable
@@ -440,12 +434,9 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qfile-agent
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
-/usr/lib/qubes/qrexec_agent
-/usr/lib/qubes/qrexec_client_vm
 /usr/lib/qubes/qrun-in-vm
 /usr/lib/qubes/qubes_download_dom0_updates.sh
 /usr/lib/qubes/qubes_fix_nm_conf.sh
-/usr/lib/qubes/qubes_rpc_multiplexer
 /usr/lib/qubes/qubes_setup_dnat_to_ns
 /usr/lib/qubes/qubes_trigger_sync_appmenus.sh
 /usr/lib/qubes/qvm-copy-to-vm.gnome
@@ -552,7 +543,6 @@ The Qubes core startup configuration for SystemD init.
 %defattr(-,root,root,-)
 /lib/systemd/system/qubes-dvm.service
 /lib/systemd/system/qubes-meminfo-writer.service
-/lib/systemd/system/qubes-qrexec-agent.service
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-firewall.service
 /lib/systemd/system/qubes-netwatcher.service
@@ -577,7 +567,7 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
-for srv in qubes-dvm qubes-meminfo-writer qubes-qrexec-agent qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy; do
+for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy; do
     /bin/systemctl enable $srv.service 2> /dev/null
 done
 
@@ -650,6 +640,6 @@ if [ "$1" != 0 ] ; then
     exit 0
 fi
 
-for srv in qubes-dvm qubes-meminfo-writer qubes-qrexec-agent qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network; do
+for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network; do
     /bin/systemctl disable $srv.service
 do
