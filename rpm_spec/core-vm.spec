@@ -584,21 +584,6 @@ done
 rm -f /etc/systemd/system/default.target
 ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
-# Services to disable
-#echo "--> Turning off unnecessary services..."
-# FIXME: perhaps there is more elegant way to do this?
-for f in /etc/init.d/*
-do
-        srv=`basename $f`
-        [ $srv = 'functions' ] && continue
-        [ $srv = 'killall' ] && continue
-        [ $srv = 'halt' ] && continue
-        [ $srv = 'single' ] && continue
-        [ $srv = 'reboot' ] && continue
-        [ $srv = 'qubes_gui' ] && continue
-        chkconfig $srv off 2> /dev/null
-done
-
 DISABLE_SERVICES="alsa-store alsa-restore auditd avahi avahi-daemon backuppc cpuspeed crond"
 DISABLE_SERVICES="$DISABLE_SERVICES fedora-autorelabel fedora-autorelabel-mark ipmi hwclock-load hwclock-save"
 DISABLE_SERVICES="$DISABLE_SERVICES mdmonitor multipathd openct rpcbind mcelog fedora-storage-init fedora-storage-init-late"
