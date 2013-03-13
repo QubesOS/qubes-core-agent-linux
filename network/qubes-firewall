@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PIDFILE=/var/run/qubes/qubes_firewall.pid
+PIDFILE=/var/run/qubes/qubes-firewall.pid
 XENSTORE_IPTABLES=qubes_iptables
 XENSTORE_IPTABLES_HEADER=qubes_iptables_header
 XENSTORE_ERROR=qubes_iptables_error
@@ -49,5 +49,7 @@ while true; do
 	fi
 
 	# Check if user didn't define some custom rules to be applied as well...
+	[ -x /rw/config/qubes-firewall-user-script ] && /rw/config/qubes-firewall-user-script
+	# XXX: Backward compatibility
 	[ -x /rw/config/qubes_firewall_user_script ] && /rw/config/qubes_firewall_user_script
 done

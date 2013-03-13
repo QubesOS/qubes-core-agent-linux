@@ -10,9 +10,9 @@ fi
 # DispVM (to override DispVM-template IP) and in case when qubes_ip was
 # called by udev before loading evtchn kernel module - in which case
 # xenstore-read fails
-INTERFACE=eth0 /usr/lib/qubes/setup_ip
+INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
-if [ -e /dev/xvdb -a ! -e /etc/this_is_dvm ] ; then
+if [ -e /dev/xvdb -a ! -e /etc/this-is-dvm ] ; then
     mount /rw
 
     if ! [ -d /rw/home ] ; then
@@ -29,7 +29,7 @@ if [ -e /dev/xvdb -a ! -e /etc/this_is_dvm ] ; then
         mkdir -p /rw/usrlocal
         cp -a /usr/local.orig/* /rw/usrlocal
 
-        touch /var/lib/qubes/first_boot_completed
+        touch /var/lib/qubes/first-boot-completed
     fi
     # Chown home if user UID have changed - can be the case on template switch
     HOME_USER_UID=`ls -dn /rw/home/user | awk '{print $3}'`

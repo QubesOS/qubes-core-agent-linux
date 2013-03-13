@@ -107,7 +107,7 @@ install -m 0644 vm-systemd/ntpd.service $RPM_BUILD_ROOT/usr/lib/qubes/init/
 install -D -m 0440 misc/qubes.sudoers $RPM_BUILD_ROOT/etc/sudoers.d/qubes
 install -D -m 0644 misc/qubes.repo $RPM_BUILD_ROOT/etc/yum.repos.d/qubes.repo
 install -D -m 0644 misc/serial.conf $RPM_BUILD_ROOT/usr/lib/qubes/serial.conf
-install -D misc/qubes_serial_login $RPM_BUILD_ROOT/sbin/qubes_serial_login
+install -D misc/qubes-serial-login $RPM_BUILD_ROOT/sbin/qubes-serial-login
 install -d $RPM_BUILD_ROOT/usr/share/glib-2.0/schemas/
 install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $RPM_BUILD_ROOT/usr/share/glib-2.0/schemas/
 install -d $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -120,16 +120,16 @@ install -d -m 755 $RPM_BUILD_ROOT/etc/pki/rpm-gpg
 install -m 644 misc/RPM-GPG-KEY-qubes* $RPM_BUILD_ROOT/etc/pki/rpm-gpg/
 install -D misc/xenstore-watch $RPM_BUILD_ROOT/usr/bin/xenstore-watch-qubes
 install -d $RPM_BUILD_ROOT/etc/udev/rules.d
-install -m 0644 misc/qubes_misc.rules $RPM_BUILD_ROOT/etc/udev/rules.d/50-qubes_misc.rules
-install -m 0644 misc/qubes_block.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes_block.rules
-install -m 0644 misc/qubes_usb.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes_usb.rules
+install -m 0644 misc/udev-qubes-misc.rules $RPM_BUILD_ROOT/etc/udev/rules.d/50-qubes-misc.rules
+install -m 0644 misc/udev-qubes-block.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes-block.rules
+install -m 0644 misc/udev-qubes-usb.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes-usb.rules
 install -d $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/qubes_download_dom0_updates.sh $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/{block_add_change,block_remove,block_cleanup} $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/{usb_add_change,usb_remove} $RPM_BUILD_ROOT/usr/lib/qubes/
+install misc/qubes-download-dom0-updates.sh $RPM_BUILD_ROOT/usr/lib/qubes/
+install misc/udev-block-* $RPM_BUILD_ROOT/usr/lib/qubes/
+install misc/udev-usb-* $RPM_BUILD_ROOT/usr/lib/qubes/
 install misc/vusb-ctl.py $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/qubes_trigger_sync_appmenus.sh $RPM_BUILD_ROOT/usr/lib/qubes/
-install -D -m 0644 misc/qubes_trigger_sync_appmenus.action $RPM_BUILD_ROOT/etc/yum/post-actions/qubes_trigger_sync_appmenus.action
+install misc/qubes-trigger-sync-appmenus.sh $RPM_BUILD_ROOT/usr/lib/qubes/
+install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 install -D misc/polkit-1-qubes-allow-all.pkla $RPM_BUILD_ROOT/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 install -D misc/polkit-1-qubes-allow-all.rules $RPM_BUILD_ROOT/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 mkdir -p $RPM_BUILD_ROOT/usr/lib/qubes
@@ -141,18 +141,18 @@ else
 fi
 install misc/dispvm-prerun.sh $RPM_BUILD_ROOT/usr/lib/qubes/dispvm-prerun.sh
 
-install -D misc/qubes_core.modules $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes_core.modules
-install -D misc/qubes_misc.modules $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes_misc.modules
+install -D misc/qubes-core.modules $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
+install -D misc/qubes-misc.modules $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-misc.modules
 
-install -m 0644 network/qubes_network.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes_network.rules
-install network/qubes_setup_dnat_to_ns $RPM_BUILD_ROOT/usr/lib/qubes
-install network/qubes_fix_nm_conf.sh $RPM_BUILD_ROOT/usr/lib/qubes
-install network/setup_ip $RPM_BUILD_ROOT/usr/lib/qubes/
+install -m 0644 network/udev-qubes-network.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes-network.rules
+install network/qubes-setup-dnat-to-ns $RPM_BUILD_ROOT/usr/lib/qubes
+install network/qubes-fix-nm-conf.sh $RPM_BUILD_ROOT/usr/lib/qubes
+install network/setup-ip $RPM_BUILD_ROOT/usr/lib/qubes/
 install network/network-manager-prepare-conf-dir $RPM_BUILD_ROOT/usr/lib/qubes/
 install -d $RPM_BUILD_ROOT/etc/dhclient.d
-ln -s /usr/lib/qubes/qubes_setup_dnat_to_ns $RPM_BUILD_ROOT/etc/dhclient.d/qubes_setup_dnat_to_ns.sh 
+ln -s /usr/lib/qubes/qubes-setup-dnat-to-ns $RPM_BUILD_ROOT/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 install -d $RPM_BUILD_ROOT/etc/NetworkManager/dispatcher.d/
-install network/{qubes_nmhook,30-qubes_external_ip} $RPM_BUILD_ROOT/etc/NetworkManager/dispatcher.d/
+install network/{qubes-nmhook,30-qubes-external-ip} $RPM_BUILD_ROOT/etc/NetworkManager/dispatcher.d/
 install -D network/vif-route-qubes $RPM_BUILD_ROOT/etc/xen/scripts/vif-route-qubes
 install -m 0400 -D network/iptables $RPM_BUILD_ROOT/etc/sysconfig/iptables
 install -m 0400 -D network/ip6tables $RPM_BUILD_ROOT/etc/sysconfig/ip6tables
@@ -163,8 +163,8 @@ install -d $RPM_BUILD_ROOT/etc/yum.conf.d
 touch $RPM_BUILD_ROOT/etc/yum.conf.d/qubes-proxy.conf
 
 install -d $RPM_BUILD_ROOT/usr/sbin
-install network/qubes_firewall $RPM_BUILD_ROOT/usr/sbin/
-install network/qubes_netwatcher $RPM_BUILD_ROOT/usr/sbin/
+install network/qubes-firewall $RPM_BUILD_ROOT/usr/sbin/
+install network/qubes-netwatcher $RPM_BUILD_ROOT/usr/sbin/
 
 install -d $RPM_BUILD_ROOT/usr/bin
 
@@ -256,7 +256,7 @@ echo '[main]' > /etc/NetworkManager/NetworkManager.conf
 echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
 echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
 fi
-/usr/lib/qubes/qubes_fix_nm_conf.sh
+/usr/lib/qubes/qubes-fix-nm-conf.sh
 
 
 # Remove ip_forward setting from sysctl, so NM will not reset it
@@ -309,30 +309,21 @@ do
         continue
     fi
 
-    if [ $(basename $f) == "xend.rules" ] ; then
+    if [ $(basename $f) == "50-qubes-misc.rules" ] ; then
         continue
     fi
 
-    if [ $(basename $f) == "50-qubes_misc.rules" ] ; then
+    if [ $(basename $f) == "99-qubes-network.rules" ] ; then
         continue
     fi
 
-    if [ $(basename $f) == "99-qubes_network.rules" ] ; then
+    if [ $(basename $f) == "99-qubes-block.rules" ] ; then
         continue
     fi
 
-    if [ $(basename $f) == "99-qubes_block.rules" ] ; then
+    if [ $(basename $f) == "99-qubes-usb.rules" ] ; then
         continue
     fi
-
-    if [ $(basename $f) == "99-qubes_usb.rules" ] ; then
-        continue
-    fi
-
-    if [ $(basename $f) == "90-hal.rules" ] ; then
-        continue
-    fi
-
 
     mv $f /var/lib/qubes/removed-udev-scripts/
 done
@@ -377,11 +368,11 @@ rm -f %{name}-%{version}
 %dir %attr(0775,user,user) /var/lib/qubes/dom0-updates
 %{kde_service_dir}/qvm-copy.desktop
 %{kde_service_dir}/qvm-dvm.desktop
-/etc/NetworkManager/dispatcher.d/30-qubes_external_ip
-/etc/NetworkManager/dispatcher.d/qubes_nmhook
+/etc/NetworkManager/dispatcher.d/30-qubes-external-ip
+/etc/NetworkManager/dispatcher.d/qubes-nmhook
 /etc/X11/xorg-preload-apps.conf
 /etc/dispvm-dotfiles.tbz
-/etc/dhclient.d/qubes_setup_dnat_to_ns.sh
+/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
@@ -398,21 +389,21 @@ rm -f %{name}-%{version}
 /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
-/etc/sysconfig/modules/qubes_core.modules
-/etc/sysconfig/modules/qubes_misc.modules
+/etc/sysconfig/modules/qubes-core.modules
+/etc/sysconfig/modules/qubes-misc.modules
 %config(noreplace) /etc/tinyproxy/filter-qubes-yum
 %config(noreplace) /etc/tinyproxy/tinyproxy-qubes-yum.conf
-/etc/udev/rules.d/50-qubes_misc.rules
-/etc/udev/rules.d/99-qubes_block.rules
-/etc/udev/rules.d/99-qubes_network.rules
-/etc/udev/rules.d/99-qubes_usb.rules
+/etc/udev/rules.d/50-qubes-misc.rules
+/etc/udev/rules.d/99-qubes-block.rules
+/etc/udev/rules.d/99-qubes-network.rules
+/etc/udev/rules.d/99-qubes-usb.rules
 /etc/xdg/nautilus-actions/nautilus-actions.conf
 /etc/xen/scripts/vif-route-qubes
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
-/etc/yum/post-actions/qubes_trigger_sync_appmenus.action
-/sbin/qubes_serial_login
+/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
+/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
 /usr/bin/qvm-open-in-dvm
 /usr/bin/qvm-open-in-vm
@@ -420,11 +411,11 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-mru-entry
 /usr/bin/xenstore-watch-qubes
 %dir /usr/lib/qubes
-/usr/lib/qubes/block_add_change
-/usr/lib/qubes/block_cleanup
-/usr/lib/qubes/block_remove
-/usr/lib/qubes/usb_add_change
-/usr/lib/qubes/usb_remove
+/usr/lib/qubes/udev-block-add-change
+/usr/lib/qubes/udev-block-cleanup
+/usr/lib/qubes/udev-block-remove
+/usr/lib/qubes/udev-usb-add-change
+/usr/lib/qubes/udev-usb-remove
 /usr/lib/qubes/vusb-ctl.py*
 /usr/lib/qubes/dispvm-prerun.sh
 /usr/lib/qubes/sync-ntp-clock
@@ -435,19 +426,19 @@ rm -f %{name}-%{version}
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
 /usr/lib/qubes/qrun-in-vm
-/usr/lib/qubes/qubes_download_dom0_updates.sh
-/usr/lib/qubes/qubes_fix_nm_conf.sh
-/usr/lib/qubes/qubes_setup_dnat_to_ns
-/usr/lib/qubes/qubes_trigger_sync_appmenus.sh
+/usr/lib/qubes/qubes-download-dom0-updates.sh
+/usr/lib/qubes/qubes-fix-nm-conf.sh
+/usr/lib/qubes/qubes-setup-dnat-to-ns
+/usr/lib/qubes/qubes-trigger-sync-appmenus.sh
 /usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-copy-to-vm.kde
 /usr/lib/qubes/serial.conf
-/usr/lib/qubes/setup_ip
+/usr/lib/qubes/setup-ip
 /usr/lib/qubes/vm-file-editor
 /usr/lib/qubes/wrap_in_html_if_url.sh
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
-/usr/sbin/qubes_firewall
-/usr/sbin/qubes_netwatcher
+/usr/sbin/qubes-firewall
+/usr/sbin/qubes-netwatcher
 /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
 /usr/share/file-manager/actions/qvm-copy-gnome.desktop
 /usr/share/file-manager/actions/qvm-dvm-gnome.desktop
@@ -468,9 +459,9 @@ Conflicts:      qubes-core-vm-systemd
 The Qubes core startup configuration for SysV init (or upstart).
 
 %files sysvinit
-/etc/init.d/qubes_core
-/etc/init.d/qubes_core_appvm
-/etc/init.d/qubes_core_netvm
+/etc/init.d/qubes-core
+/etc/init.d/qubes-core-appvm
+/etc/init.d/qubes-core-netvm
 /etc/init.d/qubes-firewall
 /etc/init.d/qubes-netwatcher
 /etc/init.d/qubes-yum-proxy
@@ -487,7 +478,7 @@ do
         [ $srv = 'halt' ] && continue
         [ $srv = 'single' ] && continue
         [ $srv = 'reboot' ] && continue
-        [ $srv = 'qubes_gui' ] && continue
+        [ $srv = 'qubes-gui' ] && continue
         chkconfig $srv off
 done
 
@@ -497,12 +488,12 @@ chkconfig haldaemon on
 chkconfig messagebus on
 chkconfig iptables on
 chkconfig ip6tables on
-chkconfig --add qubes_core || echo "WARNING: Cannot add service qubes_core!"
-chkconfig qubes_core on || echo "WARNING: Cannot enable service qubes_core!"
-chkconfig --add qubes_core_netvm || echo "WARNING: Cannot add service qubes_core_netvm!"
-chkconfig qubes_core_netvm on || echo "WARNING: Cannot enable service qubes_core_netvm!"
-chkconfig --add qubes_core_appvm || echo "WARNING: Cannot add service qubes_core_appvm!"
-chkconfig qubes_core_appvm on || echo "WARNING: Cannot enable service qubes_core_appvm!"
+chkconfig --add qubes-core || echo "WARNING: Cannot add service qubes-core!"
+chkconfig qubes-core on || echo "WARNING: Cannot enable service qubes-core!"
+chkconfig --add qubes-core-netvm || echo "WARNING: Cannot add service qubes-core-netvm!"
+chkconfig qubes-core-netvm on || echo "WARNING: Cannot enable service qubes-core-netvm!"
+chkconfig --add qubes-core-appvm || echo "WARNING: Cannot add service qubes-core-appvm!"
+chkconfig qubes-core-appvm on || echo "WARNING: Cannot enable service qubes-core-appvm!"
 chkconfig --add qubes-firewall || echo "WARNING: Cannot add service qubes-firewall!"
 chkconfig qubes-firewall on || echo "WARNING: Cannot enable service qubes-firewall!"
 chkconfig --add qubes-netwatcher || echo "WARNING: Cannot add service qubes-netwatcher!"
@@ -516,9 +507,9 @@ sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
 %preun sysvinit
 if [ "$1" = 0 ] ; then
     # no more packages left
-    chkconfig qubes_core off
-    chkconfig qubes_core_netvm off
-    chkconfig qubes_core_appvm off
+    chkconfig qubes-core off
+    chkconfig qubes-core-netvm off
+    chkconfig qubes-core-appvm off
     chkconfig qubes-firewall off
     chkconfig qubes-netwatcher off
     chkconfig qubes-yum-proxy off

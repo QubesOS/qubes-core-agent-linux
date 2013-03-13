@@ -12,4 +12,3 @@ StandardOutput=syslog
 
 [Install]
 WantedBy=multi-user.target
-Alias=qubes_firewall.service

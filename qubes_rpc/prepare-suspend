@@ -12,5 +12,5 @@ if [ x"$action" == x"suspend" ]; then
     modprobe -r uhci_hcd ehci_hcd
 else
     modprobe ehci_hcd; modprobe uhci_hcd; 
-    nmcli nm sleep false || { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes_core_netvm start
+    nmcli nm sleep false || { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes-core-netvm start
 fi

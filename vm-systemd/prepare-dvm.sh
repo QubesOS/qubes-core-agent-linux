@@ -18,7 +18,7 @@ if xenstore-read qubes_save_request 2>/dev/null ; then
         mkdir /home
     fi
     mount --bind /home_volatile /home
-    touch /etc/this_is_dvm
+    touch /etc/this-is-dvm
     mount /rw
     possibly_run_save_script
     umount /rw

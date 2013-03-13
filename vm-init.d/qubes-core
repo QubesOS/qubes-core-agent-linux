@@ -23,7 +23,7 @@ start()
 	mkdir -p /var/run/xen-hotplug
 
 	name=$(/usr/bin/xenstore-read name)
-	if ! [ -f /etc/this_is_dvm ] ; then
+	if ! [ -f /etc/this-is-dvm ] ; then
 		# we don't want to set hostname for DispVM
 		# because it makes some of the pre-created dotfiles invalid (e.g. .kde/cache-<hostname>)
 		# (let's be frank: nobody's gonna use xterm on DispVM)
@@ -50,7 +50,7 @@ start()
 	# DispVM (to override DispVM-template IP) and in case when qubes_ip was
 	# called by udev before loading evtchn kernel module - in which case
 	# xenstore-read fails
-	INTERFACE=eth0 /usr/lib/qubes/setup_ip
+	INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
 	mkdir -p /var/run/qubes
 

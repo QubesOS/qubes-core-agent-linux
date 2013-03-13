@@ -6,7 +6,7 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-PIDFILE=/var/run/qubes/qubes_netwatcher.pid
+PIDFILE=/var/run/qubes/qubes-netwatcher.pid
 
 start()
 {
@@ -15,7 +15,7 @@ start()
     if [ -z "$start_netwatcher" ] && [ "$type" == "ProxyVM" ] || [ "$start_netwatcher" == "1" ]; then
         echo -n $"Starting Qubes Network monitor:"
         /sbin/ethtool -K eth0 sg off
-        /usr/sbin/qubes_netwatcher &
+        /usr/sbin/qubes-netwatcher &
         success
         echo ""
     fi

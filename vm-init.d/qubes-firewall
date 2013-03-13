@@ -6,7 +6,7 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-PIDFILE=/var/run/qubes/qubes_firewall.pid
+PIDFILE=/var/run/qubes/qubes-firewall.pid
 
 start()
 {
@@ -15,7 +15,7 @@ start()
     if [ -z "$start_firewall" ] && [ "$type" == "ProxyVM" ] || [ "$start_firewall" == "1" ]; then
         echo -n $"Starting Qubes Firewall monitor:"
         /sbin/ethtool -K eth0 sg off
-        /usr/sbin/qubes_firewall &
+        /usr/sbin/qubes-firewall &
         success
         echo ""
     fi
