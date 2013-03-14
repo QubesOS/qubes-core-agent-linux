@@ -32,7 +32,7 @@ pidfile="/var/run/tinyproxy/tinyproxy-qubes-yum.pid"
 lockfile=/var/lock/subsys/tinyproxy-qubes-yum
 
 start() {
-    type=`/usr/bin/xenstore-read qubes_vm_type`
+    type=`/usr/bin/xenstore-read qubes-vm-type`
     start_yum_proxy=`/usr/bin/xenstore-read qubes-service/qubes-yum-proxy 2>/dev/null`
     if [ -z "$start_yum_proxy" ] && [ "$type" != "NetVM" ] || [ "$start_yum_proxy" != "1" ]; then
         # Yum proxy disabled

@@ -24,7 +24,7 @@
 
 Name:		qubes-core-vm
 Version:	%{version}
-Release:	1%{dist}
+Release:	1.1%{dist}
 Summary:	The Qubes core files for VM
 
 Group:		Qubes

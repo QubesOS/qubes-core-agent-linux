@@ -1,8 +1,8 @@
 #!/bin/sh
 if [ x$2 == xup ]; then
 	INET=$(/sbin/ip addr show dev $1 | /bin/grep inet)
-	/usr/bin/xenstore-write qubes_netvm_external_ip "$INET"
+	/usr/bin/xenstore-write qubes-netvm-external-ip "$INET"
 fi
 if [ x$2 == xdown ]; then
-	/usr/bin/xenstore-write qubes_netvm_external_ip ""
+	/usr/bin/xenstore-write qubes-netvm-external-ip ""
 fi

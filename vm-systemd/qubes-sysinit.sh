@@ -29,7 +29,7 @@ chmod 666 /proc/xen/xenbus
 chmod 666 /proc/u2mfn
 
 # Set default services depending on VM type
-TYPE=`$XS_READ qubes_vm_type 2> /dev/null`
+TYPE=`$XS_READ qubes-vm-type 2> /dev/null`
 [ "$TYPE" == "AppVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM
 [ "$TYPE" == "NetVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM
 [ "$TYPE" == "ProxyVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_PROXYVM

@@ -2,9 +2,9 @@
 set -e
 
 PIDFILE=/var/run/qubes/qubes-firewall.pid
-XENSTORE_IPTABLES=qubes_iptables
-XENSTORE_IPTABLES_HEADER=qubes_iptables_header
-XENSTORE_ERROR=qubes_iptables_error
+XENSTORE_IPTABLES=qubes-iptables
+XENSTORE_IPTABLES_HEADER=qubes-iptables-header
+XENSTORE_ERROR=qubes-iptables-error
 OLD_RULES=""
 # PIDfile handling
 [[ -e $PIDFILE ]] && kill -s 0 $(<$PIDFILE) 2>/dev/null && exit 0
@@ -38,8 +38,8 @@ while true; do
 	IPTABLES_SAVE=$(/sbin/iptables-save | sed '/^\*filter/,/^COMMIT/d')
 	OUT=`echo -e "$RULES\n$IPTABLES_SAVE" | /sbin/iptables-restore 2>&1 || true`
 
-	for i in $(xenstore-list qubes_iptables_domainrules) ; do 
-		RULES=$(/usr/bin/xenstore-read qubes_iptables_domainrules/"$i")
+	for i in $(xenstore-list qubes-iptables-domainrules) ; do
+		RULES=$(/usr/bin/xenstore-read qubes-iptables-domainrules/"$i")
 		ERRS=`echo -e "$RULES" | /sbin/iptables-restore -n 2>&1 || true`
 		OUT="$OUT$ERRS"
 	done		
