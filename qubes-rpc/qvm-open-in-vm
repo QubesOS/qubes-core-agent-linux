@@ -26,4 +26,4 @@ if ! [ $# = 2 ] ; then
 fi
 . /usr/lib/qubes/wrap_in_html_if_url.sh
 wrap_in_html_if_url "$2"
-exec /usr/lib/qubes/qrexec_client_vm "$1" qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" "$FILE_ARGUMENT"
+exec /usr/lib/qubes/qrexec-client-vm "$1" qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" "$FILE_ARGUMENT"

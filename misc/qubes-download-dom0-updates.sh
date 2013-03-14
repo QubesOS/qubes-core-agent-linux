@@ -95,7 +95,7 @@ else
 fi
 
 if ls $DOM0_UPDATES_DIR/packages/*.rpm > /dev/null 2>&1; then
-    /usr/lib/qubes/qrexec_client_vm dom0 qubes.ReceiveUpdates /usr/lib/qubes/qfile-agent $DOM0_UPDATES_DIR/packages/*.rpm
+    /usr/lib/qubes/qrexec-client-vm dom0 qubes.ReceiveUpdates /usr/lib/qubes/qfile-agent $DOM0_UPDATES_DIR/packages/*.rpm
 else
     echo "No packages downloaded"
 fi
