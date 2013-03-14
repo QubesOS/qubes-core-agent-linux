@@ -71,7 +71,7 @@ ln -sf . %{name}-%{version}
 %setup -T -D
 
 %build
-for dir in qubes_rpc misc; do
+for dir in qubes-rpc misc; do
   (cd $dir; make)
 done
 
@@ -168,23 +168,23 @@ install network/qubes-netwatcher $RPM_BUILD_ROOT/usr/sbin/
 
 install -d $RPM_BUILD_ROOT/usr/bin
 
-install qubes_rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run,qvm-mru-entry} $RPM_BUILD_ROOT/usr/bin
-install qubes_rpc/wrap_in_html_if_url.sh $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes_rpc/qvm-copy-to-vm.kde $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes_rpc/qvm-copy-to-vm.gnome $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes_rpc/{vm-file-editor,qfile-agent,qopen-in-vm,qfile-unpacker} $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes_rpc/qrun-in-vm $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes_rpc/sync-ntp-clock $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes_rpc/prepare-suspend $RPM_BUILD_ROOT/usr/lib/qubes
+install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run,qvm-mru-entry} $RPM_BUILD_ROOT/usr/bin
+install qubes-rpc/wrap-in-html-if-url.sh $RPM_BUILD_ROOT/usr/lib/qubes
+install qubes-rpc/qvm-copy-to-vm.kde $RPM_BUILD_ROOT/usr/lib/qubes
+install qubes-rpc/qvm-copy-to-vm.gnome $RPM_BUILD_ROOT/usr/lib/qubes
+install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm,qfile-unpacker} $RPM_BUILD_ROOT/usr/lib/qubes
+install qubes-rpc/qrun-in-vm $RPM_BUILD_ROOT/usr/lib/qubes
+install qubes-rpc/sync-ntp-clock $RPM_BUILD_ROOT/usr/lib/qubes
+install qubes-rpc/prepare-suspend $RPM_BUILD_ROOT/usr/lib/qubes
 install -d $RPM_BUILD_ROOT/%{kde_service_dir}
-install -m 0644 qubes_rpc/{qvm-copy.desktop,qvm-dvm.desktop} $RPM_BUILD_ROOT/%{kde_service_dir}
-install -d $RPM_BUILD_ROOT/etc/qubes_rpc
-install -m 0644 qubes_rpc/{qubes.Filecopy,qubes.OpenInVM,qubes.VMShell,qubes.SyncNtpClock} $RPM_BUILD_ROOT/etc/qubes_rpc
-install -m 0644 qubes_rpc/{qubes.SuspendPre,qubes.SuspendPost,qubes.GetAppmenus} $RPM_BUILD_ROOT/etc/qubes_rpc
-install -m 0644 qubes_rpc/qubes.WaitForSession $RPM_BUILD_ROOT/etc/qubes_rpc
+install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-dvm.desktop} $RPM_BUILD_ROOT/%{kde_service_dir}
+install -d $RPM_BUILD_ROOT/etc/qubes-rpc
+install -m 0644 qubes-rpc/{qubes.Filecopy,qubes.OpenInVM,qubes.VMShell,qubes.SyncNtpClock} $RPM_BUILD_ROOT/etc/qubes-rpc
+install -m 0644 qubes-rpc/{qubes.SuspendPre,qubes.SuspendPost,qubes.GetAppmenus} $RPM_BUILD_ROOT/etc/qubes-rpc
+install -m 0644 qubes-rpc/qubes.WaitForSession $RPM_BUILD_ROOT/etc/qubes-rpc
 
 install -d $RPM_BUILD_ROOT/usr/share/file-manager/actions
-install -m 0644 qubes_rpc/*-gnome.desktop $RPM_BUILD_ROOT/usr/share/file-manager/actions
+install -m 0644 qubes-rpc/*-gnome.desktop $RPM_BUILD_ROOT/usr/share/file-manager/actions
 
 install -D misc/nautilus-actions.conf $RPM_BUILD_ROOT/etc/xdg/nautilus-actions/nautilus-actions.conf
 
@@ -377,15 +377,14 @@ rm -f %{name}-%{version}
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 /etc/polkit-1/rules.d/00-qubes-allow-all.rules
-%dir /etc/qubes_rpc
-/etc/qubes_rpc/qubes.Filecopy
-/etc/qubes_rpc/qubes.OpenInVM
-/etc/qubes_rpc/qubes.GetAppmenus
-/etc/qubes_rpc/qubes.VMShell
-/etc/qubes_rpc/qubes.SyncNtpClock
-/etc/qubes_rpc/qubes.SuspendPre
-/etc/qubes_rpc/qubes.SuspendPost
-/etc/qubes_rpc/qubes.WaitForSession
+/etc/qubes-rpc/qubes.Filecopy
+/etc/qubes-rpc/qubes.OpenInVM
+/etc/qubes-rpc/qubes.GetAppmenus
+/etc/qubes-rpc/qubes.VMShell
+/etc/qubes-rpc/qubes.SyncNtpClock
+/etc/qubes-rpc/qubes.SuspendPre
+/etc/qubes-rpc/qubes.SuspendPost
+/etc/qubes-rpc/qubes.WaitForSession
 /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
@@ -435,7 +434,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/serial.conf
 /usr/lib/qubes/setup-ip
 /usr/lib/qubes/vm-file-editor
-/usr/lib/qubes/wrap_in_html_if_url.sh
+/usr/lib/qubes/wrap-in-html-if-url.sh
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher
