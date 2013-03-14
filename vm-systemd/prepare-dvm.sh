@@ -4,11 +4,11 @@ possibly_run_save_script()
 {
 	ENCODED_SCRIPT=$(xenstore-read qubes-save-script)
 	if [ -z "$ENCODED_SCRIPT" ] ; then return ; fi
-	echo $ENCODED_SCRIPT|perl -e 'use MIME::Base64 qw(decode_base64); local($/) = undef;print decode_base64(<STDIN>)' >/tmp/qubes_save_script
-	chmod 755 /tmp/qubes_save_script
+	echo $ENCODED_SCRIPT|perl -e 'use MIME::Base64 qw(decode_base64); local($/) = undef;print decode_base64(<STDIN>)' >/tmp/qubes-save-script
+	chmod 755 /tmp/qubes-save-script
 	Xorg -config /etc/X11/xorg-preload-apps.conf :0 &
 	while ! [ -S /tmp/.X11-unix/X0 ]; do sleep 0.5; done
-	DISPLAY=:0 su - user -c /tmp/qubes_save_script
+	DISPLAY=:0 su - user -c /tmp/qubes-save-script
 	killall Xorg
 }
 
