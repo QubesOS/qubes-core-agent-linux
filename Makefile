@@ -27,37 +27,6 @@ rpms-vm:
 rpms-dom0:
 	@true
 
-update-repo-current:
-	for vmrepo in ../yum/current-release/current/vm/* ; do \
-		dist=$$(basename $$vmrepo) ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-vm-*$(VERSION)*$$dist*.rpm $$vmrepo/rpm/ ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-vm-kernel-placeholder-*$$dist*.rpm $$vmrepo/rpm/ ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-libs-$(VERSION_LIBS)*$$dist*.rpm $$vmrepo/rpm/;\
-	done
-
-update-repo-current-testing:
-	for vmrepo in ../yum/current-release/current-testing/vm/* ; do \
-		dist=$$(basename $$vmrepo) ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-vm-*$(VERSION)*$$dist*.rpm $$vmrepo/rpm/ ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-vm-kernel-placeholder-*$$dist*.rpm $$vmrepo/rpm/ ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-libs-$(VERSION_LIBS)*$$dist*.rpm $$vmrepo/rpm/;\
-	done
-
-update-repo-unstable:
-	for vmrepo in ../yum/current-release/unstable/vm/* ; do \
-		dist=$$(basename $$vmrepo) ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-vm-*$(VERSION)*$$dist*.rpm $$vmrepo/rpm/ ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-vm-kernel-placeholder-*$$dist*.rpm $$vmrepo/rpm/ ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-libs-$(VERSION_LIBS)*$$dist*.rpm $$vmrepo/rpm/;\
-	done
-
-update-repo-template:
-	for vmrepo in ../template-builder/yum_repo_qubes/* ; do \
-		dist=$$(basename $$vmrepo) ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-vm-*$(VERSION)*$$dist*.rpm $$vmrepo/rpm/ ;\
-		ln -f $(RPMS_DIR)/x86_64/qubes-core-vm-kernel-placeholder-*$$dist*.rpm $$vmrepo/rpm/ ;\
-	done
-
 clean:
 	make -C dom0/qmemman clean
 	make -C dom0/restore clean
