@@ -7,12 +7,10 @@
 #include <fcntl.h>
 #include <malloc.h>
 #include <stdlib.h>
-#include <ioall.h>
 #include <unistd.h>
 #include <errno.h>
 #include <gui-fatal.h>
-#include "filecopy.h"
-#include "crc32.h"
+#include <libqubes-rpc-filecopy.h>
 
 enum {
 	PROGRESS_FLAG_NORMAL,

@@ -5,10 +5,10 @@ vm-file-editor: vm-file-editor.o ioall.o
 	$(CC) -pie -g -o $@ $^
 qopen-in-vm: qopen-in-vm.o ioall.o gui-fatal.o
 	$(CC) -pie -g -o $@ $^
-qfile-agent: qfile-agent.o ioall.o gui-fatal.o copy-file.o crc32.o
-	$(CC) -pie -g -o $@ $^
-qfile-unpacker: qfile-unpacker.o ioall.o gui-fatal.o copy-file.o unpack.o crc32.o
-	$(CC) -pie -g -o $@ $^
+qfile-agent: qfile-agent.o gui-fatal.o
+	$(CC) -pie -g -o $@ $^ -lqubes-rpc-filecopy
+qfile-unpacker: qfile-unpacker.o gui-fatal.o
+	$(CC) -pie -g -o $@ $^ -lqubes-rpc-filecopy
 
 clean:
 	rm -f qopen-in-vm qfile-agent qfile-unpacker vm-file-editor *.o *~

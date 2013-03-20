@@ -24,7 +24,7 @@
 
 Name:		qubes-core-vm
 Version:	%{version}
-Release:	1%{dist}
+Release:	1.1%{dist}
 Summary:	The Qubes core files for VM
 
 Group:		Qubes
@@ -47,7 +47,7 @@ Requires:   ntpdate
 Requires:   net-tools
 Requires:   nautilus-actions
 Requires:   qubes-core-vm-kernel-placeholder
-Requires:   qubes-qrexec-vm
+Requires:   qubes-utils
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
@@ -55,6 +55,7 @@ Obsoletes:  qubes-core-netvm
 Obsoletes:  qubes-core-proxyvm
 Obsoletes:  qubes-upgrade-vm < 2.0
 BuildRequires: xen-devel
+BuildRequires: qubes-utils-devel
 
 %define _builddir %(pwd)
 
@@ -71,7 +72,7 @@ ln -sf . %{name}-%{version}
 %setup -T -D
 
 %build
-for dir in qubes-rpc misc; do
+for dir in qubes-rpc qrexec misc; do
   (cd $dir; make)
 done
 
@@ -121,18 +122,16 @@ install -m 644 misc/RPM-GPG-KEY-qubes* $RPM_BUILD_ROOT/etc/pki/rpm-gpg/
 install -D misc/xenstore-watch $RPM_BUILD_ROOT/usr/bin/xenstore-watch-qubes
 install -d $RPM_BUILD_ROOT/etc/udev/rules.d
 install -m 0644 misc/udev-qubes-misc.rules $RPM_BUILD_ROOT/etc/udev/rules.d/50-qubes-misc.rules
-install -m 0644 misc/udev-qubes-block.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes-block.rules
-install -m 0644 misc/udev-qubes-usb.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes-usb.rules
 install -d $RPM_BUILD_ROOT/usr/lib/qubes/
 install misc/qubes-download-dom0-updates.sh $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/udev-block-* $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/udev-usb-* $RPM_BUILD_ROOT/usr/lib/qubes/
 install misc/vusb-ctl.py $RPM_BUILD_ROOT/usr/lib/qubes/
 install misc/qubes-trigger-sync-appmenus.sh $RPM_BUILD_ROOT/usr/lib/qubes/
 install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 install -D misc/polkit-1-qubes-allow-all.pkla $RPM_BUILD_ROOT/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 install -D misc/polkit-1-qubes-allow-all.rules $RPM_BUILD_ROOT/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 mkdir -p $RPM_BUILD_ROOT/usr/lib/qubes
+
+(cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 
 if [ -r misc/dispvm-dotfiles.%{dist}.tbz ]; then
     install misc/dispvm-dotfiles.%{dist}.tbz $RPM_BUILD_ROOT/etc/dispvm-dotfiles.tbz
@@ -377,6 +376,7 @@ rm -f %{name}-%{version}
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 /etc/polkit-1/rules.d/00-qubes-allow-all.rules
+%dir /etc/qubes-rpc
 /etc/qubes-rpc/qubes.Filecopy
 /etc/qubes-rpc/qubes.OpenInVM
 /etc/qubes-rpc/qubes.GetAppmenus
@@ -393,9 +393,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/tinyproxy/filter-qubes-yum
 %config(noreplace) /etc/tinyproxy/tinyproxy-qubes-yum.conf
 /etc/udev/rules.d/50-qubes-misc.rules
-/etc/udev/rules.d/99-qubes-block.rules
 /etc/udev/rules.d/99-qubes-network.rules
-/etc/udev/rules.d/99-qubes-usb.rules
 /etc/xdg/nautilus-actions/nautilus-actions.conf
 /etc/xen/scripts/vif-route-qubes
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
@@ -410,17 +408,16 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-mru-entry
 /usr/bin/xenstore-watch-qubes
 %dir /usr/lib/qubes
-/usr/lib/qubes/udev-block-add-change
-/usr/lib/qubes/udev-block-cleanup
-/usr/lib/qubes/udev-block-remove
-/usr/lib/qubes/udev-usb-add-change
-/usr/lib/qubes/udev-usb-remove
 /usr/lib/qubes/vusb-ctl.py*
 /usr/lib/qubes/dispvm-prerun.sh
 /usr/lib/qubes/sync-ntp-clock
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/meminfo-writer
 /usr/lib/qubes/network-manager-prepare-conf-dir
+/usr/lib/qubes/qrexec-agent
+/usr/lib/qubes/qrexec-client-vm
+/usr/lib/qubes/qrexec_client_vm
+/usr/lib/qubes/qubes-rpc-multiplexer
 /usr/lib/qubes/qfile-agent
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
@@ -464,6 +461,7 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-firewall
 /etc/init.d/qubes-netwatcher
 /etc/init.d/qubes-yum-proxy
+/etc/init.d/qubes-qrexec-agent
 
 %post sysvinit
 
@@ -499,6 +497,8 @@ chkconfig --add qubes-netwatcher || echo "WARNING: Cannot add service qubes-netw
 chkconfig qubes-netwatcher on || echo "WARNING: Cannot enable service qubes-netwatcher!"
 chkconfig --add qubes-yum-proxy || echo "WARNING: Cannot add service qubes-yum-proxy!"
 chkconfig qubes-yum-proxy on || echo "WARNING: Cannot enable service qubes-yum-proxy!"
+chkconfig --add qubes-qrexec-agent || echo "WARNING: Cannot add service qubes-qrexec-agent!"
+chkconfig qubes-qrexec-agent on || echo "WARNING: Cannot enable service qubes-qrexec-agent!"
 
 # TODO: make this not display the silly message about security context...
 sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
@@ -512,6 +512,7 @@ if [ "$1" = 0 ] ; then
     chkconfig qubes-firewall off
     chkconfig qubes-netwatcher off
     chkconfig qubes-yum-proxy off
+    chkconfig qubes-qrexec-agent off
 fi
 
 %package systemd
@@ -541,6 +542,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-update-check.service
 /lib/systemd/system/qubes-update-check.timer
 /lib/systemd/system/qubes-yum-proxy.service
+/lib/systemd/system/qubes-qrexec-agent.service
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/prepare-dvm.sh
 /usr/lib/qubes/init/network-proxy-setup.sh
@@ -557,7 +559,7 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
-for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy; do
+for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
     /bin/systemctl enable $srv.service 2> /dev/null
 done
 
@@ -615,6 +617,6 @@ if [ "$1" != 0 ] ; then
     exit 0
 fi
 
-for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network; do
+for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agenT; DO
     /bin/systemctl disable $srv.service
 do
