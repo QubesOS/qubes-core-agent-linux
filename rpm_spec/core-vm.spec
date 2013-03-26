@@ -312,15 +312,7 @@ do
         continue
     fi
 
-    if [ $(basename $f) == "99-qubes-network.rules" ] ; then
-        continue
-    fi
-
-    if [ $(basename $f) == "99-qubes-block.rules" ] ; then
-        continue
-    fi
-
-    if [ $(basename $f) == "99-qubes-usb.rules" ] ; then
+    if echo $f | grep -q qubes; then
         continue
     fi
 
