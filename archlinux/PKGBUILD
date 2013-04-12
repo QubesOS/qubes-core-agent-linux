@@ -1,0 +1,88 @@
+# This is an example PKGBUILD file. Use this as a start to creating your own,
+# and remove these comments. For more information, see 'man PKGBUILD'.
+# NOTE: Please fill out the license field for your package! If it is unknown,
+# then please put 'unknown'.
+
+# Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
+pkgname=qubes-vm-core
+pkgver=`cat version`
+pkgrel=3
+epoch=
+pkgdesc="The Qubes core files for installation inside a Qubes VM."
+arch=("x86_64")
+url="http://qubes-os.org/"
+license=('GPL')
+groups=()
+depends=(qubes-libvchan qubes-vm-utils)
+makedepends=(qubes-vm-utils)
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=PKGBUILD.install
+changelog=
+
+source=()
+
+noextract=()
+md5sums=() #generate with 'makepkg -g'
+
+
+build() {
+
+for source in qubes-rpc qrexec misc Makefile.core vm-init.d vm-systemd network ; do
+  (ln -s $srcdir/../$source $srcdir/$source)
+done
+
+# Fix for building with python2
+export PYTHON=python2
+sed 's:python:python2:g' -i misc/Makefile
+
+# Fix for network tools paths
+sed 's:/sbin/ifconfig:ifconfig:g' -i network/*
+sed 's:/sbin/route:route:g' -i network/*
+sed 's:/sbin/ethtool:ethtool:g' -i network/*
+sed 's:/sbin/ip:ip:g' -i network/*
+sed 's:/bin/grep:grep:g' -i network/*
+
+for dir in qubes-rpc qrexec misc; do
+  (cd $dir; make)
+done
+
+}
+
+package() {
+
+  (cd qrexec; make install DESTDIR=$pkgdir)
+
+  make -f ./Makefile.core install-vm DESTDIR=$pkgdir DIST=archlinux
+
+  # Convert module loading to ARCHLINUX
+  mkdir -p $pkgdir/etc/modules-load.d/
+
+  #misc/qubes-core.modules
+  echo xen-evtchn > $pkgdir/etc/modules-load.d/qubes_core.conf
+  echo xen-blkback >> $pkgdir/etc/modules-load.d/qubes_core.conf
+  # Note : need to compile pvusb drivers for this last one?
+  echo xen-usbfront >> $pkgdir/etc/modules-load.d/qubes_core.conf
+
+  #misc/qubes-misc.modules
+  #install -D misc/qubes_misc.modules $pkgdir/etc/sysconfig/modules/qubes_misc.modules
+  echo dummy-hcd > $pkgdir/etc/modules-load.d/qubes_misc.conf
+
+  # Note: appears in the gui package but required for qrexec agent to work
+  echo u2mfn > $pkgdir/etc/modules-load.d/qubes_u2mfn.conf
+
+  # Remove things non wanted in archlinux
+  rm -r $pkgdir/etc/yum*
+  rm -r $pkgdir/etc/init.d
+  # Remove fedora specific scripts
+  rm $pkgdir/etc/fstab
+
+}
+
+# vim:set ts=2 sw=2 et:
+

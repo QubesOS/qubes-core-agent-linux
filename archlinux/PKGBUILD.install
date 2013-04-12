@@ -1,0 +1,209 @@
+
+remove_ShowIn () {
+	if [ -e /etc/xdg/autostart/$1.desktop ]; then
+		sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/$1.desktop
+	fi
+}
+
+update_xdgstart () {
+
+# don't want it at all
+for F in abrt-applet deja-dup-monitor imsettings-start krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
+	if [ -e /etc/xdg/autostart/$F.desktop ]; then
+		remove_ShowIn $F
+		echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/$F.desktop
+	fi
+done
+
+# don't want it in DisposableVM
+for F in gcm-apply ; do
+	if [ -e /etc/xdg/autostart/$F.desktop ]; then
+		remove_ShowIn $F
+		echo 'NotShowIn=DisposableVM;' >> /etc/xdg/autostart/$F.desktop
+	fi
+done
+
+# want it in AppVM only
+for F in gnome-keyring-gpg gnome-keyring-pkcs11 gnome-keyring-secrets gnome-keyring-ssh gnome-settings-daemon user-dirs-update-gtk gsettings-data-convert ; do
+	if [ -e /etc/xdg/autostart/$F.desktop ]; then
+		remove_ShowIn $F
+		echo 'OnlyShowIn=GNOME;AppVM;' >> /etc/xdg/autostart/$F.desktop
+	fi
+done
+
+# remove existing rule to add own later
+for F in gpk-update-icon nm-applet ; do
+	remove_ShowIn $F
+done
+
+echo 'OnlyShowIn=GNOME;UpdateableVM;' >> /etc/xdg/autostart/gpk-update-icon.desktop || :
+echo 'OnlyShowIn=GNOME;NetVM;' >> /etc/xdg/autostart/nm-applet.desktop || :
+
+}
+
+update_qubesconfig () {
+
+# Create NetworkManager configuration if we do not have it
+if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
+echo '[main]' > /etc/NetworkManager/NetworkManager.conf
+echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
+echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
+fi
+/usr/lib/qubes/qubes-fix-nm-conf.sh
+
+# Remove ip_forward setting from sysctl, so NM will not reset it
+sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+
+# Install firmware link only on system which haven't it yet
+if ! [ -e /lib/firmware/updates ]; then
+  ln -s /lib/modules/firmware /lib/firmware/updates
+fi
+
+# qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
+if ! grep -q localhost /etc/hosts; then
+  cat <<EOF > /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 `hostname`
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+EOF
+fi
+
+# Remove most of the udev scripts to speed up the VM boot time
+# Just leave the xen* scripts, that are needed if this VM was
+# ever used as a net backend (e.g. as a VPN domain in the future)
+#echo "--> Removing unnecessary udev scripts..."
+mkdir -p /var/lib/qubes/removed-udev-scripts
+for f in /etc/udev/rules.d/*
+do
+    if [ $(basename $f) == "xen-backend.rules" ] ; then
+        continue
+    fi
+
+    if [ $(basename $f) == "50-qubes-misc.rules" ] ; then
+        continue
+    fi
+
+    if echo $f | grep -q qubes; then
+        continue
+    fi
+
+    mv $f /var/lib/qubes/removed-udev-scripts/
+done
+
+}
+
+update_systemd() {
+
+for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
+    systemctl enable $srv.service 2> /dev/null
+done
+
+systemctl enable qubes-update-check.timer 2> /dev/null
+
+# Install overriden services only when original exists
+for srv in cups NetworkManager NetworkManager-wait-online ntpd; do
+    if [ -f /lib/systemd/system/$srv.service ]; then
+        cp /usr/lib/qubes/init/$srv.service /etc/systemd/system/$srv.service
+    fi
+done
+
+# Set default "runlevel"
+rm -f /etc/systemd/system/default.target
+ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+
+DISABLE_SERVICES="alsa-store alsa-restore auditd avahi avahi-daemon backuppc cpuspeed crond"
+DISABLE_SERVICES="$DISABLE_SERVICES fedora-autorelabel fedora-autorelabel-mark ipmi hwclock-load hwclock-save"
+DISABLE_SERVICES="$DISABLE_SERVICES mdmonitor multipathd openct rpcbind mcelog fedora-storage-init fedora-storage-init-late"
+DISABLE_SERVICES="$DISABLE_SERVICES plymouth-start plymouth-read-write plymouth-quit plymouth-quit-wait"
+DISABLE_SERVICES="$DISABLE_SERVICES sshd tcsd sm-client sendmail mdmonitor-takeover"
+for srv in $DISABLE_SERVICES; do
+    if [ -f /lib/systemd/system/$srv.service ]; then
+        if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
+            systemctl disable $srv.service 2> /dev/null
+        else
+            # forcibly disable
+            ln -sf /dev/null /etc/systemd/system/$srv.service
+        fi
+    fi
+done
+
+rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
+
+# Enable some services
+systemctl enable iptables.service 2> /dev/null
+systemctl enable ip6tables.service 2> /dev/null
+systemctl enable rsyslog.service 2> /dev/null
+systemctl enable ntpd.service 2> /dev/null
+# Disable original service to enable overriden one
+systemctl disable NetworkManager.service 2> /dev/null
+# Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
+systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
+systemctl enable NetworkManager.service 2> /dev/null
+
+# Enable cups only when it is real SystemD service
+[ -e /lib/systemd/system/cups.service ] && systemctl enable cups.service 2> /dev/null
+
+}
+
+
+## arg 1:  the new package version
+#pre_install() {
+  # do something here
+#}
+
+## arg 1:  the new package version
+post_install() {
+
+update_xdgstart
+update_qubesconfig
+update_systemd
+
+# do the rest of %post thing only when updating for the first time...
+if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
+	cp /etc/init/serial.conf /var/lib/qubes/serial.orig
+fi
+
+#echo "--> Disabling SELinux..."
+sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+mv /etc/selinux/config.processed /etc/selinux/config
+setenforce 0 2>/dev/null
+
+mkdir -p /rw
+
+}
+
+
+## arg 1:  the new package version
+## arg 2:  the old package version
+post_upgrade() {
+
+update_xdgstart
+update_qubesconfig
+update_systemd
+
+}
+
+## arg 1:  the new package version
+## arg 2:  the old package version
+#pre_upgrade() {
+  # do something here
+#}
+
+## arg 1:  the new package version
+## arg 2:  the old package version
+#post_upgrade() {
+  # do something here
+#}
+
+## arg 1:  the old package version
+pre_remove() {
+
+systemctl disable qubes-qrexec-agent.service
+
+}
+
+## arg 1:  the old package version
+#post_remove() {
+  # do something here
+#}
+
+
