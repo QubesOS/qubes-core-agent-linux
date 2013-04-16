@@ -59,7 +59,7 @@ BuildRequires: qubes-utils-devel
 
 %define _builddir %(pwd)
 
-%define kde_service_dir /usr/share/kde4/services/ServiceMenus
+%define kde_service_dir /usr/share/kde4/services
 
 %description
 The Qubes core files for installation inside a Qubes VM.
@@ -92,109 +92,8 @@ adduser --create-home user
 
 %install
 
-install -m 0644 -D misc/fstab $RPM_BUILD_ROOT/etc/fstab
-install -d $RPM_BUILD_ROOT/etc/init.d
-install vm-init.d/* $RPM_BUILD_ROOT/etc/init.d/
-
-install -d $RPM_BUILD_ROOT/lib/systemd/system $RPM_BUILD_ROOT/usr/lib/qubes/init
-install -m 0755 vm-systemd/*.sh $RPM_BUILD_ROOT/usr/lib/qubes/init/
-install -m 0644 vm-systemd/qubes-*.service $RPM_BUILD_ROOT/lib/systemd/system/
-install -m 0644 vm-systemd/qubes-*.timer $RPM_BUILD_ROOT/lib/systemd/system/
-install -m 0644 vm-systemd/NetworkManager.service $RPM_BUILD_ROOT/usr/lib/qubes/init/
-install -m 0644 vm-systemd/NetworkManager-wait-online.service $RPM_BUILD_ROOT/usr/lib/qubes/init/
-install -m 0644 vm-systemd/cups.service $RPM_BUILD_ROOT/usr/lib/qubes/init/
-install -m 0644 vm-systemd/ntpd.service $RPM_BUILD_ROOT/usr/lib/qubes/init/
-
-install -D -m 0440 misc/qubes.sudoers $RPM_BUILD_ROOT/etc/sudoers.d/qubes
-install -D -m 0644 misc/qubes.repo $RPM_BUILD_ROOT/etc/yum.repos.d/qubes.repo
-install -D -m 0644 misc/serial.conf $RPM_BUILD_ROOT/usr/lib/qubes/serial.conf
-install -D misc/qubes-serial-login $RPM_BUILD_ROOT/sbin/qubes-serial-login
-install -d $RPM_BUILD_ROOT/usr/share/glib-2.0/schemas/
-install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $RPM_BUILD_ROOT/usr/share/glib-2.0/schemas/
-install -d $RPM_BUILD_ROOT/usr/lib/yum-plugins/
-install -m 0644 misc/yum-qubes-hooks.py* $RPM_BUILD_ROOT/usr/lib/yum-plugins/
-install -D -m 0644 misc/yum-qubes-hooks.conf $RPM_BUILD_ROOT/etc/yum/pluginconf.d/yum-qubes-hooks.conf
-
-install -d $RPM_BUILD_ROOT/var/lib/qubes
-
-install -d -m 755 $RPM_BUILD_ROOT/etc/pki/rpm-gpg
-install -m 644 misc/RPM-GPG-KEY-qubes* $RPM_BUILD_ROOT/etc/pki/rpm-gpg/
-install -D misc/xenstore-watch $RPM_BUILD_ROOT/usr/bin/xenstore-watch-qubes
-install -d $RPM_BUILD_ROOT/etc/udev/rules.d
-install -m 0644 misc/udev-qubes-misc.rules $RPM_BUILD_ROOT/etc/udev/rules.d/50-qubes-misc.rules
-install -d $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/qubes-download-dom0-updates.sh $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/vusb-ctl.py $RPM_BUILD_ROOT/usr/lib/qubes/
-install misc/qubes-trigger-sync-appmenus.sh $RPM_BUILD_ROOT/usr/lib/qubes/
-install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-install -D misc/polkit-1-qubes-allow-all.pkla $RPM_BUILD_ROOT/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
-install -D misc/polkit-1-qubes-allow-all.rules $RPM_BUILD_ROOT/etc/polkit-1/rules.d/00-qubes-allow-all.rules
-mkdir -p $RPM_BUILD_ROOT/usr/lib/qubes
-
 (cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
-
-if [ -r misc/dispvm-dotfiles.%{dist}.tbz ]; then
-    install misc/dispvm-dotfiles.%{dist}.tbz $RPM_BUILD_ROOT/etc/dispvm-dotfiles.tbz
-else
-    install misc/dispvm-dotfiles.tbz $RPM_BUILD_ROOT/etc/dispvm-dotfiles.tbz
-fi
-install misc/dispvm-prerun.sh $RPM_BUILD_ROOT/usr/lib/qubes/dispvm-prerun.sh
-
-install -D misc/qubes-core.modules $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
-install -D misc/qubes-misc.modules $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-misc.modules
-
-install -m 0644 network/udev-qubes-network.rules $RPM_BUILD_ROOT/etc/udev/rules.d/99-qubes-network.rules
-install network/qubes-setup-dnat-to-ns $RPM_BUILD_ROOT/usr/lib/qubes
-install network/qubes-fix-nm-conf.sh $RPM_BUILD_ROOT/usr/lib/qubes
-install network/setup-ip $RPM_BUILD_ROOT/usr/lib/qubes/
-install network/network-manager-prepare-conf-dir $RPM_BUILD_ROOT/usr/lib/qubes/
-install -d $RPM_BUILD_ROOT/etc/dhclient.d
-ln -s /usr/lib/qubes/qubes-setup-dnat-to-ns $RPM_BUILD_ROOT/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
-install -d $RPM_BUILD_ROOT/etc/NetworkManager/dispatcher.d/
-install network/{qubes-nmhook,30-qubes-external-ip} $RPM_BUILD_ROOT/etc/NetworkManager/dispatcher.d/
-install -D network/vif-route-qubes $RPM_BUILD_ROOT/etc/xen/scripts/vif-route-qubes
-install -m 0400 -D network/iptables $RPM_BUILD_ROOT/etc/sysconfig/iptables
-install -m 0400 -D network/ip6tables $RPM_BUILD_ROOT/etc/sysconfig/ip6tables
-install -m 0644 -D network/tinyproxy-qubes-yum.conf $RPM_BUILD_ROOT/etc/tinyproxy/tinyproxy-qubes-yum.conf
-install -m 0644 -D network/filter-qubes-yum $RPM_BUILD_ROOT/etc/tinyproxy/filter-qubes-yum
-
-install -d $RPM_BUILD_ROOT/etc/yum.conf.d
-touch $RPM_BUILD_ROOT/etc/yum.conf.d/qubes-proxy.conf
-
-install -d $RPM_BUILD_ROOT/usr/sbin
-install network/qubes-firewall $RPM_BUILD_ROOT/usr/sbin/
-install network/qubes-netwatcher $RPM_BUILD_ROOT/usr/sbin/
-
-install -d $RPM_BUILD_ROOT/usr/bin
-
-install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run,qvm-mru-entry} $RPM_BUILD_ROOT/usr/bin
-install qubes-rpc/wrap-in-html-if-url.sh $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes-rpc/qvm-copy-to-vm.kde $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes-rpc/qvm-copy-to-vm.gnome $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm,qfile-unpacker} $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes-rpc/qrun-in-vm $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes-rpc/sync-ntp-clock $RPM_BUILD_ROOT/usr/lib/qubes
-install qubes-rpc/prepare-suspend $RPM_BUILD_ROOT/usr/lib/qubes
-install -d $RPM_BUILD_ROOT/%{kde_service_dir}
-install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-dvm.desktop} $RPM_BUILD_ROOT/%{kde_service_dir}
-install -d $RPM_BUILD_ROOT/etc/qubes-rpc
-install -m 0644 qubes-rpc/{qubes.Filecopy,qubes.OpenInVM,qubes.VMShell,qubes.SyncNtpClock} $RPM_BUILD_ROOT/etc/qubes-rpc
-install -m 0644 qubes-rpc/{qubes.SuspendPre,qubes.SuspendPost,qubes.GetAppmenus} $RPM_BUILD_ROOT/etc/qubes-rpc
-install -m 0644 qubes-rpc/qubes.WaitForSession $RPM_BUILD_ROOT/etc/qubes-rpc
-
-install -d $RPM_BUILD_ROOT/usr/share/file-manager/actions
-install -m 0644 qubes-rpc/*-gnome.desktop $RPM_BUILD_ROOT/usr/share/file-manager/actions
-
-install -D misc/nautilus-actions.conf $RPM_BUILD_ROOT/etc/xdg/nautilus-actions/nautilus-actions.conf
-
-install misc/meminfo-writer $RPM_BUILD_ROOT/usr/lib/qubes
-install -d $RPM_BUILD_ROOT/mnt/removable
-install -d $RPM_BUILD_ROOT/var/lib/qubes/dom0-updates
-
-install -D -m 0644 misc/xorg-preload-apps.conf $RPM_BUILD_ROOT/etc/X11/xorg-preload-apps.conf
-
-install -d $RPM_BUILD_ROOT/var/run/qubes
-install -d $RPM_BUILD_ROOT/home_volatile/user
+make install-vm DESTDIR=$RPM_BUILD_ROOT
 
 %triggerin -- initscripts
 cp /usr/lib/qubes/serial.conf /etc/init/serial.conf
