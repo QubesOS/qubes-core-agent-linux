@@ -33,7 +33,7 @@ md5sums=() #generate with 'makepkg -g'
 
 build() {
 
-for source in qubes-rpc qrexec misc Makefile.core vm-init.d vm-systemd network ; do
+for source in qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network ; do
   (ln -s $srcdir/../$source $srcdir/$source)
 done
 
@@ -58,7 +58,7 @@ package() {
 
   (cd qrexec; make install DESTDIR=$pkgdir)
 
-  make -f ./Makefile.core install-vm DESTDIR=$pkgdir DIST=archlinux
+  make install-vm DESTDIR=$pkgdir DIST=archlinux
 
   # Convert module loading to ARCHLINUX
   mkdir -p $pkgdir/etc/modules-load.d/
