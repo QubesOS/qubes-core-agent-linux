@@ -146,9 +146,9 @@ systemctl enable NetworkManager.service 2> /dev/null
 
 
 ## arg 1:  the new package version
-#pre_install() {
-  # do something here
-#}
+pre_install() {
+  echo "Pre install..."
+}
 
 ## arg 1:  the new package version
 post_install() {
@@ -162,10 +162,11 @@ if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
 	cp /etc/init/serial.conf /var/lib/qubes/serial.orig
 fi
 
-#echo "--> Disabling SELinux..."
-sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
-mv /etc/selinux/config.processed /etc/selinux/config
-setenforce 0 2>/dev/null
+# SELinux is not enabled on archlinux
+# echo "--> Disabling SELinux..."
+# sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+# mv /etc/selinux/config.processed /etc/selinux/config
+# setenforce 0 2>/dev/null
 
 mkdir -p /rw
 
@@ -184,15 +185,11 @@ update_systemd
 
 ## arg 1:  the new package version
 ## arg 2:  the old package version
-#pre_upgrade() {
+pre_upgrade() {
   # do something here
-#}
+  echo "Pre upgrade..."
+}
 
-## arg 1:  the new package version
-## arg 2:  the old package version
-#post_upgrade() {
-  # do something here
-#}
 
 ## arg 1:  the old package version
 pre_remove() {
