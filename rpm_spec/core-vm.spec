@@ -56,6 +56,7 @@ Requires:   gnome-packagekit-updater
 Requires:   ImageMagick
 Requires:   fakeroot
 Requires:   desktop-notification-daemon
+Requires:   qubes-libvchan
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
@@ -64,6 +65,7 @@ Obsoletes:  qubes-core-proxyvm
 Obsoletes:  qubes-upgrade-vm < 2.0
 BuildRequires: xen-devel
 BuildRequires: qubes-utils-devel >= 2.0.5
+BuildRequires: qubes-libvchan-%{backend_vmm}-devel
 
 %define _builddir %(pwd)
 
