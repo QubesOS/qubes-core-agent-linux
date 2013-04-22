@@ -32,6 +32,7 @@
 #include <grp.h>
 #include <sys/stat.h>
 #include "qrexec.h"
+#include <libvchan.h>
 #include "libqrexec-utils.h"
 
 enum fdtype {
@@ -66,16 +67,25 @@ struct _process_fd process_fd[MAX_FDS];
 /* indexed by client id, which is descriptor number of a client in daemon */
 struct _client_info client_info[MAX_FDS];
 
+libvchan_t *vchan;
+
 int trigger_fd;
 int passfd_socket;
 
 int meminfo_write_started = 0;
 
 void do_exec(const char *cmd);
+void handle_vchan_error(const char *op) {
+	fprintf(stderr, "Error while vchan %s, exiting\n", op);
+	exit(1);
+}
 
 void init()
 {
-	peer_server_init(REXEC_PORT);
+	/* FIXME: This 0 is remote domain ID */
+	vchan = libvchan_server_init(0, REXEC_PORT, 4096, 4096);
+	if (!vchan)
+		handle_vchan_error("server_init");
 	umask(0);
 	mkfifo(QREXEC_AGENT_TRIGGER_PATH, 0666);
 	passfd_socket = get_server_socket(QREXEC_AGENT_FDPASS_PATH);
@@ -83,6 +93,10 @@ void init()
 	trigger_fd =
 	    open(QREXEC_AGENT_TRIGGER_PATH, O_RDONLY | O_NONBLOCK);
 	register_exec_func(do_exec);
+
+	/* wait for qrexec daemon */
+	while (!libvchan_is_open(vchan))
+		libvchan_wait(vchan);
 }
 
 void wake_meminfo_writer() {
@@ -154,7 +168,8 @@ void handle_just_exec(int len)
 	char buf[len];
 	int fdn, pid;
 
-	read_all_vchan_ext(buf, len);
+	if (libvchan_recv(vchan, buf, len) < 0)
+		handle_vchan_error("read");
 	switch (pid = fork()) {
 	case -1:
 		perror("fork");
@@ -203,7 +218,8 @@ void handle_exec(int client_id, int len)
 	char buf[len];
 	int pid, stdin_fd, stdout_fd, stderr_fd;
 
-	read_all_vchan_ext(buf, len);
+	if (libvchan_recv(vchan, buf, len) < 0)
+		handle_vchan_error("read");
 
 	do_fork_exec(buf, &pid, &stdin_fd, &stdout_fd, &stderr_fd);
 
@@ -218,7 +234,8 @@ void handle_connect_existing(int client_id, int len)
 {
 	int stdin_fd, stdout_fd, stderr_fd;
 	char buf[len];
-	read_all_vchan_ext(buf, len);
+	if (libvchan_recv(vchan, buf, len) < 0)
+		handle_vchan_error("read");
 	sscanf(buf, "%d %d %d", &stdin_fd, &stdout_fd, &stderr_fd);
 	create_info_about_client(client_id, -1, stdin_fd, stdout_fd,
 				 stderr_fd);
@@ -239,8 +256,10 @@ void send_exit_code(int client_id, int status)
 	s_hdr.type = MSG_AGENT_TO_SERVER_EXIT_CODE;
 	s_hdr.client_id = client_id;
 	s_hdr.len = sizeof status;
-	write_all_vchan_ext(&s_hdr, sizeof s_hdr);
-	write_all_vchan_ext(&status, sizeof(status));
+	if (libvchan_send(vchan, &s_hdr, sizeof(s_hdr)) < 0)
+		handle_vchan_error("write hdr");
+	if (libvchan_send(vchan, &status, sizeof(status)) < 0)
+		handle_vchan_error("write status");
 	fprintf(stderr, "send exit code %d for client_id %d pid %d\n",
 		status, client_id, client_info[client_id].pid);
 }
@@ -296,7 +315,8 @@ void handle_input(int client_id, int len)
 {
 	char buf[len];
 
-	read_all_vchan_ext(buf, len);
+	if (libvchan_recv(vchan, buf, len) < 0)
+		handle_vchan_error("read");
 	if (!client_info[client_id].pid || client_info[client_id].stdin_fd == -1)
 		return;
 
@@ -312,7 +332,7 @@ void handle_input(int client_id, int len)
 	}
 
 	switch (write_stdin
-		(client_info[client_id].stdin_fd, client_id, buf, len,
+		(vchan, client_info[client_id].stdin_fd, client_id, buf, len,
 		 &client_info[client_id].buffer)) {
 	case WRITE_STDIN_OK:
 		break;
@@ -341,7 +361,8 @@ void set_blocked_outerr(int client_id, int val)
 void handle_server_data()
 {
 	struct server_header s_hdr;
-	read_all_vchan_ext(&s_hdr, sizeof s_hdr);
+	if (libvchan_recv(vchan, &s_hdr, sizeof(s_hdr)) < 0)
+		handle_vchan_error("read s_hdr");
 
 //      fprintf(stderr, "got %x %x %x\n", s_hdr.type, s_hdr.client_id,
 //              s_hdr.len);
@@ -384,7 +405,7 @@ void handle_process_data(int fd)
 	int ret;
 	unsigned int len;
 
-	len = buffer_space_vchan_ext();
+	len = libvchan_buffer_space(vchan);
 	if (len <= sizeof s_hdr)
 		return;
 
@@ -402,8 +423,10 @@ void handle_process_data(int fd)
 	}
 	s_hdr.len = ret;
 	if (ret >= 0) {
-		write_all_vchan_ext(&s_hdr, sizeof s_hdr);
-		write_all_vchan_ext(buf, ret);
+		if (libvchan_send(vchan, &s_hdr, sizeof(s_hdr)) < 0)
+			handle_vchan_error("write hdr");
+		if (libvchan_send(vchan, buf, ret) < 0)
+			handle_vchan_error("write buf");
 	}
 	if (ret == 0) {
 		int client_id = process_fd[fd].client_id;
@@ -501,7 +524,7 @@ void flush_client_data_agent(int client_id)
 {
 	struct _client_info *info = &client_info[client_id];
 	switch (flush_client_data
-		(info->stdin_fd, client_id, &info->buffer)) {
+		(vchan, info->stdin_fd, client_id, &info->buffer)) {
 	case WRITE_STDIN_OK:
 		info->is_blocked = 0;
 		if (info->is_close_after_flush_needed) {
@@ -550,8 +573,10 @@ void handle_trigger_io()
 	ret = read(trigger_fd, &params, sizeof(params));
 	if (ret == sizeof(params)) {
 		s_hdr.type = MSG_AGENT_TO_SERVER_TRIGGER_CONNECT_EXISTING;
-		write_all_vchan_ext(&s_hdr, sizeof s_hdr);
-		write_all_vchan_ext(&params, sizeof params);
+		if (libvchan_send(vchan, &s_hdr, sizeof(s_hdr)) < 0)
+			handle_vchan_error("write hdr");
+		if (libvchan_send(vchan, &params, sizeof(params)) < 0)
+			handle_vchan_error("write params");
 	}
 // trigger_fd is nonblock - so no need to reopen
 // not really, need to reopen at EOF
@@ -581,17 +606,17 @@ int main()
 		if (child_exited)
 			reap_children();
 		max = fill_fds_for_select(&rdset, &wrset);
-		if (buffer_space_vchan_ext() <=
+		if (libvchan_buffer_space(vchan) <=
 		    sizeof(struct server_header))
 			FD_ZERO(&rdset);
 
-		wait_for_vchan_or_argfd(max, &rdset, &wrset);
+		wait_for_vchan_or_argfd(vchan, max, &rdset, &wrset);
 		sigprocmask(SIG_UNBLOCK, &chld_set, NULL);
 
 		if (FD_ISSET(passfd_socket, &rdset))
 			handle_new_passfd();
 
-		while (read_ready_vchan_ext())
+		while (libvchan_data_ready(vchan))
 			handle_server_data();
 
 		if (FD_ISSET(trigger_fd, &rdset))
