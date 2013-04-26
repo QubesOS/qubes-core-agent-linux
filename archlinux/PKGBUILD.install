@@ -148,6 +148,19 @@ systemctl enable NetworkManager.service 2> /dev/null
 ## arg 1:  the new package version
 pre_install() {
   echo "Pre install..."
+
+  # do this whole %pre thing only when updating for the first time...
+
+  mkdir -p /var/lib/qubes
+
+  # Add qubes core related fstab entries
+  echo "xen	/proc/xen	xenfs	defaults	0 0" >> /etc/fstab
+  echo "/dev/xvdi	/mnt/removable	auto	noauto,user,rw	0 0" >> /etc/fstab
+  #if [ -e /etc/fstab ] ; then 
+  # mv /etc/fstab /var/lib/qubes/fstab.orig
+  #fi
+
+  useradd --create-home user
 }
 
 ## arg 1:  the new package version
