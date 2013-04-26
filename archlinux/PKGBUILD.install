@@ -160,7 +160,9 @@ pre_install() {
   # mv /etc/fstab /var/lib/qubes/fstab.orig
   #fi
 
-  useradd --create-home user
+  # Archlinux bash version has a 'bug' when running su -c, /etc/profile is not loaded because bash consider there is no interactive pty when running 'su - user -c' or something like this.
+  # See https://bugs.archlinux.org/task/31831
+  useradd --shell /bin/zsh --create-home user
 }
 
 ## arg 1:  the new package version
