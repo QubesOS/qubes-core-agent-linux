@@ -6,7 +6,7 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=6
+pkgrel=7
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
@@ -72,6 +72,11 @@ package() {
   #misc/qubes-misc.modules
   #install -D misc/qubes_misc.modules $pkgdir/etc/sysconfig/modules/qubes_misc.modules
   echo dummy-hcd > $pkgdir/etc/modules-load.d/qubes_misc.conf
+
+  # Change the place for iptable rules to match archlinux standard
+  mkdir -p $pkgdir/etc/iptables
+  mv $pkgdir/etc/sysconfig/iptables $pkgdir/etc/iptables/iptables.rules
+  mv $pkgdir/etc/sysconfig/ip6tables $pkgdir/etc/iptables/ip6tables.rules
 
   # Note: appears in the gui package but required for qrexec agent to work
   echo u2mfn > $pkgdir/etc/modules-load.d/qubes_u2mfn.conf
