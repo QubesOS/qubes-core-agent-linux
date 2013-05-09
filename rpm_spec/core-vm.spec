@@ -21,7 +21,7 @@
 #
 
 %{!?version: %define version %(cat version)}
-%{!?backend_vmm: %define backend_vmm $(echo $BACKEND_VMM)}
+%{!?backend_vmm: %define backend_vmm %(echo $BACKEND_VMM)}
 
 Name:		qubes-core-vm
 Version:	%{version}
