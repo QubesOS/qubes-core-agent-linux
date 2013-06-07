@@ -32,8 +32,8 @@ pidfile="/var/run/tinyproxy/tinyproxy-updates.pid"
 lockfile=/var/lock/subsys/tinyproxy-updates
 
 start() {
-    type=`/usr/bin/xenstore-read qubes-vm-type`
-    start_updates_proxy=`/usr/bin/xenstore-read qubes-service/qubes-updates-proxy 2>/dev/null`
+    type=`/usr/bin/qubesdb-read /qubes-vm-type`
+    start_updates_proxy=`/usr/bin/qubesdb-read /qubes-service/qubes-updates-proxy 2>/dev/null`
     if [ -z "$start_updates_proxy" ] && [ "$type" != "NetVM" ] || [ "$start_updates_proxy" != "1" ]; then
         # Yum proxy disabled
         exit 0

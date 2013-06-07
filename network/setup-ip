@@ -1,16 +1,10 @@
 #!/bin/sh
 
-if [ -x /usr/sbin/xenstore-read ]; then
-	XENSTORE_READ="/usr/sbin/xenstore-read"
-else
-	XENSTORE_READ="/usr/bin/xenstore-read"
-fi
-
-ip=`$XENSTORE_READ qubes-ip 2> /dev/null`
+ip=`/usr/bin/qubesdb-read /qubes-ip 2> /dev/null`
 if [ x$ip != x ]; then
-    netmask=`$XENSTORE_READ qubes-netmask`
-    gateway=`$XENSTORE_READ qubes-gateway`
-    secondary_dns=`$XENSTORE_READ qubes-secondary-dns`
+    netmask=`/usr/bin/qubesdb-read /qubes-netmask`
+    gateway=`/usr/bin/qubesdb-read /qubes-gateway`
+    secondary_dns=`/usr/bin/qubesdb-read /qubes-secondary-dns`
     /sbin/ifconfig $INTERFACE $ip netmask 255.255.255.255
     /sbin/ifconfig $INTERFACE up
     /sbin/route add -host $gateway dev $INTERFACE
@@ -19,11 +13,11 @@ if [ x$ip != x ]; then
     /sbin/ethtool -K $INTERFACE tx off
     echo "nameserver $gateway" > /etc/resolv.conf
     echo "nameserver $secondary_dns" >> /etc/resolv.conf
-	network=$($XENSTORE_READ qubes-netvm-network 2>/dev/null)
+	network=$(/usr/bin/qubesdb-read /qubes-netvm-network 2>/dev/null)
 	if [ "x$network" != "x" ]; then
-		gateway=$($XENSTORE_READ qubes-netvm-gateway)
-		netmask=$($XENSTORE_READ qubes-netvm-netmask)
-		secondary_dns=$($XENSTORE_READ qubes-netvm-secondary-dns)
+		gateway=$(/usr/bin/qubesdb-read /qubes-netvm-gateway)
+		netmask=$(/usr/bin/qubesdb-read /qubes-netvm-netmask)
+		secondary_dns=$(/usr/bin/qubesdb-read /qubes-netvm-secondary-dns)
 		echo "NS1=$gateway" > /var/run/qubes/qubes-ns
 		echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
 		/usr/lib/qubes/qubes-setup-dnat-to-ns

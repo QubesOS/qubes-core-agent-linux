@@ -2,9 +2,9 @@
 set -e
 
 PIDFILE=/var/run/qubes/qubes-firewall.pid
-XENSTORE_IPTABLES=qubes-iptables
-XENSTORE_IPTABLES_HEADER=qubes-iptables-header
-XENSTORE_ERROR=qubes-iptables-error
+XENSTORE_IPTABLES=/qubes-iptables
+XENSTORE_IPTABLES_HEADER=/qubes-iptables-header
+XENSTORE_ERROR=/qubes-iptables-error
 OLD_RULES=""
 # PIDfile handling
 [[ -e $PIDFILE ]] && kill -s 0 $(<$PIDFILE) 2>/dev/null && exit 0
@@ -22,9 +22,9 @@ while true; do
 		FIRST_TIME=
 		TRIGGER=reload
 	else
-		# Wait for changes in xenstore file
-		/usr/bin/xenstore-watch-qubes $XENSTORE_IPTABLES
-		TRIGGER=$(/usr/bin/xenstore-read $XENSTORE_IPTABLES)
+		# Wait for changes in qubesdb file
+		/usr/bin/qubesdb-watch $XENSTORE_IPTABLES
+		TRIGGER=$(/usr/bin/qubesdb-read $XENSTORE_IPTABLES)
 	fi
 
 	if ! [ "$TRIGGER" = "reload" ]; then continue ; fi
@@ -34,19 +34,19 @@ while true; do
 	# during the time when the rules are being (re)applied
 	echo "0" > /proc/sys/net/ipv4/ip_forward
 
-	RULES=$(/usr/bin/xenstore-read $XENSTORE_IPTABLES_HEADER)
+	RULES=$(/usr/bin/qubesdb-read $XENSTORE_IPTABLES_HEADER)
 	IPTABLES_SAVE=$(/sbin/iptables-save | sed '/^\*filter/,/^COMMIT/d')
 	OUT=`echo -e "$RULES\n$IPTABLES_SAVE" | /sbin/iptables-restore 2>&1 || true`
 
-	for i in $(xenstore-list qubes-iptables-domainrules) ; do
-		RULES=$(/usr/bin/xenstore-read qubes-iptables-domainrules/"$i")
+	for i in $(qubesdb-list -f /qubes-iptables-domainrules) ; do
+		RULES=$(/usr/bin/qubesdb-read "$i")
 		ERRS=`echo -e "$RULES" | /sbin/iptables-restore -n 2>&1 || true`
 		if [ -n "$ERRS" ]; then
 			echo "Failed applying rules for $i: $ERRS" >&2
 			OUT="$OUT$ERRS"
 		fi
 	done		
-	/usr/bin/xenstore-write $XENSTORE_ERROR "$OUT"
+	/usr/bin/qubesdb-write $XENSTORE_ERROR "$OUT"
 	if [ -n "$OUT" ]; then
 		DISPLAY=:0 /usr/bin/notify-send -t 3000 "Firewall loading error ($HOSTNAME)" "$OUT" || :
 	fi

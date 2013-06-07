@@ -19,7 +19,7 @@ fi
 # Set IP address again (besides action in udev rules); this is needed by
 # DispVM (to override DispVM-template IP) and in case when qubes-ip was
 # called by udev before loading evtchn kernel module - in which case
-# xenstore-read fails
+# qubesdb-read fails
 INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
 if [ -e /dev/xvdb -a ! -e /etc/this-is-dvm ] ; then

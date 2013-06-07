@@ -8,12 +8,12 @@
 
 start()
 {
-	if ! [ -x /usr/bin/xenstore-read ] ; then
-		echo "ERROR: /usr/bin/xenstore-read not found!"
+	if ! [ -x /usr/bin/qubesdb-read ] ; then
+		echo "ERROR: /usr/bin/qubesdb-read not found!"
 		exit 1
 	fi
 
-	type=$(/usr/bin/xenstore-read qubes-vm-type)
+	type=$(/usr/bin/qubesdb-read /qubes-vm-type)
 	if [ "$type" == "NetVM" ]; then
 		/usr/lib/qubes/network-manager-prepare-conf-dir
 		/sbin/service NetworkManager start
@@ -22,11 +22,11 @@ start()
 	echo -n $"Executing Qubes Core scripts NetVM:"
 
 	# Setup gateway for all the VMs this netVM is serviceing...
-	network=$(/usr/bin/xenstore-read qubes-netvm-network 2>/dev/null)
+	network=$(/usr/bin/qubesdb-read /qubes-netvm-network 2>/dev/null)
 	if [ "x$network" != "x" ]; then
-		gateway=$(/usr/bin/xenstore-read qubes-netvm-gateway)
-		netmask=$(/usr/bin/xenstore-read qubes-netvm-netmask)
-		secondary_dns=$(/usr/bin/xenstore-read qubes-netvm-secondary-dns)
+		gateway=$(/usr/bin/qubesdb-read /qubes-netvm-gateway)
+		netmask=$(/usr/bin/qubesdb-read /qubes-netvm-netmask)
+		secondary_dns=$(/usr/bin/qubesdb-read /qubes-netvm-secondary-dns)
 		modprobe netbk 2> /dev/null || modprobe xen-netback
 		echo "NS1=$gateway" > /var/run/qubes/qubes-ns
 		echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns

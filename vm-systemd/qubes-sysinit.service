@@ -2,7 +2,7 @@
 Description=Init Qubes Services settings
 DefaultDependencies=no
 Before=sysinit.target
-After=proc-xen.mount systemd-modules-load.service
+After=proc-xen.mount systemd-modules-load.service qubes-db.service
 
 [Service]
 Type=oneshot
