@@ -8,7 +8,7 @@ DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup"
 DEFAULT_ENABLED="meminfo-writer"
 
 QDB_READ=/usr/bin/qubesdb-read
-QDB_LS=/usr/bin/qubesdb-list
+QDB_LS=/usr/bin/qubesdb-multiread
 
 read_service() {
     $QDB_READ /qubes-service/$1 2> /dev/null
@@ -47,12 +47,12 @@ for srv in $DEFAULT_ENABLED; do
 done
 
 # Enable services
-for srv in `$QDB_LS /qubes-service 2>/dev/null |grep ' = "1"'|cut -f 1 -d ' '`; do
+for srv in `$QDB_LS /qubes-service/ 2>/dev/null |grep ' = 1'|cut -f 1 -d ' '`; do
     touch /var/run/qubes-service/$srv
 done
 
 # Disable services
-for srv in `$QDB_LS /qubes-service 2>/dev/null |grep ' = "0"'|cut -f 1 -d ' '`; do
+for srv in `$QDB_LS /qubes-service/ 2>/dev/null |grep ' = 0'|cut -f 1 -d ' '`; do
     rm -f /var/run/qubes-service/$srv
 done
 
