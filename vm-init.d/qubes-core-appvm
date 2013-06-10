@@ -52,13 +52,16 @@ start()
 		dmesg -c >/dev/null
 		free | grep Mem: | 
 			(read a b c d ; qubesdb-write /qubes-used-mem $c)
+		# give dom0 time to read some entries, when done it will shutdown qubesdb,
+		# so wait for it
+		qubesdb-watch /stop-qubesdb
+		# just to make sure
+		systemctl stop qubes-db.service
+
 		# we're still running in DispVM template
 		echo "Waiting for save/restore..."
-		# ... wait until qubes-restore.c (in Dom0) recreates VM-specific keys
-        # TODO: restart qubesdb service before this
-		while ! qubesdb-read /qubes-restore-complete 2>/dev/null ; do
-			usleep 10
-		done
+		# the service will start only after successful restore
+		systemctl start qubes-db.service
 		echo Back to life.
 	fi
 
