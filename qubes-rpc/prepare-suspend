@@ -9,8 +9,8 @@ if [ x"$action" == x"suspend" ]; then
     for if in `ls /sys/class/net|grep -v "lo\|vif"`; do 
         ip l s $if down
     done
-    modprobe -r uhci_hcd ehci_hcd
+    modprobe -r uhci_hcd ehci_hcd ehci_pci
 else
-    modprobe ehci_hcd; modprobe uhci_hcd; 
+    modprobe ehci_pci; modprobe uhci_hcd;
     nmcli nm sleep false || { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes-core-netvm start
 fi
