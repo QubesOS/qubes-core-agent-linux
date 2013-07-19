@@ -10,7 +10,10 @@ if [ x"$action" == x"suspend" ]; then
         ip l s $if down
     done
     modprobe -r uhci_hcd ehci_hcd ehci_pci
+    lsmod|grep -q iwldvm && touch /var/run/qubes/suspend-iwldvm-loaded
+    modprobe -r iwldvm
 else
-    modprobe ehci_pci; modprobe uhci_hcd;
+    modprobe ehci_pci; modprobe uhci_hcd
+    test -e /var/run/qubes/suspend-iwldvm-loaded && modprobe iwldvm
     nmcli nm sleep false || { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes-core-netvm start
 fi
