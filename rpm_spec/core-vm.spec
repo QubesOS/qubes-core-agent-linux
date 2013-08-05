@@ -323,6 +323,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/setup-ip
 /usr/lib/qubes/vm-file-editor
 /usr/lib/qubes/wrap-in-html-if-url.sh
+/usr/lib/qubes/iptables-yum-proxy
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher
