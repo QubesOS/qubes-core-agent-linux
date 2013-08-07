@@ -6,7 +6,7 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=12
+pkgrel=13
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
@@ -48,6 +48,11 @@ sed 's:/sbin/ethtool:ethtool:g' -i network/*
 sed 's:/sbin/ip:ip:g' -i network/*
 sed 's:/bin/grep:grep:g' -i network/*
 
+# Fix for archlinux sbindir
+sed 's:/usr/sbin/ntpdate:ntpdate:g' -i qubes-rpc/sync-ntp-clock
+sed 's:/usr/sbin/qubes-netwatcher:qubes-netwatcher:g' -i vm-systemd/qubes-netwatcher.service
+sed 's:/usr/sbin/qubes-firewall:qubes-firewall:g' -i vm-systemd/qubes-firewall.service
+
 for dir in qubes-rpc qrexec misc; do
   (cd $dir; make)
 done
@@ -55,10 +60,11 @@ done
 }
 
 package() {
+  # Note: Archlinux removed use of directory such as /sbin /bin /usr/sbin (https://mailman.archlinux.org/pipermail/arch-dev-public/2012-March/022625.html)
+  
+  (cd qrexec; make install DESTDIR=$pkgdir SBINDIR=/usr/bin)
 
-  (cd qrexec; make install DESTDIR=$pkgdir)
-
-  make install-vm DESTDIR=$pkgdir DIST=archlinux
+  make install-vm DESTDIR=$pkgdir SBINDIR=/usr/bin DIST=archlinux
 
   # Convert module loading to ARCHLINUX
   mkdir -p $pkgdir/etc/modules-load.d/
