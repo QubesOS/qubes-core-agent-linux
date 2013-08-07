@@ -4,6 +4,7 @@ VERSION := $(shell cat version)
 
 DIST ?= fc18
 KDESERVICEDIR ?= /usr/share/kde4/services
+SBINDIR ?= /usr/sbin
 
 help:
 	@echo "make rpms                  -- generate binary rpm packages"
@@ -54,7 +55,7 @@ install-vm:
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0644 misc/qubes.repo $(DESTDIR)/etc/yum.repos.d/qubes.repo
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/lib/qubes/serial.conf
-	install -D misc/qubes-serial-login $(DESTDIR)/sbin/qubes-serial-login
+	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -d $(DESTDIR)/usr/lib/yum-plugins/
@@ -107,9 +108,9 @@ install-vm:
 	install -d $(DESTDIR)/etc/yum.conf.d
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
-	install -d $(DESTDIR)/usr/sbin
-	install network/qubes-firewall $(DESTDIR)/usr/sbin/
-	install network/qubes-netwatcher $(DESTDIR)/usr/sbin/
+	install -d $(DESTDIR)/$(SBINDIR)
+	install network/qubes-firewall $(DESTDIR)/$(SBINDIR)/
+	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
 
 	install -d $(DESTDIR)/usr/bin
 
