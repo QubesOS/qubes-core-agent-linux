@@ -49,9 +49,9 @@ sed 's:/sbin/ip:ip:g' -i network/*
 sed 's:/bin/grep:grep:g' -i network/*
 
 # Fix for archlinux sbindir
-sed 's:/usr/sbin/ntpdate:ntpdate:g' -i qubes-rpc/sync-ntp-clock
-sed 's:/usr/sbin/qubes-netwatcher:qubes-netwatcher:g' -i vm-systemd/qubes-netwatcher.service
-sed 's:/usr/sbin/qubes-firewall:qubes-firewall:g' -i vm-systemd/qubes-firewall.service
+sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
+sed 's:/usr/sbin/qubes-netwatcher:/usr/bin/qubes-netwatcher:g' -i vm-systemd/qubes-netwatcher.service
+sed 's:/usr/sbin/qubes-firewall:/usr/bin/qubes-firewall:g' -i vm-systemd/qubes-firewall.service
 
 for dir in qubes-rpc qrexec misc; do
   (cd $dir; make)
