@@ -291,7 +291,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-/sbin/qubes-serial-login
+/usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
 /usr/bin/qvm-open-in-dvm
 /usr/bin/qvm-open-in-vm
