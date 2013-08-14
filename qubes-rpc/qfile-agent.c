@@ -18,6 +18,8 @@ enum {
 	PROGRESS_FLAG_DONE
 };
 
+int ignore_symlinks = 0;
+
 unsigned long crc32_sum;
 int write_all_with_crc(int fd, void *buf, int size)
 {
@@ -143,7 +145,7 @@ int single_file_processor(char *filename, struct stat *st)
 		hdr.filelen = 0;
 		write_headers(&hdr, filename);
 	}
-	if (S_ISLNK(mode)) {
+	if (S_ISLNK(mode) && !ignore_symlinks) {
 		char name[st->st_size + 1];
 		if (readlink(filename, name, sizeof(name)) != st->st_size)
 			gui_fatal("readlink %s", filename);
@@ -227,6 +229,11 @@ int main(int argc, char **argv)
 	crc32_sum = 0;
 	cwd = getcwd(NULL, 0);
 	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "--ignore-symlinks")==0) {
+			ignore_symlinks = 1;
+			continue;
+		}
+
 		entry = get_abs_path(cwd, argv[i]);
 
 		do {
