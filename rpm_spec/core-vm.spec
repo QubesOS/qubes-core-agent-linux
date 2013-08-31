@@ -276,6 +276,7 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.SuspendPre
 /etc/qubes-rpc/qubes.SuspendPost
 /etc/qubes-rpc/qubes.WaitForSession
+/etc/qubes-rpc/qubes.DetachPciDevice
 /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
