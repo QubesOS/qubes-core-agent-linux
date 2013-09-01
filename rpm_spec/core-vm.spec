@@ -497,6 +497,8 @@ rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 # Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
 /bin/systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
 /bin/systemctl enable NetworkManager.service 2> /dev/null
+# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
+/bin/systemctl enable NetworkManager-dispatcher.service 2> /dev/null
 
 # Enable cups only when it is real SystemD service
 [ -e /lib/systemd/system/cups.service ] && /bin/systemctl enable cups.service 2> /dev/null
