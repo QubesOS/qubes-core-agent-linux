@@ -276,6 +276,7 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.SuspendPre
 /etc/qubes-rpc/qubes.SuspendPost
 /etc/qubes-rpc/qubes.WaitForSession
+/etc/qubes-rpc/qubes.DetachPciDevice
 /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
@@ -291,7 +292,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-/sbin/qubes-serial-login
+/usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
 /usr/bin/qvm-open-in-dvm
 /usr/bin/qvm-open-in-vm
@@ -323,6 +324,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/setup-ip
 /usr/lib/qubes/vm-file-editor
 /usr/lib/qubes/wrap-in-html-if-url.sh
+/usr/lib/qubes/iptables-yum-proxy
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher

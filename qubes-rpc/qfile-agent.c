@@ -18,6 +18,8 @@ enum {
 	PROGRESS_FLAG_DONE
 };
 
+int ignore_symlinks = 0;
+
 unsigned long crc32_sum;
 int write_all_with_crc(int fd, void *buf, int size)
 {
@@ -51,6 +53,9 @@ void do_notify_progress(long long total, int flag)
 void wait_for_result()
 {
 	struct result_header hdr;
+	struct result_header_ext hdr_ext;
+	char last_filename[MAX_PATH_LENGTH + 1];
+	char last_filename_prefix[] = "; Last file: ";
 
 	if (!read_all(0, &hdr, sizeof(hdr))) {
 		if (errno == EAGAIN) {
@@ -61,17 +66,35 @@ void wait_for_result()
 			exit(1);	// hopefully remote has produced error message
 		}
 	}
+	if (!read_all(0, &hdr_ext, sizeof(hdr_ext))) {
+		// remote used old result_header struct
+		hdr_ext.last_namelen = 0;
+	}
+	if (hdr_ext.last_namelen > MAX_PATH_LENGTH) {
+		// read only at most MAX_PATH_LENGTH chars
+		hdr_ext.last_namelen = MAX_PATH_LENGTH;
+	}
+	if (!read_all(0, last_filename, hdr_ext.last_namelen)) {
+		fprintf(stderr, "Failed to get last filename\n");
+		hdr_ext.last_namelen = 0;
+	}
+	last_filename[hdr_ext.last_namelen] = '\0';
+	if (!hdr_ext.last_namelen)
+		/* set prefix to empty string */
+		last_filename_prefix[0] = '\0';
+
+	errno = hdr.error_code;
 	if (hdr.error_code != 0) {
 		switch (hdr.error_code) {
 			case EEXIST:
-				gui_fatal("File copy: not overwriting existing file. Clean QubesIncoming dir, and retry copy");
+				gui_fatal("File copy: not overwriting existing file. Clean QubesIncoming dir, and retry copy%s%s", last_filename_prefix, last_filename);
 				break;
 			case EINVAL:
-				gui_fatal("File copy: Corrupted data from packer");
+				gui_fatal("File copy: Corrupted data from packer%s%s", last_filename_prefix, last_filename);
 				break;
 			default:
-				gui_fatal("File copy: %s",
-						strerror(hdr.error_code));
+				gui_fatal("File copy: %s%s%s",
+						strerror(hdr.error_code), last_filename_prefix, last_filename);
 		}
 	}
 	if (hdr.crc32 != crc32_sum) {
@@ -143,7 +166,7 @@ int single_file_processor(char *filename, struct stat *st)
 		hdr.filelen = 0;
 		write_headers(&hdr, filename);
 	}
-	if (S_ISLNK(mode)) {
+	if (S_ISLNK(mode) && !ignore_symlinks) {
 		char name[st->st_size + 1];
 		if (readlink(filename, name, sizeof(name)) != st->st_size)
 			gui_fatal("readlink %s", filename);
@@ -227,6 +250,11 @@ int main(int argc, char **argv)
 	crc32_sum = 0;
 	cwd = getcwd(NULL, 0);
 	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "--ignore-symlinks")==0) {
+			ignore_symlinks = 1;
+			continue;
+		}
+
 		entry = get_abs_path(cwd, argv[i]);
 
 		do {

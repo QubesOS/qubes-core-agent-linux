@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ "$1" == "start" ]; then
+    CMD="-I"
+else
+    # Remove rules
+    CMD="-D"
+fi
+
+cat <<__EOF__ | iptables-restore -n
+*filter
+$CMD INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
+COMMIT
+*nat
+$CMD PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
+COMMIT
+__EOF__
