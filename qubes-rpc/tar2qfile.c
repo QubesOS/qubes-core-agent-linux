@@ -683,14 +683,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
     case EXTHEADERTYPE:
 	fprintf(stderr,"Extended HEADER encountered\n");
 
-	fprintf(stderr,"Need to skip %d bytes. Skipping a full block\n",sb->st_size);
-	sb->st_size = BLKMULT;
-	while (sb->st_size > 0) {
-		sb->st_size -= read(fd, buf, MAX(sb->st_size,BLKMULT));
-		fprintf(stderr,"now at %d\n",sb->st_size);
-	}
-	
-
+	return NEED_SKIP;
 	break;
     default:
 	fprintf(stderr,"Default type detected:%c\n",hd->typeflag);
@@ -705,7 +698,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 //      arcn->sb.st_mode |= S_IFREG;
       break;
     }
-  return NEED_READ;
+  return NEED_SKIP;
 }
 
 
@@ -724,7 +717,8 @@ int tar_file_processor(int fd)
 
 	i=0;
 	current = NEED_READ;
-	long sync_count = 0;
+	size_t to_skip = 0;
+	int sync_count = 0;
 	while (size = read(fd, &buf, BLKMULT)) {
 		fprintf(stderr,"Read %d bytes\n",size);
 
@@ -740,6 +734,19 @@ int tar_file_processor(int fd)
 			current = ustar_rd(fd, &hdr, &buf, &sb);
 			fprintf(stderr,"Return %d\n",ret);
 		}
+		if (current==NEED_SKIP) {
+			fprintf(stderr,"Need to skip %d bytes\n",sb.st_size);
+			to_skip = sb.st_size;
+			while (to_skip > 0) {
+				to_skip -= read(fd, &buf, MIN(to_skip,BLKMULT));
+			}
+	
+			// Extract extra padding
+			fprintf(stderr,"Need to remove pad:%d %d %d\n",to_skip,sb.st_size,BLKMULT-(sb.st_size%BLKMULT));
+			ret = read(fd, &buf, BLKMULT-(sb.st_size%BLKMULT));
+			fprintf(stderr,"Removed %d bytes of padding\n",ret);
+			current = NEED_READ;
+		} 
 		i++;
 		//if (i >= 10)
 		//	exit(0);
