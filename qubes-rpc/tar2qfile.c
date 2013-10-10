@@ -47,8 +47,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-#include <qfile-agent.c>
-
+#include <qfile-utils.h>
 
 
 /***************************************************
@@ -155,7 +154,6 @@ typedef struct {
 	char devminor[8];		/* minor device number */
 	char prefix[TPFSZ];		/* linked to name */
 } HD_USTAR;
-
 
 
 /*
@@ -343,50 +341,8 @@ ustar_id (char *blk, size_t size)
 }
 
 
-
-
 /*
  * Routines for reading tar files
- */
-
-
-
-/*
-struct file_header {
-	unsigned int namelen;
-	unsigned int mode;
-	unsigned long long filelen;
-	unsigned int atime;
-	unsigned int atime_nsec;
-	unsigned int mtime;
-	unsigned int mtime_nsec;
-};
-*/
-
-
-
-/*
-
-
-0000cc00  76 6d 2d 74 65 6d 70 6c  61 74 65 73 2f 61 72 63  |vm-templates/arc|
-0000cc10  68 6c 69 6e 75 78 2d 78  36 34 2d 73 70 65 63 2d  |hlinux-x64-spec-|
-0000cc20  32 30 31 33 2e 30 30 30  00 00 00 00 00 00 00 00  |2013.000........|
-0000cc30  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-*
-0000cc60  00 00 00 00 30 30 30 30  36 36 34 00 30 30 30 31  |....0000664.0001|
-0000cc70  37 35 30 00 30 30 30 31  37 35 31 00 30 37 35 30  |750.0001751.0750|
-0000cc80  32 32 30 30 30 34 30 00  31 32 32 32 31 35 32 37  |2200040.12221527|
-0000cc90  31 34 34 00 30 31 37 33  30 33 00 20 30 00 00 00  |144.017303. 0...|
-0000cca0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-*
-0000cd00  00 75 73 74 61 72 00 30  30 6f 6d 65 00 00 00 00  |.ustar.00ome....|
-0000cd10  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-0000cd20  00 00 00 00 00 00 00 00  00 6f 6d 65 00 00 00 00  |.........ome....|
-0000cd30  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-0000cd40  00 00 00 00 00 00 00 00  00 30 30 30 30 30 30 30  |.........0000000|
-0000cd50  00 30 30 30 30 30 30 30  00 00 00 00 00 00 00 00  |.0000000........|
-0000cd60  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-*
 
 // Source: http://www.mkssoftware.com/docs/man4/pax.4.asp
 struct file_header {	// PAX header is similar as file_header and can be completely ignored
@@ -428,14 +384,12 @@ enum {
 */
 
 
-
 enum {
 	NEED_NOTHING,
 	NEED_SKIP,
 	NEED_READ,
 	NEED_SYNC_TRAIL
 };
-
 
 
 /*
@@ -721,7 +675,6 @@ int tar_file_processor(int fd)
 	int sync_count = 0;
 	while (size = read(fd, &buf, BLKMULT)) {
 		fprintf(stderr,"Read %d bytes\n",size);
-
 		ret = 0;
 		if (current==NEED_SYNC_TRAIL) {
 			ret = tar_trail (buf, 1, &sync_count);
@@ -765,6 +718,8 @@ int main(int argc, char **argv)
 	//signal(SIGPIPE, SIG_IGN);
 	// this will allow checking for possible feedback packet in the middle of transfer
 	//set_nonblock(0);
+	notify_progress(0, PROGRESS_FLAG_INIT);
+
 	crc32_sum = 0;
 	cwd = getcwd(NULL, 0);
 	for (i = 1; i < argc; i++) {
@@ -787,15 +742,13 @@ int main(int argc, char **argv)
 
 	if (i <= 1) {
 		// No argument specified. Use STDIN
-		fprintf(stderr,"Using STDIN");
+		fprintf(stderr,"Using STDIN\n");
 		tar_file_processor(fileno(stdin));
 	}
 
+	notify_end_and_wait_for_result();
+	notify_progress(0, PROGRESS_FLAG_DONE);
 	return 0;
 }
-
-
-
-
 
 
