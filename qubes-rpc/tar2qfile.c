@@ -456,6 +456,9 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
       untrusted_hdr->namelen = cnt + strlen(strncpy (dest, hd->name,
 				  MIN(TNMSZ+1, sizeof (untrusted_namebuf) - cnt)));
 
+  // qfile count the \0 in the namelen
+  untrusted_hdr->namelen += 1;
+
   fprintf(stderr,"Retrieved name len: %d\n",untrusted_hdr->namelen);
   fprintf(stderr,"Retrieved name: %s\n",untrusted_namebuf);
 
@@ -615,6 +618,8 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	break;
     case REGTYPE:
 	fprintf(stderr,"File is REGTYPE of size %d\n",sb->st_size);
+	// Restored POSIX stat file mode (because PAX format use its own file type)
+	untrusted_hdr->mode |= S_IFREG;
 	write_headers(untrusted_hdr, untrusted_namebuf);
 	ret = copy_file(1, fd, untrusted_hdr->filelen, &crc32_sum);
 	if (ret != COPY_FILE_OK) {
