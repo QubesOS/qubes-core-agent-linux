@@ -388,7 +388,8 @@ enum {
 	NEED_NOTHING,
 	NEED_SKIP,
 	NEED_READ,
-	NEED_SYNC_TRAIL
+	NEED_SYNC_TRAIL,
+	INVALID_HEADER,
 };
 
 
@@ -417,9 +418,10 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
    * we only get proper sized buffers
    */
   fprintf(stderr,"Checking if valid header\n");
-  if (ustar_id (buf, BLKMULT) < 0)
-    return (-1);
-
+  if (ustar_id (buf, BLKMULT) < 0) {
+    fprintf (stderr,"Invalid header\n");
+    return INVALID_HEADER;
+  }
   fprintf(stderr,"Valid header!\n");
   /* DISABLED: Internal to PAX
   arcn->org_name = arcn->name;
@@ -674,33 +676,35 @@ int tar_file_processor(int fd)
 	size_t to_skip = 0;
 	int sync_count = 0;
 	while (size = read(fd, &buf, BLKMULT)) {
-		fprintf(stderr,"Read %d bytes\n",size);
-		ret = 0;
-		if (current==NEED_SYNC_TRAIL) {
-			ret = tar_trail (buf, 1, &sync_count);
-			fprintf(stderr,"Synchronizing trail: %d %d\n",ret,sync_count);
-			if (ret != 1) {
-				current = NEED_READ;
+		if (size != -1) {
+			fprintf(stderr,"Read %d bytes\n",size);
+			ret = 0;
+			if (current==NEED_SYNC_TRAIL) {
+				ret = tar_trail (buf, 1, &sync_count);
+				fprintf(stderr,"Synchronizing trail: %d %d\n",ret,sync_count);
+				if (ret != 1) {
+					current = NEED_READ;
+				}
 			}
-		}
-		if (current==NEED_READ) {
-			current = ustar_rd(fd, &hdr, &buf, &sb);
-			fprintf(stderr,"Return %d\n",ret);
-		}
-		if (current==NEED_SKIP) {
-			fprintf(stderr,"Need to skip %d bytes\n",sb.st_size);
-			to_skip = sb.st_size;
-			while (to_skip > 0) {
-				to_skip -= read(fd, &buf, MIN(to_skip,BLKMULT));
+			if (current==NEED_READ) {
+				current = ustar_rd(fd, &hdr, &buf, &sb);
+				fprintf(stderr,"Return %d\n",ret);
 			}
+			if (current==NEED_SKIP) {
+				fprintf(stderr,"Need to skip %d bytes\n",sb.st_size);
+				to_skip = sb.st_size;
+				while (to_skip > 0) {
+					to_skip -= read(fd, &buf, MIN(to_skip,BLKMULT));
+				}
 	
-			// Extract extra padding
-			fprintf(stderr,"Need to remove pad:%d %d %d\n",to_skip,sb.st_size,BLKMULT-(sb.st_size%BLKMULT));
-			ret = read(fd, &buf, BLKMULT-(sb.st_size%BLKMULT));
-			fprintf(stderr,"Removed %d bytes of padding\n",ret);
-			current = NEED_READ;
-		} 
-		i++;
+				// Extract extra padding
+				fprintf(stderr,"Need to remove pad:%d %d %d\n",to_skip,sb.st_size,BLKMULT-(sb.st_size%BLKMULT));
+				ret = read(fd, &buf, BLKMULT-(sb.st_size%BLKMULT));
+				fprintf(stderr,"Removed %d bytes of padding\n",ret);
+				current = NEED_READ;
+			} 
+			i++;
+		}
 		//if (i >= 10)
 		//	exit(0);
 	}
@@ -717,7 +721,7 @@ int main(int argc, char **argv)
 
 	//signal(SIGPIPE, SIG_IGN);
 	// this will allow checking for possible feedback packet in the middle of transfer
-	//set_nonblock(0);
+	// set_nonblock(0);
 	notify_progress(0, PROGRESS_FLAG_INIT);
 
 	crc32_sum = 0;
@@ -743,6 +747,7 @@ int main(int argc, char **argv)
 	if (i <= 1) {
 		// No argument specified. Use STDIN
 		fprintf(stderr,"Using STDIN\n");
+		set_block(0);
 		tar_file_processor(fileno(stdin));
 	}
 
