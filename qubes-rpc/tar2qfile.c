@@ -49,7 +49,6 @@
 #include <string.h>
 #include <qfile-utils.h>
 
-
 /***************************************************
  * Most routines extracted from the PAX project (tar.c...) *
  ***************************************************/
@@ -390,6 +389,7 @@ enum {
 	NEED_READ,
 	NEED_SYNC_TRAIL,
 	INVALID_HEADER,
+	MEMORY_ALLOC_FAILED,
 };
 
 
@@ -400,6 +400,9 @@ enum {
  * Return:
  *	0
  */
+
+int n_dirs = 0;
+char ** dirs_headers_sent = NULL;
 
 int
 ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * sb)
@@ -618,15 +621,104 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	break;
     case REGTYPE:
 	fprintf(stderr,"File is REGTYPE of size %d\n",sb->st_size);
-	// Restored POSIX stat file mode (because PAX format use its own file type)
+
+        // Create a copy of untrusted_namebuf to be used for strtok
+	char * dirbuf;
+	dirbuf = malloc(sizeof (char) * (untrusted_hdr->namelen));
+	if (dirbuf == NULL)
+		return MEMORY_ALLOC_FAILED;
+	dirbuf = strncpy(dirbuf, untrusted_namebuf, untrusted_hdr->namelen);
+
+	int i = 0;
+	int dir_found = 0;
+	size_t pathsize = 0;
+	char * path = NULL;
+	struct file_header dir_header;
+
+        // Split the path in directories and recompose it incrementally
+	char * last_token = strtok(dirbuf,"/");
+	char * token = strtok(NULL, "/");
+	while (token != NULL) {
+		
+		fprintf(stderr,"Found directory %s (last:%s)\n",token,last_token);
+
+		// Recompose the path based on last discovered directory
+		if (path == NULL) {
+			path = malloc(sizeof (char) * (strlen(last_token)+1));
+			if (path == NULL)
+				return MEMORY_ALLOC_FAILED;
+			path = strncpy(path, last_token, strlen(last_token));
+			path[strlen(last_token)] = '\0';
+		} else {
+			pathsize = strlen(path);
+			path = realloc(path, sizeof (char) * (strlen(path)+1+strlen(last_token)+1));
+			if (path == NULL)
+				return MEMORY_ALLOC_FAILED;
+			path[pathsize] = '/';
+			
+			strncpy(path+pathsize+1, last_token, strlen(last_token));
+			path[pathsize+strlen(last_token)+1] = '\0';
+		}
+		fprintf(stderr,"Path is %s\n",path);
+
+		fprintf(stderr,"Checking from i=0 i<%d\n",n_dirs);
+		// Verify if qfile headers for the current path have already been sent based on the dirs_headers_sent table
+		dir_found = 0;
+		for (i = 0; i < n_dirs; ++i) {
+			fprintf(stderr,"Comparing with %d %d %s %s\n",i,n_dirs,dirs_headers_sent[i],path);
+			if (strcmp(dirs_headers_sent[i],path)==0) {
+				fprintf(stderr,"Directory headers already sent\n");
+				dir_found=1;
+			}
+		}
+		if (dir_found == 0) {
+                        // Register the current path as being sent in the dirs_headers_sent table
+			fprintf(stderr,"Inserting %s into register\n",path);
+			dirs_headers_sent = realloc(dirs_headers_sent, sizeof (char*) * n_dirs++);
+			if (dirs_headers_sent == NULL)
+				return MEMORY_ALLOC_FAILED;
+			dirs_headers_sent[n_dirs-1] = malloc(sizeof (char) * (strlen(path)+1));
+			if (dirs_headers_sent[n_dirs-1] == NULL)
+				return MEMORY_ALLOC_FAILED;
+			strncpy(dirs_headers_sent[n_dirs-1], path, strlen(path)+1);
+
+                        // Initialize the qfile headers for the current directory path
+			dir_header.namelen = strlen(path)+1;
+			dir_header.atime = untrusted_hdr->atime;
+			dir_header.atime_nsec = untrusted_hdr->atime_nsec;
+			dir_header.mtime = untrusted_hdr->mtime;
+			dir_header.mtime_nsec = untrusted_hdr->mtime_nsec;
+
+			dir_header.mode = untrusted_hdr->mode | S_IFDIR;
+			dir_header.filelen = 0;
+		
+			fprintf(stderr,"Sending directory headers for %s\n",path);
+                        // Send the qfile headers for the current directory path
+			write_headers(&dir_header, path);
+		}
+		last_token = token;
+		token = strtok(NULL, "/");
+	}
+	free(path);
+	free(dirbuf);
+	
+	fprintf(stderr,"End of directory checks\n");
+
+	// Restore POSIX stat file mode (because PAX format use its own file type)
 	untrusted_hdr->mode |= S_IFREG;
+	fprintf(stderr,"Writing file header\n");
+        // Send header and file content
 	write_headers(untrusted_hdr, untrusted_namebuf);
+	fprintf(stderr,"Writing file content\n");
 	ret = copy_file(1, fd, untrusted_hdr->filelen, &crc32_sum);
+
+	fprintf(stderr,"Copyfile returned with error %d\n",ret);
 	if (ret != COPY_FILE_OK) {
 		if (ret != COPY_FILE_WRITE_ERROR)
 			gui_fatal("Copying file %s: %s", untrusted_namebuf,
 				  copy_file_status_to_str(ret));
 		else {
+			fprintf(stderr,"UNKNOWN ERROR RETURN STATUS:%d\n.. Waiting...\n",ret);
 			set_block(0);
 			wait_for_result();
 			exit(1);
@@ -637,7 +729,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	ret = read(fd, buf, BLKMULT-(sb->st_size%BLKMULT));
 	fprintf(stderr,"Removed %d bytes of padding\n",ret);
 
-	// Resync trailing headers
+	// Resync trailing headers in order to find next file chunck in the tar file
 	return NEED_SYNC_TRAIL;
 
 	break;
@@ -724,15 +816,16 @@ int main(int argc, char **argv)
 	char *sep;
 	int fd;
 
-	//signal(SIGPIPE, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 	// this will allow checking for possible feedback packet in the middle of transfer
-	// set_nonblock(0);
+	// if disabled, the copy_file process could hang
 	notify_progress(0, PROGRESS_FLAG_INIT);
+	//set_size_limit(1500000000, 2048);
 
 	crc32_sum = 0;
 	cwd = getcwd(NULL, 0);
 	for (i = 1; i < argc; i++) {
-
+		set_nonblock(0);
 		if (strcmp(argv[i], "--ignore-symlinks")==0) {
 			ignore_symlinks = 1;
 			continue;
@@ -756,7 +849,8 @@ int main(int argc, char **argv)
 		tar_file_processor(fileno(stdin));
 	}
 
-	notify_end_and_wait_for_result();
+
+	//notify_end_and_wait_for_result();
 	notify_progress(0, PROGRESS_FLAG_DONE);
 	return 0;
 }
