@@ -9,7 +9,7 @@ if [ x"$action" == x"suspend" ]; then
     for if in `ls /sys/class/net|grep -v "lo\|vif"`; do 
         ip l s $if down
     done
-    modprobe -r uhci_hcd ehci_hcd ehci_pci
+    modprobe -r uhci_hcd ehci_pci ehci_hcd
     lsmod|grep -q iwldvm && touch /var/run/qubes/suspend-iwldvm-loaded
     modprobe -r iwldvm
 else
