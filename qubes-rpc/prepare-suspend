@@ -3,17 +3,31 @@
 action=$1
 [ -z "$action" ] && action=suspend
 
+MODULES_BLACKLIST="uhci_hcd ehci_pci ehci_hcd iwldvm"
+if [ -r /etc/qubes-suspend-module-blacklist ]; then
+    MODULES_BLACKLIST="$MODULES_BLACKLIST `cat /etc/qubes-suspend-module-blacklist`"
+fi
+if [ -r /rw/config/suspend-module-blacklist ]; then
+    MODULES_BLACKLIST="$MODULES_BLACKLIST `cat /rw/config/suspend-module-blacklist`"
+fi
+
 if [ x"$action" == x"suspend" ]; then
     nmcli nm sleep true || service NetworkManager stop
     # Force interfaces down, just in case when NM didn't done it
     for if in `ls /sys/class/net|grep -v "lo\|vif"`; do 
         ip l s $if down
     done
-    modprobe -r uhci_hcd ehci_pci ehci_hcd
-    lsmod|grep -q iwldvm && touch /var/run/qubes/suspend-iwldvm-loaded
-    modprobe -r iwldvm
+    LOADED_MODULES=""
+    for mod in $MODULES_BLACKLIST; do
+        if lsmod |grep -q $mod; then
+            LOADED_MODULES="$LOADED_MODULES $mod"
+            modprobe -r $mod
+        fi
+    done
+    echo $LOADED_MODULES > /var/run/qubes/suspend-modules-loaded
 else
-    modprobe ehci_pci; modprobe uhci_hcd
-    test -e /var/run/qubes/suspend-iwldvm-loaded && modprobe iwldvm
+    for mod in `cat /var/run/qubes/suspend-modules-loaded`; do
+        modprobe $mod
+    done
     nmcli nm sleep false || { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes-core-netvm start
 fi
