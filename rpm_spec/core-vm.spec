@@ -130,7 +130,7 @@ for F in gcm-apply ; do
 done
 
 # want it in AppVM only
-for F in gnome-keyring-gpg gnome-keyring-pkcs11 gnome-keyring-secrets gnome-keyring-ssh gnome-settings-daemon user-dirs-update-gtk gsettings-data-convert ; do
+for F in gnome-keyring-gpg gnome-keyring-pkcs11 gnome-keyring-secrets gnome-keyring-ssh user-dirs-update-gtk gsettings-data-convert ; do
 	if [ -e /etc/xdg/autostart/$F.desktop ]; then
 		remove_ShowIn $F
 		echo 'OnlyShowIn=GNOME;AppVM;' >> /etc/xdg/autostart/$F.desktop
