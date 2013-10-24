@@ -3,7 +3,7 @@
 action=$1
 [ -z "$action" ] && action=suspend
 
-MODULES_BLACKLIST="uhci_hcd ehci_pci ehci_hcd iwldvm"
+MODULES_BLACKLIST=""
 if [ -r /etc/qubes-suspend-module-blacklist ]; then
     MODULES_BLACKLIST="$MODULES_BLACKLIST `cat /etc/qubes-suspend-module-blacklist`"
 fi
