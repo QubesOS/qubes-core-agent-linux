@@ -120,6 +120,7 @@ install-vm:
 	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)/usr/lib/qubes
+	install qubes-rpc/tar2qfile $(DESTDIR)/usr/lib/qubes
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
 	install -m 4555  qubes-rpc/qfile-unpacker $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/qrun-in-vm $(DESTDIR)/usr/lib/qubes
@@ -132,6 +133,7 @@ install-vm:
 	install -m 0644 qubes-rpc/{qubes.SuspendPre,qubes.SuspendPost,qubes.GetAppmenus} $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.WaitForSession $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.DetachPciDevice $(DESTDIR)/etc/qubes-rpc
+	install -m 0644 qubes-rpc/qubes.{Backup,Restore} $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/usr/share/file-manager/actions
 	install -m 0644 qubes-rpc/*-gnome.desktop $(DESTDIR)/usr/share/file-manager/actions

@@ -277,6 +277,8 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.SuspendPost
 /etc/qubes-rpc/qubes.WaitForSession
 /etc/qubes-rpc/qubes.DetachPciDevice
+/etc/qubes-rpc/qubes.Backup
+/etc/qubes-rpc/qubes.Restore
 /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
@@ -322,6 +324,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qvm-copy-to-vm.kde
 /usr/lib/qubes/serial.conf
 /usr/lib/qubes/setup-ip
+/usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
 /usr/lib/qubes/wrap-in-html-if-url.sh
 /usr/lib/qubes/iptables-yum-proxy

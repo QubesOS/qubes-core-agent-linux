@@ -1,0 +1,32 @@
+echo Starting Restorecopy >2
+read args
+echo Arguments: $args >2
+if [ -f "$args" ] ; then
+  echo "Performing restore from backup file $args" >2
+  TARGET="$args"
+  echo "Copying $TARGET to STDOUT" >2
+  /usr/lib/qubes/tar2qfile $TARGET
+else
+  echo "Checking if arguments is matching a command" >2
+  COMMAND=`echo $args | cut -d ' ' -f 1`
+  TYPE=`type -t $COMMAND`
+  if [ "$TYPE" == "file" ] ; then
+    tmpdir=`mktemp -d`
+    mkfifo $tmpdir/backup-data
+    echo "Redirecting $args to STDOUT" >2
+    # Parsing args to handle quotes correctly
+    # Dangerous method if args are uncontrolled
+    eval "set -- $args"
+    # Use named pipe to pass original stdin to tar2file
+    $@ > $tmpdir/backup-data < /dev/null &
+    retcode=$?
+    /usr/lib/qubes/tar2qfile $tmpdir/backup-data
+    wait
+    rm $tmpdir/backup-data
+    rmdir $tmpdir
+    exit $retcode
+  else
+    echo "Invalid command $COMMAND" >2
+    exit 1
+  fi
+fi
