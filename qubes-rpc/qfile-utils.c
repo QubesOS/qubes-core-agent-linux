@@ -1,7 +1,8 @@
 
 #include <qfile-utils.h>
 
-ignore_symlinks = 0;
+unsigned long crc32_sum;
+int ignore_symlinks = 0;
 
 void notify_progress(int size, int flag)
 {

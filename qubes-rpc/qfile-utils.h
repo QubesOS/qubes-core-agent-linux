@@ -22,8 +22,8 @@ enum {
 	PROGRESS_FLAG_DONE
 };
 
-unsigned long crc32_sum;
-int ignore_symlinks;
+extern unsigned long crc32_sum;
+extern int ignore_symlinks;
 
 void notify_progress(int size, int flag);
 void do_notify_progress(long long total, int flag);

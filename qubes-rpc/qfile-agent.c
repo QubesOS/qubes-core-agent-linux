@@ -1,7 +1,4 @@
-
 #include "qfile-utils.h"
-
-ignore_symlinks = 0;
 
 char *get_abs_path(char *cwd, char *pathname)
 {
