@@ -166,6 +166,7 @@ static unsigned long tar_chksm (char *, int);
 char *gnu_hack_string;          /* GNU ././@LongLink hackery */
 
 char untrusted_namebuf[MAX_PATH_LENGTH];
+extern int ignore_quota_error;
 
 
 /*
@@ -820,6 +821,9 @@ int main(int argc, char **argv)
 	//set_size_limit(1500000000, 2048);
 
 	crc32_sum = 0;
+	/* when extracting backup header, dom0 will terminate the transfer with
+	 * EDQUOT just after getting qubes.xml */
+	ignore_quota_error = 1;
 	for (i = 1; i < argc; i++) {
 		set_nonblock(0);
 		if (strcmp(argv[i], "--ignore-symlinks")==0) {

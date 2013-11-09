@@ -3,6 +3,7 @@
 
 unsigned long crc32_sum;
 int ignore_symlinks = 0;
+int ignore_quota_error = 0;
 
 void notify_progress(int size, int flag)
 {
@@ -106,6 +107,13 @@ void wait_for_result()
 			case EINVAL:
 				gui_fatal("File copy: Corrupted data from packer%s%s", last_filename_prefix, last_filename);
 				break;
+			case EDQUOT:
+				if (ignore_quota_error) {
+					/* skip also CRC check as sender and receiver might be
+					 * desynchronized in this case */
+					return;
+				}
+				/* fall though */
 			default:
 				gui_fatal("File copy: %s%s%s",
 						strerror(hdr.error_code), last_filename_prefix, last_filename);
