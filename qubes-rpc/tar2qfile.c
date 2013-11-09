@@ -1,4 +1,3 @@
-/*
 /*	$OpenBSD: tar.h,v 1.7 2003/06/02 23:32:09 millert Exp $	*/
 /*	$NetBSD: tar.h,v 1.3 1995/03/21 09:07:51 cgd Exp $	*/
 
@@ -620,7 +619,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	fprintf(stderr,"File is AREGTYPE\n");
 	break;
     case REGTYPE:
-	fprintf(stderr,"File is REGTYPE of size %d\n",sb->st_size);
+	fprintf(stderr,"File is REGTYPE of size %ld\n",sb->st_size);
 
         // Create a copy of untrusted_namebuf to be used for strtok
 	char * dirbuf;
@@ -725,7 +724,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 		}
 	}
 	// Extract extra padding
-	fprintf(stderr,"Need to remove pad:%d %d\n",sb->st_size,BLKMULT-(sb->st_size%BLKMULT));
+	fprintf(stderr,"Need to remove pad:%ld %ld\n",sb->st_size,BLKMULT-(sb->st_size%BLKMULT));
 	ret = read(fd, buf, BLKMULT-(sb->st_size%BLKMULT));
 	fprintf(stderr,"Removed %d bytes of padding\n",ret);
 
@@ -756,7 +755,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 
 
 
-int tar_file_processor(int fd)
+void tar_file_processor(int fd)
 {
 	int ret;
 	int i;
@@ -772,9 +771,9 @@ int tar_file_processor(int fd)
 	current = NEED_READ;
 	size_t to_skip = 0;
 	int sync_count = 0;
-	while (size = read(fd, &buf, BLKMULT)) {
+	while ((size = read(fd, &buf, BLKMULT))) {
 		if (size != -1) {
-			fprintf(stderr,"Read %d bytes\n",size);
+			fprintf(stderr,"Read %ld bytes\n",size);
 			ret = 0;
 			if (current==NEED_SYNC_TRAIL) {
 				ret = tar_trail (buf, 1, &sync_count);
@@ -784,18 +783,18 @@ int tar_file_processor(int fd)
 				}
 			}
 			if (current==NEED_READ) {
-				current = ustar_rd(fd, &hdr, &buf, &sb);
+				current = ustar_rd(fd, &hdr, buf, &sb);
 				fprintf(stderr,"Return %d\n",ret);
 			}
 			if (current==NEED_SKIP) {
-				fprintf(stderr,"Need to skip %d bytes\n",sb.st_size);
+				fprintf(stderr,"Need to skip %ld bytes\n",sb.st_size);
 				to_skip = sb.st_size;
 				while (to_skip > 0) {
 					to_skip -= read(fd, &buf, MIN(to_skip,BLKMULT));
 				}
 	
 				// Extract extra padding
-				fprintf(stderr,"Need to remove pad:%d %d %d\n",to_skip,sb.st_size,BLKMULT-(sb.st_size%BLKMULT));
+				fprintf(stderr,"Need to remove pad:%ld %ld %ld\n",to_skip,sb.st_size,BLKMULT-(sb.st_size%BLKMULT));
 				ret = read(fd, &buf, BLKMULT-(sb.st_size%BLKMULT));
 				fprintf(stderr,"Removed %d bytes of padding\n",ret);
 				current = NEED_READ;
@@ -812,8 +811,6 @@ int main(int argc, char **argv)
 {
 	int i;
 	char *entry;
-	char *cwd;
-	char *sep;
 	int fd;
 
 	signal(SIGPIPE, SIG_IGN);
@@ -823,7 +820,6 @@ int main(int argc, char **argv)
 	//set_size_limit(1500000000, 2048);
 
 	crc32_sum = 0;
-	cwd = getcwd(NULL, 0);
 	for (i = 1; i < argc; i++) {
 		set_nonblock(0);
 		if (strcmp(argv[i], "--ignore-symlinks")==0) {
