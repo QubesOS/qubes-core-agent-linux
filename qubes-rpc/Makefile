@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -Wall -I. -fPIC -pie
-all:	vm-file-editor qopen-in-vm qfile-unpacker tar2qfile
+all:	vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile
 vm-file-editor: vm-file-editor.o ioall.o
 	$(CC) -pie -g -o $@ $^
 qopen-in-vm: qopen-in-vm.o ioall.o gui-fatal.o
