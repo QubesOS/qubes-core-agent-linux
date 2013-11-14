@@ -331,6 +331,8 @@ rm -f %{name}-%{version}
 /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
 /usr/share/file-manager/actions/qvm-copy-gnome.desktop
 /usr/share/file-manager/actions/qvm-dvm-gnome.desktop
+%dir /usr/share/qubes
+/usr/share/qubes/mime-override/globs
 %dir /home_volatile
 %attr(700,user,user) /home_volatile/user
 %dir /mnt/removable
