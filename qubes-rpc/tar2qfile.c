@@ -803,7 +803,7 @@ int tar_file_processor(int fd, int filter_count, char **filter)
 				}
 			}
 			if (current==NEED_READ) {
-				current = ustar_rd(fd, &hdr, buf, &sb);
+				current = ustar_rd(fd, &hdr, buf, &sb, filter_count, filter);
 				fprintf(stderr,"Return %d\n",ret);
 			}
 			if (current==NEED_SKIP) {
