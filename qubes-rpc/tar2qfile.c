@@ -743,8 +743,8 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 		}
 	}
 	// Extract extra padding
-	fprintf(stderr,"Need to remove pad:%ld %ld\n",sb->st_size,BLKMULT-(sb->st_size%BLKMULT));
-	ret = read(fd, buf, BLKMULT-(sb->st_size%BLKMULT));
+	fprintf(stderr,"Need to remove pad:%ld %ld\n",untrusted_hdr->filelen,BLKMULT-(untrusted_hdr->filelen%BLKMULT));
+	ret = read(fd, buf, BLKMULT-(untrusted_hdr->filelen%BLKMULT));
 	fprintf(stderr,"Removed %d bytes of padding\n",ret);
 
 	// Resync trailing headers in order to find next file chunck in the tar file
@@ -806,15 +806,15 @@ int tar_file_processor(int fd, int filter_count, char **filter)
 				fprintf(stderr,"Return %d\n",ret);
 			}
 			if (current==NEED_SKIP) {
-				fprintf(stderr,"Need to skip %ld bytes\n",sb.st_size);
-				to_skip = sb.st_size;
+				fprintf(stderr,"Need to skip %ld bytes\n",hdr.filelen);
+				to_skip = hdr.filelen;
 				while (to_skip > 0) {
 					to_skip -= read(fd, &buf, MIN(to_skip,BLKMULT));
 				}
 	
 				// Extract extra padding
-				fprintf(stderr,"Need to remove pad:%ld %ld %ld\n",to_skip,sb.st_size,BLKMULT-(sb.st_size%BLKMULT));
-				ret = read(fd, &buf, BLKMULT-(sb.st_size%BLKMULT));
+				fprintf(stderr,"Need to remove pad:%ld %ld %ld\n",to_skip,hdr.filelen,BLKMULT-(hdr.filelen%BLKMULT));
+				ret = read(fd, &buf, BLKMULT-(hdr.filelen%BLKMULT));
 				fprintf(stderr,"Removed %d bytes of padding\n",ret);
 				current = NEED_SYNC_TRAIL;
 			} 
