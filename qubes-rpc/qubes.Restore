@@ -1,11 +1,13 @@
 echo Starting Restorecopy >2
 read args
+read paths
 echo Arguments: $args >2
+echo Paths: $paths >2
 if [ -f "$args" ] ; then
   echo "Performing restore from backup file $args" >2
   TARGET="$args"
   echo "Copying $TARGET to STDOUT" >2
-  /usr/lib/qubes/tar2qfile $TARGET
+  /usr/lib/qubes/tar2qfile $TARGET $paths
 else
   echo "Checking if arguments is matching a command" >2
   COMMAND=`echo $args | cut -d ' ' -f 1`
@@ -20,7 +22,7 @@ else
     # Use named pipe to pass original stdin to tar2file
     $@ > $tmpdir/backup-data < /dev/null &
     retcode=$?
-    /usr/lib/qubes/tar2qfile $tmpdir/backup-data
+    /usr/lib/qubes/tar2qfile $tmpdir/backup-data $paths
     wait
     rm $tmpdir/backup-data
     rmdir $tmpdir
