@@ -8,6 +8,9 @@
 #include <ioall.h>
 #include "dvm2.h"
 
+#define USER_HOME "/home/user"
+#define MIMEINFO_DATABASES "/usr/share/mime:/usr/local/share:" USER_HOME "/.local/share:/usr/share/qubes/mime-override"
+
 char *gettime()
 {
 	static char retbuf[60];
@@ -130,9 +133,10 @@ main()
 			dup2(log_fd, 1);
 			close(log_fd);
 
-			setenv("HOME", "/home/user", 1);
+			setenv("HOME", USER_HOME, 1);
 			setenv("DISPLAY", ":0", 1);
-			execl("/usr/bin/mimeopen", "mimeopen", "-n", filename, (char*)NULL);
+			execl("/usr/bin/mimeopen", "mimeopen", "-n",
+					"--database", MIMEINFO_DATABASES, filename, (char*)NULL);
 			perror("execl");
 			exit(1);
 		default:

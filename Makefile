@@ -76,6 +76,8 @@ install-vm:
 	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 	install -D misc/polkit-1-qubes-allow-all.pkla $(DESTDIR)/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 	install -D misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
+	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
+
 	mkdir -p $(DESTDIR)/usr/lib/qubes
 
 	if [ -r misc/dispvm-dotfiles.$(DIST).tbz ] ; \
