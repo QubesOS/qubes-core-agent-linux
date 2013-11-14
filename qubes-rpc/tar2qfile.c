@@ -405,13 +405,15 @@ int n_dirs = 0;
 char ** dirs_headers_sent = NULL;
 
 int
-ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * sb)
+ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * sb, int filter_count, char **filter)
 {
 
   register HD_USTAR *hd;
   register char *dest;
   register int cnt = 0;
   int ret;
+  int i;
+  int should_extract;
   /* DISABLED: unused
   dev_t devmajor;
   dev_t devminor;
@@ -620,7 +622,23 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	fprintf(stderr,"File is AREGTYPE\n");
 	break;
     case REGTYPE:
-	fprintf(stderr,"File is REGTYPE of size %ld\n",sb->st_size);
+	fprintf(stderr,"File is REGTYPE of size %d\n",sb->st_size);
+
+	// Check if user want to extract this file
+	should_extract = 1;
+	for (i=1; i < filter_count; i++) {
+		should_extract = 0;
+		fprintf(stderr, "Comparing with filter %s\n", filter[i]);
+		if (strstr(untrusted_namebuf, filter[i]) == untrusted_namebuf) {
+			fprintf(stderr, "Match\n");
+			should_extract = 1;
+			break;
+		}
+	}
+	if (should_extract != 1) {
+		fprintf(stderr, "File should be filtered.. Skipping\n");
+		return NEED_SKIP;
+	}
 
         // Create a copy of untrusted_namebuf to be used for strtok
 	char * dirbuf;
@@ -756,7 +774,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 
 
 
-void tar_file_processor(int fd)
+int tar_file_processor(int fd, int filter_count, char **filter)
 {
 	int ret;
 	int i;
@@ -798,7 +816,7 @@ void tar_file_processor(int fd)
 				fprintf(stderr,"Need to remove pad:%ld %ld %ld\n",to_skip,sb.st_size,BLKMULT-(sb.st_size%BLKMULT));
 				ret = read(fd, &buf, BLKMULT-(sb.st_size%BLKMULT));
 				fprintf(stderr,"Removed %d bytes of padding\n",ret);
-				current = NEED_READ;
+				current = NEED_SYNC_TRAIL;
 			} 
 			i++;
 		}
@@ -812,7 +830,11 @@ int main(int argc, char **argv)
 {
 	int i;
 	char *entry;
+	char *cwd;
+	char *sep;
 	int fd;
+	int use_stdin = 0;
+	
 
 	signal(SIGPIPE, SIG_IGN);
 	// this will allow checking for possible feedback packet in the middle of transfer
@@ -829,6 +851,9 @@ int main(int argc, char **argv)
 		if (strcmp(argv[i], "--ignore-symlinks")==0) {
 			ignore_symlinks = 1;
 			continue;
+		} else if (strcmp(argv[i], "-")==0) {
+			use_stdin = 1;
+			break;
 		} else {
 			// Parse tar file
 			entry = argv[i];
@@ -838,15 +863,21 @@ int main(int argc, char **argv)
 			if (fd < 0)
 				fprintf(stderr,"Error opening file %s\n",entry);
 
-			tar_file_processor(fd);
+			// At least two arguments can be found in the command line
+			// (process name and the file to extract)
+			tar_file_processor(fd, argc-2, argv[2]);
 		}
 	}
 
-	if (i <= 1) {
+	if (i <= 1 || use_stdin == 1) {
 		// No argument specified. Use STDIN
 		fprintf(stderr,"Using STDIN\n");
 		set_block(0);
-		tar_file_processor(fileno(stdin));
+		// If at least one argument has been found ( process name and - )
+		if (use_stdin)
+			tar_file_processor(fileno(stdin), argc-2, argv[2]);
+		else
+			tar_file_processor(fileno(stdin), argc-1, argv[1]);
 	}
 
 
