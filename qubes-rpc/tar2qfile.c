@@ -863,24 +863,27 @@ int main(int argc, char **argv)
 			fprintf(stderr,"Parsing file %s\n",entry);
 
 			fd = open(entry, O_RDONLY);
-			if (fd < 0)
+			if (fd < 0) {
 				fprintf(stderr,"Error opening file %s\n",entry);
+				exit(2);
+			}
 
 			// At least two arguments can be found in the command line
 			// (process name and the file to extract)
-			tar_file_processor(fd, argc-2, argv[2]);
+			tar_file_processor(fd, argc, argv);
+			break;
 		}
 	}
 
-	if (i <= 1 || use_stdin == 1) {
+	if (use_stdin == 1) {
 		// No argument specified. Use STDIN
 		fprintf(stderr,"Using STDIN\n");
 		set_block(0);
 		// If at least one argument has been found ( process name and - )
 		if (use_stdin)
-			tar_file_processor(fileno(stdin), argc-2, argv[2]);
+			tar_file_processor(fileno(stdin), argc, argv);
 		else
-			tar_file_processor(fileno(stdin), argc-1, argv[1]);
+			tar_file_processor(fileno(stdin), argc, argv);
 	}
 
 
