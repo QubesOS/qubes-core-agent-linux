@@ -13,6 +13,7 @@ fi
 INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
 if [ -e /dev/xvdb -a ! -e /etc/this-is-dvm ] ; then
+    resize2fs /dev/xvdb 2> /dev/null || echo "'resize2fs /dev/xvdb' failed"
     mount /rw
 
     if ! [ -d /rw/home ] ; then

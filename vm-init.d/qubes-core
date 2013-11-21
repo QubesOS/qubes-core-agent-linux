@@ -55,6 +55,7 @@ start()
 	mkdir -p /var/run/qubes
 
 	if [ -e /dev/xvdb ] ; then
+		resize2fs /dev/xvdb 2> /dev/null || echo "'resize2fs /dev/xvdb' failed"
 		mount /rw
 
         if ! [ -d /rw/home ] ; then
