@@ -48,6 +48,8 @@
 #include <string.h>
 #include <qfile-utils.h>
 
+// #define DEBUG
+
 /***************************************************
  * Most routines extracted from the PAX project (tar.c...) *
  ***************************************************/
@@ -430,12 +432,18 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
   /*
    * we only get proper sized buffers
    */
+#ifdef DEBUG
   fprintf(stderr,"Checking if valid header\n");
+#endif
   if (ustar_id (buf, BLKMULT) < 0) {
-    fprintf (stderr,"Invalid header\n");
+#ifdef DEBUG
+    fprintf (stderr, "Invalid header\n");
+#endif
     return INVALID_HEADER;
   }
+#ifdef DEBUG
   fprintf(stderr,"Valid header!\n");
+#endif
   /* DISABLED: Internal to PAX
   arcn->org_name = arcn->name;
   arcn->sb.st_nlink = 1;
@@ -472,8 +480,10 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
   // qfile count the \0 in the namelen
   untrusted_hdr->namelen += 1;
 
+#ifdef DEBUG
   fprintf(stderr,"Retrieved name len: %d\n",untrusted_hdr->namelen);
   fprintf(stderr,"Retrieved name: %s\n",untrusted_namebuf);
+#endif
 
   /*
    * follow the spec to the letter. we should only have mode bits, strip
@@ -523,7 +533,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
   arcn->skip = 0;
   arcn->sb.st_rdev = (dev_t) 0;
   */
-  
+
 
   /*
    * set the mode and PAX type according to the typeflag in the header
@@ -531,14 +541,18 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
   switch (hd->typeflag)
     {
     case FIFOTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is FIFOTYPE\n");
+#endif
       /* DISABLED: unused
       arcn->type = PAX_FIF;
       arcn->sb.st_mode |= S_IFIFO;
       */
       break;
     case DIRTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is DIRTYPE\n");
+#endif
       /* DISABLED: unused
       arcn->type = PAX_DIR;
       arcn->sb.st_mode |= S_IFDIR;
@@ -555,10 +569,14 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 */
       break;
     case BLKTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is BLKTYPE\n");
+#endif
 	break;
     case CHRTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is CHRTYPE\n");
+#endif
       /*
        * this type requires the rdev field to be set.
        */
@@ -583,10 +601,14 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 //      arcn->sb.st_rdev = TODEV (devmajor, devminor);
       break;
     case SYMTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is SYMTYPE\n");
+#endif
 	break;
     case LNKTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is LNKTYPE\n");
+#endif
       if (hd->typeflag == SYMTYPE)
 	{
 //	  arcn->type = PAX_SLK;
@@ -608,10 +630,14 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 //			       MIN(TNMSZ+1,sizeof (arcn->ln_name)));
       break;
     case LONGLINKTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is LONGLINKTYPE\n");
+#endif
 	break;
     case LONGNAMETYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is LONGNAMETYPE\n");
+#endif
       /*
        * GNU long link/file; we tag these here and let the
        * pax internals deal with it -- too ugly otherwise.
@@ -624,21 +650,31 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 //      arcn->ln_nlen = 0;
       break;
     case CONTTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is CONTTYPE\n");
+#endif
 	break;
     case AREGTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is AREGTYPE\n");
+#endif
 	break;
     case REGTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"File is REGTYPE of size %ld\n",sb->st_size);
+#endif
 
 	// Check if user want to extract this file
 	should_extract = 1;
 	for (i=0; i < filters->filters_count; i++) {
 		should_extract = 0;
+#ifdef DEBUG
 		fprintf(stderr, "Comparing with filter %s\n", filters->filters[i]);
+#endif
 		if (strncmp(untrusted_namebuf, filters->filters[i], strlen(filters->filters[i])) == 0) {
+#ifdef DEBUG
 			fprintf(stderr, "Match (%d)\n", filters->filters_matches[i]);
+#endif
 			should_extract = 1;
 			filters->filters_matches[i]++;
 			if (filters->filters_matches[i] == 1) {
@@ -649,7 +685,9 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 		}
 	}
 	if (should_extract != 1) {
+#ifdef DEBUG
 		fprintf(stderr, "File should be filtered.. Skipping\n");
+#endif
 		return NEED_SKIP_FILE;
 	}
 
@@ -671,7 +709,9 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	char * token = strtok(NULL, "/");
 	while (token != NULL) {
 		
+#ifdef DEBUG
 		fprintf(stderr,"Found directory %s (last:%s)\n",token,last_token);
+#endif
 
 		// Recompose the path based on last discovered directory
 		if (path == NULL) {
@@ -690,21 +730,31 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 			strncpy(path+pathsize+1, last_token, strlen(last_token));
 			path[pathsize+strlen(last_token)+1] = '\0';
 		}
+#ifdef DEBUG
 		fprintf(stderr,"Path is %s\n",path);
+#endif
 
+#ifdef DEBUG
 		fprintf(stderr,"Checking from i=0 i<%d\n",n_dirs);
+#endif
 		// Verify if qfile headers for the current path have already been sent based on the dirs_headers_sent table
 		dir_found = 0;
 		for (i = 0; i < n_dirs; ++i) {
+#ifdef DEBUG
 			fprintf(stderr,"Comparing with %d %d %s %s\n",i,n_dirs,dirs_headers_sent[i],path);
+#endif
 			if (strcmp(dirs_headers_sent[i],path)==0) {
+#ifdef DEBUG
 				fprintf(stderr,"Directory headers already sent\n");
+#endif
 				dir_found=1;
 			}
 		}
 		if (dir_found == 0) {
                         // Register the current path as being sent in the dirs_headers_sent table
+#ifdef DEBUG
 			fprintf(stderr,"Inserting %s into register\n",path);
+#endif
 			dirs_headers_sent = realloc(dirs_headers_sent, sizeof (char*) * n_dirs++);
 			if (dirs_headers_sent == NULL)
 				return MEMORY_ALLOC_FAILED;
@@ -723,7 +773,9 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 			dir_header.mode = untrusted_hdr->mode | S_IFDIR;
 			dir_header.filelen = 0;
 		
+#ifdef DEBUG
 			fprintf(stderr,"Sending directory headers for %s\n",path);
+#endif
                         // Send the qfile headers for the current directory path
 			write_headers(&dir_header, path);
 		}
@@ -733,17 +785,25 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	free(path);
 	free(dirbuf);
 	
+#ifdef DEBUG
 	fprintf(stderr,"End of directory checks\n");
+#endif
 
 	// Restore POSIX stat file mode (because PAX format use its own file type)
 	untrusted_hdr->mode |= S_IFREG;
+#ifdef DEBUG
 	fprintf(stderr,"Writing file header\n");
+#endif
         // Send header and file content
 	write_headers(untrusted_hdr, untrusted_namebuf);
+#ifdef DEBUG
 	fprintf(stderr,"Writing file content\n");
+#endif
 	ret = copy_file(1, fd, untrusted_hdr->filelen, &crc32_sum);
 
+#ifdef DEBUG
 	fprintf(stderr,"Copyfile returned with error %d\n",ret);
+#endif
 	if (ret != COPY_FILE_OK) {
 		if (ret != COPY_FILE_WRITE_ERROR)
 			gui_fatal("Copying file %s: %s", untrusted_namebuf,
@@ -756,22 +816,30 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 		}
 	}
 	// Extract extra padding
+#ifdef DEBUG
 	fprintf(stderr,"Need to remove pad:%lld %lld\n",untrusted_hdr->filelen,BLKMULT-(untrusted_hdr->filelen%BLKMULT));
+#endif
 	if (untrusted_hdr->filelen%BLKMULT > 0)
 		ret = read(fd, buf, BLKMULT-(untrusted_hdr->filelen%BLKMULT));
+#ifdef DEBUG
 	fprintf(stderr,"Removed %d bytes of padding\n",ret);
+#endif
 
 	// Resync trailing headers in order to find next file chunck in the tar file
 	return NEED_SYNC_TRAIL;
 
 	break;
     case EXTHEADERTYPE:
+#ifdef DEBUG
 	fprintf(stderr,"Extended HEADER encountered\n");
+#endif
 
 	return NEED_SKIP;
 	break;
     default:
+#ifdef DEBUG
 	fprintf(stderr,"Default type detected:%c\n",hd->typeflag);
+#endif
 	return NEED_SKIP;
       /*
        * these types have file data that follows. Set the skip and
@@ -806,18 +874,24 @@ void tar_file_processor(int fd, struct filters *filters)
 	int sync_count = 0;
 	while ((size = read(fd, &buf, BLKMULT))) {
 		if (size != -1) {
+#ifdef DEBUG
 			fprintf(stderr,"Read %ld bytes\n",size);
+#endif
 			ret = 0;
 			if (current==NEED_SYNC_TRAIL) {
 				ret = tar_trail (buf, 1, &sync_count);
+#ifdef DEBUG
 				fprintf(stderr,"Synchronizing trail: %d %d\n",ret,sync_count);
+#endif
 				if (ret != 1) {
 					current = NEED_READ;
 				}
 			}
 			if (current==NEED_READ) {
 				current = ustar_rd(fd, &hdr, buf, &sb, filters);
+#ifdef DEBUG
 				fprintf(stderr,"Return %d\n",ret);
+#endif
 			}
 			if (current==NEED_SKIP || current==NEED_SKIP_FILE) {
 				if (current==NEED_SKIP_FILE &&
@@ -844,13 +918,17 @@ void tar_file_processor(int fd, struct filters *filters)
 				}
 	
 				// Extract extra padding
+#ifdef DEBUG
 				fprintf(stderr,"Need to remove pad:%ld %lld %lld\n",to_skip,hdr.filelen,BLKMULT-(hdr.filelen%BLKMULT));
+#endif
 				if (hdr.filelen%BLKMULT > 0) {
 					ret = read(fd, &buf, BLKMULT-(hdr.filelen%BLKMULT));
+#ifdef DEBUG
 					fprintf(stderr,"Removed %d bytes of padding\n",ret);
+#endif
 				}
 				current = NEED_SYNC_TRAIL;
-			} 
+			}
 			i++;
 		}
 		//if (i >= 10)
@@ -890,7 +968,9 @@ int main(int argc, char **argv)
 			// Parse tar file
 			use_stdin = 0;
 			entry = argv[i];
+#ifdef DEBUG
 			fprintf(stderr,"Parsing file %s\n",entry);
+#endif
 
 			fd = open(entry, O_RDONLY);
 			if (fd < 0) {
@@ -911,8 +991,9 @@ int main(int argc, char **argv)
 	filters.matched_filters = 0;
 
 	if (use_stdin == 1) {
-		// No argument specified. Use STDIN
+#ifdef DEBUG
 		fprintf(stderr,"Using STDIN\n");
+#endif
 		set_block(0);
 		fd = 0;
 	}
