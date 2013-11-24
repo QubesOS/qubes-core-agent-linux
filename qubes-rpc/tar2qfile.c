@@ -919,7 +919,7 @@ int main(int argc, char **argv)
 	tar_file_processor(fd, &filters);
 
 
-	//notify_end_and_wait_for_result();
+	notify_end_and_wait_for_result();
 	notify_progress(0, PROGRESS_FLAG_DONE);
 	return 0;
 }
