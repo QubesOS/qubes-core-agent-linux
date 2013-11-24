@@ -756,8 +756,8 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 		}
 	}
 	// Extract extra padding
-	fprintf(stderr,"Need to remove pad:%ld %ld\n",untrusted_hdr->filelen,BLKMULT-(untrusted_hdr->filelen%BLKMULT));
-	if (untrusted_hdr->filelen%BLKMULT < BLKMULT)
+	fprintf(stderr,"Need to remove pad:%lld %lld\n",untrusted_hdr->filelen,BLKMULT-(untrusted_hdr->filelen%BLKMULT));
+	if (untrusted_hdr->filelen%BLKMULT > 0)
 		ret = read(fd, buf, BLKMULT-(untrusted_hdr->filelen%BLKMULT));
 	fprintf(stderr,"Removed %d bytes of padding\n",ret);
 
@@ -844,8 +844,8 @@ void tar_file_processor(int fd, struct filters *filters)
 				}
 	
 				// Extract extra padding
-				fprintf(stderr,"Need to remove pad:%ld %ld %ld\n",to_skip,hdr.filelen,BLKMULT-(hdr.filelen%BLKMULT));
-				if (hdr.filelen%BLKMULT < BLKMULT) {
+				fprintf(stderr,"Need to remove pad:%ld %lld %lld\n",to_skip,hdr.filelen,BLKMULT-(hdr.filelen%BLKMULT));
+				if (hdr.filelen%BLKMULT > 0) {
 					ret = read(fd, &buf, BLKMULT-(hdr.filelen%BLKMULT));
 					fprintf(stderr,"Removed %d bytes of padding\n",ret);
 				}
