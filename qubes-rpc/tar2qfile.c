@@ -168,6 +168,13 @@ char *gnu_hack_string;          /* GNU ././@LongLink hackery */
 char untrusted_namebuf[MAX_PATH_LENGTH];
 extern int ignore_quota_error;
 
+struct filters {
+    int filters_count;
+    char **filters;
+    int *filters_matches;
+    int matched_filters;
+};
+
 
 /*
  * asc_ul()
@@ -386,6 +393,7 @@ enum {
 enum {
 	NEED_NOTHING,
 	NEED_SKIP,
+	NEED_SKIP_FILE, // distinguish between skipped file and unwanted blocks (extended headers etc)
 	NEED_READ,
 	NEED_SYNC_TRAIL,
 	INVALID_HEADER,
@@ -405,7 +413,7 @@ int n_dirs = 0;
 char ** dirs_headers_sent = NULL;
 
 int
-ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * sb, int filter_count, char **filter)
+ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * sb, struct filters *filters)
 {
 
   register HD_USTAR *hd;
@@ -626,18 +634,23 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 
 	// Check if user want to extract this file
 	should_extract = 1;
-	for (i=1; i < filter_count; i++) {
+	for (i=0; i < filters->filters_count; i++) {
 		should_extract = 0;
-		fprintf(stderr, "Comparing with filter %s\n", filter[i]);
-		if (strstr(untrusted_namebuf, filter[i]) == untrusted_namebuf) {
-			fprintf(stderr, "Match\n");
+		fprintf(stderr, "Comparing with filter %s\n", filters->filters[i]);
+		if (strncmp(untrusted_namebuf, filters->filters[i], strlen(filters->filters[i])) == 0) {
+			fprintf(stderr, "Match (%d)\n", filters->filters_matches[i]);
 			should_extract = 1;
+			filters->filters_matches[i]++;
+			if (filters->filters_matches[i] == 1) {
+			    // first match
+			    filters->matched_filters++;
+			}
 			break;
 		}
 	}
 	if (should_extract != 1) {
 		fprintf(stderr, "File should be filtered.. Skipping\n");
-		return NEED_SKIP;
+		return NEED_SKIP_FILE;
 	}
 
         // Create a copy of untrusted_namebuf to be used for strtok
@@ -775,7 +788,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 
 
 
-int tar_file_processor(int fd, int filter_count, char **filter)
+void tar_file_processor(int fd, struct filters *filters)
 {
 	int ret;
 	int i;
@@ -803,11 +816,28 @@ int tar_file_processor(int fd, int filter_count, char **filter)
 				}
 			}
 			if (current==NEED_READ) {
-				current = ustar_rd(fd, &hdr, buf, &sb, filter_count, filter);
+				current = ustar_rd(fd, &hdr, buf, &sb, filters);
 				fprintf(stderr,"Return %d\n",ret);
 			}
-			if (current==NEED_SKIP) {
-				fprintf(stderr,"Need to skip %ld bytes\n",hdr.filelen);
+			if (current==NEED_SKIP || current==NEED_SKIP_FILE) {
+				if (current==NEED_SKIP_FILE &&
+					filters->filters_count > 0 &&
+					filters->filters_count == filters->matched_filters) {
+				    // This assume that either:
+				    //  a) files are sorted (using full path as sort key)
+				    //  b) all the directory content is in
+				    //     consecutive block and only directories
+				    //      are given as filters
+				    // This is true for backups prepared by qvm-backup
+#ifdef DEBUG
+				    fprintf(stderr, "All filters matched at least once - assuming end of requested data\n");
+#endif
+				    return;
+				}
+#ifdef DEBUG
+				fprintf(stderr,"Need to skip %lld bytes (matched filters %d < %d)\n",
+					hdr.filelen, filters->matched_filters, filters->filters_count);
+#endif
 				to_skip = hdr.filelen;
 				while (to_skip > 0) {
 					to_skip -= read(fd, &buf, MIN(to_skip,BLKMULT));
@@ -836,8 +866,8 @@ int main(int argc, char **argv)
 	char *cwd;
 	char *sep;
 	int fd;
-	int use_stdin = 0;
-	
+	int use_stdin = 1;
+	struct filters filters;
 
 	signal(SIGPIPE, SIG_IGN);
 	// this will allow checking for possible feedback packet in the middle of transfer
@@ -856,9 +886,11 @@ int main(int argc, char **argv)
 			continue;
 		} else if (strcmp(argv[i], "-")==0) {
 			use_stdin = 1;
+			i++;
 			break;
 		} else {
 			// Parse tar file
+			use_stdin = 0;
 			entry = argv[i];
 			fprintf(stderr,"Parsing file %s\n",entry);
 
@@ -867,24 +899,26 @@ int main(int argc, char **argv)
 				fprintf(stderr,"Error opening file %s\n",entry);
 				exit(2);
 			}
-
-			// At least two arguments can be found in the command line
-			// (process name and the file to extract)
-			tar_file_processor(fd, argc, argv);
+			i++;
 			break;
 		}
 	}
+	filters.filters_count = argc-i;
+	filters.filters = argv+i;
+	filters.filters_matches = calloc(filters.filters_count, sizeof(int));
+	if (filters.filters_matches == NULL) {
+	    perror("calloc");
+	    exit(1);
+	}
+	filters.matched_filters = 0;
 
 	if (use_stdin == 1) {
 		// No argument specified. Use STDIN
 		fprintf(stderr,"Using STDIN\n");
 		set_block(0);
-		// If at least one argument has been found ( process name and - )
-		if (use_stdin)
-			tar_file_processor(fileno(stdin), argc, argv);
-		else
-			tar_file_processor(fileno(stdin), argc, argv);
+		fd = 0;
 	}
+	tar_file_processor(fd, &filters);
 
 
 	//notify_end_and_wait_for_result();
