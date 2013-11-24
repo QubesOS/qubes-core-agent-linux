@@ -630,7 +630,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	fprintf(stderr,"File is AREGTYPE\n");
 	break;
     case REGTYPE:
-	fprintf(stderr,"File is REGTYPE of size %d\n",sb->st_size);
+	fprintf(stderr,"File is REGTYPE of size %ld\n",sb->st_size);
 
 	// Check if user want to extract this file
 	should_extract = 1;
@@ -863,8 +863,6 @@ int main(int argc, char **argv)
 {
 	int i;
 	char *entry;
-	char *cwd;
-	char *sep;
 	int fd;
 	int use_stdin = 1;
 	struct filters filters;
