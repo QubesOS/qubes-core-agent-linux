@@ -168,6 +168,7 @@ static unsigned long tar_chksm (char *, int);
 char *gnu_hack_string;          /* GNU ././@LongLink hackery */
 
 char untrusted_namebuf[MAX_PATH_LENGTH];
+int use_seek = 1;
 extern int ignore_quota_error;
 
 struct filters {
@@ -914,12 +915,27 @@ void tar_file_processor(int fd, struct filters *filters)
 			if (to_skip%BLKMULT > 0) {
 				to_skip += BLKMULT-(to_skip%BLKMULT);
 			}
-			while (to_skip > 0) {
-				ret = read_all(fd, &buf, MIN(to_skip,BLKMULT));
-				if (ret <= 0) {
-					exit(1);
+			if (use_seek) {
+				ret = lseek(fd, to_skip, SEEK_CUR);
+				if (ret < 0) {
+					if (errno == ESPIPE) {
+						// fallback to read()
+						use_seek = 0;
+					} else {
+						perror("lseek");
+						exit(1);
+					}
 				}
-				to_skip -= MIN(to_skip,BLKMULT);
+			}
+			// not using "else" because above can fallback to read() method
+			if (!use_seek) {
+				while (to_skip > 0) {
+					ret = read_all(fd, &buf, MIN(to_skip,BLKMULT));
+					if (ret <= 0) {
+						exit(1);
+					}
+					to_skip -= MIN(to_skip,BLKMULT);
+				}
 			}
 
 			current = NEED_SYNC_TRAIL;
