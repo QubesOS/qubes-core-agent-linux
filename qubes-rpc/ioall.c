@@ -35,12 +35,16 @@ void perror_wrapper(char * msg)
 void set_nonblock(int fd)
 {
 	int fl = fcntl(fd, F_GETFL, 0);
+	if (fl & O_NONBLOCK)
+		return;
 	fcntl(fd, F_SETFL, fl | O_NONBLOCK);
 }
 
 void set_block(int fd)
 {
 	int fl = fcntl(fd, F_GETFL, 0);
+	if (!(fl & O_NONBLOCK))
+		return;
 	fcntl(fd, F_SETFL, fl & ~O_NONBLOCK);
 }
 
