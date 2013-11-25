@@ -819,11 +819,12 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 #ifdef DEBUG
 	fprintf(stderr,"Need to remove pad:%lld %lld\n",untrusted_hdr->filelen,BLKMULT-(untrusted_hdr->filelen%BLKMULT));
 #endif
-	if (untrusted_hdr->filelen%BLKMULT > 0)
-		ret = read(fd, buf, BLKMULT-(untrusted_hdr->filelen%BLKMULT));
-#ifdef DEBUG
-	fprintf(stderr,"Removed %d bytes of padding\n",ret);
-#endif
+	if (untrusted_hdr->filelen%BLKMULT > 0) {
+		if (!read_all(fd, buf, BLKMULT-(untrusted_hdr->filelen%BLKMULT))) {
+			wait_for_result();
+			exit(1);
+		}
+	}
 
 	// Resync trailing headers in order to find next file chunck in the tar file
 	return NEED_SYNC_TRAIL;
@@ -866,71 +867,64 @@ void tar_file_processor(int fd, struct filters *filters)
 	struct stat sb;			/* stat buffer see stat(2) */
 
 	char buf[BLKMULT+1];
-	size_t size;
 
 	i=0;
 	current = NEED_READ;
 	size_t to_skip = 0;
 	int sync_count = 0;
-	while ((size = read(fd, &buf, BLKMULT))) {
-		if (size != -1) {
+	while (read_all(fd, buf, BLKMULT)) {
+		ret = 0;
+		if (current==NEED_SYNC_TRAIL) {
+			ret = tar_trail (buf, 1, &sync_count);
 #ifdef DEBUG
-			fprintf(stderr,"Read %ld bytes\n",size);
+			fprintf(stderr,"Synchronizing trail: %d %d\n", ret, sync_count);
 #endif
-			ret = 0;
-			if (current==NEED_SYNC_TRAIL) {
-				ret = tar_trail (buf, 1, &sync_count);
-#ifdef DEBUG
-				fprintf(stderr,"Synchronizing trail: %d %d\n",ret,sync_count);
-#endif
-				if (ret != 1) {
-					current = NEED_READ;
-				}
+			if (ret != 1) {
+				current = NEED_READ;
+				sync_count = 0;
 			}
-			if (current==NEED_READ) {
-				current = ustar_rd(fd, &hdr, buf, &sb, filters);
-#ifdef DEBUG
-				fprintf(stderr,"Return %d\n",ret);
-#endif
-			}
-			if (current==NEED_SKIP || current==NEED_SKIP_FILE) {
-				if (current==NEED_SKIP_FILE &&
-					filters->filters_count > 0 &&
-					filters->filters_count == filters->matched_filters) {
-				    // This assume that either:
-				    //  a) files are sorted (using full path as sort key)
-				    //  b) all the directory content is in
-				    //     consecutive block and only directories
-				    //      are given as filters
-				    // This is true for backups prepared by qvm-backup
-#ifdef DEBUG
-				    fprintf(stderr, "All filters matched at least once - assuming end of requested data\n");
-#endif
-				    return;
-				}
-#ifdef DEBUG
-				fprintf(stderr,"Need to skip %lld bytes (matched filters %d < %d)\n",
-					hdr.filelen, filters->matched_filters, filters->filters_count);
-#endif
-				to_skip = hdr.filelen;
-				while (to_skip > 0) {
-					to_skip -= read(fd, &buf, MIN(to_skip,BLKMULT));
-				}
-	
-				// Extract extra padding
-#ifdef DEBUG
-				fprintf(stderr,"Need to remove pad:%ld %lld %lld\n",to_skip,hdr.filelen,BLKMULT-(hdr.filelen%BLKMULT));
-#endif
-				if (hdr.filelen%BLKMULT > 0) {
-					ret = read(fd, &buf, BLKMULT-(hdr.filelen%BLKMULT));
-#ifdef DEBUG
-					fprintf(stderr,"Removed %d bytes of padding\n",ret);
-#endif
-				}
-				current = NEED_SYNC_TRAIL;
-			}
-			i++;
 		}
+		if (current==NEED_READ) {
+			current = ustar_rd(fd, &hdr, buf, &sb, filters);
+#ifdef DEBUG
+			fprintf(stderr,"Return %d\n", current);
+#endif
+		}
+		if (current==NEED_SKIP || current==NEED_SKIP_FILE) {
+			if (current==NEED_SKIP_FILE &&
+				filters->filters_count > 0 &&
+				filters->filters_count == filters->matched_filters) {
+				// This assume that either:
+				//  a) files are sorted (using full path as sort key)
+				//  b) all the directory content is in
+				//     consecutive block and only directories
+				//      are given as filters
+				// This is true for backups prepared by qvm-backup
+#ifdef DEBUG
+				fprintf(stderr, "All filters matched at least once - assuming end of requested data\n");
+#endif
+				return;
+			}
+			to_skip = hdr.filelen;
+#ifdef DEBUG
+			fprintf(stderr,"Need to skip %lld bytes (matched filters %d < %d)\n",
+				hdr.filelen, filters->matched_filters, filters->filters_count);
+			fprintf(stderr,"Need to remove pad:%ld %lld %lld\n",to_skip,hdr.filelen,BLKMULT-(hdr.filelen%BLKMULT));
+#endif
+			if (to_skip%BLKMULT > 0) {
+				to_skip += BLKMULT-(to_skip%BLKMULT);
+			}
+			while (to_skip > 0) {
+				ret = read_all(fd, &buf, MIN(to_skip,BLKMULT));
+				if (ret <= 0) {
+					exit(1);
+				}
+				to_skip -= MIN(to_skip,BLKMULT);
+			}
+
+			current = NEED_SYNC_TRAIL;
+		}
+		i++;
 		//if (i >= 10)
 		//	exit(0);
 	}
