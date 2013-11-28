@@ -52,11 +52,15 @@ fi
 /usr/lib/qubes/qubes-fix-nm-conf.sh
 
 # Remove ip_forward setting from sysctl, so NM will not reset it
-sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+# Archlinux now use sysctl.d/ instead of sysctl.conf
+# sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+
 
 # Install firmware link only on system which haven't it yet
 if ! [ -e /lib/firmware/updates ]; then
-  ln -s /lib/modules/firmware /lib/firmware/updates
+  if ! [ -h /lib/firmware/updates ]; then
+    ln -s /lib/modules/firmware /lib/firmware/updates
+  fi
 fi
 
 # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
