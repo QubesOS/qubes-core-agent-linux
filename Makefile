@@ -55,7 +55,7 @@ install-vm:
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0644 misc/qubes.repo $(DESTDIR)/etc/yum.repos.d/qubes.repo
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/lib/qubes/serial.conf
-	install -D misc/qubes-serial-login $(DESTDIR)$(SBINDIR)/qubes-serial-login
+	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -d $(DESTDIR)/usr/lib/yum-plugins/
@@ -111,9 +111,9 @@ install-vm:
 	install -d $(DESTDIR)/etc/yum.conf.d
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
-	install -d $(DESTDIR)$(SBINDIR)
-	install network/qubes-firewall $(DESTDIR)$(SBINDIR)/
-	install network/qubes-netwatcher $(DESTDIR)$(SBINDIR)/
+	install -d $(DESTDIR)/$(SBINDIR)
+	install network/qubes-firewall $(DESTDIR)/$(SBINDIR)/
+	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
 
 	install -d $(DESTDIR)/usr/bin
 
@@ -122,6 +122,7 @@ install-vm:
 	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)/usr/lib/qubes
+	install qubes-rpc/tar2qfile $(DESTDIR)/usr/lib/qubes
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
 	install -m 4555  qubes-rpc/qfile-unpacker $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/qrun-in-vm $(DESTDIR)/usr/lib/qubes
@@ -134,6 +135,7 @@ install-vm:
 	install -m 0644 qubes-rpc/{qubes.SuspendPre,qubes.SuspendPost,qubes.GetAppmenus} $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.WaitForSession $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.DetachPciDevice $(DESTDIR)/etc/qubes-rpc
+	install -m 0644 qubes-rpc/qubes.{Backup,Restore} $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/usr/share/file-manager/actions
 	install -m 0644 qubes-rpc/*-gnome.desktop $(DESTDIR)/usr/share/file-manager/actions
