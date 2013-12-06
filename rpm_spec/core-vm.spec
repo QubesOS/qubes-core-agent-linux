@@ -291,7 +291,8 @@ rm -f %{name}-%{version}
 /etc/xdg/nautilus-actions/nautilus-actions.conf
 /etc/xen/scripts/vif-route-qubes
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
-%config(noreplace) /etc/yum.repos.d/qubes.repo
+%config(noreplace) /etc/yum.repos.d/qubes-r2-beta2.repo
+%config(noreplace) /etc/yum.repos.d/qubes-r2-beta3.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 /usr/sbin/qubes-serial-login
