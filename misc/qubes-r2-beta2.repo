@@ -3,6 +3,7 @@ name = Qubes OS Repository for VM (updates)
 baseurl = http://yum.qubes-os.org/r2-beta2/current/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-2-primary
 gpgcheck = 1
+enabled=0
 
 [qubes-vm-r2b2-current-testing]
 name = Qubes OS Repository for VM (updates-testing)
