@@ -24,4 +24,9 @@ Provides:   kernel-modules-extra
 %description
 Placeholder for kernel package as it is managed by Dom0.
 
+%install
+
+mkdir -p $RPM_BUILD_ROOT/lib/modules
+
 %files
+%dir /lib/modules
