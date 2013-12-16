@@ -49,7 +49,7 @@ install-vm:
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)/lib/systemd/system/
 	install -m 0644 vm-systemd/NetworkManager.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/cups.service $(DESTDIR)/usr/lib/qubes/init/
+	install -m 0644 vm-systemd/cups.* $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)/usr/lib/qubes/init/
 
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes

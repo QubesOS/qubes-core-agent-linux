@@ -451,10 +451,14 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/NetworkManager.service
 /usr/lib/qubes/init/NetworkManager-wait-online.service
 /usr/lib/qubes/init/cups.service
+/usr/lib/qubes/init/cups.socket
+/usr/lib/qubes/init/cups.path
 /usr/lib/qubes/init/ntpd.service
 %ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager.service
 %ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager-wait-online.service
 %ghost %attr(0644,root,root) /etc/systemd/system/cups.service
+%ghost %attr(0644,root,root) /etc/systemd/system/cups.socket
+%ghost %attr(0644,root,root) /etc/systemd/system/cups.path
 
 %post systemd
 
@@ -464,10 +468,19 @@ done
 
 /bin/systemctl enable qubes-update-check.timer 2> /dev/null
 
+UNITDIR=/lib/systemd/system
+OVERRIDEDIR=/usr/lib/qubes/init
+
 # Install overriden services only when original exists
 for srv in cups NetworkManager NetworkManager-wait-online ntpd; do
-    if [ -f /lib/systemd/system/$srv.service ]; then
-        cp /usr/lib/qubes/init/$srv.service /etc/systemd/system/$srv.service
+    if [ -f $UNITDIR/$srv.service ]; then
+        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
+    fi
+    if [ -f $UNITDIR/$srv.socket -a -f $OVERRIDEDIR/$srv.socket ]; then
+        cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/
+    fi
+    if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then
+        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
     fi
 done
 
@@ -518,6 +531,6 @@ if [ "$1" != 0 ] ; then
     exit 0
 fi
 
-for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agenT; DO
+for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agenT; do
     /bin/systemctl disable $srv.service
 do
