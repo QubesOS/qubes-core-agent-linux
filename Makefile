@@ -51,6 +51,7 @@ install-vm:
 	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/cups.* $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)/usr/lib/qubes/init/
+	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)/usr/lib/qubes/init/
 
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0644 misc/qubes-r2-beta2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2-beta2.repo

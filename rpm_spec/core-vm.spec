@@ -454,6 +454,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/cups.socket
 /usr/lib/qubes/init/cups.path
 /usr/lib/qubes/init/ntpd.service
+/usr/lib/qubes/init/chronyd.service
 %ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager.service
 %ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager-wait-online.service
 %ghost %attr(0644,root,root) /etc/systemd/system/cups.service
@@ -472,7 +473,7 @@ UNITDIR=/lib/systemd/system
 OVERRIDEDIR=/usr/lib/qubes/init
 
 # Install overriden services only when original exists
-for srv in cups NetworkManager NetworkManager-wait-online ntpd; do
+for srv in cups NetworkManager NetworkManager-wait-online ntpd chronyd; do
     if [ -f $UNITDIR/$srv.service ]; then
         cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
     fi
@@ -493,6 +494,7 @@ DISABLE_SERVICES="$DISABLE_SERVICES fedora-autorelabel fedora-autorelabel-mark i
 DISABLE_SERVICES="$DISABLE_SERVICES mdmonitor multipathd openct rpcbind mcelog fedora-storage-init fedora-storage-init-late"
 DISABLE_SERVICES="$DISABLE_SERVICES plymouth-start plymouth-read-write plymouth-quit plymouth-quit-wait"
 DISABLE_SERVICES="$DISABLE_SERVICES sshd tcsd sm-client sendmail mdmonitor-takeover"
+DISABLE_SERVICES="$DISABLE_SERVICES rngd smartd upower irqbalance colord"
 for srv in $DISABLE_SERVICES; do
     if [ -f /lib/systemd/system/$srv.service ]; then
         if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
