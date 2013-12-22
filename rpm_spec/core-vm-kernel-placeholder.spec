@@ -29,4 +29,6 @@ Placeholder for kernel package as it is managed by Dom0.
 mkdir -p $RPM_BUILD_ROOT/lib/modules
 
 %files
+%if %{fedora} > 18
 %dir /lib/modules
+%endif
