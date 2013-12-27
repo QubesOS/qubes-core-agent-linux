@@ -3,12 +3,8 @@ CFLAGS+=-I. -g -Wall -Wextra -Werror -pie -fPIC `pkg-config --cflags vchan-$(BAC
 LIBS=`pkg-config --libs vchan-$(BACKEND_VMM)` -lqrexec-utils
 
 all: qrexec-agent qrexec-client-vm
-qrexec-daemon: qrexec-daemon.o
-	$(CC) -pie -g -o qrexec-daemon qrexec-daemon.o $(LIBS)
 qrexec-agent: qrexec-agent.o
 	$(CC) -pie -g -o qrexec-agent qrexec-agent.o $(LIBS)
-qrexec-client: qrexec-client.o
-	$(CC) -pie -g -o qrexec-client qrexec-client.o $(LIBS)
 qrexec-client-vm: qrexec-client-vm.o
 	$(CC) -pie -g -o qrexec-client-vm qrexec-client-vm.o
 clean:
