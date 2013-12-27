@@ -60,7 +60,7 @@ char *get_program_name(char *prog)
 int main(int argc, char **argv)
 {
     int trigger_fd;
-    struct trigger_connect_params params;
+    struct trigger_service_params params;
     int local_fd[3], remote_fd[3];
     int i;
     char *abs_exec_path;
@@ -93,15 +93,16 @@ int main(int argc, char **argv)
             putenv(env);
             dup2(local_fd[i], i);
             close(local_fd[i]);
-        }
+        } else
+            close(local_fd[i]);
     }
 
     memset(&params, 0, sizeof(params));
-    strncpy(params.exec_index, argv[2], sizeof(params.exec_index));
-    strncpy(params.target_vmname, argv[1],
-            sizeof(params.target_vmname));
-    snprintf(params.process_fds.ident,
-            sizeof(params.process_fds.ident), "%d %d %d",
+    strncpy(params.service_name, argv[2], sizeof(params.service_name));
+    strncpy(params.target_domain, argv[1],
+            sizeof(params.target_domain));
+    snprintf(params.request_id.ident,
+            sizeof(params.request_id.ident), "%d %d %d",
             remote_fd[0], remote_fd[1], remote_fd[2]);
 
     if (write(trigger_fd, &params, sizeof(params)) < 0) {
