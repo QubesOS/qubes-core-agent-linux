@@ -29,92 +29,92 @@
 #include "qrexec.h"
 int connect_unix_socket()
 {
-	int s, len;
-	struct sockaddr_un remote;
+    int s, len;
+    struct sockaddr_un remote;
 
-	if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-		perror("socket");
-		return -1;
-	}
+    if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+        perror("socket");
+        return -1;
+    }
 
-	remote.sun_family = AF_UNIX;
-	strncpy(remote.sun_path, QREXEC_AGENT_FDPASS_PATH,
-		sizeof(remote.sun_path));
-	len = strlen(remote.sun_path) + sizeof(remote.sun_family);
-	if (connect(s, (struct sockaddr *) &remote, len) == -1) {
-		perror("connect");
-		exit(1);
-	}
-	return s;
+    remote.sun_family = AF_UNIX;
+    strncpy(remote.sun_path, QREXEC_AGENT_FDPASS_PATH,
+            sizeof(remote.sun_path));
+    len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+    if (connect(s, (struct sockaddr *) &remote, len) == -1) {
+        perror("connect");
+        exit(1);
+    }
+    return s;
 }
 
 char *get_program_name(char *prog)
 {
-	char *basename = rindex(prog, '/');
-	if (basename)
-		return basename + 1;
-	else
-		return prog;
+    char *basename = rindex(prog, '/');
+    if (basename)
+        return basename + 1;
+    else
+        return prog;
 }
 
 int main(int argc, char **argv)
 {
-	int trigger_fd;
-	struct trigger_connect_params params;
-	int local_fd[3], remote_fd[3];
-	int i;
-	char *abs_exec_path;
+    int trigger_fd;
+    struct trigger_connect_params params;
+    int local_fd[3], remote_fd[3];
+    int i;
+    char *abs_exec_path;
 
-	if (argc < 4) {
-		fprintf(stderr,
-			"usage: %s target_vmname program_ident local_program [local program arguments]\n",
-			argv[0]);
-		exit(1);
-	}
+    if (argc < 4) {
+        fprintf(stderr,
+                "usage: %s target_vmname program_ident local_program [local program arguments]\n",
+                argv[0]);
+        exit(1);
+    }
 
-	trigger_fd = open(QREXEC_AGENT_TRIGGER_PATH, O_WRONLY);
-	if (trigger_fd < 0) {
-		perror("open " QREXEC_AGENT_TRIGGER_PATH);
-		exit(1);
-	}
+    trigger_fd = open(QREXEC_AGENT_TRIGGER_PATH, O_WRONLY);
+    if (trigger_fd < 0) {
+        perror("open " QREXEC_AGENT_TRIGGER_PATH);
+        exit(1);
+    }
 
-	for (i = 0; i < 3; i++) {
-		local_fd[i] = connect_unix_socket();
-		if (read(local_fd[i], &remote_fd[i], sizeof(remote_fd[i])) != sizeof(remote_fd[i])) {
-			perror("read client fd");
-			exit(1);
-		}
-		if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
-			char *env;
-			if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
-				perror("prepare SAVED_FD_");
-				exit(1);
-			}
-			putenv(env);
-			dup2(local_fd[i], i);
-			close(local_fd[i]);
-		}
-	}
+    for (i = 0; i < 3; i++) {
+        local_fd[i] = connect_unix_socket();
+        if (read(local_fd[i], &remote_fd[i], sizeof(remote_fd[i])) != sizeof(remote_fd[i])) {
+            perror("read client fd");
+            exit(1);
+        }
+        if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
+            char *env;
+            if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
+                perror("prepare SAVED_FD_");
+                exit(1);
+            }
+            putenv(env);
+            dup2(local_fd[i], i);
+            close(local_fd[i]);
+        }
+    }
 
-	memset(&params, 0, sizeof(params));
-	strncpy(params.exec_index, argv[2], sizeof(params.exec_index));
-	strncpy(params.target_vmname, argv[1],
-		sizeof(params.target_vmname));
-	snprintf(params.process_fds.ident,
-		 sizeof(params.process_fds.ident), "%d %d %d",
-		 remote_fd[0], remote_fd[1], remote_fd[2]);
+    memset(&params, 0, sizeof(params));
+    strncpy(params.exec_index, argv[2], sizeof(params.exec_index));
+    strncpy(params.target_vmname, argv[1],
+            sizeof(params.target_vmname));
+    snprintf(params.process_fds.ident,
+            sizeof(params.process_fds.ident), "%d %d %d",
+            remote_fd[0], remote_fd[1], remote_fd[2]);
 
-	if (write(trigger_fd, &params, sizeof(params)) < 0) {
-		if (!getenv("PASS_LOCAL_STDERR"))
-			perror("write to agent");
-		exit(1);
-	}
+    if (write(trigger_fd, &params, sizeof(params)) < 0) {
+        if (!getenv("PASS_LOCAL_STDERR"))
+            perror("write to agent");
+        exit(1);
+    }
 
-	close(trigger_fd);
+    close(trigger_fd);
 
-	abs_exec_path = strdup(argv[3]);
-	argv[3] = get_program_name(argv[3]);
-	execv(abs_exec_path, argv + 3);
-	perror("execv");
-	return 1;
+    abs_exec_path = strdup(argv[3]);
+    argv[3] = get_program_name(argv[3]);
+    execv(abs_exec_path, argv + 3);
+    perror("execv");
+    return 1;
 }
