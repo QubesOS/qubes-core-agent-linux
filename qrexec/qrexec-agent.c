@@ -84,7 +84,7 @@ void init()
 
 void wake_meminfo_writer() {
 	FILE *f;
-	pid_t pid;
+	int pid;
 
 	if (meminfo_write_started)
 		/* wake meminfo-writer only once */
@@ -101,6 +101,10 @@ void wake_meminfo_writer() {
 	}
 
 	fclose(f);
+	if (pid <= 1 || pid > 0xffff) {
+		/* check within acceptable range */
+		return;
+	}
 	kill(pid, SIGUSR1);
 	meminfo_write_started = 1;
 }
