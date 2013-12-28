@@ -85,11 +85,11 @@ void no_colon_in_cmd()
 void do_exec(const char *cmd)
 {
     char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - RPC_REQUEST_COMMAND_LEN + 1];
-    char *realcmd = index(cmd, ':');
+    char *realcmd = index(cmd, ':'), *user;
     if (!realcmd)
         no_colon_in_cmd();
     /* mark end of username and move to command */
-    *realcmd = 0;
+    user=strndup(cmd,realcmd-cmd);
     realcmd++;
     /* ignore "nogui:" prefix in linux agent */
     if (strncmp(realcmd, NOGUI_CMD_PREFIX, NOGUI_CMD_PREFIX_LEN) == 0)
@@ -103,7 +103,7 @@ void do_exec(const char *cmd)
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
 
-    execl("/bin/su", "su", "-", cmd, "-c", realcmd, NULL);
+    execl("/bin/su", "su", "-", user, "-c", realcmd, NULL);
     perror("execl");
     exit(1);
 }
