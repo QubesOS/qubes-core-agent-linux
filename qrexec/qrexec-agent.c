@@ -223,7 +223,7 @@ void update_max_process_fd()
 {
 	int i;
 	for (i = max_process_fd;
-	     process_fd[i].type == FDTYPE_INVALID && i >= 0; i--);
+	     i >= 0 && process_fd[i].type == FDTYPE_INVALID; i--);
 	max_process_fd = i;
 }
 
