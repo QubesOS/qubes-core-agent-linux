@@ -22,9 +22,12 @@ int prepare_creds_return_uid(const char *username)
 	}
 	setenv("HOME", pwd->pw_dir, 1);
 	setenv("USER", username, 1);
-	setgid(pwd->pw_gid);
-	initgroups(username, pwd->pw_gid);
-	setfsuid(pwd->pw_uid);
+	if (setgid(pwd->pw_gid) < 0)
+		gui_fatal("Error setting group permissions");
+	if (initgroups(username, pwd->pw_gid) < 0)
+		gui_fatal("Error initializing groups");
+	if (setfsuid(pwd->pw_uid) < 0)
+		gui_fatal("Error setting filesystem level permissions");
 	return pwd->pw_uid;
 }
 
@@ -47,12 +50,14 @@ int main(int argc, char ** argv)
 		exit(1);
 	}
 	mkdir(INCOMING_DIR_ROOT, 0700);
-	asprintf(&incoming_dir, "%s/%s", INCOMING_DIR_ROOT, remote_domain);
+	if (asprintf(&incoming_dir, "%s/%s", INCOMING_DIR_ROOT, remote_domain) < 0)
+		gui_fatal("Error allocating memory"); 
 	mkdir(incoming_dir, 0700);
 	if (chdir(incoming_dir))
 		gui_fatal("Error chdir to %s", incoming_dir); 
 	if (chroot(incoming_dir)) //impossible
 		gui_fatal("Error chroot to %s", incoming_dir);
-	setuid(uid);
+	if (setuid(uid) < 0)
+		gui_fatal("Error changing permissions to '%s'", "user");
 	return do_unpack();
 }
