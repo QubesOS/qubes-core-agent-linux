@@ -96,6 +96,7 @@ void wake_meminfo_writer() {
 		return;
 	}
 	if (fscanf(f, "%d", &pid) < 1) {
+		fclose(f);
 		/* no meminfo-writer found, ignoring */
 		return;
 	}
