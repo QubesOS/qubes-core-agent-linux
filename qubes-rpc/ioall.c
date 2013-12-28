@@ -25,7 +25,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-void perror_wrapper(char * msg)
+void perror_wrapper(const char * msg)
 {
 	int prev=errno;
 	perror(msg);
@@ -48,7 +48,7 @@ void set_block(int fd)
 	fcntl(fd, F_SETFL, fl & ~O_NONBLOCK);
 }
 
-int write_all(int fd, void *buf, int size)
+int write_all(int fd, const void *buf, int size)
 {
 	int written = 0;
 	int ret;

@@ -12,7 +12,7 @@
 #include <errno.h>
 #include <libqubes-rpc-filecopy.h>
 #define INCOMING_DIR_ROOT "/home/user/QubesIncoming"
-int prepare_creds_return_uid(char *username)
+int prepare_creds_return_uid(const char *username)
 {
 	struct passwd *pwd;
 	pwd = getpwnam(username);
@@ -37,7 +37,7 @@ int main(int argc, char ** argv)
 {
 	char *incoming_dir;
 	int uid;
-	char *remote_domain;
+	const char *remote_domain;
 
 	uid = prepare_creds_return_uid("user");
 
