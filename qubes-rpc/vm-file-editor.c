@@ -28,11 +28,12 @@ char *get_filename()
 	int i;
 	if (!read_all(0, buf, sizeof(buf)))
 		exit(1);
+	buf[DVM_FILENAME_SIZE-1] = 0;
 	if (index(buf, '/')) {
 		fprintf(stderr, "filename contains /");
 		exit(1);
 	}
-	for (i=0; i < DVM_FILENAME_SIZE && buf[i]!=0; i++) {
+	for (i=0; buf[i]!=0; i++) {
 		// replace some characters with _ (eg mimeopen have problems with some of them)
 		if (index(" !?\"#$%^&*()[]<>;`~", buf[i]))
 			buf[i]='_';
