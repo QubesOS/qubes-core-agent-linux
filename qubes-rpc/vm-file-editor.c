@@ -64,6 +64,7 @@ void send_file_back(char * filename)
 	if (!copy_fd_all(1, fd))
 	 exit(1);
 	close(fd);
+	close(1);
 }
 
 int
