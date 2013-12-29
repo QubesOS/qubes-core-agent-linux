@@ -35,6 +35,7 @@ static void produce_message(const char * type, const char *fmt, va_list args)
 		exit(1);
 	default:;
 	}
+	free(dialog_msg);
 }
 
 void gui_fatal(const char *fmt, ...)
