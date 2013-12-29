@@ -20,7 +20,7 @@ static void produce_message(const char * type, const char *fmt, va_list args)
 	(void) vsnprintf(buf, sizeof(buf), fmt, args);
 	asprintf(&dialog_msg, "%s: %s: %s (error type: %s)",
 		 program_invocation_short_name, type, buf, strerror(errno));
-	fprintf(stderr, "%s", dialog_msg);
+	fprintf(stderr, "%s\n", dialog_msg);
 	switch (fork()) {
 	case -1:
 		exit(1);	//what else
