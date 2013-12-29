@@ -106,7 +106,10 @@ void wake_meminfo_writer() {
 		/* check within acceptable range */
 		return;
 	}
-	kill(pid, SIGUSR1);
+	if (kill(pid, SIGUSR1) < 0) {
+		/* Can't send signal */
+		return;
+	}
 	meminfo_write_started = 1;
 }
 
