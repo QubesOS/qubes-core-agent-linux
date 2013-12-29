@@ -30,6 +30,7 @@ void send_file(char *fname)
 	if (!copy_fd_all(1, fd))
 		gui_fatal("send file to dispVM");
 	close(1);
+	close(fd);
 }
 
 int copy_and_return_nonemptiness(int tmpfd)
