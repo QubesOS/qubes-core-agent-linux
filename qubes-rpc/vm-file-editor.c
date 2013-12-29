@@ -44,7 +44,7 @@ char *get_filename()
 
 void copy_file(char *filename)
 {
-	int fd = open(filename, O_WRONLY | O_CREAT, 0600);
+	int fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
 	if (fd < 0) {
 		perror("open file");
 		exit(1);
