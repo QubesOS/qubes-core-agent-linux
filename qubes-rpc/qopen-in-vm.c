@@ -44,7 +44,7 @@ int copy_and_return_nonemptiness(int tmpfd)
 		gui_fatal("fstat");
 	close(tmpfd);
 
-	return st.st_size;
+	return st.st_size > 0;
 }
 
 void recv_file_nowrite(char *fname)
