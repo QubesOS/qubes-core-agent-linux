@@ -5,11 +5,13 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 #include <ioall.h>
 #include "dvm2.h"
 
 #define USER_HOME "/home/user"
 #define MIMEINFO_DATABASES "/usr/share/mime:/usr/local/share:" USER_HOME "/.local/share:/usr/share/qubes/mime-override"
+#define TMP_LOC "/tmp/qopen/"
 
 const char *gettime(void)
 {
@@ -21,11 +23,62 @@ const char *gettime(void)
 	return retbuf;
 }
 
-const char *get_filename(void)
+static char *get_directory(void)
+{
+	const char *remote_domain;
+	char *dir;
+	size_t len;
+	struct stat dstat;
+	int ret;
+
+	remote_domain = getenv("QREXEC_REMOTE_DOMAIN");
+	if (!remote_domain) {
+		fprintf(stderr, "Cannot get remote domain name\n");
+		exit(1);
+	}
+	if (!*remote_domain || index(remote_domain, '/'))
+		goto fail;
+	if (!strcmp(remote_domain, ".") || !strcmp(remote_domain, ".."))
+		goto fail;
+
+	len = strlen("/tmp")+1+strlen(remote_domain)+1;
+	dir = malloc(len);
+	if (!dir) {
+		fprintf(stderr, "Cannot allocate memory\n");
+		exit(1);
+	}
+	snprintf(dir, len, "/tmp/%s", remote_domain);
+
+	ret=mkdir(dir, 0777);
+	if (ret<0 && errno!=EEXIST) {
+		perror("mkdir");
+		exit(1);
+	}
+	if (stat(dir, &dstat)) {
+		perror("stat dir");
+		exit(1);
+	}
+	if (!S_ISDIR(dstat.st_mode)) {
+		fprintf(stderr, "%s exists and is not a directory\n", dir);
+		exit(1);
+	}
+
+	return dir;
+
+fail:
+	fprintf(stderr, "Invalid remote domain name: %s\n", remote_domain);
+	exit(1);
+}
+
+char *get_filename(void)
 {
 	char buf[DVM_FILENAME_SIZE];
-	static char retname[sizeof(buf) + sizeof("/tmp/")];
+	static char *retname;
 	int i;
+	char *directory;
+	size_t len;
+
+	directory = get_directory();
 	if (!read_all(0, buf, sizeof(buf)))
 		exit(1);
 	buf[DVM_FILENAME_SIZE-1] = 0;
@@ -38,7 +91,14 @@ const char *get_filename(void)
 		if (index(" !?\"#$%^&*()[]<>;`~|", buf[i]))
 			buf[i]='_';
 	}
-	snprintf(retname, sizeof(retname), "/tmp/%s", buf);
+	len = strlen(directory)+1+strlen(buf)+1;
+	retname = malloc(len);
+	if (!retname) {
+		fprintf(stderr, "Cannot allocate memory\n");
+		exit(1);
+	}
+	snprintf(retname, len, "%s/%s", directory, buf);
+	free(directory);
 	return retname;
 }
 
@@ -71,7 +131,7 @@ int
 main()
 {
 	struct stat stat_pre, stat_post, session_stat;
-	const char *filename = get_filename();
+	char *filename = get_filename();
 	int child, status, log_fd, null_fd;
 	char var[1024], val[4096];
 	FILE *env_file;
@@ -163,5 +223,6 @@ main()
 	}
 	if (stat_pre.st_mtime != stat_post.st_mtime)
 		send_file_back(filename);
+	free(filename);
 	return 0;
 }
