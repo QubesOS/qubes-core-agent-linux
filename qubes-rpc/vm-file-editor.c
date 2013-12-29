@@ -35,7 +35,7 @@ char *get_filename()
 	}
 	for (i=0; buf[i]!=0; i++) {
 		// replace some characters with _ (eg mimeopen have problems with some of them)
-		if (index(" !?\"#$%^&*()[]<>;`~", buf[i]))
+		if (index(" !?\"#$%^&*()[]<>;`~|", buf[i]))
 			buf[i]='_';
 	}
 	snprintf(retname, sizeof(retname), "/tmp/%s", buf);
