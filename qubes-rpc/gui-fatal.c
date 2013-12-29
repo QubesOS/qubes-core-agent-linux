@@ -27,10 +27,10 @@ static void produce_message(const char * type, const char *fmt, va_list args)
 	case 0:
 		fix_display();
 #ifdef USE_KDIALOG
-		execlp("kdialog", "kdialog", "--sorry", dialog_msg, NULL);
+		execlp("/usr/bin/kdialog", "kdialog", "--sorry", dialog_msg, NULL);
 #else
 
-		execlp("zenity", "zenity", "--error",  "--text", dialog_msg, NULL);
+		execlp("/usr/bin/zenity", "zenity", "--error",  "--text", dialog_msg, NULL);
 #endif
 		exit(1);
 	default:;
