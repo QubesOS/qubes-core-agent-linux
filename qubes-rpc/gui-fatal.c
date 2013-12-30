@@ -8,12 +8,12 @@
 #include <unistd.h>
 #include <stdarg.h>
 
-static void fix_display()
+static void fix_display(void)
 {
 	setenv("DISPLAY", ":0", 1);
 }
 
-static void produce_message(char * type, const char *fmt, va_list args)
+static void produce_message(const char * type, const char *fmt, va_list args)
 {
 	char *dialog_msg;
 	char buf[1024];

@@ -24,9 +24,9 @@ void notify_progress(int size, int flag)
 
 void do_notify_progress(long long total, int flag)
 {
-	char *du_size_env = getenv("FILECOPY_TOTAL_SIZE");
-	char *progress_type_env = getenv("PROGRESS_TYPE");
-	char *saved_stdout_env = getenv("SAVED_FD_1");
+	const char *du_size_env = getenv("FILECOPY_TOTAL_SIZE");
+	const char *progress_type_env = getenv("PROGRESS_TYPE");
+	const char *saved_stdout_env = getenv("SAVED_FD_1");
 	if (!progress_type_env)
 		return;
 	if (!strcmp(progress_type_env, "console") && du_size_env) {
@@ -45,7 +45,7 @@ void do_notify_progress(long long total, int flag)
 	}
 }
 
-void notify_end_and_wait_for_result()
+void notify_end_and_wait_for_result(void)
 {
 	struct file_header end_hdr;
 
@@ -59,13 +59,13 @@ void notify_end_and_wait_for_result()
 	wait_for_result();
 }
 
-int write_all_with_crc(int fd, void *buf, int size)
+int write_all_with_crc(int fd, const void *buf, int size)
 {
 	crc32_sum = Crc32_ComputeBuf(crc32_sum, buf, size);
 	return write_all(fd, buf, size);
 }
 
-void wait_for_result()
+void wait_for_result(void)
 {
 	struct result_header hdr;
 	struct result_header_ext hdr_ext;
@@ -124,7 +124,7 @@ void wait_for_result()
 	}
 }
 
-void write_headers(struct file_header *hdr, char *filename)
+void write_headers(const struct file_header *hdr, const char *filename)
 {
 	if (!write_all_with_crc(1, hdr, sizeof(*hdr))
 	    || !write_all_with_crc(1, filename, hdr->namelen)) {
@@ -134,7 +134,7 @@ void write_headers(struct file_header *hdr, char *filename)
 	}
 }
 
-int single_file_processor(char *filename, struct stat *st)
+int single_file_processor(const char *filename, const struct stat *st)
 {
 	struct file_header hdr;
 	int fd;

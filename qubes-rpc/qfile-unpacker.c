@@ -14,7 +14,7 @@
 #define INCOMING_DIR_ROOT "/home/user/QubesIncoming"
 int prepare_creds_return_uid(const char *username)
 {
-	struct passwd *pwd;
+	const struct passwd *pwd;
 	pwd = getpwnam(username);
 	if (!pwd) {
 		perror("getpwnam");

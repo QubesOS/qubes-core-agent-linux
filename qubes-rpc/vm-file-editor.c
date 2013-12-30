@@ -11,7 +11,7 @@
 #define USER_HOME "/home/user"
 #define MIMEINFO_DATABASES "/usr/share/mime:/usr/local/share:" USER_HOME "/.local/share:/usr/share/qubes/mime-override"
 
-char *gettime()
+const char *gettime(void)
 {
 	static char retbuf[60];
 	struct timeval tv;
@@ -21,7 +21,7 @@ char *gettime()
 	return retbuf;
 }
 
-char *get_filename()
+const char *get_filename(void)
 {
 	char buf[DVM_FILENAME_SIZE];
 	static char retname[sizeof(buf) + sizeof("/tmp/")];
@@ -42,7 +42,7 @@ char *get_filename()
 	return retname;
 }
 
-void copy_file(char *filename)
+void copy_file(const char *filename)
 {
 	int fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
 	if (fd < 0) {
@@ -54,7 +54,7 @@ void copy_file(char *filename)
 	close(fd);
 }
 
-void send_file_back(char * filename)
+void send_file_back(const char * filename)
 {
 	int fd = open(filename, O_RDONLY);
 	if (fd < 0) {
@@ -71,7 +71,7 @@ int
 main()
 {
 	struct stat stat_pre, stat_post, session_stat;
-	char *filename = get_filename();
+	const char *filename = get_filename();
 	int child, status, log_fd, null_fd;
 	char var[1024], val[4096];
 	FILE *env_file;

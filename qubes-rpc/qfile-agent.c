@@ -1,6 +1,6 @@
 #include "qfile-utils.h"
 
-char *get_abs_path(char *cwd, char *pathname)
+char *get_abs_path(const char *cwd, const char *pathname)
 {
 	char *ret;
 	if (pathname[0] == '/')
@@ -9,7 +9,7 @@ char *get_abs_path(char *cwd, char *pathname)
 	return ret;
 }
 
-int do_fs_walk(char *file)
+int do_fs_walk(const char *file)
 {
 	char *newfile;
 	struct stat st;

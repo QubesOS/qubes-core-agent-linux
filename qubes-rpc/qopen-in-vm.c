@@ -12,9 +12,9 @@
 #include <gui-fatal.h>
 #include "dvm2.h"
 
-void send_file(char *fname)
+void send_file(const char *fname)
 {
-	char *base;
+	const char *base;
 	char sendbuf[DVM_FILENAME_SIZE];
 	int fd = open(fname, O_RDONLY);
 	if (fd < 0)
@@ -47,7 +47,7 @@ int copy_and_return_nonemptiness(int tmpfd)
 	return st.st_size > 0;
 }
 
-void recv_file_nowrite(char *fname)
+void recv_file_nowrite(const char *fname)
 {
 	char *tempfile;
 	char *errmsg;
@@ -68,7 +68,7 @@ void recv_file_nowrite(char *fname)
 	gui_nonfatal(errmsg);
 }
 
-void actually_recv_file(char *fname, char *tempfile, int tmpfd)
+void actually_recv_file(const char *fname, const char *tempfile, int tmpfd)
 {
 	if (!copy_and_return_nonemptiness(tmpfd)) {
 		unlink(tempfile);
@@ -78,7 +78,7 @@ void actually_recv_file(char *fname, char *tempfile, int tmpfd)
 		gui_fatal("rename");
 }
 
-void recv_file(char *fname)
+void recv_file(const char *fname)
 {
 	int tmpfd;
 	char *tempfile;
@@ -90,7 +90,7 @@ void recv_file(char *fname)
 		actually_recv_file(fname, tempfile, tmpfd);
 }
 
-void talk_to_daemon(char *fname)
+void talk_to_daemon(const char *fname)
 {
 	send_file(fname);
 	recv_file(fname);
