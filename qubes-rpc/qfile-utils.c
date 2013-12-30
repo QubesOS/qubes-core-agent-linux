@@ -175,9 +175,9 @@ int single_file_processor(const char *filename, const struct stat *st)
 		char name[st->st_size + 1];
 		if (readlink(filename, name, sizeof(name)) != st->st_size)
 			gui_fatal("readlink %s", filename);
-		hdr.filelen = st->st_size + 1;
+		hdr.filelen = st->st_size;
 		write_headers(&hdr, filename);
-		if (!write_all_with_crc(1, name, st->st_size + 1)) {
+		if (!write_all_with_crc(1, name, st->st_size)) {
 			set_block(0);
 			wait_for_result();
 			exit(1);
