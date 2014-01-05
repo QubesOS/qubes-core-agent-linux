@@ -307,7 +307,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/dispvm-prerun.sh
 /usr/lib/qubes/sync-ntp-clock
 /usr/lib/qubes/prepare-suspend
-/usr/lib/qubes/meminfo-writer
 /usr/lib/qubes/network-manager-prepare-conf-dir
 /usr/lib/qubes/qrexec-agent
 /usr/lib/qubes/qrexec-client-vm
@@ -432,7 +431,6 @@ The Qubes core startup configuration for SystemD init.
 %files systemd
 %defattr(-,root,root,-)
 /lib/systemd/system/qubes-dvm.service
-/lib/systemd/system/qubes-meminfo-writer.service
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-firewall.service
 /lib/systemd/system/qubes-netwatcher.service
@@ -463,7 +461,7 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
-for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
     /bin/systemctl enable $srv.service 2> /dev/null
 done
 
@@ -533,6 +531,6 @@ if [ "$1" != 0 ] ; then
     exit 0
 fi
 
-for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agenT; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agent; do
     /bin/systemctl disable $srv.service
 do

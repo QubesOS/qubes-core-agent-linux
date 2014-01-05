@@ -144,7 +144,6 @@ install-vm:
 
 	install -D misc/nautilus-actions.conf $(DESTDIR)/etc/xdg/nautilus-actions/nautilus-actions.conf
 
-	install misc/meminfo-writer $(DESTDIR)/usr/lib/qubes
 	install -d $(DESTDIR)/mnt/removable
 	install -d $(DESTDIR)/var/lib/qubes/dom0-updates
 
