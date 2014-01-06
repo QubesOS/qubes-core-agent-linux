@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
-#include <ioall.h>
+#include <libqubes-rpc-filecopy.h>
 #include "dvm2.h"
 
 #define USER_HOME "/home/user"
@@ -103,7 +103,7 @@ char *get_filename(void)
 	return retname;
 }
 
-void copy_file(const char *filename)
+void copy_file_by_name(const char *filename)
 {
 	int fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0600);
 	if (fd < 0) {
@@ -138,7 +138,7 @@ main()
 	FILE *env_file;
 	FILE *waiter_pidfile;
 
-	copy_file(filename);
+	copy_file_by_name(filename);
 	if (stat(filename, &stat_pre)) {
 		perror("stat pre");
 		exit(1);

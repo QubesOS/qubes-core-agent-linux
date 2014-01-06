@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <malloc.h>
 #include <stdlib.h>
-#include <ioall.h>
+#include <libqubes-rpc-filecopy.h>
 #include <unistd.h>
 #include <gui-fatal.h>
 #include "dvm2.h"

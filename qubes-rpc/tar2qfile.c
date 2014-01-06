@@ -38,13 +38,13 @@
 
 #define _GNU_SOURCE /* For O_NOFOLLOW. */
 #include <errno.h>
-#include <ioall.h>
 #include <fcntl.h>
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <libqubes-rpc-filecopy.h>
 #include <string.h>
 #include <qfile-utils.h>
 
