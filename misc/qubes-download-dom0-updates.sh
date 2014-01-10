@@ -8,6 +8,8 @@ CLEAN=0
 CHECK_ONLY=0
 OPTS="--installroot $DOM0_UPDATES_DIR --config=$DOM0_UPDATES_DIR/etc/yum.conf"
 PKGLIST=
+export LC_ALL=C
+
 while [ -n "$1" ]; do
     case "$1" in
         --doit)
@@ -54,7 +56,7 @@ fi
 
 if [ "x$PKGLIST" = "x" ]; then
     echo "Checking for dom0 updates..." >&2
-    PKGLIST=`yum $OPTS check-update -q | cut -f 1 -d ' '`
+    PKGLIST=`yum $OPTS check-update -q | cut -f 1 -d ' ' | grep -v "^Obsoleting"`
 else
     PKGS_FROM_CMDLINE=1
 fi
