@@ -916,15 +916,20 @@ void tar_file_processor(int fd, struct filters *filters)
 				to_skip += BLKMULT-(to_skip%BLKMULT);
 			}
 			if (use_seek) {
-				ret = lseek(fd, to_skip, SEEK_CUR);
-				if (ret < 0) {
+				int tries = 3;
+				while (lseek(fd, to_skip, SEEK_CUR) < 0) {
 					if (errno == ESPIPE) {
 						// fallback to read()
 						use_seek = 0;
-					} else {
-						perror("lseek");
-						exit(1);
+						break;
+					} else if (errno == EAGAIN) {
+						/* WTF?! lseek theoretically never returns this error, but
+						 * in practice it was seen... */
+						if (tries--)
+							continue;
 					}
+					perror("lseek");
+					exit(1);
 				}
 			}
 			// not using "else" because above can fallback to read() method
