@@ -3,7 +3,7 @@ read args
 echo Arguments: $args 
 if [ -d "$args" ] ; then
   echo "Performing backup to directory $args"
-  TARGET="$args/qubes-backup-`date +'%Y-%d-%d-%H%M%S'`"
+  TARGET="$args/qubes-backup-`date +'%Y-%d-%m-%H%M%S'`"
   echo "Copying STDIN data to $TARGET"
   cat > $TARGET
 else
