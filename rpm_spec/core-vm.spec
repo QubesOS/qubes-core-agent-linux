@@ -279,6 +279,8 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.DetachPciDevice
 /etc/qubes-rpc/qubes.Backup
 /etc/qubes-rpc/qubes.Restore
+/etc/qubes-rpc/qubes.SelectFile
+/etc/qubes-rpc/qubes.SelectDirectory
 /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
