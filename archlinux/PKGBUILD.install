@@ -97,16 +97,25 @@ done
 
 update_systemd() {
 
-for srv in qubes-dvm qubes-meminfo-writer qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
     systemctl enable $srv.service 2> /dev/null
 done
 
 systemctl enable qubes-update-check.timer 2> /dev/null
 
+UNITDIR=/lib/systemd/system
+OVERRIDEDIR=/usr/lib/qubes/init
+
 # Install overriden services only when original exists
-for srv in cups NetworkManager NetworkManager-wait-online ntpd; do
-    if [ -f /lib/systemd/system/$srv.service ]; then
-        cp /usr/lib/qubes/init/$srv.service /etc/systemd/system/$srv.service
+for srv in cups NetworkManager NetworkManager-wait-online ntpd chronyd; do
+    if [ -f $UNITDIR/$srv.service ]; then
+        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
+    fi
+    if [ -f $UNITDIR/$srv.socket -a -f $OVERRIDEDIR/$srv.socket ]; then
+        cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/
+    fi
+    if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then
+        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
     fi
 done
 
@@ -119,6 +128,7 @@ DISABLE_SERVICES="$DISABLE_SERVICES fedora-autorelabel fedora-autorelabel-mark i
 DISABLE_SERVICES="$DISABLE_SERVICES mdmonitor multipathd openct rpcbind mcelog fedora-storage-init fedora-storage-init-late"
 DISABLE_SERVICES="$DISABLE_SERVICES plymouth-start plymouth-read-write plymouth-quit plymouth-quit-wait"
 DISABLE_SERVICES="$DISABLE_SERVICES sshd tcsd sm-client sendmail mdmonitor-takeover"
+DISABLE_SERVICES="$DISABLE_SERVICES rngd smartd upower irqbalance colord"
 for srv in $DISABLE_SERVICES; do
     if [ -f /lib/systemd/system/$srv.service ]; then
         if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
@@ -142,6 +152,8 @@ systemctl disable NetworkManager.service 2> /dev/null
 # Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
 systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
 systemctl enable NetworkManager.service 2> /dev/null
+# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
+systemctl enable NetworkManager-dispatcher.service 2> /dev/null
 
 # Enable cups only when it is real SystemD service
 [ -e /lib/systemd/system/cups.service ] && systemctl enable cups.service 2> /dev/null
@@ -211,15 +223,15 @@ pre_upgrade() {
 
 
 ## arg 1:  the old package version
-pre_remove() {
-
-systemctl disable qubes-qrexec-agent.service
-
-}
+#pre_remove() {
+#
+#}
 
 ## arg 1:  the old package version
-#post_remove() {
-  # do something here
-#}
+post_remove() {
+  for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agent; do
+    systemctl disable $srv.service
+  do
+}
 
 
