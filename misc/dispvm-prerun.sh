@@ -30,6 +30,7 @@ ps ax > /tmp/dispvm-prerun-proclist.log
 echo "Closing windows..."
 /usr/lib/qubes/close-window `xwininfo -root -children|tail -n +7 |awk '{print $1}'`
 sleep 1
+fuser -vkm /rw
 
 if [ -e /rw/home/user/.qubes-dispvm-customized ]; then
 	cp -af /rw/home/user /home/
