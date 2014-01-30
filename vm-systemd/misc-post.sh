@@ -48,6 +48,11 @@ fi
 
 # Start services which haven't own proper systemd unit:
 
+# Hide nm-applet when network-manager is disabled
+nm_enabled=false
+[ -f /var/run/qubes-service/network-manager ] && nm_enabled=true
+su -c "gsettings set org.gnome.nm-applet show-applet $nm_enabled" user 2> /dev/null
+
 # Start AppVM specific services
 if [ ! -f /etc/systemd/system/cups.service ]; then
     if [ -f /var/run/qubes-service/cups ]; then
