@@ -1,0 +1,4 @@
+.include /lib/systemd/system/ModemManager.service
+[Unit]
+ConditionPathExists=|/var/run/qubes-service/network-manager
+ConditionPathExists=|/var/run/qubes-service/modem-manager
