@@ -483,7 +483,7 @@ for srv in cups ModemManager NetworkManager NetworkManager-wait-online ntpd chro
         cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/
     fi
     if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then
-        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
+        cp $OVERRIDEDIR/$srv.path /etc/systemd/system/
     fi
 done
 
