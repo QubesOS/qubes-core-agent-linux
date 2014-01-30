@@ -448,6 +448,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/misc-post.sh
 /usr/lib/qubes/init/misc-post-stop.sh
 /usr/lib/qubes/init/qubes-sysinit.sh
+/usr/lib/qubes/init/ModemManager.service
 /usr/lib/qubes/init/NetworkManager.service
 /usr/lib/qubes/init/NetworkManager-wait-online.service
 /usr/lib/qubes/init/cups.service
@@ -455,6 +456,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/cups.path
 /usr/lib/qubes/init/ntpd.service
 /usr/lib/qubes/init/chronyd.service
+%ghost %attr(0644,root,root) /etc/systemd/system/ModemManager.service
 %ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager.service
 %ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager-wait-online.service
 %ghost %attr(0644,root,root) /etc/systemd/system/cups.service
@@ -473,7 +475,7 @@ UNITDIR=/lib/systemd/system
 OVERRIDEDIR=/usr/lib/qubes/init
 
 # Install overriden services only when original exists
-for srv in cups NetworkManager NetworkManager-wait-online ntpd chronyd; do
+for srv in cups ModemManager NetworkManager NetworkManager-wait-online ntpd chronyd; do
     if [ -f $UNITDIR/$srv.service ]; then
         cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
     fi
@@ -514,9 +516,11 @@ rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 /bin/systemctl enable rsyslog.service 2> /dev/null
 /bin/systemctl enable ntpd.service 2> /dev/null
 # Disable original service to enable overriden one
+/bin/systemctl disable ModemManager.service 2> /dev/null
 /bin/systemctl disable NetworkManager.service 2> /dev/null
 # Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
 /bin/systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
+/bin/systemctl enable ModemManager.service 2> /dev/null
 /bin/systemctl enable NetworkManager.service 2> /dev/null
 # Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
 /bin/systemctl enable NetworkManager-dispatcher.service 2> /dev/null
