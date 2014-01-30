@@ -138,6 +138,7 @@ install-vm:
 	install -m 0644 qubes-rpc/qubes.WaitForSession $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.DetachPciDevice $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.{Backup,Restore} $(DESTDIR)/etc/qubes-rpc
+	install -m 0644 qubes-rpc/qubes.GetImageRGBA $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/usr/share/file-manager/actions
 	install -m 0644 qubes-rpc/*-gnome.desktop $(DESTDIR)/usr/share/file-manager/actions

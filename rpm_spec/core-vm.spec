@@ -48,6 +48,7 @@ Requires:   net-tools
 Requires:   nautilus-actions
 Requires:   qubes-core-vm-kernel-placeholder
 Requires:   qubes-utils
+Requires:   ImageMagick
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
@@ -279,6 +280,7 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.DetachPciDevice
 /etc/qubes-rpc/qubes.Backup
 /etc/qubes-rpc/qubes.Restore
+/etc/qubes-rpc/qubes.GetImageRGBA
 /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
