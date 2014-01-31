@@ -1,0 +1,31 @@
+set -e
+read filename
+
+if [[ "${filename}" = xdgicon:* ]]; then
+    # get biggest icon from hicolor theme
+    candidate=$(find /usr/share/icons/hicolor -type f -name "${filename#*:}.png" | xargs ls --sort=size | head -1)
+
+    if [[ ! "$(basename "${candidate}")" = "${filename#*:}.png" ]]; then
+        # file not found, ls returned garbage
+        exit 1
+    fi
+    filename="${candidate}"
+
+elif [[ "${filename}" = "-" ]] || [[ "${filename}" = *":-" ]]; then
+    tmpfile="$(mktemp /tmp/qimg-XXXXXXXX)"
+    cat > "${tmpfile}"
+    if [[ "$filename" = *":-" ]]; then
+        tmpfile="${filename%:*}:${tmpfile}"
+    fi
+    filename="${tmpfile}"
+
+elif ! [[ -r "${filename}" ]]; then
+    exit 1
+fi
+
+identify -format '%w %h' "$filename"
+convert -depth 8 "$filename" rgba:-
+
+[[ -n "${tmpfile}" ]] && rm -f ${tmpfile} || true
+
+# vim: ft=sh ts=4 sw=4 et
