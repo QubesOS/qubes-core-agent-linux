@@ -100,7 +100,9 @@ adduser --create-home user
 make install-vm DESTDIR=$RPM_BUILD_ROOT
 
 %triggerin -- initscripts
-cp /usr/lib/qubes/serial.conf /etc/init/serial.conf
+if [ -e /etc/init/serial.conf ]; then
+	cp /usr/lib/qubes/serial.conf /etc/init/serial.conf
+fi
 
 %post
 
