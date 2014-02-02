@@ -48,6 +48,10 @@ Requires:   net-tools
 Requires:   nautilus-actions
 Requires:   qubes-core-vm-kernel-placeholder
 Requires:   qubes-utils
+%if %{fedora} >= 20
+# gpk-update-viewer required by qubes-manager
+Requires:   gnome-packagekit-updater
+%endif
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
