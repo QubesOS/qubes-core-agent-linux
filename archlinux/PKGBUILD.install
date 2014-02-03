@@ -169,6 +169,11 @@ pre_install() {
 
   mkdir -p /var/lib/qubes
 
+  # Backup fstab
+  if [ -e /etc/fstab ] ; then 
+    mv /etc/fstab /var/lib/qubes/fstab.orig
+  fi
+
   # Add qubes core related fstab entries
   echo "xen	/proc/xen	xenfs	defaults	0 0" >> /etc/fstab
   echo "/dev/xvdi	/mnt/removable	auto	noauto,user,rw	0 0" >> /etc/fstab
@@ -189,9 +194,10 @@ update_qubesconfig
 update_systemd
 
 # do the rest of %post thing only when updating for the first time...
-if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
-	cp /etc/init/serial.conf /var/lib/qubes/serial.orig
-fi
+# Note: serial console wont work this way on archlinux. Maybe better using systemd ?
+#if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
+#	cp /etc/init/serial.conf /var/lib/qubes/serial.orig
+#fi
 
 # SELinux is not enabled on archlinux
 # echo "--> Disabling SELinux..."
@@ -223,13 +229,29 @@ pre_upgrade() {
 
 
 ## arg 1:  the old package version
-#pre_remove() {
-#
-#}
+pre_remove() {
+
+    # no more packages left
+    if [ -e /var/lib/qubes/fstab.orig ] ; then
+    mv /var/lib/qubes/fstab.orig /etc/fstab
+    fi
+    mv /var/lib/qubes/removed-udev-scripts/* /etc/udev/rules.d/
+    if [ -e /var/lib/qubes/serial.orig ] ; then
+    mv /var/lib/qubes/serial.orig /etc/init/serial.conf
+    fi
+
+}
 
 ## arg 1:  the old package version
 post_remove() {
-  for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agent; do
+
+    /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas &> /dev/null || :
+
+    if [ -L /lib/firmware/updates ] ; then
+      rm /lib/firmware/updates
+    fi
+
+  for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-qrexec-agent qubes-update-check qubes-yum-proxy qubes-meminfo-writer; do
     systemctl disable $srv.service
   done
 }
