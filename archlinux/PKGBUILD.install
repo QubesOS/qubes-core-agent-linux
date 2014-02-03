@@ -97,7 +97,7 @@ done
 
 update_systemd() {
 
-for srv in qubes-dvm qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
     systemctl enable $srv.service 2> /dev/null
 done
 
