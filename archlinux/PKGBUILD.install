@@ -97,7 +97,7 @@ done
 
 update_systemd() {
 
-for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent qubes-ensure-lib-modules; do
     systemctl enable $srv.service 2> /dev/null
 done
 
@@ -247,7 +247,7 @@ post_remove() {
       rm /lib/firmware/updates
     fi
 
-  for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-qrexec-agent qubes-yum-proxy; do
+  for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-qrexec-agent qubes-yum-proxy qubes-ensure-lib-modules; do
     systemctl disable $srv.service
   done
   systemctl disable qubes-update-check.timer

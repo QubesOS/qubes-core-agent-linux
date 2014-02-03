@@ -6,7 +6,7 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=16
+pkgrel=17
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
@@ -25,10 +25,10 @@ options=()
 install=PKGBUILD.install
 changelog=
 
-source=()
+source=(PKGBUILD.qubes-ensure-lib-modules.service)
 
 noextract=()
-md5sums=() #generate with 'makepkg -g'
+md5sums=('88f4b3d5b156888a9d38f5bc28702ab8') #generate with 'makepkg -g'
 
 
 build() {
@@ -92,6 +92,9 @@ package() {
   rm -r $pkgdir/etc/init.d
   # Remove fedora specific scripts
   rm $pkgdir/etc/fstab
+
+  # Install systemd script allowing to automount /lib/modules
+  install -m 644 $srcdir/PKGBUILD.qubes-ensure-lib-modules.service $pkgdir/lib/systemd/system/qubes-ensure-lib-modules.service
 
 }
 
