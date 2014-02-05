@@ -756,7 +756,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 #ifdef DEBUG
 			fprintf(stderr,"Inserting %s into register\n",path);
 #endif
-			dirs_headers_sent = realloc(dirs_headers_sent, sizeof (char*) * n_dirs++);
+			dirs_headers_sent = realloc(dirs_headers_sent, sizeof (char*) * (++n_dirs));
 			if (dirs_headers_sent == NULL)
 				return MEMORY_ALLOC_FAILED;
 			dirs_headers_sent[n_dirs-1] = malloc(sizeof (char) * (strlen(path)+1));
