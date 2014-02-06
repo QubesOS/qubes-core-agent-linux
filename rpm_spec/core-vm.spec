@@ -101,7 +101,7 @@ make install-vm DESTDIR=$RPM_BUILD_ROOT
 
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
-	cp /usr/lib/qubes/serial.conf /etc/init/serial.conf
+	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
 fi
 
 %post
@@ -334,7 +334,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
 /usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-copy-to-vm.kde
-/usr/lib/qubes/serial.conf
 /usr/lib/qubes/setup-ip
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
@@ -343,6 +342,7 @@ rm -f %{name}-%{version}
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher
+/usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
 /usr/share/file-manager/actions/qvm-copy-gnome.desktop
 /usr/share/file-manager/actions/qvm-dvm-gnome.desktop
