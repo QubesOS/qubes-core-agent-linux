@@ -149,7 +149,7 @@ for F in gpk-update-icon nm-applet ; do
 done
 
 echo 'OnlyShowIn=GNOME;UpdateableVM;' >> /etc/xdg/autostart/gpk-update-icon.desktop || :
-if %{fedora} >= 20
+%if %{fedora} >= 20
 echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
 %else
 echo 'OnlyShowIn=GNOME;NetVM;' >> /etc/xdg/autostart/nm-applet.desktop || :
