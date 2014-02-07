@@ -71,6 +71,8 @@ int passfd_socket;
 
 int meminfo_write_started = 0;
 
+void do_exec(const char *cmd);
+
 void init()
 {
 	peer_server_init(REXEC_PORT);
@@ -80,6 +82,7 @@ void init()
 	umask(077);
 	trigger_fd =
 	    open(QREXEC_AGENT_TRIGGER_PATH, O_RDONLY | O_NONBLOCK);
+	register_exec_func(do_exec);
 }
 
 void wake_meminfo_writer() {

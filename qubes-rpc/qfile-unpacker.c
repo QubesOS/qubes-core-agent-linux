@@ -31,11 +31,6 @@ int prepare_creds_return_uid(const char *username)
 	return pwd->pw_uid;
 }
 
-
-void notify_progress(int p1, int p2)
-{
-	}
-
 int main(int argc, char ** argv)
 {
 	char *incoming_dir;

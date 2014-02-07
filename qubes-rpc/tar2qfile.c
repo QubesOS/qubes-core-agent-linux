@@ -963,6 +963,7 @@ int main(int argc, char **argv)
 	signal(SIGPIPE, SIG_IGN);
 	// this will allow checking for possible feedback packet in the middle of transfer
 	// if disabled, the copy_file process could hang
+	register_notify_progress(&notify_progress);
 	notify_progress(0, PROGRESS_FLAG_INIT);
 	//set_size_limit(1500000000, 2048);
 

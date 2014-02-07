@@ -49,6 +49,7 @@ int main(int argc, char **argv)
 	signal(SIGPIPE, SIG_IGN);
 	// this will allow checking for possible feedback packet in the middle of transfer
 	set_nonblock(0);
+	register_notify_progress(&notify_progress);
 	notify_progress(0, PROGRESS_FLAG_INIT);
 	crc32_sum = 0;
 	cwd = getcwd(NULL, 0);
