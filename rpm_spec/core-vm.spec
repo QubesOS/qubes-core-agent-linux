@@ -52,6 +52,7 @@ Requires:   qubes-utils
 # gpk-update-viewer required by qubes-manager
 Requires:   gnome-packagekit-updater
 %endif
+Requires:   ImageMagick
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
@@ -299,6 +300,7 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.Restore
 /etc/qubes-rpc/qubes.SelectFile
 /etc/qubes-rpc/qubes.SelectDirectory
+/etc/qubes-rpc/qubes.GetImageRGBA
 /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
