@@ -308,6 +308,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/tinyproxy/tinyproxy-qubes-yum.conf
 /etc/udev/rules.d/50-qubes-misc.rules
 /etc/udev/rules.d/99-qubes-network.rules
+/etc/xdg/autostart/qubes-show-hide-nm-applet.desktop
 /etc/xdg/nautilus-actions/nautilus-actions.conf
 /etc/xen/scripts/vif-route-qubes
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
@@ -328,6 +329,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/sync-ntp-clock
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/network-manager-prepare-conf-dir
+/usr/lib/qubes/show-hide-nm-applet.sh
 /usr/lib/qubes/qrexec-agent
 /usr/lib/qubes/qrexec-client-vm
 /usr/lib/qubes/qrexec_client_vm
