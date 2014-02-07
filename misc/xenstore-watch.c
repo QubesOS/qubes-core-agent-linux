@@ -2,7 +2,7 @@
 #include <xs.h>
 #include <stdio.h>
 #include <stdlib.h>
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	struct xs_handle *xs;
 	unsigned int count;
@@ -25,4 +25,5 @@ main(int argc, char **argv)
 	free(vec);
 	vec = xs_read_watch(xs, &count);
 	free(vec);
+	return 0;
 }
