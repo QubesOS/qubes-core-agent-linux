@@ -127,7 +127,7 @@ install-vm:
 	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/tar2qfile $(DESTDIR)/usr/lib/qubes
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
-	install -m 4555  qubes-rpc/qfile-unpacker $(DESTDIR)/usr/lib/qubes
+	install -m 4755  qubes-rpc/qfile-unpacker $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/qrun-in-vm $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/sync-ntp-clock $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/prepare-suspend $(DESTDIR)/usr/lib/qubes
