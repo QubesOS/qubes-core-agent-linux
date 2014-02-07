@@ -99,6 +99,14 @@ adduser --create-home user
 (cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
 
+# Create ghost files to silent rpmbuild warnings, those files will NOT be
+# included in package
+mkdir -p $RPM_BUILD_ROOT/etc/systemd/system
+for f in ModemManager.service NetworkManager.service \
+        NetworkManager-wait-online.service cups.service cups.socket cups.path; do
+    cp $RPM_BUILD_ROOT/usr/lib/qubes/init/$f $RPM_BUILD_ROOT/etc/systemd/system/
+done
+
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
 	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
