@@ -59,7 +59,7 @@ Obsoletes:  qubes-core-netvm
 Obsoletes:  qubes-core-proxyvm
 Obsoletes:  qubes-upgrade-vm < 2.0
 BuildRequires: xen-devel
-BuildRequires: qubes-utils-devel
+BuildRequires: qubes-utils-devel >= 2.0.5
 
 %define _builddir %(pwd)
 
