@@ -113,6 +113,10 @@ if [ -e /etc/init/serial.conf ]; then
 	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
 fi
 
+%triggerin -- pulseaudio-module-x11
+sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/pulseaudio.desktop
+echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/pulseaudio.desktop
+
 %post
 
 # disable some Upstart services
