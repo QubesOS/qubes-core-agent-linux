@@ -6,14 +6,14 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=17
+pkgrel=18
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
 url="http://qubes-os.org/"
 license=('GPL')
 groups=()
-depends=(qubes-libvchan qubes-vm-utils)
+depends=(qubes-libvchan qubes-vm-utils imagemagick ntp zenity)
 makedepends=(qubes-vm-utils)
 checkdepends=()
 optdepends=()
@@ -95,6 +95,14 @@ package() {
 
   # Install systemd script allowing to automount /lib/modules
   install -m 644 $srcdir/PKGBUILD.qubes-ensure-lib-modules.service $pkgdir/lib/systemd/system/qubes-ensure-lib-modules.service
+
+  # Archlinux specific: enable autologin on tty1
+  mkdir -p $pkgdir/etc/systemd/system/getty@tty1.service.d/
+  cat <<EOF > $pkgdir/etc/systemd/system/getty@tty1.service.d/autologin.conf
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --autologin user --noclear %I 38400 linux
+EOF
 
 }
 

@@ -97,6 +97,26 @@ done
 
 update_systemd() {
 
+echo "Updating systemd configuration for Qubes..."
+echo "Enabling tty1"
+# Archlinux specific: ensure tty1 is enabled
+rm -f /etc/systemd/system/getty.target.wants/getty\@tty*.service
+systemctl enable getty\@tty1.service
+
+echo "Fixing bug in xinitrc"
+# Archlinux specific: Fix potential bug in xinitrc making dbus to not initilize correctly
+sed 's:for f in /etc/X11/xinit/xinitrc.d/?\*\.sh:for f in /etc/X11/xinit/xinitrc.d/?\*:' -i /etc/X11/xinit/xinitrc
+
+# Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
+if [ -z "`cat /etc/pam.d/su | grep system-login`" ] ; then
+	echo "Fixing pam.d"
+	sed '/auth\t\trequired\tpam_unix.so/aauth\t\tinclude\t\tsystem-login' -i /etc/pam.d/su
+	sed '/account\t\trequired\tpam_unix.so/aaccount\t\tinclude\t\tsystem-login' -i /etc/pam.d/su
+	sed '/session\t\trequired\tpam_unix.so/asession\t\tinclude\t\tsystem-login' -i /etc/pam.d/su
+	cp /etc/pam.d/su /etc/pam.d/su-l
+fi
+
+echo "Enabling qubes specific services"
 for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent qubes-ensure-lib-modules; do
     systemctl enable $srv.service 2> /dev/null
 done
@@ -140,8 +160,6 @@ for srv in $DISABLE_SERVICES; do
     fi
 done
 
-rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
-
 # Enable some services
 systemctl enable iptables.service 2> /dev/null
 systemctl enable ip6tables.service 2> /dev/null
@@ -176,7 +194,6 @@ pre_install() {
 
   # Add qubes core related fstab entries
   echo "xen	/proc/xen	xenfs	defaults	0 0" >> /etc/fstab
-  echo "/dev/xvdi	/mnt/removable	auto	noauto,user,rw	0 0" >> /etc/fstab
 
   # Archlinux bash version has a 'bug' when running su -c, /etc/profile is not loaded because bash consider there is no interactive pty when running 'su - user -c' or something like this.
   # See https://bugs.archlinux.org/task/31831
