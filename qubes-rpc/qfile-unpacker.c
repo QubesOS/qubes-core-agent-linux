@@ -31,7 +31,7 @@ int prepare_creds_return_uid(const char *username)
 	return pwd->pw_uid;
 }
 
-int main(int argc, char ** argv)
+int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unused__)))
 {
 	char *incoming_dir;
 	int uid;

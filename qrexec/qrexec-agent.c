@@ -149,7 +149,7 @@ void do_exec(const char *cmd)
 	exit(1);
 }
 
-void handle_just_exec(int client_id, int len)
+void handle_just_exec(int len)
 {
 	char buf[len];
 	int fdn, pid;
@@ -362,7 +362,7 @@ void handle_server_data()
 		break;
 	case MSG_SERVER_TO_AGENT_JUST_EXEC:
 		wake_meminfo_writer();
-		handle_just_exec(s_hdr.client_id, s_hdr.len);
+		handle_just_exec(s_hdr.len);
 		break;
 	case MSG_SERVER_TO_AGENT_INPUT:
 		handle_input(s_hdr.client_id, s_hdr.len);
@@ -385,7 +385,7 @@ void handle_process_data(int fd)
 	int len;
 
 	len = buffer_space_vchan_ext();
-	if (len <= sizeof s_hdr)
+	if (len <= (int)sizeof s_hdr)
 		return;
 
 	ret = read(fd, buf, len - sizeof s_hdr);
@@ -425,7 +425,7 @@ void handle_process_data(int fd)
 
 volatile int child_exited;
 
-void sigchld_handler(int x)
+void sigchld_handler(int x __attribute__((__unused__)))
 {
 	child_exited = 1;
 	signal(SIGCHLD, sigchld_handler);
@@ -580,7 +580,7 @@ int main()
 			reap_children();
 		max = fill_fds_for_select(&rdset, &wrset);
 		if (buffer_space_vchan_ext() <=
-		    sizeof(struct server_header))
+		    (int)sizeof(struct server_header))
 			FD_ZERO(&rdset);
 
 		wait_for_vchan_or_argfd(max, &rdset, &wrset);

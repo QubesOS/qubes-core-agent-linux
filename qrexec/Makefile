@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS+=-I. -g -Wall -pie -fPIC
+CFLAGS+=-I. -g -Wall -Wextra -Werror -pie -fPIC
 XENLIBS=-lvchan -lxenstore -lxenctrl
 LIBS=$(XENLIBS) -lqrexec-utils
 
