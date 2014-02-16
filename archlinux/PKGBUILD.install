@@ -103,10 +103,6 @@ echo "Enabling tty1"
 rm -f /etc/systemd/system/getty.target.wants/getty\@tty*.service
 systemctl enable getty\@tty1.service
 
-echo "Fixing bug in xinitrc"
-# Archlinux specific: Fix potential bug in xinitrc making dbus to not initilize correctly
-sed 's:for f in /etc/X11/xinit/xinitrc.d/?\*\.sh:for f in /etc/X11/xinit/xinitrc.d/?\*:' -i /etc/X11/xinit/xinitrc
-
 # Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
 if [ -z "`cat /etc/pam.d/su | grep system-login`" ] ; then
 	echo "Fixing pam.d"
