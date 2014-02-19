@@ -382,10 +382,10 @@ void handle_process_data(int fd)
 	struct server_header s_hdr;
 	char buf[MAX_DATA_CHUNK];
 	int ret;
-	int len;
+	unsigned int len;
 
 	len = buffer_space_vchan_ext();
-	if (len <= (int)sizeof s_hdr)
+	if (len <= sizeof s_hdr)
 		return;
 
 	ret = read(fd, buf, len - sizeof s_hdr);
@@ -580,7 +580,7 @@ int main()
 			reap_children();
 		max = fill_fds_for_select(&rdset, &wrset);
 		if (buffer_space_vchan_ext() <=
-		    (int)sizeof(struct server_header))
+		    sizeof(struct server_header))
 			FD_ZERO(&rdset);
 
 		wait_for_vchan_or_argfd(max, &rdset, &wrset);
