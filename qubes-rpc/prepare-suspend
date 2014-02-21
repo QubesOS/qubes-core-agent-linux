@@ -12,7 +12,11 @@ if [ -r /rw/config/suspend-module-blacklist ]; then
 fi
 
 if [ x"$action" == x"suspend" ]; then
-    nmcli nm sleep true || service NetworkManager stop
+    dbus_send --system --print-reply          \
+        --dest=org.freedesktop.NetworkManager \ 
+        /org/freedesktop/NetworkManager       \
+        org.freedesktop.NetworkManager.Sleep boolean:true ||  \
+        service NetworkManager stop
     # Force interfaces down, just in case when NM didn't done it
     for if in `ls /sys/class/net|grep -v "lo\|vif"`; do 
         ip l s $if down
@@ -29,5 +33,9 @@ else
     for mod in `cat /var/run/qubes/suspend-modules-loaded`; do
         modprobe $mod
     done
-    nmcli nm sleep false || { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes-core-netvm start
+    dbus_send --system --print-reply          \
+        --dest=org.freedesktop.NetworkManager \ 
+        /org/freedesktop/NetworkManager       \
+        org.freedesktop.NetworkManager.Sleep boolean:false ||  \
+        { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes-core-netvm start
 fi
