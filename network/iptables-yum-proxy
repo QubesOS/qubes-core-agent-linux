@@ -1,17 +1,20 @@
 #!/bin/sh
 
-if [ "$1" == "start" ]; then
-    CMD="-I"
-else
-    # Remove rules
-    CMD="-D"
-fi
+RULE_FILTER="INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT"
+RULE_NAT="PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT"
 
+if [ "$1" == "start" ]; then
 cat <<__EOF__ | iptables-restore -n
 *filter
-$CMD INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
+-A $RULE_FILTER
 COMMIT
 *nat
-$CMD PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
+-A $RULE_NAT
 COMMIT
 __EOF__
+else
+    # Remove rules
+    iptables -D $RULE_FILTER
+    iptables -t nat -D $RULE_NAT
+    exit 0
+fi
