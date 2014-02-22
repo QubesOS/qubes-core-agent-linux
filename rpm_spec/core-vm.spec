@@ -168,6 +168,9 @@ echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
 echo 'OnlyShowIn=GNOME;NetVM;' >> /etc/xdg/autostart/nm-applet.desktop || :
 %endif
 
+# Enable autostart of notification-daemon when installed
+ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
+
 usermod -p '' root
 usermod -L user
 
