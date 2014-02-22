@@ -41,6 +41,7 @@ while true; do
 	for i in $(xenstore-list qubes-iptables-domainrules) ; do
 		RULES=$(/usr/bin/xenstore-read qubes-iptables-domainrules/"$i")
 		ERRS=`echo -e "$RULES" | /sbin/iptables-restore -n 2>&1 || true`
+		echo "Failed applying rules for $i: $ERRS" >&2
 		OUT="$OUT$ERRS"
 	done		
 	/usr/bin/xenstore-write $XENSTORE_ERROR "$OUT"
