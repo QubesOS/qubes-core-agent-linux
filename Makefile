@@ -123,10 +123,12 @@ install-vm:
 
 	install -d $(DESTDIR)/usr/bin
 
-	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
+	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-move-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
 	install qubes-rpc/wrap-in-html-if-url.sh $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)/usr/lib/qubes
+	install qubes-rpc/qvm-move-to-vm.kde $(DESTDIR)/usr/lib/qubes
+	install qubes-rpc/qvm-move-to-vm.gnome $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/tar2qfile $(DESTDIR)/usr/lib/qubes
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
@@ -135,7 +137,7 @@ install-vm:
 	install qubes-rpc/sync-ntp-clock $(DESTDIR)/usr/lib/qubes
 	install qubes-rpc/prepare-suspend $(DESTDIR)/usr/lib/qubes
 	install -d $(DESTDIR)/$(KDESERVICEDIR)
-	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDESERVICEDIR)
+	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-move.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDESERVICEDIR)
 	install -d $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/{qubes.Filecopy,qubes.OpenInVM,qubes.VMShell,qubes.SyncNtpClock} $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/{qubes.SuspendPre,qubes.SuspendPost,qubes.GetAppmenus} $(DESTDIR)/etc/qubes-rpc

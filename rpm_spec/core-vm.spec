@@ -283,6 +283,7 @@ rm -f %{name}-%{version}
 %dir /var/run/qubes
 %dir %attr(0775,user,user) /var/lib/qubes/dom0-updates
 %{kde_service_dir}/qvm-copy.desktop
+%{kde_service_dir}/qvm-move.desktop
 %{kde_service_dir}/qvm-dvm.desktop
 /etc/NetworkManager/dispatcher.d/30-qubes-external-ip
 /etc/NetworkManager/dispatcher.d/qubes-nmhook
@@ -327,6 +328,7 @@ rm -f %{name}-%{version}
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
+/usr/bin/qvm-move-to-vm
 /usr/bin/qvm-open-in-dvm
 /usr/bin/qvm-open-in-vm
 /usr/bin/qvm-run
@@ -353,6 +355,8 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
 /usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-copy-to-vm.kde
+/usr/lib/qubes/qvm-move-to-vm.gnome
+/usr/lib/qubes/qvm-move-to-vm.kde
 /usr/lib/qubes/setup-ip
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
@@ -364,6 +368,7 @@ rm -f %{name}-%{version}
 /usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
 /usr/share/file-manager/actions/qvm-copy-gnome.desktop
+/usr/share/file-manager/actions/qvm-move-gnome.desktop
 /usr/share/file-manager/actions/qvm-dvm-gnome.desktop
 %dir /usr/share/qubes
 /usr/share/qubes/mime-override/globs

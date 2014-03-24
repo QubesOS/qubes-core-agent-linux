@@ -1,0 +1,10 @@
+[Desktop Entry]
+Actions=QvmMove;
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin,inode/directory,all/allfiles
+
+[Desktop Action QvmMove]
+Exec=/usr/lib/qubes/qvm-move-to-vm.kde %U
+Icon=kget
+Name=Move To VM
+
