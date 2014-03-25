@@ -6,10 +6,10 @@ RULE_NAT="PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIR
 if [ "$1" == "start" ]; then
 cat <<__EOF__ | iptables-restore -n
 *filter
--A $RULE_FILTER
+-I $RULE_FILTER
 COMMIT
 *nat
--A $RULE_NAT
+-I $RULE_NAT
 COMMIT
 __EOF__
 else
