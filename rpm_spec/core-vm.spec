@@ -53,6 +53,7 @@ Requires:   qubes-utils
 Requires:   gnome-packagekit-updater
 %endif
 Requires:   ImageMagick
+Requires:   fakeroot
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm

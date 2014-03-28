@@ -56,12 +56,12 @@ fi
 
 if [ "x$PKGLIST" = "x" ]; then
     echo "Checking for dom0 updates..." >&2
-    PKGLIST=`yum $OPTS check-update -q | cut -f 1 -d ' ' | grep -v "^Obsoleting"`
+    UPDATES=`yum $OPTS check-update -q | cut -f 1 -d ' ' | grep -v "^Obsoleting"`
 else
     PKGS_FROM_CMDLINE=1
 fi
 
-if [ -z "$PKGLIST" ]; then
+if [ -z "$PKGLIST" -a -z "$UPDATES" ]; then
     # No new updates
     if [ "$GUI" = 1 ]; then
         zenity --info --text="No new updates available"
@@ -79,8 +79,10 @@ if [ "$DOIT" != "1" -a "$PKGS_FROM_CMDLINE" != "1" ]; then
       --text="There are updates for dom0 available, do you want to download them now?" || exit 0
 fi
 
+YUM_ACTION=upgrade
 if [ "$PKGS_FROM_CMDLINE" == 1 ]; then
     GUI=0
+    YUM_ACTION=install
 fi
 
 mkdir -p "$DOM0_UPDATES_DIR/packages"
@@ -89,11 +91,11 @@ set -e
 
 if [ "$GUI" = 1 ]; then
     ( echo "1"
-    yumdownloader --resolve --destdir "$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
+    fakeroot yum $YUM_ACTION --downloadonly --downloaddir="$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
     echo 100 ) | zenity --progress --pulsate --auto-close --auto-kill \
          --text="Downloading updates for Dom0, please wait..." --title="Qubes Dom0 updates"
 else
-    yumdownloader --resolve --destdir "$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
+    fakeroot yum $YUM_ACTION --downloadonly --downloaddir="$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
 fi
 
 if ls $DOM0_UPDATES_DIR/packages/*.rpm > /dev/null 2>&1; then
