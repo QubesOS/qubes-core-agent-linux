@@ -29,7 +29,7 @@ while true; do
 
 	if ! [ "$TRIGGER" = "reload" ]; then continue ; fi
 
-	# Disable forarding to prevent potential "leaks" that might
+	# Disable forwarding to prevent potential "leaks" that might
 	# be bypassing the firewall or some proxy service (e.g. tor)
 	# during the time when the rules are being (re)applied
 	echo "0" > /proc/sys/net/ipv4/ip_forward
