@@ -55,8 +55,7 @@ install-vm:
 	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)/usr/lib/qubes/init/
 
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
-	install -D -m 0644 misc/qubes-r2-beta2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2-beta2.repo
-	install -D -m 0644 misc/qubes-r2-beta3.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2-beta3.repo
+	install -D -m 0644 misc/qubes-r2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2.repo
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
