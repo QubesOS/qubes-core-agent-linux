@@ -91,11 +91,11 @@ set -e
 
 if [ "$GUI" = 1 ]; then
     ( echo "1"
-    fakeroot yum $YUM_ACTION --downloadonly --downloaddir="$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
+    fakeroot yum $YUM_ACTION -y --downloadonly --downloaddir="$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
     echo 100 ) | zenity --progress --pulsate --auto-close --auto-kill \
          --text="Downloading updates for Dom0, please wait..." --title="Qubes Dom0 updates"
 else
-    fakeroot yum $YUM_ACTION --downloadonly --downloaddir="$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
+    fakeroot yum $YUM_ACTION -y --downloadonly --downloaddir="$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
 fi
 
 if ls $DOM0_UPDATES_DIR/packages/*.rpm > /dev/null 2>&1; then
