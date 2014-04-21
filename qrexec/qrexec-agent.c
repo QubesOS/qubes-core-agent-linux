@@ -533,7 +533,9 @@ void handle_new_passfd()
 		exit(1);
 	}
 	// let client know what fd has been allocated
-	write(fd, &fd, sizeof(fd));
+	if (write(fd, &fd, sizeof(fd)) != sizeof(fd)) {
+		perror("write to client");
+	}
 }
 
 

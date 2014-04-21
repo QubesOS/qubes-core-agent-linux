@@ -51,21 +51,21 @@ void recv_file_nowrite(const char *fname)
 {
 	char *tempfile;
 	char *errmsg;
-	int tmpfd;
+	int tmpfd = -1;
 
-	asprintf(&tempfile, "/tmp/file_edited_in_dvm.XXXXXX");
-	tmpfd = mkstemp(tempfile);
+	if (asprintf(&tempfile, "/tmp/file_edited_in_dvm.XXXXXX") != -1)
+		tmpfd = mkstemp(tempfile);
 	if (tmpfd < 0)
 		gui_fatal("unable to create any temporary file, aborting");
 	if (!copy_and_return_nonemptiness(tmpfd)) {
 		unlink(tempfile);
 		return;
 	}
-	asprintf(&errmsg,
+	if (asprintf(&errmsg,
 		 "The file %s has been edited in Disposable VM and the modified content has been received, "
 		 "but this file is in nonwritable directory and thus cannot be modified safely. The edited file has been "
-		 "saved to %s", fname, tempfile);
-	gui_nonfatal(errmsg);
+		 "saved to %s", fname, tempfile) != -1)
+        gui_nonfatal(errmsg);
 }
 
 void actually_recv_file(const char *fname, const char *tempfile, int tmpfd)
@@ -80,10 +80,11 @@ void actually_recv_file(const char *fname, const char *tempfile, int tmpfd)
 
 void recv_file(const char *fname)
 {
-	int tmpfd;
+	int tmpfd = -1;
 	char *tempfile;
-	asprintf(&tempfile, "%s.XXXXXX", fname);
-	tmpfd = mkstemp(tempfile);
+	if (asprintf(&tempfile, "%s.XXXXXX", fname) != -1) {
+		tmpfd = mkstemp(tempfile);
+	}
 	if (tmpfd < 0)
 		recv_file_nowrite(fname);
 	else

@@ -5,8 +5,10 @@ char *get_abs_path(const char *cwd, const char *pathname)
 	char *ret;
 	if (pathname[0] == '/')
 		return strdup(pathname);
-	asprintf(&ret, "%s/%s", cwd, pathname);
-	return ret;
+	if (asprintf(&ret, "%s/%s", cwd, pathname) < 0)
+		return NULL;
+	else
+		return ret;
 }
 
 int do_fs_walk(const char *file)
@@ -28,9 +30,13 @@ int do_fs_walk(const char *file)
 		char *fname = ent->d_name;
 		if (!strcmp(fname, ".") || !strcmp(fname, ".."))
 			continue;
-		asprintf(&newfile, "%s/%s", file, fname);
-		do_fs_walk(newfile);
-		free(newfile);
+		if (asprintf(&newfile, "%s/%s", file, fname) >= 0) {
+			do_fs_walk(newfile);
+			free(newfile);
+		} else {
+			fprintf(stderr, "asprintf failed\n");
+			exit(1);
+		}
 	}
 	closedir(dir);
 	// directory metadata is resent; this makes the code simple,
@@ -68,9 +74,11 @@ int main(int argc, char **argv)
 				    ("Internal error: nonabsolute filenames not allowed");
 			*sep = 0;
 		} while (sep[1] == 0);
-		if (entry[0] == 0)
-			chdir("/");
-		else if (chdir(entry))
+		if (entry[0] == 0) {
+			if (chdir("/") < 0) {
+				gui_fatal("Internal error: chdir(\"/\") failed?!");
+			}
+		} else if (chdir(entry))
 			gui_fatal("chdir to %s", entry);
 		do_fs_walk(sep + 1);
 		free(entry);

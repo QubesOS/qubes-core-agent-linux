@@ -27,21 +27,25 @@ void do_notify_progress(long long total, int flag)
 	const char *du_size_env = getenv("FILECOPY_TOTAL_SIZE");
 	const char *progress_type_env = getenv("PROGRESS_TYPE");
 	const char *saved_stdout_env = getenv("SAVED_FD_1");
+	int ignore;
 	if (!progress_type_env)
 		return;
 	if (!strcmp(progress_type_env, "console") && du_size_env) {
 		char msg[256];
 		snprintf(msg, sizeof(msg), "sent %lld/%lld KB\r",
 			 total / 1024, strtoull(du_size_env, NULL, 0));
-		write(2, msg, strlen(msg));
+		ignore = write(2, msg, strlen(msg));
 		if (flag == PROGRESS_FLAG_DONE)
-			write(2, "\n", 1);
+			ignore = write(2, "\n", 1);
 	}
 	if (!strcmp(progress_type_env, "gui") && saved_stdout_env) {
 		char msg[256];
 		snprintf(msg, sizeof(msg), "%lld\n", total);
-		write(strtoul(saved_stdout_env, NULL, 0), msg,
-		      strlen(msg));
+		ignore = write(strtoul(saved_stdout_env, NULL, 0), msg,
+				strlen(msg));
+	}
+	if (ignore < 0) {
+		/* silence gcc warning */
 	}
 }
 

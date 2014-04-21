@@ -956,7 +956,7 @@ int main(int argc, char **argv)
 {
 	int i;
 	char *entry;
-	int fd;
+	int fd = -1;
 	int use_stdin = 1;
 	struct filters filters;
 
@@ -1012,6 +1012,10 @@ int main(int argc, char **argv)
 #endif
 		set_block(0);
 		fd = 0;
+	}
+	if (fd < 0) {
+		fprintf(stderr, "No input file provided\n");
+		exit(1);
 	}
 	tar_file_processor(fd, &filters);
 

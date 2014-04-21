@@ -214,7 +214,7 @@ main()
 				snprintf(cmd, sizeof(cmd),
 						"HOME=/home/user DISPLAY=:0 /usr/bin/zenity --error --text 'Unable to handle mimetype of the requested file (exit status: %d)!' > /tmp/kdialog.log 2>&1 </dev/null", status);
 #endif
-				system(cmd);
+				status = system(cmd);
 			}
 	}
 

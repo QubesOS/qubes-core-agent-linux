@@ -18,8 +18,11 @@ static void produce_message(const char * type, const char *fmt, va_list args)
 	char *dialog_msg;
 	char buf[1024];
 	(void) vsnprintf(buf, sizeof(buf), fmt, args);
-	asprintf(&dialog_msg, "%s: %s: %s (error type: %s)",
-		 program_invocation_short_name, type, buf, strerror(errno));
+	if (asprintf(&dialog_msg, "%s: %s: %s (error type: %s)",
+		 program_invocation_short_name, type, buf, strerror(errno)) < 0) {
+		fprintf(stderr, "Failed to allocate memory for error message :(\n");
+		return;
+	}
 	fprintf(stderr, "%s\n", dialog_msg);
 	switch (fork()) {
 	case -1:

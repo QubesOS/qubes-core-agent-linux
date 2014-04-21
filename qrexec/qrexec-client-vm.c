@@ -80,10 +80,16 @@ int main(int argc, char **argv)
 
 	for (i = 0; i < 3; i++) {
 		local_fd[i] = connect_unix_socket();
-		read(local_fd[i], &remote_fd[i], sizeof(remote_fd[i]));
+		if (read(local_fd[i], &remote_fd[i], sizeof(remote_fd[i])) != sizeof(remote_fd[i])) {
+			perror("read client fd");
+			exit(1);
+		}
 		if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
 			char *env;
-			asprintf(&env, "SAVED_FD_%d=%d", i, dup(i));
+			if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
+				perror("prepare SAVED_FD_");
+				exit(1);
+			}
 			putenv(env);
 			dup2(local_fd[i], i);
 			close(local_fd[i]);
@@ -98,7 +104,12 @@ int main(int argc, char **argv)
 		 sizeof(params.process_fds.ident), "%d %d %d",
 		 remote_fd[0], remote_fd[1], remote_fd[2]);
 
-	write(trigger_fd, &params, sizeof(params));
+	if (write(trigger_fd, &params, sizeof(params)) < 0) {
+		if (!getenv("PASS_LOCAL_STDERR"))
+			perror("write to agent");
+		exit(1);
+	}
+
 	close(trigger_fd);
 
 	abs_exec_path = strdup(argv[3]);
