@@ -31,12 +31,9 @@ rpms-dom0:
 	@true
 
 clean:
-	make -C dom0/qmemman clean
-	make -C dom0/restore clean
 	make -C misc clean
 	make -C qrexec clean
-	make -C u2mfn clean
-	make -C vchan -f Makefile.linux clean
+	make -C qubes-rpc clean
 
 all:
 	make -C misc
