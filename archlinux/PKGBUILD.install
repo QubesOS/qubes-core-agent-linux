@@ -37,7 +37,10 @@ for F in gpk-update-icon nm-applet ; do
 done
 
 echo 'OnlyShowIn=GNOME;UpdateableVM;' >> /etc/xdg/autostart/gpk-update-icon.desktop || :
-echo 'OnlyShowIn=GNOME;NetVM;' >> /etc/xdg/autostart/nm-applet.desktop || :
+echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
+
+# Enable autostart of notification-daemon when installed
+ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
 
 }
 
