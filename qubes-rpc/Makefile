@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -Wall -Wextra -Werror -I. -fPIC -pie
+CFLAGS=-g -O2 -Wall -Wextra -Werror -I. -fPIC -pie
 all:	vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile
 vm-file-editor: vm-file-editor.o
 	$(CC) -pie -g -o $@ $^ -lqubes-rpc-filecopy
