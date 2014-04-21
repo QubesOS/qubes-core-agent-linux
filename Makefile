@@ -38,7 +38,12 @@ clean:
 	make -C u2mfn clean
 	make -C vchan -f Makefile.linux clean
 
-install-vm:
+all:
+	make -C misc
+	make -C qrexec
+	make -C qubes-rpc
+
+install-rh:
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 	install -d $(DESTDIR)/etc/init.d
 	install vm-init.d/* $(DESTDIR)/etc/init.d/
@@ -54,22 +59,30 @@ install-vm:
 	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)/usr/lib/qubes/init/
 
-	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0644 misc/qubes-r2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2.repo
-	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
-	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.nautilus.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -d $(DESTDIR)/usr/lib/yum-plugins/
 	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)/usr/lib/yum-plugins/
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
-	install -D misc/close-window $(DESTDIR)/usr/lib/qubes/close-window
+	install -d -m 755 $(DESTDIR)/etc/pki/rpm-gpg
+	install -m 644 misc/RPM-GPG-KEY-qubes* $(DESTDIR)/etc/pki/rpm-gpg/
+
+	install -D misc/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
+	install -D misc/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
+
+
+	install -d $(DESTDIR)/etc/yum.conf.d
+	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
+
+install-common:
+	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
+	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
+	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 
 	install -d $(DESTDIR)/var/lib/qubes
 
-	install -d -m 755 $(DESTDIR)/etc/pki/rpm-gpg
-	install -m 644 misc/RPM-GPG-KEY-qubes* $(DESTDIR)/etc/pki/rpm-gpg/
 	install -D misc/xenstore-watch $(DESTDIR)/usr/bin/xenstore-watch-qubes
 	install -d $(DESTDIR)/etc/udev/rules.d
 	install -m 0644 misc/udev-qubes-misc.rules $(DESTDIR)/etc/udev/rules.d/50-qubes-misc.rules
@@ -92,9 +105,7 @@ install-vm:
 	fi;
 
 	install misc/dispvm-prerun.sh $(DESTDIR)/usr/lib/qubes/dispvm-prerun.sh
-
-	install -D misc/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
-	install -D misc/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
+	install misc/close-window $(DESTDIR)/usr/lib/qubes/close-window
 
 	install -m 0644 network/udev-qubes-network.rules $(DESTDIR)/etc/udev/rules.d/99-qubes-network.rules
 	install network/qubes-setup-dnat-to-ns $(DESTDIR)/usr/lib/qubes
@@ -114,9 +125,6 @@ install-vm:
 	install -d $(DESTDIR)/etc/xdg/autostart
 	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)/usr/lib/qubes/show-hide-nm-applet.sh
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
-
-	install -d $(DESTDIR)/etc/yum.conf.d
-	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
 	install -d $(DESTDIR)/$(SBINDIR)
 	install network/qubes-firewall $(DESTDIR)/$(SBINDIR)/
@@ -160,3 +168,5 @@ install-vm:
 
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/home_volatile/user
+
+install-vm: install-rh install-common
