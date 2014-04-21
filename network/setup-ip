@@ -3,7 +3,7 @@
 if [ -x /usr/sbin/xenstore-read ]; then
 	XENSTORE_READ="/usr/sbin/xenstore-read"
 else
-	XENSTORE_READ="$XENSTORE_READ"
+	XENSTORE_READ="/usr/bin/xenstore-read"
 fi
 
 ip=`$XENSTORE_READ qubes-ip 2> /dev/null`
