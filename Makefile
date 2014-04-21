@@ -6,6 +6,9 @@ DIST ?= fc18
 KDESERVICEDIR ?= /usr/share/kde4/services
 SBINDIR ?= /usr/sbin
 
+# This makefile uses some bash-isms, make uses /bin/sh by default.
+SHELL = /bin/bash
+
 help:
 	@echo "make rpms                  -- generate binary rpm packages"
 	@echo "make rpms-vm               -- generate binary rpm packages for VM"
