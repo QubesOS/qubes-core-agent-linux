@@ -54,6 +54,7 @@ Requires:   gnome-packagekit-updater
 %endif
 Requires:   ImageMagick
 Requires:   fakeroot
+Requires:   notification-daemon
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
@@ -173,7 +174,9 @@ echo 'OnlyShowIn=GNOME;NetVM;' >> /etc/xdg/autostart/nm-applet.desktop || :
 %endif
 
 # Enable autostart of notification-daemon when installed
-ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
+if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
+    ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
+fi
 
 usermod -p '' root
 usermod -L user
