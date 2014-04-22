@@ -2,7 +2,7 @@
 Description=Init Qubes Services settings
 DefaultDependencies=no
 Before=sysinit.target
-After=local-fs.target
+After=proc-xen.mount systemd-modules-load.service
 
 [Service]
 Type=oneshot
