@@ -14,6 +14,9 @@ read_service() {
     $XS_READ qubes-service/$1 2> /dev/null
 }
 
+# Ensure we're running right version of systemd (the one started by initrd may be different)
+systemctl daemon-reexec
+
 # Wait for evtchn initialization
 while [ ! -e /proc/xen/xenbus ]; do
   sleep 0.1
