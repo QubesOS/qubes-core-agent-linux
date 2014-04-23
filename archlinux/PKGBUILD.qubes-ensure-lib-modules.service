@@ -7,6 +7,7 @@ Before=systemd-modules-load.service
 Before=systemd-udevd.service
 Before=local-fs-pre.target
 After=systemd-remount-fs.service
+ConditionPathExists=!/usr/lib/modules/lost+found
 
 [Service]
 Type=oneshot
