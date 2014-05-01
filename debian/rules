@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export DESTDIR=$(shell pwd)/debian/qubes-core-agent
+
+%:
+	dh $@ 
+
+override_dh_auto_build:
+	make all
+
+override_dh_auto_install:
+	make install-common
+	make -C qrexec install
+
