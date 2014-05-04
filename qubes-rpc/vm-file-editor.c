@@ -14,6 +14,17 @@
 #define MIMEINFO_DATABASES "/usr/share/mime:/usr/local/share:" USER_HOME "/.local/share:/usr/share/qubes/mime-override"
 #define TMP_LOC "/tmp/qopen/"
 
+static const char *cleanup_filename = NULL;
+
+static void cleanup_file(void)
+{
+	if (cleanup_filename) {
+		if (unlink(cleanup_filename) < 0)
+			fprintf(stderr, "Failed to remove file at exit\n");
+		cleanup_filename = NULL;
+	}
+}
+
 const char *gettime(void)
 {
 	static char retbuf[60];
@@ -110,6 +121,9 @@ void copy_file_by_name(const char *filename)
 		perror("open file");
 		exit(1);
 	}
+	/* we now have created a new file, ensure we delete it at the end */
+	cleanup_filename = filename;
+	atexit(cleanup_file);
 	if (!copy_fd_all(fd, 0))
         exit(1);
 	close(fd);
