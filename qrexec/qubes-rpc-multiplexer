@@ -1,4 +1,10 @@
 #!/bin/sh
+
+mkfifo /tmp/qrexec-rpc-stderr.$$
+logger -t "$1-$2" -f /tmp/qrexec-rpc-stderr.$$ &
+exec 2>/tmp/qrexec-rpc-stderr.$$
+rm -f /tmp/qrexec-rpc-stderr.$$
+
 QUBES_RPC=/etc/qubes-rpc
 # XXX: Backward compatibility
 DEPRECATED_QUBES_RPC=/etc/qubes_rpc
