@@ -373,6 +373,7 @@ rm -f %{name}-%{version}
 /usr/sbin/qubes-netwatcher
 /usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
+/usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.override
 /usr/share/file-manager/actions/qvm-copy-gnome.desktop
 /usr/share/file-manager/actions/qvm-move-gnome.desktop
 /usr/share/file-manager/actions/qvm-dvm-gnome.desktop
