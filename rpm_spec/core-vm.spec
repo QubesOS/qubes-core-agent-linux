@@ -193,9 +193,9 @@ fi
 # Remove ip_forward setting from sysctl, so NM will not reset it
 sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 
-# Install firmware link only on system which haven't it yet
-if ! [ -e /lib/firmware/updates ]; then
-  ln -s /lib/modules/firmware /lib/firmware/updates
+# Remove old firmware updates link
+if [ -L /lib/firmware/updates ]; then
+  rm -f /lib/firmware/updates
 fi
 
 if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
