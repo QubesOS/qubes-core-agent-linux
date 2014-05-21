@@ -25,5 +25,15 @@ if [ x$ip != x ]; then
 		# XXX: Backward compatibility
 		[ -x /rw/config/qubes_ip_change_hook ] && /rw/config/qubes_ip_change_hook
 	fi
-
+    if [ -f /var/run/qubes-service/network-manager ]; then
+        cat > /etc/sysconfig/network-scripts/ifcfg-$INTERFACE <<__EOF__
+DEVICE=$INTERFACE
+IPADDR=$ip
+NETMASK=255.255.255.255
+NETWORK=$ip
+ONBOOT=yes
+GATEWAYDEV=$INTERFACE
+GATEWAY=$gateway
+__EOF__
+    fi
 fi
