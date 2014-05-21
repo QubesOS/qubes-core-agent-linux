@@ -48,6 +48,7 @@ Requires:   net-tools
 Requires:   nautilus-actions
 Requires:   qubes-core-vm-kernel-placeholder
 Requires:   qubes-utils
+Requires:   initscripts
 %if %{fedora} >= 20
 # gpk-update-viewer required by qubes-manager
 Requires:   gnome-packagekit-updater
@@ -173,11 +174,6 @@ echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
 echo 'OnlyShowIn=GNOME;NetVM;' >> /etc/xdg/autostart/nm-applet.desktop || :
 %endif
 
-# Enable autostart of notification-daemon when installed
-if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
-    ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
-fi
-
 usermod -p '' root
 usermod -L user
 
@@ -224,11 +220,6 @@ if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
 	cp /etc/init/serial.conf /var/lib/qubes/serial.orig
 fi
 
-#echo "--> Disabling SELinux..."
-sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
-mv /etc/selinux/config.processed /etc/selinux/config
-setenforce 0 2>/dev/null
-
 # Remove most of the udev scripts to speed up the VM boot time
 # Just leave the xen* scripts, that are needed if this VM was
 # ever used as a net backend (e.g. as a VPN domain in the future)
@@ -255,6 +246,20 @@ mkdir -p /rw
 #echo "--> Removing HWADDR setting from /etc/sysconfig/network-scripts/ifcfg-eth0"
 #mv /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.orig
 #grep -v HWADDR /etc/sysconfig/network-scripts/ifcfg-eth0.orig > /etc/sysconfig/network-scripts/ifcfg-eth0
+
+%triggerin -- notification-daemon
+# Enable autostart of notification-daemon when installed
+if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
+    ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
+fi
+exit 0
+
+%triggerin -- selinux-policy
+#echo "--> Disabling SELinux..."
+sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+mv /etc/selinux/config.processed /etc/selinux/config
+setenforce 0 2>/dev/null
+exit 0
 
 %preun
 if [ "$1" = 0 ] ; then
