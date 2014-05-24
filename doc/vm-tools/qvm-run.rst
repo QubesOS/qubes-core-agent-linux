@@ -14,6 +14,8 @@ SYNOPSIS
 
 OPTIONS
 =======
+--dispvm
+  Pass this option instead of vmname to start new DisposableVM
 
 AUTHORS
 =======

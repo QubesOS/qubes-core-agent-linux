@@ -22,6 +22,7 @@
 
 if [ $# -lt 2 ] ; then 
 	echo "Usage: $0 vmname command arguments"
+	echo "  you can use \$dispvm or --dispvm instead of vmname to start new DisposableVM"
 	exit 1
 fi
 VMNAME=$1
