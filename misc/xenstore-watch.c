@@ -1,9 +1,5 @@
 #include <sys/types.h>
-#ifdef USE_XENSTORE_H
 #include <xenstore.h>
-#else
-#include <xs.h>
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 int main(int argc, char **argv)
