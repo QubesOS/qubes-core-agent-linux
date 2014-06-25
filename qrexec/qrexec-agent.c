@@ -55,6 +55,8 @@ int passfd_socket;
 
 int meminfo_write_started = 0;
 
+void do_exec(const char *cmd);
+
 void handle_vchan_error(const char *op)
 {
     fprintf(stderr, "Error while vchan %s, exiting\n", op);
@@ -120,6 +122,7 @@ void init()
     umask(077);
     trigger_fd =
         open(QREXEC_AGENT_TRIGGER_PATH, O_RDONLY | O_NONBLOCK);
+    register_exec_func(do_exec);
 
     /* wait for qrexec daemon */
     while (!libvchan_is_open(ctrl_vchan))
