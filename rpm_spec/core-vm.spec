@@ -55,7 +55,7 @@ Requires:   gnome-packagekit-updater
 %endif
 Requires:   ImageMagick
 Requires:   fakeroot
-Requires:   notification-daemon
+Requires:   desktop-notification-daemon
 Provides:   qubes-core-vm
 Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
