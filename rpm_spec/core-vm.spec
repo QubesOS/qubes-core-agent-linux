@@ -561,7 +561,28 @@ rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 /bin/systemctl enable ip6tables.service 2> /dev/null
 /bin/systemctl enable rsyslog.service 2> /dev/null
 /bin/systemctl enable ntpd.service 2> /dev/null
-/bin/systemctl enable haveged.service 2> /dev/null
+
+# Enable cups only when it is real SystemD service
+[ -e /lib/systemd/system/cups.service ] && /bin/systemctl enable cups.service 2> /dev/null
+
+exit 0
+
+%triggerin systemd -- NetworkManager
+UNITDIR=/lib/systemd/system
+OVERRIDEDIR=/usr/lib/qubes/init
+# Install overriden services only when original exists
+for srv in ModemManager NetworkManager NetworkManager-wait-online; do
+    if [ -f $UNITDIR/$srv.service ]; then
+        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
+    fi
+    if [ -f $UNITDIR/$srv.socket -a -f $OVERRIDEDIR/$srv.socket ]; then
+        cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/
+    fi
+    if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then
+        cp $OVERRIDEDIR/$srv.path /etc/systemd/system/
+    fi
+done
+
 # Disable original service to enable overriden one
 /bin/systemctl disable ModemManager.service 2> /dev/null
 /bin/systemctl disable NetworkManager.service 2> /dev/null
@@ -571,10 +592,30 @@ rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 /bin/systemctl enable NetworkManager.service 2> /dev/null
 # Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
 /bin/systemctl enable NetworkManager-dispatcher.service 2> /dev/null
+exit 0
+
+%triggerin systemd -- cups
+UNITDIR=/lib/systemd/system
+OVERRIDEDIR=/usr/lib/qubes/init
+# Install overriden services only when original exists
+for srv in cups; do
+    if [ -f $UNITDIR/$srv.service ]; then
+        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
+    fi
+    if [ -f $UNITDIR/$srv.socket -a -f $OVERRIDEDIR/$srv.socket ]; then
+        cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/
+    fi
+    if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then
+        cp $OVERRIDEDIR/$srv.path /etc/systemd/system/
+    fi
+done
 
 # Enable cups only when it is real SystemD service
 [ -e /lib/systemd/system/cups.service ] && /bin/systemctl enable cups.service 2> /dev/null
+exit 0
 
+%triggerin systemd -- haveged
+/bin/systemctl enable haveged.service 2> /dev/null
 exit 0
 
 %postun systemd
