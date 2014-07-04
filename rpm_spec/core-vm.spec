@@ -561,6 +561,7 @@ rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 /bin/systemctl enable ip6tables.service 2> /dev/null
 /bin/systemctl enable rsyslog.service 2> /dev/null
 /bin/systemctl enable ntpd.service 2> /dev/null
+/bin/systemctl enable haveged.service 2> /dev/null
 # Disable original service to enable overriden one
 /bin/systemctl disable ModemManager.service 2> /dev/null
 /bin/systemctl disable NetworkManager.service 2> /dev/null
