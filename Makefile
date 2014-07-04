@@ -64,6 +64,7 @@ install-vm:
 	install -d $(DESTDIR)/usr/lib/yum-plugins/
 	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)/usr/lib/yum-plugins/
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
+	install -D misc/close-window $(DESTDIR)/usr/lib/qubes/close-window
 
 	install -d $(DESTDIR)/var/lib/qubes
 
