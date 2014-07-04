@@ -62,9 +62,11 @@ fi
 if [ -f /var/run/qubes-service/network-manager ]; then
     # Allow also notification icon
     sed -i -e '/QUBES/!s/^OnlyShowIn=.*/\0QUBES;/' /etc/xdg/autostart/nm-applet.desktop
+    sed -i -e '/^NotShowIn=.*/s/QUBES;//' /etc/xdg/autostart/nm-applet.desktop
 else
     # Disable notification icon
     sed -i -e '/^OnlyShowIn=.*/s/QUBES;//' /etc/xdg/autostart/nm-applet.desktop
+    sed -i -e '/QUBES/!s/^NotShowIn=.*/\0QUBES;/' /etc/xdg/autostart/nm-applet.desktop
 fi
 
 exit 0
