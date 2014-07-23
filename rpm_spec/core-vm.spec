@@ -97,6 +97,8 @@ mv /etc/fstab /var/lib/qubes/fstab.orig
 fi
 
 adduser --create-home user
+usermod -p '' root
+usermod -L user
 
 %install
 
@@ -173,9 +175,6 @@ echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
 %else
 echo 'OnlyShowIn=GNOME;NetVM;' >> /etc/xdg/autostart/nm-applet.desktop || :
 %endif
-
-usermod -p '' root
-usermod -L user
 
 # Create NetworkManager configuration if we do not have it
 if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
@@ -299,13 +298,13 @@ rm -f %{name}-%{version}
 %{kde_service_dir}/qvm-dvm.desktop
 /etc/NetworkManager/dispatcher.d/30-qubes-external-ip
 /etc/NetworkManager/dispatcher.d/qubes-nmhook
-/etc/X11/xorg-preload-apps.conf
+%config(noreplace) /etc/X11/xorg-preload-apps.conf
 /etc/dispvm-dotfiles.tbz
 /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
-/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
-/etc/polkit-1/rules.d/00-qubes-allow-all.rules
+%config(noreplace) /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
+%config(noreplace) /etc/polkit-1/rules.d/00-qubes-allow-all.rules
 %dir /etc/qubes-rpc
 /etc/qubes-rpc/qubes.Filecopy
 /etc/qubes-rpc/qubes.OpenInVM
@@ -321,15 +320,15 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.SelectFile
 /etc/qubes-rpc/qubes.SelectDirectory
 /etc/qubes-rpc/qubes.GetImageRGBA
-/etc/sudoers.d/qubes
+%config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
 /etc/sysconfig/modules/qubes-core.modules
 /etc/sysconfig/modules/qubes-misc.modules
 %config(noreplace) /etc/tinyproxy/filter-qubes-yum
 %config(noreplace) /etc/tinyproxy/tinyproxy-qubes-yum.conf
-/etc/udev/rules.d/50-qubes-misc.rules
-/etc/udev/rules.d/99-qubes-network.rules
+%config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
+%config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
 /etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
 /etc/xdg/nautilus-actions/nautilus-actions.conf
 /etc/xen/scripts/vif-route-qubes
