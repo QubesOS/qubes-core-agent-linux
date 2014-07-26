@@ -598,7 +598,7 @@ int main()
 			handle_trigger_io();
 
 		handle_process_data_all(&rdset);
-		for (i = 0; i <= MAX_FDS; i++)
+		for (i = 0; i < MAX_FDS; i++)
 			if (client_info[i].pid
 			    && client_info[i].is_blocked
 			    && FD_ISSET(client_info[i].stdin_fd, &wrset))
