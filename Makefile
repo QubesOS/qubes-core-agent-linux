@@ -169,4 +169,9 @@ install-common:
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/home_volatile/user
 
+install-deb:
+	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
+	sed -e "s/@DIST@/`cat /etc/debian_version | cut -d/ -f 1`/" misc/qubes-r2.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r2.list
+	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
+
 install-vm: install-rh install-common
