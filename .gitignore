@@ -1,5 +1,5 @@
-rpm/
-deb/
+rpm/*
+deb/*
 *.pyc
 *.pyo
 *~
