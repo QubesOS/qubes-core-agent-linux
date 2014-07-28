@@ -18,3 +18,6 @@ override_dh_auto_install:
 
 override_dh_fixperms:
 	dh_fixperms -a -Xqfile-unpacker
+
+override_dh_installinit:
+	dh_installinit --no-restart-on-upgrade
