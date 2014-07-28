@@ -7,8 +7,11 @@ remove_ShowIn () {
 
 update_xdgstart () {
 
+# reenable abrt-aplet if disabled by some earlier version of package
+remove_ShowIn abrt-applet.desktop
+
 # don't want it at all
-for F in abrt-applet deja-dup-monitor imsettings-start krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
+for F in deja-dup-monitor imsettings-start krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
 	if [ -e /etc/xdg/autostart/$F.desktop ]; then
 		remove_ShowIn $F
 		echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/$F.desktop
@@ -58,12 +61,9 @@ fi
 # Archlinux now use sysctl.d/ instead of sysctl.conf
 # sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 
-
-# Install firmware link only on system which haven't it yet
-if ! [ -e /lib/firmware/updates ]; then
-  if ! [ -h /lib/firmware/updates ]; then
-    ln -s /lib/modules/firmware /lib/firmware/updates
-  fi
+# Remove old firmware updates link
+if [ -L /lib/firmware/updates ]; then
+  rm -f /lib/firmware/updates
 fi
 
 # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
@@ -164,6 +164,7 @@ systemctl enable iptables.service 2> /dev/null
 systemctl enable ip6tables.service 2> /dev/null
 systemctl enable rsyslog.service 2> /dev/null
 systemctl enable ntpd.service 2> /dev/null
+systemctl enabled haveged.service 2> /dev/null
 # Disable original service to enable overriden one
 systemctl disable NetworkManager.service 2> /dev/null
 # Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
