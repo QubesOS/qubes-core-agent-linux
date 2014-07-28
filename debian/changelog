@@ -1,3 +1,69 @@
+qubes-core-agent (2.1.40) jessie; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix compiler warnings.
+  * Enable compiler optimization.
+  * rpm: do not disable abrt-applet autostart
+  * systemd: relax qubes-sysinit dependencies
+  * systemd: reexec systemd to ensure right version is running
+  * rpm: fix notification-daemon setup
+  * archlinux: do not fail mount /usr/lib/modules if already mounted
+  * version 2.1.34
+  * suspend: fix dbus-send invocation
+  * qubes-rpc: log service stderr to syslog instead of sending to dom0
+    (#842)
+  * version 2.1.35
+
+  [ Wojciech Zygmunt Porczyk ]
+  * misc: do not display file preview by default (#813)
+
+  [ Vincent Penquerc'h ]
+  * vm-file-editor: remove temporary file on exit
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: remove /lib/firmware/updates link
+  * Hide nm-applet icon earlier (#857)
+  * Configure only installed programs
+  * network: setup NM connection when its active in the ProxyVM
+  * version 2.1.36
+  * Add --dispvm to qvm-run documentation
+  * Fix formating
+  * Do not start nm-applet at all when no NetworkManager running (#857)
+  * version 2.1.37
+  * rpm: require generic "desktop-notification-daemon" not a specific
+    one
+  * rpm: enable haveged service by default (#673)
+  * Do not start nm-applet at all when no NetworkManager running -
+    update (#857)
+  * rpm: enable/disable services when corresponding packages got
+    installed
+  * dispvm: close all windows after apps prerun (#872)
+  * version 2.1.38
+  * systemd: do not reexec when not necessary
+  * version 2.1.39
+  * rpm: mark config files with %config(noreplace)
+
+  [ Davíð Steinn Geirsson ]
+  * Split install target into install-common and install-rh, and add all
+    target
+  * Fix make clean target
+  * Check for xenstore-read in /usr/sbin as well (default on debian)
+  * Use xenstore.h instead of xs.h when xen >= 4.2
+  * Explicitly specify /bin/bash for Makefile SHELL, since it's
+    required.
+  * Initial debian packaging
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: update deps
+  * qrexec: fix loop bounds
+  * gitignore
+  * Fix bashism
+  * gitignore: fix binary packages declaration
+  * debian: add updates repo definition and key
+  * debian: fix qfile-unpacker perms
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 28 Jul 2014 02:38:59 +0200
+
 qubes-core-agent (2.1.33) jessie; urgency=low
 
   * Initial Release.
