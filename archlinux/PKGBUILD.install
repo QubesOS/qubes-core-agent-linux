@@ -117,7 +117,16 @@ fi
 
 echo "Enabling qubes specific services"
 for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent qubes-ensure-lib-modules; do
-    systemctl enable $srv.service 2> /dev/null
+  if [ -f /lib/systemd/system/$srv.service ]; then
+    if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
+      systemctl enable "$srv"
+      # 2> /dev/null
+    else
+      echo "WARNING: Cannot enable qubes service $srv: unit cannot be installed"
+    fi
+  else
+    echo "WARNING: Cannot enable qubes service $srv: unit does not exists"
+  fi
 done
 
 systemctl enable qubes-update-check.timer 2> /dev/null
@@ -159,22 +168,27 @@ for srv in $DISABLE_SERVICES; do
     fi
 done
 
-# Enable some services
-systemctl enable iptables.service 2> /dev/null
-systemctl enable ip6tables.service 2> /dev/null
-systemctl enable rsyslog.service 2> /dev/null
-systemctl enable ntpd.service 2> /dev/null
-systemctl enabled haveged.service 2> /dev/null
 # Disable original service to enable overriden one
 systemctl disable NetworkManager.service 2> /dev/null
 # Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
 systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
-systemctl enable NetworkManager.service 2> /dev/null
-# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
-systemctl enable NetworkManager-dispatcher.service 2> /dev/null
 
+# Enable some services
+ENABLE_SERVICES="iptables ip6tables ip6tables rsyslog ntpd haveged"
+ENABLE_SERVICES="$ENABLE_SERVICES NetworkManager"
+# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
+ENABLE_SERVICES="$ENABLE_SERVICES NetworkManager-dispatcher"
 # Enable cups only when it is real SystemD service
-[ -e /lib/systemd/system/cups.service ] && systemctl enable cups.service 2> /dev/null
+ENABLE_SERVICES="$ENABLE_SERVICES cups"
+for srv in $ENABLE_SERVICES; do
+  if [ -f /lib/systemd/system/$srv.service ]; then
+    if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
+      echo "Enabling service $srv"
+      systemctl enable "$srv"
+      # 2> /dev/null
+    fi
+  fi
+done
 
 }
 
