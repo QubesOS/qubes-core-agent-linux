@@ -29,7 +29,7 @@ if xenstore-read qubes-save-request 2>/dev/null ; then
     echo "Waiting for save/restore..."
     # ... wait until qubes-restore.c (in Dom0) recreates VM-specific keys
     while ! xenstore-read qubes-restore-complete 2>/dev/null ; do
-        usleep 10
+        usleep 10000
     done
     echo Back to life.
 fi
