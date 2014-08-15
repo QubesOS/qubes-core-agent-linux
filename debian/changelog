@@ -1,3 +1,22 @@
+qubes-core-agent (2.1.41) jessie; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * dispvm: slow down "spinlock" while waiting for save/restore
+
+  [ Olivier MEDOC ]
+  * archlinux: add notification daemon
+  * archlinux: follow fedora20 qubes agent improvement
+  * archlinux: follow fedora20 qubes agent improvement
+  * archlinux: enable/disable services when corresponding packages got
+    installed
+
+  [ Marek Marczykowski-Górecki ]
+  * network: use the same gateway IP generation method as backend
+  * Revert "network: use the same gateway IP generation method as
+    backend"
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 Aug 2014 17:45:15 +0200
+
 qubes-core-agent (2.1.40) jessie; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
