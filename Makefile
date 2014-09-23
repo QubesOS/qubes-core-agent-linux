@@ -68,6 +68,7 @@ install-rh:
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
 	install -d -m 755 $(DESTDIR)/etc/pki/rpm-gpg
 	install -m 644 misc/RPM-GPG-KEY-qubes* $(DESTDIR)/etc/pki/rpm-gpg/
+	install -D -m 644 misc/session-stop-timeout.conf $(DESTDIR)/usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 
 	install -D misc/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install -D misc/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules

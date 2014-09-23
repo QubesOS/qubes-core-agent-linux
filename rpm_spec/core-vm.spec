@@ -336,6 +336,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes-r2.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
+/usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
 /usr/bin/qvm-move-to-vm
