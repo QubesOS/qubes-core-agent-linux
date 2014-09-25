@@ -7,7 +7,7 @@
 export DESTDIR=$(shell pwd)/debian/qubes-core-agent
 
 %:
-	dh $@ 
+	dh $@ --with=systemd
 
 override_dh_auto_build:
 	make all
@@ -19,5 +19,5 @@ override_dh_auto_install:
 override_dh_fixperms:
 	dh_fixperms -a -Xqfile-unpacker
 
-override_dh_installinit:
-	dh_installinit --no-restart-on-upgrade
+override_dh_systemd_start:
+	dh_systemd_start --no-restart-on-upgrade

@@ -51,16 +51,15 @@ install-rh:
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 
-	install -d $(DESTDIR)/lib/systemd/system $(DESTDIR)/usr/lib/qubes/init
-	install -m 0755 vm-systemd/*.sh $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)/lib/systemd/system/
 	install -m 0644 vm-systemd/ModemManager.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/cups.* $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)/usr/lib/qubes/init/
+	install -m 0644 vm-systemd/qubes-update-check.service $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-update-check.timer $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-yum-proxy.service $(DESTDIR)/lib/systemd/system/
 
 	install -D -m 0644 misc/qubes-r2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2.repo
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
@@ -168,6 +167,16 @@ install-common:
 
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/home_volatile/user
+
+	install -d $(DESTDIR)/lib/systemd/system $(DESTDIR)/usr/lib/qubes/init
+	install -m 0755 vm-systemd/*.sh $(DESTDIR)/usr/lib/qubes/init/
+	install -m 0644 vm-systemd/qubes-dvm.service $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-firewall.service $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-misc-post.service $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-netwatcher.service $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-network.service $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-qrexec-agent.service $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-sysinit.service $(DESTDIR)/lib/systemd/system/
 
 install-deb:
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
