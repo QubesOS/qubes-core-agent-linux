@@ -48,6 +48,9 @@ install-rh:
 	install -d $(DESTDIR)/etc/init.d
 	install vm-init.d/* $(DESTDIR)/etc/init.d/
 
+	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
+	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
+
 	install -d $(DESTDIR)/lib/systemd/system $(DESTDIR)/usr/lib/qubes/init
 	install -m 0755 vm-systemd/*.sh $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)/lib/systemd/system/
@@ -76,10 +79,12 @@ install-rh:
 	install -d $(DESTDIR)/etc/yum.conf.d
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
+	install misc/qubes-download-dom0-updates.sh $(DESTDIR)/usr/lib/qubes/
+	install -d $(DESTDIR)/var/lib/qubes/dom0-updates
+	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
+
 install-common:
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
-	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
-	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 
 	install -d $(DESTDIR)/var/lib/qubes
 
@@ -87,10 +92,8 @@ install-common:
 	install -d $(DESTDIR)/etc/udev/rules.d
 	install -m 0644 misc/udev-qubes-misc.rules $(DESTDIR)/etc/udev/rules.d/50-qubes-misc.rules
 	install -d $(DESTDIR)/usr/lib/qubes/
-	install misc/qubes-download-dom0-updates.sh $(DESTDIR)/usr/lib/qubes/
 	install misc/vusb-ctl.py $(DESTDIR)/usr/lib/qubes/
 	install misc/qubes-trigger-sync-appmenus.sh $(DESTDIR)/usr/lib/qubes/
-	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 	install -D misc/polkit-1-qubes-allow-all.pkla $(DESTDIR)/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 	install -D misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
@@ -117,8 +120,6 @@ install-common:
 	install -d $(DESTDIR)/etc/NetworkManager/dispatcher.d/
 	install network/{qubes-nmhook,30-qubes-external-ip} $(DESTDIR)/etc/NetworkManager/dispatcher.d/
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
-	install -m 0400 -D network/iptables $(DESTDIR)/etc/sysconfig/iptables
-	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/sysconfig/ip6tables
 	install -m 0644 -D network/tinyproxy-qubes-yum.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-qubes-yum.conf
 	install -m 0644 -D network/filter-qubes-yum $(DESTDIR)/etc/tinyproxy/filter-qubes-yum
 	install -m 0755 -D network/iptables-yum-proxy $(DESTDIR)/usr/lib/qubes/iptables-yum-proxy
@@ -162,7 +163,6 @@ install-common:
 	install -D misc/nautilus-actions.conf $(DESTDIR)/etc/xdg/nautilus-actions/nautilus-actions.conf
 
 	install -d $(DESTDIR)/mnt/removable
-	install -d $(DESTDIR)/var/lib/qubes/dom0-updates
 
 	install -D -m 0644 misc/xorg-preload-apps.conf $(DESTDIR)/etc/X11/xorg-preload-apps.conf
 
