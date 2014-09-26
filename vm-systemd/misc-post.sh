@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -f /var/run/qubes-service/yum-proxy-setup ]; then
+if [ -f /var/run/qubes-service/yum-proxy-setup -o -f /var/run/qubes-service/updates-proxy-setup ]; then
     echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
 else
     echo > /etc/yum.conf.d/qubes-proxy.conf
