@@ -182,5 +182,9 @@ install-deb:
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
 	sed -e "s/@DIST@/`cat /etc/debian_version | cut -d/ -f 1`/" misc/qubes-r2.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r2.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
+	install -D -m 644 network/iptables $(DESTDIR)/etc/iptables/rules.v4
+	install -D -m 644 network/ip6tables $(DESTDIR)/etc/iptables/rules.v6
+	install -d $(DESTDIR)/etc/sysctl.d
+	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/
 
 install-vm: install-rh install-common
