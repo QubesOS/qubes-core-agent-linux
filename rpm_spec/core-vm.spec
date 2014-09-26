@@ -325,8 +325,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sysconfig/ip6tables
 /etc/sysconfig/modules/qubes-core.modules
 /etc/sysconfig/modules/qubes-misc.modules
-%config(noreplace) /etc/tinyproxy/filter-qubes-yum
-%config(noreplace) /etc/tinyproxy/tinyproxy-qubes-yum.conf
+%config(noreplace) /etc/tinyproxy/filter-updates
+%config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
 /etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
@@ -372,7 +372,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
 /usr/lib/qubes/wrap-in-html-if-url.sh
-/usr/lib/qubes/iptables-yum-proxy
+/usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/close-window
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/sbin/qubes-firewall
@@ -407,7 +407,7 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-core-netvm
 /etc/init.d/qubes-firewall
 /etc/init.d/qubes-netwatcher
-/etc/init.d/qubes-yum-proxy
+/etc/init.d/qubes-updates-proxy
 /etc/init.d/qubes-qrexec-agent
 
 %post sysvinit
@@ -442,8 +442,8 @@ chkconfig --add qubes-firewall || echo "WARNING: Cannot add service qubes-firewa
 chkconfig qubes-firewall on || echo "WARNING: Cannot enable service qubes-firewall!"
 chkconfig --add qubes-netwatcher || echo "WARNING: Cannot add service qubes-netwatcher!"
 chkconfig qubes-netwatcher on || echo "WARNING: Cannot enable service qubes-netwatcher!"
-chkconfig --add qubes-yum-proxy || echo "WARNING: Cannot add service qubes-yum-proxy!"
-chkconfig qubes-yum-proxy on || echo "WARNING: Cannot enable service qubes-yum-proxy!"
+chkconfig --add qubes-updates-proxy || echo "WARNING: Cannot add service qubes-updates-proxy!"
+chkconfig qubes-updates-proxy on || echo "WARNING: Cannot enable service qubes-updates-proxy!"
 chkconfig --add qubes-qrexec-agent || echo "WARNING: Cannot add service qubes-qrexec-agent!"
 chkconfig qubes-qrexec-agent on || echo "WARNING: Cannot enable service qubes-qrexec-agent!"
 
@@ -458,7 +458,7 @@ if [ "$1" = 0 ] ; then
     chkconfig qubes-core-appvm off
     chkconfig qubes-firewall off
     chkconfig qubes-netwatcher off
-    chkconfig qubes-yum-proxy off
+    chkconfig qubes-updates-proxy off
     chkconfig qubes-qrexec-agent off
 fi
 
@@ -487,7 +487,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-sysinit.service
 /lib/systemd/system/qubes-update-check.service
 /lib/systemd/system/qubes-update-check.timer
-/lib/systemd/system/qubes-yum-proxy.service
+/lib/systemd/system/qubes-updates-proxy.service
 /lib/systemd/system/qubes-qrexec-agent.service
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/prepare-dvm.sh
@@ -512,7 +512,7 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
-for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-yum-proxy qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-updates-proxy qubes-qrexec-agent; do
     /bin/systemctl enable $srv.service 2> /dev/null
 done
 

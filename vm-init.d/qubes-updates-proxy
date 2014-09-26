@@ -1,14 +1,14 @@
 #!/bin/sh
 #
-# tinyproxy     Startup script for the tinyproxy server as Qubes yum proxy
+# tinyproxy     Startup script for the tinyproxy server as Qubes updates proxy
 #
 # chkconfig:   - 85 15
 # description: small, efficient HTTP/SSL proxy daemon
 #
 # processname: tinyproxy
-# config:      /etc/tinyproxy/tinyproxy-qubes-yum.conf
-# config:      /etc/sysconfig/tinyproxy-qubes-yum
-# pidfile:     /var/run/tinyproxy/tinyproxy-qubes-yum.pid
+# config:      /etc/tinyproxy/tinyproxy-updates.conf
+# config:      /etc/sysconfig/tinyproxy-updates
+# pidfile:     /var/run/tinyproxy/tinyproxy-updates.pid
 #
 # Note: pidfile is created by tinyproxy in its config
 # see PidFile in the configuration file.
@@ -24,17 +24,17 @@
 
 exec="/usr/sbin/tinyproxy"
 prog=$(basename $exec)
-config="/etc/tinyproxy/tinyproxy-qubes-yum.conf"
-pidfile="/var/run/tinyproxy/tinyproxy-qubes-yum.pid"
+config="/etc/tinyproxy/tinyproxy-updates.conf"
+pidfile="/var/run/tinyproxy/tinyproxy-updates.pid"
 
-[ -e /etc/sysconfig/tinyproxy-qubes-yum ] && . /etc/sysconfig/tinyproxy-qubes-yum
+[ -e /etc/sysconfig/tinyproxy-updates ] && . /etc/sysconfig/tinyproxy-updates
 
-lockfile=/var/lock/subsys/tinyproxy-qubes-yum
+lockfile=/var/lock/subsys/tinyproxy-updates
 
 start() {
     type=`/usr/bin/xenstore-read qubes-vm-type`
-    start_yum_proxy=`/usr/bin/xenstore-read qubes-service/qubes-yum-proxy 2>/dev/null`
-    if [ -z "$start_yum_proxy" ] && [ "$type" != "NetVM" ] || [ "$start_yum_proxy" != "1" ]; then
+    start_updates_proxy=`/usr/bin/xenstore-read qubes-service/qubes-updates-proxy 2>/dev/null`
+    if [ -z "$start_updates_proxy" ] && [ "$type" != "NetVM" ] || [ "$start_updates_proxy" != "1" ]; then
         # Yum proxy disabled
         exit 0
     fi
@@ -45,7 +45,7 @@ start() {
     /sbin/iptables -I INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
     /sbin/iptables -t nat -A PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
 
-    echo -n $"Starting $prog (as Qubes yum proxy): "
+    echo -n $"Starting $prog (as Qubes updates proxy): "
     daemon $exec -c $config
     retval=$?
     echo

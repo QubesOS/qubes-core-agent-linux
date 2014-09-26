@@ -120,9 +120,9 @@ install-common:
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
 	install -m 0400 -D network/iptables $(DESTDIR)/etc/sysconfig/iptables
 	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/sysconfig/ip6tables
-	install -m 0644 -D network/tinyproxy-qubes-yum.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-qubes-yum.conf
-	install -m 0644 -D network/filter-qubes-yum $(DESTDIR)/etc/tinyproxy/filter-qubes-yum
-	install -m 0755 -D network/iptables-yum-proxy $(DESTDIR)/usr/lib/qubes/iptables-yum-proxy
+	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
+	install -m 0644 -D network/filter-updates $(DESTDIR)/etc/tinyproxy/filter-updates
+	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)/usr/lib/qubes/iptables-updates-proxy
 	install -d $(DESTDIR)/etc/xdg/autostart
 	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)/usr/lib/qubes/show-hide-nm-applet.sh
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
