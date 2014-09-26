@@ -1,9 +1,17 @@
 #!/bin/sh
 
-if [ -f /var/run/qubes-service/yum-proxy-setup ]; then
-    echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
+if [ -e /etc/debian_version ]; then
+    if [ -f /var/run/qubes-service/yum-proxy-setup ]; then
+        echo 'Acquire::http::proxy "http://10.137.255.254:8082/";' > /etc/apt/apt.conf.d/80qubes-proxy
+    else
+        echo > /etc/apt/apt.conf.d/80qubes-proxy
+    fi
 else
-    echo > /etc/yum.conf.d/qubes-proxy.conf
+    if [ -f /var/run/qubes-service/yum-proxy-setup ]; then
+        echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
+    else
+        echo > /etc/yum.conf.d/qubes-proxy.conf
+    fi
 fi
 
 # Set IP address again (besides action in udev rules); this is needed by
@@ -51,7 +59,7 @@ fi
 # Start AppVM specific services
 if [ ! -f /etc/systemd/system/cups.service ]; then
     if [ -f /var/run/qubes-service/cups ]; then
-        /sbin/service cups start
+        service cups start
         # Allow also notification icon
         sed -i -e '/^NotShowIn=.*QUBES/s/;QUBES//' /etc/xdg/autostart/print-applet.desktop
     else
