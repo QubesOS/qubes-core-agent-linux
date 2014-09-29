@@ -210,6 +210,17 @@ if ! grep -q localhost /etc/hosts; then
 EOF
 fi
 
+# ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
+# in the form expected by qubes-sysinit.sh
+for ip in '127\.0\.0\.1' '::1'; do
+    if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
+        sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
+        sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
+    else
+        echo "${ip} `hostname`" >> /etc/hosts
+    fi
+done
+
 if [ "$1" !=  1 ] ; then
 # do the rest of %post thing only when updating for the first time...
 exit 0

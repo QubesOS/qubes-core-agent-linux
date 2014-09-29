@@ -62,7 +62,13 @@ done
 name=`$XS_READ name`
 if [ -n "$name" ]; then
     hostname $name
-    sed -i "s/^\(127\.0\.0\.1 .*\) \($name \)\?\(.*\)/\1\2 $name/" /etc/hosts
+    if [ -e /etc/debian_version ]; then
+        ipv4_localhost_re="127\.0\.1\.1"
+    else
+        ipv4_localhost_re="127\.0\.0\.1"
+    fi
+    sed -i "s/^\($ipv4_localhost_re\(\s.*\)*\s\).*$/\1${name}/" /etc/hosts
+    sed -i "s/^\(::1\(\s.*\)*\s\).*$/\1${name}/" /etc/hosts
 fi
 
 timezone=`$XS_READ qubes-timezone 2> /dev/null`
