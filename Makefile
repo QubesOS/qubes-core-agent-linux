@@ -43,21 +43,35 @@ all:
 	make -C qrexec
 	make -C qubes-rpc
 
-install-rh:
-	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
-	install -d $(DESTDIR)/etc/init.d
-	install vm-init.d/* $(DESTDIR)/etc/init.d/
-
-	install -d $(DESTDIR)/lib/systemd/system $(DESTDIR)/usr/lib/qubes/init
+install-systemd:
+	install -d $(DESTDIR)/lib/systemd/system $(DESTDIR)/usr/lib/qubes/init $(DESTDIR)/lib/modules-load.d
 	install -m 0755 vm-systemd/*.sh $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)/lib/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)/lib/systemd/system/
 	install -m 0644 vm-systemd/ModemManager.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)/usr/lib/qubes/init/
+	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)/lib/modules-load.d/
+	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)/lib/modules-load.d/
 	install -m 0644 vm-systemd/cups.* $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)/usr/lib/qubes/init/
+
+install-sysvinit:
+	install -d $(DESTDIR)/etc/init.d
+	install vm-init.d/qubes-core $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-core-appvm $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-core-netvm $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-firewall $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-netwatcher $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-qrexec-agent $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
+	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
+	install -D vm-init.d/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
+
+
+install-rh: install-systemd install-sysvinit
+	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
 	install -D -m 0644 misc/qubes-r2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2.repo
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
@@ -69,9 +83,6 @@ install-rh:
 	install -d -m 755 $(DESTDIR)/etc/pki/rpm-gpg
 	install -m 644 misc/RPM-GPG-KEY-qubes* $(DESTDIR)/etc/pki/rpm-gpg/
 	install -D -m 644 misc/session-stop-timeout.conf $(DESTDIR)/usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
-
-	install -D misc/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
-	install -D misc/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
 
 
 	install -d $(DESTDIR)/etc/yum.conf.d

@@ -8,7 +8,9 @@ DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup"
 DEFAULT_ENABLED="meminfo-writer"
 
 XS_READ=/usr/bin/xenstore-read
+[ -x /usr/sbin/xenstore-read ] && XS_READ=/usr/sbin/xenstore-read
 XS_LS=/usr/bin/xenstore-ls
+[ -x /usr/sbin/xenstore-read ] && XS_LS=/usr/sbin/xenstore-ls
 
 read_service() {
     $XS_READ qubes-service/$1 2> /dev/null
@@ -36,10 +38,10 @@ chmod 666 /proc/u2mfn
 
 # Set default services depending on VM type
 TYPE=`$XS_READ qubes-vm-type 2> /dev/null`
-[ "$TYPE" == "AppVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM
-[ "$TYPE" == "NetVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM
-[ "$TYPE" == "ProxyVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_PROXYVM
-[ "$TYPE" == "TemplateVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_TEMPLATEVM
+[ "$TYPE" = "AppVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM
+[ "$TYPE" = "NetVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM
+[ "$TYPE" = "ProxyVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_PROXYVM
+[ "$TYPE" = "TemplateVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_TEMPLATEVM
 
 # Enable default services
 for srv in $DEFAULT_ENABLED; do

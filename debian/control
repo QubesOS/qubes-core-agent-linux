@@ -2,7 +2,7 @@ Source: qubes-core-agent
 Section: admin
 Priority: extra
 Maintainer: Davíð Steinn Geirsson <david@dsg.is>
-Build-Depends: qubes-utils, libvchan-xen-dev, python, debhelper, quilt, libxen-dev
+Build-Depends: qubes-utils, libvchan-xen-dev, python, debhelper, quilt, libxen-dev, dh-systemd (>= 1.5)
 Standards-Version: 3.9.3
 Homepage: http://www.qubes-os.org
 Vcs-Git: git://git.qubes-os.org/marmarek/core-agent-linux.git
