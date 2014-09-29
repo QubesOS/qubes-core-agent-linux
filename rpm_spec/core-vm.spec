@@ -323,8 +323,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
-/etc/sysconfig/modules/qubes-core.modules
-/etc/sysconfig/modules/qubes-misc.modules
 %config(noreplace) /etc/tinyproxy/filter-updates
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
@@ -409,6 +407,8 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-netwatcher
 /etc/init.d/qubes-updates-proxy
 /etc/init.d/qubes-qrexec-agent
+/etc/sysconfig/modules/qubes-core.modules
+/etc/sysconfig/modules/qubes-misc.modules
 
 %post sysvinit
 
@@ -489,6 +489,8 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-update-check.timer
 /lib/systemd/system/qubes-updates-proxy.service
 /lib/systemd/system/qubes-qrexec-agent.service
+/lib/modules-load.d/qubes-core.conf
+/lib/modules-load.d/qubes-misc.conf
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/prepare-dvm.sh
 /usr/lib/qubes/init/network-proxy-setup.sh
