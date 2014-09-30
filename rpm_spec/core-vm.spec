@@ -320,6 +320,7 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.SelectFile
 /etc/qubes-rpc/qubes.SelectDirectory
 /etc/qubes-rpc/qubes.GetImageRGBA
+/etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables
 %config(noreplace) /etc/sysconfig/ip6tables
