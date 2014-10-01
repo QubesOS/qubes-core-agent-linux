@@ -9,7 +9,7 @@ Vcs-Git: git://git.qubes-os.org/marmarek/core-agent-linux.git
 
 Package: qubes-core-agent
 Architecture: any
-Depends: qubes-utils, libvchan-xen, xenstore-utils, ethtool, python2.7, iptables-persistent, ${shlibs:Depends}, ${misc:Depends}
+Depends: qubes-utils, libvchan-xen, xenstore-utils, ethtool, python2.7, iptables-persistent, xserver-xorg-video-dummy, ${shlibs:Depends}, ${misc:Depends}
 Conflicts: qubes-core-agent-linux
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
