@@ -181,6 +181,7 @@ install-common:
 
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/home_volatile/user
+	install -d $(DESTDIR)/rw
 
 install-deb:
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d

@@ -387,6 +387,7 @@ rm -f %{name}-%{version}
 %dir /home_volatile
 %attr(700,user,user) /home_volatile/user
 %dir /mnt/removable
+%dir /rw
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
