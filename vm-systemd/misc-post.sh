@@ -62,7 +62,7 @@ fi
 # Start AppVM specific services
 if [ ! -f /etc/systemd/system/cups.service ]; then
     if [ -f /var/run/qubes-service/cups ]; then
-        /sbin/service cups start
+        /usr/sbin/service cups start
         # Allow also notification icon
         sed -i -e '/^NotShowIn=.*QUBES/s/;QUBES//' /etc/xdg/autostart/print-applet.desktop
     else
