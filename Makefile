@@ -172,6 +172,7 @@ install-common:
 	install -d $(DESTDIR)/usr/share/file-manager/actions
 	install -m 0644 qubes-rpc/*-gnome.desktop $(DESTDIR)/usr/share/file-manager/actions
 
+	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)/usr/bin/qubes-desktop-run
 	install -D misc/nautilus-actions.conf $(DESTDIR)/etc/xdg/nautilus-actions/nautilus-actions.conf
 
 	install -d $(DESTDIR)/mnt/removable

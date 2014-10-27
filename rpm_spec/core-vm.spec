@@ -344,6 +344,7 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-run
 /usr/bin/qvm-mru-entry
 /usr/bin/xenstore-watch-qubes
+/usr/bin/qubes-desktop-run
 %dir /usr/lib/qubes
 /usr/lib/qubes/vusb-ctl.py*
 /usr/lib/qubes/dispvm-prerun.sh
