@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 #include <fcntl.h>
 #include <libvchan.h>
 #include "qrexec.h"
@@ -38,6 +39,7 @@
 #define VCHAN_BUFFER_SIZE 65536
 
 static volatile int child_exited;
+static volatile int stdio_socket_requested;
 int stdout_msg_type = MSG_DATA_STDOUT;
 pid_t child_process_pid;
 
@@ -45,6 +47,12 @@ static void sigchld_handler(int __attribute__((__unused__))x)
 {
 	child_exited = 1;
 	signal(SIGCHLD, sigchld_handler);
+}
+
+static void sigusr1_handler(int __attribute__((__unused__))x)
+{
+    stdio_socket_requested = 1;
+    signal(SIGUSR1, SIG_IGN);
 }
 
 
@@ -146,7 +154,10 @@ int handle_input(libvchan_t *vchan, int fd, int msg_type)
             return -1;
 
         if (len == 0) {
-            close(fd);
+            if (shutdown(fd, SHUT_RD) < 0) {
+                if (errno == ENOTSOCK)
+                    close(fd);
+            }
             return 0;
         }
     }
@@ -188,14 +199,20 @@ int handle_remote_data(libvchan_t *data_vchan, int stdin_fd)
                     /* discard the data */
                     continue;
                 if (hdr.len == 0) {
-                    close(stdin_fd);
+                    if (shutdown(stdin_fd, SHUT_WR) < 0) {
+                        if (errno == ENOTSOCK)
+                            close(stdin_fd);
+                    }
                     stdin_fd = -1;
                     return 0;
                 } else {
                     /* FIXME: use buffered write here to prevent deadlock */
                     if (!write_all(stdin_fd, buf, hdr.len)) {
-                        if (errno == EPIPE) {
-                            close(stdin_fd);
+                        if (errno == EPIPE || errno == ECONNRESET) {
+                            if (shutdown(stdin_fd, SHUT_WR) < 0) {
+                                if (errno == ENOTSOCK)
+                                    close(stdin_fd);
+                            }
                             stdin_fd = -1;
                         } else {
                             perror("write");
@@ -248,7 +265,10 @@ void process_child_io(libvchan_t *data_vchan,
                 if (pid == child_process_pid) {
                     child_process_status = WEXITSTATUS(status);
                     if (stdin_fd >= 0) {
-                        close(stdin_fd);
+                        if (shutdown(stdin_fd, SHUT_WR) < 0) {
+                            if (errno == ENOTSOCK)
+                                close(stdin_fd);
+                        }
                         stdin_fd = -1;
                     }
                 }
@@ -263,6 +283,13 @@ void process_child_io(libvchan_t *data_vchan,
                 send_exit_code(data_vchan, child_process_status);
             }
             break;
+        }
+        /* child signaled desire to use single socket for both stdin and stdout */
+        if (stdio_socket_requested) {
+            if (stdout_fd != -1)
+                close(stdout_fd);
+            stdout_fd = stdin_fd;
+            stdio_socket_requested = 0;
         }
         /* otherwise handle the events */
 
@@ -337,7 +364,10 @@ void process_child_io(libvchan_t *data_vchan,
                 break;
             case -2:
                 /* remote process exited, no sense in sending more data to it */
-                close(stdout_fd);
+                if (shutdown(stdout_fd, SHUT_RD) < 0) {
+                    if (errno == ENOTSOCK)
+                        close(stdout_fd);
+                }
                 stdout_fd = -1;
                 close(stderr_fd);
                 stderr_fd = -1;
@@ -353,6 +383,7 @@ pid_t handle_new_process(int type, int connect_domain, int connect_port,
     libvchan_t *data_vchan;
     pid_t pid;
     int stdin_fd, stdout_fd, stderr_fd;
+    char pid_s[10];
 
     if (type == MSG_SERVICE_CONNECT) {
         if (cmdline_len != sizeof(*svc_params)) {
@@ -394,6 +425,10 @@ pid_t handle_new_process(int type, int connect_domain, int connect_port,
     handle_handshake(data_vchan);
 
     signal(SIGCHLD, sigchld_handler);
+    signal(SIGUSR1, sigusr1_handler);
+    snprintf(pid_s, sizeof(pid_s), "%d", getpid());
+    setenv("QREXEC_AGENT_PID", pid_s, 1);
+    /* TODO: use setresuid to allow child process to actually send the signal? */
 
     switch (type) {
         case MSG_JUST_EXEC:
