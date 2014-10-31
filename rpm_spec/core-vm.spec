@@ -276,7 +276,7 @@ fi
 if [ $1 -eq 0 ] ; then
     /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
-    if [ -l /lib/firmware/updates ]; then
+    if [ -L /lib/firmware/updates ]; then
       rm /lib/firmware/updates
     fi
 fi
