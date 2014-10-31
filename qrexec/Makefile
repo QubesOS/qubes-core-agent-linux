@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS+=-I. -g -O2 -Wall -Wextra -Werror -pie -fPIC `pkg-config --cflags vchan-$(BACKEND_VMM)`
 LDFLAGS=-pie
-LDLIBS=`pkg-config --libs vchan-$(BACKEND_VMM)` -lqrexec-utils
+LDLIBS=`pkg-config --libs vchan-$(BACKEND_VMM)` -lqrexec-utils -lpam
 
 all: qrexec-agent qrexec-client-vm qrexec-fork-server
 qrexec-agent: qrexec-agent.o qrexec-agent-data.o
@@ -19,4 +19,5 @@ install:
 	ln -s ../../bin/qrexec-client-vm $(DESTDIR)/usr/lib/qubes/qrexec_client_vm
 	install qrexec-fork-server $(DESTDIR)/usr/bin
 	install qubes-rpc-multiplexer $(DESTDIR)/usr/lib/qubes
+	install -D -m 0644 qrexec.pam $(DESTDIR)/etc/pam.d/qrexec
 

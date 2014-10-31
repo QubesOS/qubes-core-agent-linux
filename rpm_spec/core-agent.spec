@@ -157,6 +157,7 @@ BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
+BuildRequires: pam-devel
 
 %description
 The Qubes core files for installation inside a Qubes VM.
@@ -611,6 +612,7 @@ rm -f %{name}-%{version}
 %{python3_sitelib}/dnf-plugins/*
 
 %files qrexec
+%config(noreplace) /etc/pam.d/qrexec
 /usr/bin/qrexec-fork-server
 /usr/bin/qrexec-client-vm
 /usr/lib/qubes/qrexec-agent

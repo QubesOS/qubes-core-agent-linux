@@ -3,6 +3,7 @@ Section: admin
 Priority: extra
 Maintainer: unman <unman@thirdeyesecurity.org>
 Build-Depends:
+    libpam0g-dev,
     libqrexec-utils-dev,
     libqubes-rpc-filecopy-dev (>= 3.1.3),
     libvchan-xen-dev,
