@@ -78,7 +78,10 @@ EOF
     # --------------------------------------------------------------------------
     # User add / modifications
     # --------------------------------------------------------------------------
-    id -u 'user' || adduser user 
+    id -u 'user' || {
+        groupadd -f user
+        useradd -g user -G dialout,cdrom,floppy,sudo,audio,dip,video,plugdev -m -s /bin/bash user
+    }
     usermod -p '' root
     usermod -L user
     exit 0
