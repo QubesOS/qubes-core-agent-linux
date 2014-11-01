@@ -10,7 +10,7 @@ DEFAULT_ENABLED="meminfo-writer"
 XS_READ=/usr/bin/xenstore-read
 [ -x /usr/sbin/xenstore-read ] && XS_READ=/usr/sbin/xenstore-read
 XS_LS=/usr/bin/xenstore-ls
-[ -x /usr/sbin/xenstore-read ] && XS_LS=/usr/sbin/xenstore-ls
+[ -x /usr/sbin/xenstore-ls ] && XS_LS=/usr/sbin/xenstore-ls
 
 read_service() {
     $XS_READ qubes-service/$1 2> /dev/null
