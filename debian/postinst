@@ -34,6 +34,16 @@ case "$1" in
             fi
         }
 
+
+        # Stops Qt form using the MIT-SHM X11 Shared Memory Extension
+        echo 'export QT_X11_NO_MITSHM=1' >> /etc/profile
+
+        # Sudo's defualt umask is 077 so set sane default of 022
+        # Also don't allow QT to used shared memory to prevent errors
+        echo 'Defaults umask = 0002' >> /etc/sudoers
+        echo 'Defaults umask_override' >> /etc/sudoers
+        echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' >> /etc/sudoers
+
         # reenable abrt-aplet if disable by some earlier version of package
         remove_ShowIn abrt-applet.desktop
 

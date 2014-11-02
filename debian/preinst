@@ -46,6 +46,13 @@ if [ "$1" = "install" ] ; then
     fi
 
     # --------------------------------------------------------------------------
+    # Many Qubes scripts reference /bin/sh expecting the shell to be bash but
+    # in Debian it is dash so some scripts will fail so force an alternate for
+    # /bin/sh to be /bin/bash
+    # --------------------------------------------------------------------------
+    update-alternatives --force --install /bin/sh sh /bin/bash 999
+
+    # --------------------------------------------------------------------------
     # Modules setup
     # --------------------------------------------------------------------------
     echo "xen_netfront" >> /etc/modules
@@ -81,6 +88,10 @@ EOF
     id -u 'user' || {
         groupadd -f user
         useradd -g user -G dialout,cdrom,floppy,sudo,audio,dip,video,plugdev -m -s /bin/bash user
+    }
+    id -u 'tinyproxy' || {
+        groupadd -f tinyproxy
+        useradd -g tinyproxy -M --home /run/tinyproxy --shell /bin/false tinyproxy
     }
     usermod -p '' root
     usermod -L user
