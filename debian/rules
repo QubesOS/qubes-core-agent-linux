@@ -7,13 +7,13 @@
 export DESTDIR=$(shell pwd)/debian/qubes-core-agent
 
 %:
-	dh $@ --with=systemd
+	dh $@ --with systemd
 
 override_dh_auto_build:
 	make all
 
 override_dh_auto_install:
-	make install-common install-deb
+	make install-common install-deb install-systemd
 	make -C qrexec install
 
 override_dh_fixperms:

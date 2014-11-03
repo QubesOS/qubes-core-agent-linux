@@ -40,13 +40,15 @@ while true; do
 
 	for i in $(xenstore-list qubes-iptables-domainrules) ; do
 		RULES=$(xenstore-read qubes-iptables-domainrules/"$i")
-		ERRS=`echo -e "$RULES" | iptables-restore -n 2>&1 || true`
-		echo "Failed applying rules for $i: $ERRS" >&2
-		OUT="$OUT$ERRS"
+		ERRS=`echo -e "$RULES" | /sbin/iptables-restore -n 2>&1 || true`
+		if [ -n "$ERRS" ]; then
+			echo "Failed applying rules for $i: $ERRS" >&2
+			OUT="$OUT$ERRS"
+		fi
 	done		
 	xenstore-write $XENSTORE_ERROR "$OUT"
-	if [ "$OUT" ]; then
-		DISPLAY=:0 notify-send -t 3000 "Firewall loading error ($HOSTNAME)" "$OUT" || :
+	if [ -n "$OUT" ]; then
+		DISPLAY=:0 /usr/bin/notify-send -t 3000 "Firewall loading error ($HOSTNAME)" "$OUT" || :
 	fi
 
 	# Check if user didn't define some custom rules to be applied as well...

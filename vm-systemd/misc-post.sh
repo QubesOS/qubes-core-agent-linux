@@ -1,15 +1,17 @@
 #!/bin/sh
 
-if [ -e /etc/debian_version ]; then
-    if [ -f /var/run/qubes-service/yum-proxy-setup ]; then
-        echo 'Acquire::http::proxy "http://10.137.255.254:8082/";' > /etc/apt/apt.conf.d/80qubes-proxy
-    else
-        echo > /etc/apt/apt.conf.d/80qubes-proxy
+if [ -f /var/run/qubes-service/yum-proxy-setup -o -f /var/run/qubes-service/updates-proxy-setup ]; then
+    if [ -d /etc/apt/apt.conf.d ]; then
+        echo 'Acquire::http::Proxy "http://10.137.255.254:8082/";' >> /etc/apt/apt.conf.d/01qubes-proxy
+    fi
+    if [ -d /etc/yum.conf.d ]; then
+        echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
     fi
 else
-    if [ -f /var/run/qubes-service/yum-proxy-setup ]; then
-        echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
-    else
+    if [ -d /etc/apt/apt.conf.d ]; then
+        rm -f /etc/apt/apt.conf.d/01qubes-proxy
+    fi
+    if [ -d /etc/yum.conf.d ]; then
         echo > /etc/yum.conf.d/qubes-proxy.conf
     fi
 fi
@@ -22,6 +24,7 @@ INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
 if [ -e /dev/xvdb -a ! -e /etc/this-is-dvm ] ; then
     resize2fs /dev/xvdb 2> /dev/null || echo "'resize2fs /dev/xvdb' failed"
+    tune2fs -m 0 /dev/xvdb
     mount /rw
 
     if ! [ -d /rw/home ] ; then
@@ -59,7 +62,7 @@ fi
 # Start AppVM specific services
 if [ ! -f /etc/systemd/system/cups.service ]; then
     if [ -f /var/run/qubes-service/cups ]; then
-        service cups start
+        /usr/sbin/service cups start
         # Allow also notification icon
         sed -i -e '/^NotShowIn=.*QUBES/s/;QUBES//' /etc/xdg/autostart/print-applet.desktop
     else

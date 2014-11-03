@@ -28,6 +28,9 @@ static void produce_message(const char * type, const char *fmt, va_list args)
 	case -1:
 		exit(1);	//what else
 	case 0:
+		if (geteuid() == 0)
+			if (setuid(getuid()) != 0)
+				perror("setuid failed, calling kdialog/zenity as root");
 		fix_display();
 #ifdef USE_KDIALOG
 		execlp("/usr/bin/kdialog", "kdialog", "--sorry", dialog_msg, NULL);

@@ -19,6 +19,9 @@ if [ x"$action" == x"suspend" ]; then
         service NetworkManager stop
     # Force interfaces down, just in case when NM didn't done it
     for if in `ls /sys/class/net|grep -v "lo\|vif"`; do 
+        if [ "`cat /sys/class/net/$if/device/devtype 2>/dev/null`" == "vif" ]; then
+            continue
+        fi
         ip l s $if down
     done
     LOADED_MODULES=""

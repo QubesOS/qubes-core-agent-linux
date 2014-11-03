@@ -28,7 +28,7 @@ start()
 		# because it makes some of the pre-created dotfiles invalid (e.g. .kde/cache-<hostname>)
 		# (let's be frank: nobody's gonna use xterm on DispVM)
 		hostname $name
-		sed -i "s/^\(127\.0\.0\.1 .*\) \($name \)\?\(.*\)/\1\2 $name/" /etc/hosts
+		sed -i "s/^\(127\.0\.0\.1[\t ].*\) \($name \)\?\(.*\)/\1\2 $name/" /etc/hosts
 	fi
 
 	timezone=`/usr/bin/xenstore-read qubes-timezone 2> /dev/null`
@@ -38,7 +38,7 @@ start()
 		echo "ZONE=\"$timezone\"" >> /etc/sysconfig/clock
 	fi
 
-	yum_proxy_setup=$(/usr/bin/xenstore-read qubes-service/yum-proxy-setup 2> /dev/null)
+	yum_proxy_setup=$(/usr/bin/xenstore-read qubes-service/yum-proxy-setup 2> /dev/null || /usr/bin/xenstore-read qubes-service/updates-proxy-setup 2>/dev/null )
     type=$(/usr/bin/xenstore-read qubes-vm-type)
 	if [ "$yum_proxy_setup" != "0" ] || [ -z "$yum_proxy_setup" -a "$type" == "TemplateVM" ]; then
 		echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf

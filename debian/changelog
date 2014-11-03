@@ -1,3 +1,25 @@
+qubes-core-agent (2.1.42) jessie; urgency=medium
+
+  * firewall: show error message only on actual error
+  * Avoid 100MB reserved space in private ext4 partition
+  * gui-fatal: do not run as root
+  * fedora: workaround slow system shutdown (#852)
+  * Rename qubes-yum-proxy service to qubes-updates-proxy
+  * Rename yum-proxy-setup service to updates-proxy-setup
+  * updates-proxy: add rules for debian repositories (#887)
+  * qrexec: check for setuid() error when calling zenity/kdialog
+  * Use systemd mechanism for loading kernel modules (when available)
+  * Add missing u2mfn module load
+  * archlinux: modules-load.d handled now in generic files
+  * debian: migrate to native systemd services
+  * updates-proxy-setup: support setting proxy for apt (#887)
+  * Introduce qubes.SetDateTime service for time synchronization
+  * systemd: fix 'service' path
+  * Include /rw in the package
+  * debian: custom dh_auto_clean no longer needed
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 25 Oct 2014 01:49:58 +0200
+
 qubes-core-agent (2.1.41) jessie; urgency=medium
 
   [ Marek Marczykowski-Górecki ]

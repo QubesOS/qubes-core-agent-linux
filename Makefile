@@ -43,23 +43,35 @@ all:
 	make -C qrexec
 	make -C qubes-rpc
 
-install-rh:
-	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
-	install -d $(DESTDIR)/etc/init.d
-	install vm-init.d/* $(DESTDIR)/etc/init.d/
-
-	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
-	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
-
+install-systemd:
+	install -d $(DESTDIR)/lib/systemd/system $(DESTDIR)/usr/lib/qubes/init $(DESTDIR)/lib/modules-load.d
+	install -m 0755 vm-systemd/*.sh $(DESTDIR)/usr/lib/qubes/init/
+	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)/lib/systemd/system/
+	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)/lib/systemd/system/
 	install -m 0644 vm-systemd/ModemManager.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)/usr/lib/qubes/init/
+	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)/lib/modules-load.d/
+	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)/lib/modules-load.d/
 	install -m 0644 vm-systemd/cups.* $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)/usr/lib/qubes/init/
 	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/qubes-update-check.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-update-check.timer $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-yum-proxy.service $(DESTDIR)/lib/systemd/system/
+
+install-sysvinit:
+	install -d $(DESTDIR)/etc/init.d
+	install vm-init.d/qubes-core $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-core-appvm $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-core-netvm $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-firewall $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-netwatcher $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-qrexec-agent $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
+	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
+	install -D vm-init.d/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
+
+
+install-rh: install-systemd install-sysvinit
+	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
 	install -D -m 0644 misc/qubes-r2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2.repo
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
@@ -70,9 +82,7 @@ install-rh:
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
 	install -d -m 755 $(DESTDIR)/etc/pki/rpm-gpg
 	install -m 644 misc/RPM-GPG-KEY-qubes* $(DESTDIR)/etc/pki/rpm-gpg/
-
-	install -D misc/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
-	install -D misc/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
+	install -D -m 644 misc/session-stop-timeout.conf $(DESTDIR)/usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 
 
 	install -d $(DESTDIR)/etc/yum.conf.d
@@ -81,6 +91,12 @@ install-rh:
 	install misc/qubes-download-dom0-updates.sh $(DESTDIR)/usr/lib/qubes/
 	install -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
+
+	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
+	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
+
+	install -m 0400 -D network/iptables $(DESTDIR)/etc/sysconfig/iptables
+	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/sysconfig/ip6tables
 
 install-common:
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
@@ -119,9 +135,9 @@ install-common:
 	install -d $(DESTDIR)/etc/NetworkManager/dispatcher.d/
 	install network/{qubes-nmhook,30-qubes-external-ip} $(DESTDIR)/etc/NetworkManager/dispatcher.d/
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
-	install -m 0644 -D network/tinyproxy-qubes-yum.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-qubes-yum.conf
-	install -m 0644 -D network/filter-qubes-yum $(DESTDIR)/etc/tinyproxy/filter-qubes-yum
-	install -m 0755 -D network/iptables-yum-proxy $(DESTDIR)/usr/lib/qubes/iptables-yum-proxy
+	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
+	install -m 0644 -D network/filter-updates $(DESTDIR)/etc/tinyproxy/filter-updates
+	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)/usr/lib/qubes/iptables-updates-proxy
 	install -d $(DESTDIR)/etc/xdg/autostart
 	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)/usr/lib/qubes/show-hide-nm-applet.sh
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
@@ -155,10 +171,12 @@ install-common:
 	install -m 0644 qubes-rpc/qubes.{Backup,Restore} $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.Select{File,Directory} $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.GetImageRGBA $(DESTDIR)/etc/qubes-rpc
+	install -m 0644 qubes-rpc/qubes.SetDateTime $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/usr/share/file-manager/actions
 	install -m 0644 qubes-rpc/*-gnome.desktop $(DESTDIR)/usr/share/file-manager/actions
 
+	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)/usr/bin/qubes-desktop-run
 	install -D misc/nautilus-actions.conf $(DESTDIR)/etc/xdg/nautilus-actions/nautilus-actions.conf
 
 	install -d $(DESTDIR)/mnt/removable
@@ -167,16 +185,7 @@ install-common:
 
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/home_volatile/user
-
-	install -d $(DESTDIR)/lib/systemd/system $(DESTDIR)/usr/lib/qubes/init
-	install -m 0755 vm-systemd/*.sh $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/qubes-dvm.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-firewall.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-misc-post.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-netwatcher.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-network.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-qrexec-agent.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-sysinit.service $(DESTDIR)/lib/systemd/system/
+	install -d $(DESTDIR)/rw
 
 install-deb:
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d

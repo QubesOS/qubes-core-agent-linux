@@ -66,26 +66,10 @@ package() {
 
   make install-vm DESTDIR=$pkgdir SBINDIR=/usr/bin DIST=archlinux
 
-  # Convert module loading to ARCHLINUX
-  mkdir -p $pkgdir/etc/modules-load.d/
-
-  #misc/qubes-core.modules
-  echo xen-evtchn > $pkgdir/etc/modules-load.d/qubes_core.conf
-  echo xen-blkback >> $pkgdir/etc/modules-load.d/qubes_core.conf
-  # Note : need to compile pvusb drivers for this last one?
-  echo xen-usbfront >> $pkgdir/etc/modules-load.d/qubes_core.conf
-
-  #misc/qubes-misc.modules
-  #install -D misc/qubes_misc.modules $pkgdir/etc/sysconfig/modules/qubes_misc.modules
-  echo dummy-hcd > $pkgdir/etc/modules-load.d/qubes_misc.conf
-
   # Change the place for iptable rules to match archlinux standard
   mkdir -p $pkgdir/etc/iptables
   mv $pkgdir/etc/sysconfig/iptables $pkgdir/etc/iptables/iptables.rules
   mv $pkgdir/etc/sysconfig/ip6tables $pkgdir/etc/iptables/ip6tables.rules
-
-  # Note: appears in the gui package but required for qrexec agent to work
-  echo u2mfn > $pkgdir/etc/modules-load.d/qubes_u2mfn.conf
 
   # Remove things non wanted in archlinux
   rm -r $pkgdir/etc/yum*

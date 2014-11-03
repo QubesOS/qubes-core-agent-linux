@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# it is in format of `date -u -Iseconds`, example: 2014-09-29T22:59:21+0000
+# it comes from dom0, so is trusted
+read timestamp
+timediff=$(( `date -u +'+%Y%m%d%H%M%S'` - `date -u -d "$timestamp" +'+%Y%m%d%H%M%S'` ))
+if [ $timediff -le 2 -a $timediff -ge -2 ]; then
+    # don't bother
+    exit 0
+fi
+date -u -s "$timestamp"
