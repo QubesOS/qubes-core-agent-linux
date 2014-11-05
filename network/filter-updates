@@ -5,7 +5,7 @@
 ^mirrors\.fedoraproject\.org:443$
 ^http://mirrors\..*/mirrorlist\?
 \.deb$
-/dists/[a-z]*/\(InRelease\|Release\|Release.gpg\)$
-/dists/[a-z]*/.*/\(Packages\|Sources\|Release\)\(\|\.gz\|\.bz2\|\.xz\|\.lzma\)$
-/dists/[a-z]*/.*/\(Contents\|Translation\)-.*\(\|\.gz\|\.xz\|\.bz2\|\.lzma\)$
-/dists/[a-z]*/.*/\(Contents-.*\|Translation-.*\|Packages\)\.diff/\(Index\|[0-9.-]*\)\(\|\.gz\|\.xz\|\.bz2\|\.lzma\)$
+/dists/[a-z-]*/\(InRelease\|Release\|Release.gpg\)$
+/dists/[a-z-]*/.*/\(Packages\|Sources\|Release\)\(\|\.gz\|\.bz2\|\.xz\|\.lzma\|.*\)$
+/dists/[a-z-]*/.*/\(Contents\|Translation\)-.*\(\|\.gz\|\.xz\|\.bz2\|\.lzma\)$
+/dists/[a-z-]*/.*/\(Contents-.*\|Translation-.*\|Packages\)\.diff/\(Index\|[0-9.-]*\)\(\|\.gz\|\.xz\|\.bz2\|\.lzma\)$

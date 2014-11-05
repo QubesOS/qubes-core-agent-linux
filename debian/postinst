@@ -1,0 +1,242 @@
+#!/bin/bash
+# postinst script for core-agent-linux
+#
+# see: dh_installdeb(1)
+
+set -x
+
+# The postint script may be called in the following ways:
+#   * <postinst> 'configure' <most-recently-configured-version>
+#   * <old-postinst> 'abort-upgrade' <new version>
+#   * <conflictor's-postinst> 'abort-remove' 'in-favour' <package>
+#     <new-version>
+#   * <postinst> 'abort-remove'
+#   * <deconfigured's-postinst> 'abort-deconfigure' 'in-favour'
+#     <failed-install-package> <version> 'removing'
+#     <conflicting-package> <version>
+#
+#    For details, see http://www.debian.org/doc/debian-policy/ or
+# https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html or
+# the debian-policy package
+
+case "$1" in
+    configure)
+        # disable some Upstart services
+        for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
+            if [ -e /etc/init/$F.conf ]; then
+                mv -f /etc/init/$F.conf /etc/init/$F.conf.disabled
+            fi
+        done
+
+        remove_ShowIn () {
+            if [ -e /etc/xdg/autostart/$1.desktop ]; then
+                sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/$1.desktop
+            fi
+        }
+
+
+        # Stops Qt form using the MIT-SHM X11 Shared Memory Extension
+        echo 'export QT_X11_NO_MITSHM=1' >> /etc/profile
+
+        # Sudo's defualt umask is 077 so set sane default of 022
+        # Also don't allow QT to used shared memory to prevent errors
+        echo 'Defaults umask = 0002' >> /etc/sudoers
+        echo 'Defaults umask_override' >> /etc/sudoers
+        echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' >> /etc/sudoers
+
+        # reenable abrt-aplet if disable by some earlier version of package
+        remove_ShowIn abrt-applet.desktop
+
+        # don't want it at all
+        for F in deja-dup-monitor imsettings-start krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
+            if [ -e /etc/xdg/autostart/$F.desktop ]; then
+                remove_ShowIn $F
+                echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/$F.desktop
+            fi
+        done
+
+        # don't want it in DisposableVM
+        for F in gcm-apply ; do
+            if [ -e /etc/xdg/autostart/$F.desktop ]; then
+                remove_ShowIn $F
+                echo 'NotShowIn=DisposableVM;' >> /etc/xdg/autostart/$F.desktop
+            fi
+        done
+
+        # want it in AppVM only
+        for F in gnome-keyring-gpg gnome-keyring-pkcs11 gnome-keyring-secrets gnome-keyring-ssh gnome-settings-daemon user-dirs-update-gtk gsettings-data-convert ; do
+            if [ -e /etc/xdg/autostart/$F.desktop ]; then
+                remove_ShowIn $F
+                echo 'OnlyShowIn=GNOME;AppVM;' >> /etc/xdg/autostart/$F.desktop
+            fi
+        done
+
+        # remove existing rule to add own later
+        for F in gpk-update-icon nm-applet ; do
+            remove_ShowIn $F
+        done
+
+        echo 'OnlyShowIn=GNOME;UpdateableVM;' >> /etc/xdg/autostart/gpk-update-icon.desktop || :
+        echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
+
+        # Create NetworkManager configuration if we do not have it
+        if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
+        echo '[main]' > /etc/NetworkManager/NetworkManager.conf
+        echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
+        echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
+        fi
+        /usr/lib/qubes/qubes-fix-nm-conf.sh
+
+
+        # Remove ip_forward setting from sysctl, so NM will not reset it
+        sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+
+        # Remove old firmware updates link
+        if [ -L /lib/firmware/updates ]; then
+          rm -f /lib/firmware/updates
+        fi
+
+        #if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
+        #  echo >> /etc/yum.conf
+        #  echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
+        #  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
+        #fi
+
+        # Revert 'Prevent unnecessary updates in VMs':
+        #sed -i -e '/^exclude = kernel/d' /etc/yum.conf
+
+        # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
+        #if ! grep -q localhost /etc/hosts; then
+        cat <<EOF > /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 `hostname`
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+EOF
+        #fi
+
+        #if [ "$1" !=  1 ] ; then
+        #    # do the rest of %post thing only when updating for the first time...
+        #    exit 0
+        #fi
+
+        if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
+            cp /etc/init/serial.conf /var/lib/qubes/serial.orig
+        fi
+
+        # Remove most of the udev scripts to speed up the VM boot time
+        # Just leave the xen* scripts, that are needed if this VM was
+        # ever used as a net backend (e.g. as a VPN domain in the future)
+        #echo "--> Removing unnecessary udev scripts..."
+        mkdir -p /var/lib/qubes/removed-udev-scripts
+        for f in /etc/udev/rules.d/*
+        do
+            if [ $(basename $f) == "xen-backend.rules" ] ; then
+                continue
+            fi
+
+            if [ $(basename $f) == "50-qubes-misc.rules" ] ; then
+                continue
+            fi
+
+            if echo $f | grep -q qubes; then
+                continue
+            fi
+
+            mv $f /var/lib/qubes/removed-udev-scripts/
+        done
+        mkdir -p /rw
+        #rm -f /etc/mtab
+        #echo "--> Removing HWADDR setting from /etc/sysconfig/network-scripts/ifcfg-eth0"
+        #mv /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.orig
+        #grep -v HWADDR /etc/sysconfig/network-scripts/ifcfg-eth0.orig > /etc/sysconfig/network-scripts/ifcfg-eth0
+
+        #######################################################################
+        # systemd post-init
+        #######################################################################
+        for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-updates-proxy qubes-qrexec-agent; do
+            /bin/systemctl enable $srv.service 2> /dev/null
+        done
+
+        /bin/systemctl enable qubes-update-check.timer 2> /dev/null
+
+        UNITDIR=/lib/systemd/system
+        OVERRIDEDIR=/usr/lib/qubes/init
+
+        # XXX: Debian specific
+        if [ -f "$OVERRIDEDIR/NetworkManager.service" ]; then
+            mv -f $OVERRIDEDIR/NetworkManager.service $OVERRIDEDIR/network-manager.service
+            sed 's/NetworkManager/network-manager/' -i $OVERRIDEDIR/network-manager.service
+        fi
+        if [ -f "$OVERRIDEDIR/NetworkManager-wait-online.service" ]; then
+            mv -f $OVERRIDEDIR/NetworkManager-wait-online.service $OVERRIDEDIR/network-manager-wait-online.service
+            sed 's/NetworkManager/network-manager/' -i $OVERRIDEDIR/network-manager-wait-online.service
+        fi
+        if [ -f "$OVERRIDEDIR/ModemManager" ]; then
+            mv -f $OVERRIDEDIR/ModemManager $OVERRIDEDIR/modemmanager.service
+            sed 's/ModemManager/modemmanager/' -i $OVERRIDEDIR/modemmanager.service
+        fi
+
+        # Install overriden services only when original exists
+        #for srv in cups modemmanager network-manager network-manager-wait-online ntpd chronyd; do
+        for srv in cups modemmanager network-manager network-manager-wait-online; do
+            if [ -f $UNITDIR/$srv.service ]; then
+                cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
+            fi
+            if [ -f $UNITDIR/$srv.socket -a -f $OVERRIDEDIR/$srv.socket ]; then
+                cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/
+            fi
+            if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then
+                cp $OVERRIDEDIR/$srv.path /etc/systemd/system/
+            fi
+        done
+
+        # Set default "runlevel"
+        rm -f /etc/systemd/system/default.target
+        ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+
+        #DISABLE_SERVICES="alsa-store alsa-restore auditd avahi avahi-daemon backuppc cpuspeed crond"
+        #DISABLE_SERVICES="$DISABLE_SERVICES fedora-autorelabel fedora-autorelabel-mark ipmi hwclock-load hwclock-save"
+        #DISABLE_SERVICES="$DISABLE_SERVICES mdmonitor multipathd openct rpcbind mcelog fedora-storage-init fedora-storage-init-late"
+        #DISABLE_SERVICES="$DISABLE_SERVICES plymouth-start plymouth-read-write plymouth-quit plymouth-quit-wait"
+        #DISABLE_SERVICES="$DISABLE_SERVICES sshd tcsd sm-client sendmail mdmonitor-takeover"
+        #DISABLE_SERVICES="$DISABLE_SERVICES rngd smartd upower irqbalance colord"
+        #for srv in $DISABLE_SERVICES; do
+        #    if [ -f /lib/systemd/system/$srv.service ]; then
+        #        if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
+        #            /bin/systemctl disable $srv.service 2> /dev/null
+        #        else
+        #            # forcibly disable
+        #            ln -sf /dev/null /etc/systemd/system/$srv.service
+        #        fi
+        #    fi
+        #done
+
+        rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
+
+        # Enable some services
+        /bin/systemctl enable iptables.service 2> /dev/null
+        /bin/systemctl enable ip6tables.service 2> /dev/null
+        /bin/systemctl enable rsyslog.service 2> /dev/null
+        /bin/systemctl enable ntpd.service 2> /dev/null
+
+        # Enable cups only when it is real SystemD service
+        [ -e /lib/systemd/system/cups.service ] && /bin/systemctl enable cups.service 2> /dev/null
+        ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+        exit 0
+        ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+# dh_installdeb will replace this with shell code automatically
+# generated by other debhelper scripts.
+
+#DEBHELPER#
+
+exit 0
+
+# vim: set ts=4 sw=4 sts=4 et :
