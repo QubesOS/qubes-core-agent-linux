@@ -112,7 +112,7 @@ case "$1" in
                 sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
                 sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
             else
-                echo "${ip} `hostname`" >> /etc/hosts
+                echo "${ip//\\/} `hostname`" >> /etc/hosts
             fi
         done
         # remove hostname from 127.0.0.1 line (in debian the hostname is by default
