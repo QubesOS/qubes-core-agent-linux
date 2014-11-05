@@ -234,6 +234,11 @@ case "$1" in
         exit 0
         ;;
 
+    triggered)
+        echo "Updating Qubes AppMenu."
+        /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
+        ;;
+
     *)
         echo "postinst called with unknown argument \`$1'" >&2
         exit 1
