@@ -10,7 +10,7 @@ addrule()
         fi
 }
 export PATH=$PATH:/sbin:/bin
-source /var/run/qubes/qubes-ns
+. /var/run/qubes/qubes-ns
 if [ "X"$NS1 = "X" ] ; then exit ; fi
 iptables -t nat -F PR-QBS
 FIRSTONE=yes
