@@ -4,7 +4,6 @@
 # see: dh_installdeb(1)
 
 set -e
-set -x
 
 # The postint script may be called in the following ways:
 #   * <postinst> 'configure' <most-recently-configured-version>
@@ -20,20 +19,111 @@ set -x
 # https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html or
 # the debian-policy package
 
-case "$1" in
+# Install overriden services only when original exists
+installOverridenServices() {
+    unit_dir="${1}"
+    override_dir="${2}"
+    service="${3}"
+    retval=1
+
+    for unit in ${service}; do
+        if [ -f ${unit_dir}/${unit}.service ]; then
+            cp ${override_dir}/${unit}.service /etc/systemd/system/
+            retval=0
+        fi
+        if [ -f ${unit_dir}/${unit}.socket -a -f ${override_dir}/${unit}.socket ]; then
+            cp ${override_dir}/${unit}.socket /etc/systemd/system/
+            retval=0
+        fi
+        if [ -f ${unit_dir}/${unit}.path -a -f ${override_dir}/${unit}.path ]; then
+            cp ${override_dir}/${unit}.path /etc/systemd/system/
+            retval=0
+        fi
+    done
+
+    return ${retval}
+}
+
+reenableNetworkManager() {
+    # Disable original service to enable overriden one
+    /bin/systemctl disable ModemManager.service 2> /dev/null
+    /bin/systemctl disable NetworkManager.service 2> /dev/null
+
+    # Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
+    /bin/systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
+    /bin/systemctl enable ModemManager.service 2> /dev/null
+    /bin/systemctl enable NetworkManager.service 2> /dev/null
+
+    # Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
+    /bin/systemctl enable NetworkManager-dispatcher.service 2> /dev/null
+}
+
+remove_ShowIn () {
+    if [ -e "${1}" ]; then
+        sed -i '/^\(Not\|Only\)ShowIn/d' "${1}"
+    fi
+}
+
+# Disable systemd units
+disableSystemdUnits() {
+    for unit in $*; do
+        systemctl is-enabled ${unit} > /dev/null 2>&1 && {
+            echo "Disabling ${unit}..."
+            systemctl is-active ${unit} > /dev/null 2>&1 && {
+                systemctl stop ${unit} > /dev/null 2>&1 || echo "Unable to stop ${unit}"
+            }
+            if [ -f /lib/systemd/system/${unit} ]; then
+                if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
+                    systemctl disable ${unit} > /dev/null 2>&1 || echo "Could not disable ${unit}"
+                else
+                    # Forcibly disable
+                    echo "Forcibly disabling: ${unit}"
+                    ln -sf /dev/null /etc/systemd/system/${unit}
+                fi
+            else
+                    systemctl disable ${unit} > /dev/null 2>&1 || echo "Could not disable ${unit}"
+            fi
+        } || {
+            echo "It appears ${unit} is already disabled!"
+        }
+    done
+}
+
+# Enable systemd units
+enableSystemdUnits() {
+    for unit in $*; do
+        systemctl is-enabled ${unit} > /dev/null 2>&1 && {
+            echo "It appears ${unit} is already enabled!"
+        } || {
+            echo "Enabling: ${unit}..."
+            systemctl enable ${unit} > /dev/null 2>&1 || echo "Could not enable: ${unit}"
+        }
+    done
+}
+
+# Manually trigger all triggers to automaticatly configure
+triggerTriggers() {
+        path="$(readlink -m ${0})"
+        triggers="${path/postinst/triggers}"
+
+        awk '{sub(/[ \t]*#.*/,"")} NF' ${triggers} | while read line
+        do
+            /bin/bash -c "${0} triggered ${line##* }" || true
+        done
+}
+
+case "${1}" in
     configure)
         # disable some Upstart services
-        for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
-            if [ -e /etc/init/$F.conf ]; then
-                mv -f /etc/init/$F.conf /etc/init/$F.conf.disabled
+        for init in plymouth-shutdown \
+                    prefdm \
+                    splash-manager \
+                    start-ttys \
+                    tty ; do
+            if [ -e /etc/init/${init}.conf ]; then
+                mv -f /etc/init/${init}.conf /etc/init/${init}.conf.disabled
             fi
         done
-
-        remove_ShowIn () {
-            if [ -e /etc/xdg/autostart/$1.desktop ]; then
-                sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/$1.desktop
-            fi
-        }
 
         # Stops Qt form using the MIT-SHM X11 Shared Memory Extension
         echo 'export QT_X11_NO_MITSHM=1' > /etc/profile.d/qt_x11_no_mitshm
@@ -45,56 +135,21 @@ case "$1" in
         echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' > /etc/sudoers.d/qt_x11_no_mitshm.sh
         chmod 0755 /etc/sudoers.d/qt_x11_no_mitshm.sh 
 
-        # reenable abrt-aplet if disabled by some earlier version of package
-        remove_ShowIn abrt-applet.desktop
-
-        # don't want it at all
-        for F in deja-dup-monitor imsettings-start krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
-            if [ -e /etc/xdg/autostart/$F.desktop ]; then
-                remove_ShowIn $F
-                echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/$F.desktop
-            fi
-        done
-
-        # don't want it in DisposableVM
-        for F in gcm-apply ; do
-            if [ -e /etc/xdg/autostart/$F.desktop ]; then
-                remove_ShowIn $F
-                echo 'NotShowIn=DisposableVM;' >> /etc/xdg/autostart/$F.desktop
-            fi
-        done
-
-        # want it in AppVM only
-        for F in gnome-keyring-gpg gnome-keyring-pkcs11 gnome-keyring-secrets gnome-keyring-ssh gnome-settings-daemon user-dirs-update-gtk gsettings-data-convert ; do
-            if [ -e /etc/xdg/autostart/$F.desktop ]; then
-                remove_ShowIn $F
-                echo 'OnlyShowIn=GNOME;AppVM;' >> /etc/xdg/autostart/$F.desktop
-            fi
-        done
-
-        # remove existing rule to add own later
-        for F in gpk-update-icon nm-applet ; do
-            remove_ShowIn $F
-        done
-
-        echo 'OnlyShowIn=GNOME;UpdateableVM;' >> /etc/xdg/autostart/gpk-update-icon.desktop || :
-        echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
-
         # Create NetworkManager configuration if we do not have it
         if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
-        echo '[main]' > /etc/NetworkManager/NetworkManager.conf
-        echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
-        echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
+            echo '[main]' > /etc/NetworkManager/NetworkManager.conf
+            echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
+            echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
         fi
         /usr/lib/qubes/qubes-fix-nm-conf.sh
 
 
         # Remove ip_forward setting from sysctl, so NM will not reset it
-        sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+        sed 's/^net.ipv4.ip_forward.*/#\0/' -i /etc/sysctl.conf
 
         # Remove old firmware updates link
         if [ -L /lib/firmware/updates ]; then
-          rm -f /lib/firmware/updates
+            rm -f /lib/firmware/updates
         fi
 
         #if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
@@ -122,7 +177,7 @@ case "$1" in
 
         chown user:user /home_volatile/user
 
-        #if [ "$1" !=  1 ] ; then
+        #if [ "${1}" !=  1 ] ; then
         #    # do the rest of %post thing only when updating for the first time...
         #    exit 0
         #fi
@@ -138,84 +193,94 @@ case "$1" in
         mkdir -p /var/lib/qubes/removed-udev-scripts
         for f in /etc/udev/rules.d/*
         do
-            if [ $(basename $f) == "xen-backend.rules" ] ; then
+            if [ $(basename ${f}) == "xen-backend.rules" ] ; then
                 continue
             fi
 
-            if [ $(basename $f) == "50-qubes-misc.rules" ] ; then
+            if [ $(basename ${f}) == "50-qubes-misc.rules" ] ; then
                 continue
             fi
 
-            if echo $f | grep -q qubes; then
+            if echo ${f} | grep -q qubes; then
                 continue
             fi
 
-            mv $f /var/lib/qubes/removed-udev-scripts/
+            mv ${f} /var/lib/qubes/removed-udev-scripts/
         done
+
+        # Create /rw directory
         mkdir -p /rw
+
+        # XXX: TODO: Needs to be implemented still
         #rm -f /etc/mtab
         #echo "--> Removing HWADDR setting from /etc/sysconfig/network-scripts/ifcfg-eth0"
         #mv /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.orig
         #grep -v HWADDR /etc/sysconfig/network-scripts/ifcfg-eth0.orig > /etc/sysconfig/network-scripts/ifcfg-eth0
 
-        #######################################################################
-        # systemd post-init
-        #######################################################################
-        for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-updates-proxy qubes-qrexec-agent; do
-            /bin/systemctl enable $srv.service 2> /dev/null
-        done
-
-        /bin/systemctl enable qubes-update-check.timer 2> /dev/null
-
-        UNITDIR=/lib/systemd/system
-        OVERRIDEDIR=/usr/lib/qubes/init
-
-        # Install overriden services only when original exists
-        for srv in cups ModemManager NetworkManager NetworkManager-wait-online ntpd chronyd; do
-            if [ -f $UNITDIR/$srv.service ]; then
-                cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
-            fi
-            if [ -f $UNITDIR/$srv.socket -a -f $OVERRIDEDIR/$srv.socket ]; then
-                cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/
-            fi
-            if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then
-                cp $OVERRIDEDIR/$srv.path /etc/systemd/system/
-            fi
-        done
+        # Enable Qubes systemd units
+        enableSystemdUnits \
+            qubes-sysinit.service \
+            qubes-misc-post.service \
+            qubes-netwatcher.service \
+            qubes-network.service \
+            qubes-firewall.service \
+            qubes-updates-proxy.service \
+            qubes-updates-proxy.timer \
+            qubes-qrexec-agent.service
 
         # Set default "runlevel"
         rm -f /etc/systemd/system/default.target
         ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
-        #DISABLE_SERVICES="alsa-store alsa-restore auditd avahi avahi-daemon backuppc cpuspeed crond"
-        #DISABLE_SERVICES="$DISABLE_SERVICES fedora-autorelabel fedora-autorelabel-mark ipmi hwclock-load hwclock-save"
-        #DISABLE_SERVICES="$DISABLE_SERVICES mdmonitor multipathd openct rpcbind mcelog fedora-storage-init fedora-storage-init-late"
-        #DISABLE_SERVICES="$DISABLE_SERVICES plymouth-start plymouth-read-write plymouth-quit plymouth-quit-wait"
-        #DISABLE_SERVICES="$DISABLE_SERVICES sshd tcsd sm-client sendmail mdmonitor-takeover"
-        #DISABLE_SERVICES="$DISABLE_SERVICES rngd smartd upower irqbalance colord"
-        #for srv in $DISABLE_SERVICES; do
-        #    if [ -f /lib/systemd/system/$srv.service ]; then
-        #        if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
-        #            /bin/systemctl disable $srv.service 2> /dev/null
-        #        else
-        #            # forcibly disable
-        #            ln -sf /dev/null /etc/systemd/system/$srv.service
-        #        fi
-        #    fi
-        #done
+        # Process all triggers which will set defaults to wanted values
+        triggerTriggers
+
+        disableSystemdUnits \
+            alsa-store \
+            alsa-restore \
+            auditd \
+            avahi \
+            avahi-daemon \
+            backuppc \
+            cpuspeed \
+            crond \
+            fedora-autorelabel \
+            fedora-autorelabel-mark \
+            ipmi \
+            hwclock-load \
+            hwclock-save \
+            mdmonitor \
+            multipathd \
+            openct \
+            rpcbind \
+            mcelog \
+            fedora-storage-init \
+            fedora-storage-init-late \
+            plymouth-start \
+            plymouth-read-write \
+            plymouth-quit \
+            plymouth-quit-wait \
+            sshd \
+            tcsd \
+            sm-client \
+            sendmail \
+            mdmonitor-takeover \
+            rngd smartd \
+            upower \
+            irqbalance \
+            colord
 
         rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 
-        # Enable some services
-        /bin/systemctl enable rsyslog.service 2> /dev/null
+        # Enable other systemd units
+        enableSystemdUnits \
+            rsyslog.service
 
+        # XXX: TODO: Needs to be implemented still
         # These do not exist on debian; maybe a different package name
-        #/bin/systemctl enable iptables.service 2> /dev/null
-        #/bin/systemctl enable ntpd.service 2> /dev/null
-        #/bin/systemctl enable ip6tables.service 2> /dev/null
-
-        # Enable cups only when it is real SystemD service
-        [ -e /lib/systemd/system/cups.service ] && /bin/systemctl enable cups.service 2> /dev/null
+        #    iptables.service \
+        #    ntpd.service \
+        #    ip6tables.service \
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -223,14 +288,137 @@ case "$1" in
         ;;
 
     triggered)
-        for trigger in $2; do
-            case "$trigger" in
+        for trigger in ${2}; do
+            case "${trigger}" in
+
+                # Update Qubes App Menus
                 /usr/share/applications)
-                    echo "Updating Qubes AppMenu."
-                    /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
+                    echo "Updating Qubes App Menus..."
+                    /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
                     ;;
+
+                # Install overriden services only when original exists
+                /lib/systemd/system/NetworkManager.service | \
+                /lib/systemd/system/NetworkManager-wait-online.service | \
+                /lib/systemd/system/ModemManager.service)
+                    echo "Installing over-riden services for $(basename -s .service ${trigger})..."
+                    UNITDIR=/lib/systemd/system
+                    OVERRIDEDIR=/usr/lib/qubes/init
+                    installOverridenServices "${UNITDIR}" "${OVERRIDEDIR}" "$(basename -s .service "${trigger}")"
+                    if [ $? -eq 0 ]; then
+                        reenableNetworkManager
+                    fi
+                    ;;
+
+                # Enable cups only when it is real Systemd service
+                /lib/systemd/system/cups.service)
+                    echo "Enabling cups"
+                    [ -e /lib/systemd/system/cups.service ] && enableSystemdUnits cups.service
+                    ;;
+
+                # "Enable haveged service"
+                /lib/systemd/system/haveged.service)
+                    echo "Enabling haveged service"
+                    enableSystemdUnits haveged.service
+                    ;;
+
+                # Install overridden serial.conf init script 
+                /etc/init/serial.conf)
+                    echo "Installing over-ridden serial.conf init script..."
+                    if [ -e /etc/init/serial.conf ]; then
+                        cp /usr/share/qubes/serial.conf /etc/init/serial.conf
+                    fi
+                    ;;
+
+                # Enable autostart of notification-daemon when installed
+                /etc/xdg/autostart/notification-daemon.desktop)
+                    if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
+                        echo "Enabling autostart of notification-daemon when installed..."
+                        ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
+                    fi
+                    ;;
+
+                # Disable SELinux"
+                /etc/selinux/config)
+                    echo "Disabling SELinux..."
+                    if [ -e /etc/selinux/config ]; then
+                        sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+                        mv /etc/selinux/config.processed /etc/selinux/config
+                        setenforce 0 2>/dev/null
+                    fi
+                    ;;
+
+                # Desktop Entry Modification - Remove existing rules
+                /etc/xdg/autostart/gpk-update-icon.desktop | \
+                /etc/xdg/autostart/nm-applet.desktop | \
+                /etc/xdg/autostart/abrt-applet.desktop)
+                    if [ -e "${trigger}" ]; then
+                        echo "Desktop Entry Modification - Removing ShowIn from: ${trigger}..."
+                        remove_ShowIn "${trigger}"
+                    fi
+                    ;;
+
+                # Desktop Entry Modification - Not shown in Qubes
+                /etc/xdg/autostart/pulseaudio.desktop | \
+                /etc/xdg/autostart/deja-dup-monitor.desktop | \
+                /etc/xdg/autostart/imsettings-start.desktop | \
+                /etc/xdg/autostart/krb5-auth-dialog.desktop | \
+                /etc/xdg/autostart/pulseaudio.desktop | \
+                /etc/xdg/autostart/restorecond.desktop | \
+                /etc/xdg/autostart/sealertauto.desktop | \
+                /etc/xdg/autostart/gnome-power-manager.desktop | \
+                /etc/xdg/autostart/gnome-sound-applet.desktop | \
+                /etc/xdg/autostart/gnome-screensaver.desktop | \
+                /etc/xdg/autostart/orca-autostart.desktop)
+                    if [ -e "${trigger}" ]; then
+                        echo "Desktop Entry Modification - Not Shown in Qubes: ${trigger}..."
+                        remove_ShowIn "${trigger}"
+                        echo 'NotShowIn=QUBES;' >> "${trigger}" || true
+                    fi
+                    ;;
+
+                # Desktop Entry Modification - Not shown in in DisposableVM
+                /etc/xdg/autostart/gcm-apply.desktop)
+                    if [ -e "${trigger}" ]; then
+                        echo "Desktop Entry Modification - Not Shown in DisposableVM: ${trigger}..."
+                        remove_ShowIn "${trigger}"
+                        echo 'NotShowIn=DisposableVM;' >> "${trigger}" || true
+                    fi
+                    ;;
+
+                # Desktop Entry Modification - Only shown in AppVM
+                /etc/xdg/autostart/gnome-keyring-gpg.desktop | \
+                /etc/xdg/autostart/gnome-keyring-pkcs11.desktop | \
+                /etc/xdg/autostart/gnome-keyring-secrets.desktop | \
+                /etc/xdg/autostart/gnome-keyring-ssh.desktop | \
+                /etc/xdg/autostart/gnome-settings-daemon.desktop | \
+                /etc/xdg/autostart/user-dirs-update-gtk.desktop | \
+                /etc/xdg/autostart/gsettings-data-convert.desktop)
+                    if [ -e "${trigger}" ]; then
+                        echo "Desktop Entry Modification - Only Shown in Gnome & AppVM: ${trigger}..."
+                        remove_ShowIn "${trigger}"
+                        echo 'OnlyShowIn=GNOME;AppVM;' >> "${trigger}" || true
+                    fi
+                    ;;
+
+                # Desktop Entry Modification - Only shown in Gnome & UpdateableVM
+                /etc/xdg/autostart/gpk-update-icon.desktop)
+                    if [ -e "${trigger}" ]; then
+                        echo "Desktop Entry Modification - Only Shown in Gnome & UpdateableVM: ${trigger}..."
+                        echo 'OnlyShowIn=GNOME;UpdateableVM;' >> "${trigger}" || true
+                    fi
+                    ;;
+
+                # Desktop Entry Modification - Only shown in Gnome & Qubes
+                /etc/xdg/autostart/nm-applet.desktop)
+                    if [ -e "${trigger}" ]; then
+                        echo "Desktop Entry Modification - Only Shown in Gnome & Qubes: ${trigger}..."
+                        echo 'OnlyShowIn=GNOME;QUBES;' >> "${trigger}" || true
+                    fi
+                    ;;
+
                 *)
-                    echo "postinst called with unknown trigger \`$2'" >&2
+                    echo "postinst called with unknown trigger \`${2}'" >&2
                     exit 1
                     ;;
             esac
@@ -239,7 +427,7 @@ case "$1" in
         ;;
 
     *)
-        echo "postinst called with unknown argument \`$1'" >&2
+        echo "postinst called with unknown argument \`${1}'" >&2
         exit 1
         ;;
 esac
