@@ -170,23 +170,8 @@ case "$1" in
         UNITDIR=/lib/systemd/system
         OVERRIDEDIR=/usr/lib/qubes/init
 
-        # XXX: Debian specific
-        if [ -f "$OVERRIDEDIR/NetworkManager.service" ]; then
-            mv -f $OVERRIDEDIR/NetworkManager.service $OVERRIDEDIR/network-manager.service
-            sed 's/NetworkManager/network-manager/' -i $OVERRIDEDIR/network-manager.service
-        fi
-        if [ -f "$OVERRIDEDIR/NetworkManager-wait-online.service" ]; then
-            mv -f $OVERRIDEDIR/NetworkManager-wait-online.service $OVERRIDEDIR/network-manager-wait-online.service
-            sed 's/NetworkManager/network-manager/' -i $OVERRIDEDIR/network-manager-wait-online.service
-        fi
-        if [ -f "$OVERRIDEDIR/ModemManager" ]; then
-            mv -f $OVERRIDEDIR/ModemManager $OVERRIDEDIR/modemmanager.service
-            sed 's/ModemManager/modemmanager/' -i $OVERRIDEDIR/modemmanager.service
-        fi
-
         # Install overriden services only when original exists
-        #for srv in cups modemmanager network-manager network-manager-wait-online ntpd chronyd; do
-        for srv in cups modemmanager network-manager network-manager-wait-online; do
+        for srv in cups ModemManager NetworkManager NetworkManager-wait-online ntpd chronyd; do
             if [ -f $UNITDIR/$srv.service ]; then
                 cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
             fi
