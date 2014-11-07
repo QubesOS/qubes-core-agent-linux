@@ -3,7 +3,7 @@
 #
 # see: dh_installdeb(1)
 
-set -x
+set -e
 
 # The prerm script may be called in the following ways:
 #   * <postrm> 'remove'
