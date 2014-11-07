@@ -3,6 +3,7 @@
 #
 # see: dh_installdeb(1)
 
+set -e
 set -x
 
 # The postint script may be called in the following ways:
@@ -34,17 +35,17 @@ case "$1" in
             fi
         }
 
-
         # Stops Qt form using the MIT-SHM X11 Shared Memory Extension
-        echo 'export QT_X11_NO_MITSHM=1' >> /etc/profile
+        echo 'export QT_X11_NO_MITSHM=1' > /etc/profile.d/qt_x11_no_mitshm
 
         # Sudo's defualt umask is 077 so set sane default of 022
         # Also don't allow QT to used shared memory to prevent errors
-        echo 'Defaults umask = 0002' >> /etc/sudoers
-        echo 'Defaults umask_override' >> /etc/sudoers
-        echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' >> /etc/sudoers
+        echo 'Defaults umask = 0002' > /etc/sudoers.d/umask
+        echo 'Defaults umask_override' >> /etc/sudoers.d/umask
+        echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' > /etc/sudoers.d/qt_x11_no_mitshm.sh
+        chmod 0755 /etc/sudoers.d/qt_x11_no_mitshm.sh 
 
-        # reenable abrt-aplet if disable by some earlier version of package
+        # reenable abrt-aplet if disabled by some earlier version of package
         remove_ShowIn abrt-applet.desktop
 
         # don't want it at all
@@ -221,10 +222,12 @@ case "$1" in
         rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 
         # Enable some services
-        /bin/systemctl enable iptables.service 2> /dev/null
-        /bin/systemctl enable ip6tables.service 2> /dev/null
         /bin/systemctl enable rsyslog.service 2> /dev/null
-        /bin/systemctl enable ntpd.service 2> /dev/null
+
+        # These do not exist on debian; maybe a different package name
+        #/bin/systemctl enable iptables.service 2> /dev/null
+        #/bin/systemctl enable ntpd.service 2> /dev/null
+        #/bin/systemctl enable ip6tables.service 2> /dev/null
 
         # Enable cups only when it is real SystemD service
         [ -e /lib/systemd/system/cups.service ] && /bin/systemctl enable cups.service 2> /dev/null
@@ -235,8 +238,19 @@ case "$1" in
         ;;
 
     triggered)
-        echo "Updating Qubes AppMenu."
-        /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
+        for trigger in $2; do
+            case "$trigger" in
+                /usr/share/applications)
+                    echo "Updating Qubes AppMenu."
+                    /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
+                    ;;
+                *)
+                    echo "postinst called with unknown trigger \`$2'" >&2
+                    exit 1
+                    ;;
+            esac
+        done
+        exit 0
         ;;
 
     *)
