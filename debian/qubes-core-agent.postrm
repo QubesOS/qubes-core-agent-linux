@@ -36,12 +36,16 @@ set -e
 # https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html or
 # the debian-policy package
 
-if [ "$1" = "remove" ] ; then
+if [ "${1}" = "remove" ] ; then
     /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas &> /dev/null || :
 
     if [ -L /lib/firmware/updates ]; then
         rm /lib/firmware/updates
     fi
+
+    for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agent; do
+        systemctl disable ${srv}.service
+    done
 fi
 
 # dh_installdeb will replace this with shell code automatically
