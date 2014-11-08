@@ -21,22 +21,26 @@ set -e
 
 # Install overriden services only when original exists
 installOverridenServices() {
-    unit_dir="${1}"
-    override_dir="${2}"
-    service="${3}"
+    override_dir="${1}"
+    service="${2}"
     retval=1
 
     for unit in ${service}; do
-        if [ -f ${unit_dir}/${unit}.service ]; then
-            cp ${override_dir}/${unit}.service /etc/systemd/system/
+        unit="${unit%%.*}"
+        unit_name="$(basename ${unit})"
+        if [ -f ${unit}.service ]; then
+            echo "Installing override for ${unit}.service..."
+            cp ${override_dir}/${unit_name}.service /etc/systemd/system/
             retval=0
         fi
-        if [ -f ${unit_dir}/${unit}.socket -a -f ${override_dir}/${unit}.socket ]; then
-            cp ${override_dir}/${unit}.socket /etc/systemd/system/
+        if [ -f ${unit}.socket -a -f ${override_dir}/${unit}.socket ]; then
+            echo "Installing override for ${unit}.socket..."
+            cp ${override_dir}/${unit_name}.socket /etc/systemd/system/
             retval=0
         fi
-        if [ -f ${unit_dir}/${unit}.path -a -f ${override_dir}/${unit}.path ]; then
-            cp ${override_dir}/${unit}.path /etc/systemd/system/
+        if [ -f ${unit}.path -a -f ${override_dir}/${unit}.path ]; then
+            echo "Installing override for ${unit}.path..."
+            cp ${override_dir}/${unit_name}.path /etc/systemd/system/
             retval=0
         fi
     done
@@ -46,16 +50,21 @@ installOverridenServices() {
 
 reenableNetworkManager() {
     # Disable original service to enable overriden one
-    /bin/systemctl disable ModemManager.service 2> /dev/null
-    /bin/systemctl disable NetworkManager.service 2> /dev/null
+    echo "Disabling original service to enable overriden one..."
+    disableSystemdUnits ModemManager.service
+    disableSystemdUnits NetworkManager.service
 
     # Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
-    /bin/systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
-    /bin/systemctl enable ModemManager.service 2> /dev/null
-    /bin/systemctl enable NetworkManager.service 2> /dev/null
+    echo "Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)"
+    systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null || echo "Could not disable D-BUS activation of NetworkManager"
+
+    echo "Re-enabling original service to enable overriden one..."
+    enableSystemdUnits ModemManager.service
+    enableSystemdUnits NetworkManager.service
 
     # Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
-    /bin/systemctl enable NetworkManager-dispatcher.service 2> /dev/null
+    echo "Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811"
+    enableSystemdUnits NetworkManager-dispatcher.service
 }
 
 remove_ShowIn () {
@@ -64,27 +73,64 @@ remove_ShowIn () {
     fi
 }
 
+setArrayAsGlobal() {
+    local array="$1"
+    local export_as="$2"
+    local code=$(declare -p "$array")
+    local replaced="${code/$array/$export_as}"
+    eval ${replaced/declare -/declare -g}
+}
+
+systemdInfo() {
+    unit=${1}
+    return_global_var=${2}
+
+    declare -A -g INFO
+    while read line; do
+        INFO[${line%%=*}]="${line##*=}"
+    done < <(systemctl show ${unit} 2> /dev/null)
+    setArrayAsGlobal INFO $return_global_var
+}
+
+displayFailedStatus() {
+    action=${1}
+    unit=${2}
+
+    systemdInfo ${unit} info
+    echo
+    echo "==================================================="
+    echo "FAILED: systemd ${action} ${unit}"
+    echo "==================================================="
+    echo "    LoadState = ${info[LoadState]}"
+    echo "    LoadError = ${info[LoadError]}"
+    echo "  ActiveState = ${info[ActiveState]}"
+    echo "     SubState = ${info[SubState]}"
+    echo "UnitFileState = ${info[UnitFileState]}"
+    echo
+}
+
 # Disable systemd units
 disableSystemdUnits() {
     for unit in $*; do
         systemctl is-enabled ${unit} > /dev/null 2>&1 && {
             echo "Disabling ${unit}..."
             systemctl is-active ${unit} > /dev/null 2>&1 && {
-                systemctl stop ${unit} > /dev/null 2>&1 || echo "Unable to stop ${unit}"
+                systemctl stop ${unit} > /dev/null 2>&1 || displayFailedStatus stop ${unit}
             }
             if [ -f /lib/systemd/system/${unit} ]; then
                 if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
-                    systemctl disable ${unit} > /dev/null 2>&1 || echo "Could not disable ${unit}"
+                    systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
                 else
                     # Forcibly disable
                     echo "Forcibly disabling: ${unit}"
                     ln -sf /dev/null /etc/systemd/system/${unit}
                 fi
             else
-                    systemctl disable ${unit} > /dev/null 2>&1 || echo "Could not disable ${unit}"
+                    systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
             fi
         } || {
             echo "It appears ${unit} is already disabled!"
+            #displayFailedStatus is-disabled ${unit}
         }
     done
 }
@@ -94,9 +140,15 @@ enableSystemdUnits() {
     for unit in $*; do
         systemctl is-enabled ${unit} > /dev/null 2>&1 && {
             echo "It appears ${unit} is already enabled!"
+            #displayFailedStatus is-enabled ${unit}
         } || {
             echo "Enabling: ${unit}..."
-            systemctl enable ${unit} > /dev/null 2>&1 || echo "Could not enable: ${unit}"
+            systemctl enable ${unit} > /dev/null 2>&1 && {
+                systemctl start ${unit} > /dev/null 2>&1 || displayFailedStatus start ${unit}
+            } || {
+                echo "Could not enable: ${unit}"
+                displayFailedStatus enable ${unit}
+            }
         }
     done
 }
@@ -236,39 +288,39 @@ case "${1}" in
         triggerTriggers
 
         disableSystemdUnits \
-            alsa-store \
-            alsa-restore \
-            auditd \
-            avahi \
-            avahi-daemon \
-            backuppc \
-            cpuspeed \
-            crond \
-            fedora-autorelabel \
-            fedora-autorelabel-mark \
-            ipmi \
-            hwclock-load \
-            hwclock-save \
-            mdmonitor \
-            multipathd \
-            openct \
-            rpcbind \
-            mcelog \
-            fedora-storage-init \
-            fedora-storage-init-late \
-            plymouth-start \
-            plymouth-read-write \
-            plymouth-quit \
-            plymouth-quit-wait \
-            sshd \
-            tcsd \
-            sm-client \
-            sendmail \
-            mdmonitor-takeover \
-            rngd smartd \
-            upower \
-            irqbalance \
-            colord
+            alsa-store.service \
+            alsa-restore.service \
+            auditd.service \
+            avahi.service \
+            avahi-daemon.service \
+            backuppc.service \
+            cpuspeed.service \
+            crond.service \
+            fedora-autorelabel.service \
+            fedora-autorelabel-mark.service \
+            ipmi.service \
+            hwclock-load.service \
+            hwclock-save.service \
+            mdmonitor.service \
+            multipathd.service \
+            openct.service \
+            rpcbind.service \
+            mcelog.service \
+            fedora-storage-init.service \
+            fedora-storage-init-late.service \
+            plymouth-start.service \
+            plymouth-read-write.service \
+            plymouth-quit.service \
+            plymouth-quit-wait.service \
+            sshd.service \
+            tcsd.service \
+            sm-client.service \
+            sendmail.service \
+            mdmonitor-takeover.service \
+            rngd smartd.service \
+            upower.service \
+            irqbalance.service \
+            colord.service
 
         rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 
@@ -301,10 +353,9 @@ case "${1}" in
                 /lib/systemd/system/NetworkManager.service | \
                 /lib/systemd/system/NetworkManager-wait-online.service | \
                 /lib/systemd/system/ModemManager.service)
-                    echo "Installing over-riden services for $(basename -s .service ${trigger})..."
                     UNITDIR=/lib/systemd/system
                     OVERRIDEDIR=/usr/lib/qubes/init
-                    installOverridenServices "${UNITDIR}" "${OVERRIDEDIR}" "$(basename -s .service "${trigger}")"
+                    installOverridenServices "${OVERRIDEDIR}" "${trigger}"
                     if [ $? -eq 0 ]; then
                         reenableNetworkManager
                     fi
