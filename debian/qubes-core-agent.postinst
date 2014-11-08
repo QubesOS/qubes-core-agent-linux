@@ -85,7 +85,7 @@ systemdInfo() {
     unit=${1}
     return_global_var=${2}
 
-    declare -A -g INFO
+    declare -A INFO
     while read line; do
         INFO[${line%%=*}]="${line##*=}"
     done < <(systemctl show ${unit} 2> /dev/null)
@@ -178,14 +178,16 @@ case "${1}" in
         done
 
         # Stops Qt form using the MIT-SHM X11 Shared Memory Extension
-        echo 'export QT_X11_NO_MITSHM=1' > /etc/profile.d/qt_x11_no_mitshm
+        echo 'export QT_X11_NO_MITSHM=1' > /etc/profile.d/qt_x11_no_mitshm.sh
+        chmod 0755 /etc/profile.d/qt_x11_no_mitshm.sh
 
         # Sudo's defualt umask is 077 so set sane default of 022
         # Also don't allow QT to used shared memory to prevent errors
         echo 'Defaults umask = 0002' > /etc/sudoers.d/umask
         echo 'Defaults umask_override' >> /etc/sudoers.d/umask
-        echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' > /etc/sudoers.d/qt_x11_no_mitshm.sh
-        chmod 0755 /etc/sudoers.d/qt_x11_no_mitshm.sh 
+        chmod 0440 /etc/sudoers.d/umask
+        echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' > /etc/sudoers.d/qt_x11_no_mitshm
+        chmod 0440 /etc/sudoers.d/qt_x11_no_mitshm
 
         # Create NetworkManager configuration if we do not have it
         if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
@@ -193,8 +195,19 @@ case "${1}" in
             echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
             echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
         fi
-        /usr/lib/qubes/qubes-fix-nm-conf.sh
+        # XXX - Disabling for now; will need to change script to not include ifcfg-rh plugin
+        #/usr/lib/qubes/qubes-fix-nm-conf.sh
+        
+        # XXX: Test to see if this will satisify dispatcher dependancy
+        if [ ! -e  "/lib/systemd/system/org.freedesktop.nm_dispatcher.service" ]; then
+            ln -s org.freedesktop.nm_dispatcher.service NetworkManager-dispatcher.service
+        fi
 
+        # NetworkManager is looking for this to load.  Check into a debian alternative
+        #
+        # We are writing the config in qubes-fix-nm-conf.sh to use the ifcfg-rh plugin
+        #
+        #<error> [1415425011.785917] [main.c:566] main(): failed to initialize settings storage: Could not load plugin 'ifcfg-rh': /usr/lib/NetworkManager/libnm-settings-plugin-ifcfg-rh.so: cannot open shared object file: No such file or directory
 
         # Remove ip_forward setting from sysctl, so NM will not reset it
         sed 's/^net.ipv4.ip_forward.*/#\0/' -i /etc/sysctl.conf
