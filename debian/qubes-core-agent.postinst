@@ -19,6 +19,9 @@ set -e
 # https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html or
 # the debian-policy package
 
+# Directory that modified desktop entry config files are stored in
+XDG_CONFIG_QUBES="/usr/share/qubes/xdg"
+
 # Install overriden services only when original exists
 installOverridenServices() {
     override_dir="${1}"
@@ -67,9 +70,38 @@ reenableNetworkManager() {
     enableSystemdUnits NetworkManager-dispatcher.service
 }
 
-remove_ShowIn () {
+remove_ShowIn() {
     if [ -e "${1}" ]; then
         sed -i '/^\(Not\|Only\)ShowIn/d' "${1}"
+    fi
+}
+
+showIn() {
+    desktop_entry="${1}"
+    shown_in="${2}"
+    message="${shown_in:-"Shown in All;"}" 
+    desktop_entry_qubes="${XDG_CONFIG_QUBES}/autostart/${desktop_entry##*/}"
+
+    # Make sure Qubes autostart directory exists
+    mkdir -p "${XDG_CONFIG_QUBES_AUTOSTART}/autostart"
+
+    # Desktop entry exists, so move to Qubes directory and modify it
+    if [ -e "${desktop_entry}" ]; then
+        echo "Desktop Entry Modification - ${message} ${desktop_entry##*/}..."
+        cp -pf "${desktop_entry}" "${desktop_entry_qubes}"
+
+        remove_ShowIn "${desktop_entry_qubes}"
+        sed -i '/^X-GNOME-Autostart-enabled.*[fF0]/d' "${desktop_entry_qubes}"
+
+        # Will only be '' if shown in all
+        if [ ! "${shown_in}x" == "x" ]; then
+            echo "${shown_in}" >> "${desktop_entry_qubes}" || true
+        fi
+
+    # Desktop entry must have been removed, so also remove from Qubes directory
+    else
+        echo "Desktop Entry Modification - Remove: ${desktop_entry##*/}..."
+        rm -f "${desktop_entry_qubes}"
     fi
 }
 
@@ -195,22 +227,11 @@ case "${1}" in
             echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
             echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
         fi
-        # XXX - Disabling for now; will need to change script to not include ifcfg-rh plugin
-        #/usr/lib/qubes/qubes-fix-nm-conf.sh
         
         # XXX: Test to see if this will satisify dispatcher dependancy
         if [ ! -e  "/lib/systemd/system/org.freedesktop.nm_dispatcher.service" ]; then
             ln -s org.freedesktop.nm_dispatcher.service NetworkManager-dispatcher.service
         fi
-
-        # NetworkManager is looking for this to load.  Check into a debian alternative
-        #
-        # We are writing the config in qubes-fix-nm-conf.sh to use the ifcfg-rh plugin
-        #
-        #<error> [1415425011.785917] [main.c:566] main(): failed to initialize settings storage: Could not load plugin 'ifcfg-rh': /usr/lib/NetworkManager/libnm-settings-plugin-ifcfg-rh.so: cannot open shared object file: No such file or directory
-
-        # Remove ip_forward setting from sysctl, so NM will not reset it
-        sed 's/^net.ipv4.ip_forward.*/#\0/' -i /etc/sysctl.conf
 
         # Remove old firmware updates link
         if [ -L /lib/firmware/updates ]; then
@@ -394,14 +415,6 @@ case "${1}" in
                     fi
                     ;;
 
-                # Enable autostart of notification-daemon when installed
-                /etc/xdg/autostart/notification-daemon.desktop)
-                    if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
-                        echo "Enabling autostart of notification-daemon when installed..."
-                        ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
-                    fi
-                    ;;
-
                 # Disable SELinux"
                 /etc/selinux/config)
                     echo "Disabling SELinux..."
@@ -415,11 +428,9 @@ case "${1}" in
                 # Desktop Entry Modification - Remove existing rules
                 /etc/xdg/autostart/gpk-update-icon.desktop | \
                 /etc/xdg/autostart/nm-applet.desktop | \
-                /etc/xdg/autostart/abrt-applet.desktop)
-                    if [ -e "${trigger}" ]; then
-                        echo "Desktop Entry Modification - Removing ShowIn from: ${trigger}..."
-                        remove_ShowIn "${trigger}"
-                    fi
+                /etc/xdg/autostart/abrt-applet.desktop | \
+                /etc/xdg/autostart/notify-osd.desktop)
+                    showIn "${trigger}"
                     ;;
 
                 # Desktop Entry Modification - Not shown in Qubes
@@ -434,20 +445,12 @@ case "${1}" in
                 /etc/xdg/autostart/gnome-sound-applet.desktop | \
                 /etc/xdg/autostart/gnome-screensaver.desktop | \
                 /etc/xdg/autostart/orca-autostart.desktop)
-                    if [ -e "${trigger}" ]; then
-                        echo "Desktop Entry Modification - Not Shown in Qubes: ${trigger}..."
-                        remove_ShowIn "${trigger}"
-                        echo 'NotShowIn=QUBES;' >> "${trigger}" || true
-                    fi
+                    showIn "${trigger}" 'NotShowIn=QUBES;'
                     ;;
 
                 # Desktop Entry Modification - Not shown in in DisposableVM
                 /etc/xdg/autostart/gcm-apply.desktop)
-                    if [ -e "${trigger}" ]; then
-                        echo "Desktop Entry Modification - Not Shown in DisposableVM: ${trigger}..."
-                        remove_ShowIn "${trigger}"
-                        echo 'NotShowIn=DisposableVM;' >> "${trigger}" || true
-                    fi
+                    showIn "${trigger}" 'NotShowIn=DisposableVM;'
                     ;;
 
                 # Desktop Entry Modification - Only shown in AppVM
@@ -458,27 +461,17 @@ case "${1}" in
                 /etc/xdg/autostart/gnome-settings-daemon.desktop | \
                 /etc/xdg/autostart/user-dirs-update-gtk.desktop | \
                 /etc/xdg/autostart/gsettings-data-convert.desktop)
-                    if [ -e "${trigger}" ]; then
-                        echo "Desktop Entry Modification - Only Shown in Gnome & AppVM: ${trigger}..."
-                        remove_ShowIn "${trigger}"
-                        echo 'OnlyShowIn=GNOME;AppVM;' >> "${trigger}" || true
-                    fi
+                    showIn "${trigger}" 'OnlyShowIn=GNOME;AppVM;'
                     ;;
 
                 # Desktop Entry Modification - Only shown in Gnome & UpdateableVM
                 /etc/xdg/autostart/gpk-update-icon.desktop)
-                    if [ -e "${trigger}" ]; then
-                        echo "Desktop Entry Modification - Only Shown in Gnome & UpdateableVM: ${trigger}..."
-                        echo 'OnlyShowIn=GNOME;UpdateableVM;' >> "${trigger}" || true
-                    fi
+                    showIn "${trigger}" 'OnlyShowIn=GNOME;UpdateableVM;'
                     ;;
 
                 # Desktop Entry Modification - Only shown in Gnome & Qubes
                 /etc/xdg/autostart/nm-applet.desktop)
-                    if [ -e "${trigger}" ]; then
-                        echo "Desktop Entry Modification - Only Shown in Gnome & Qubes: ${trigger}..."
-                        echo 'OnlyShowIn=GNOME;QUBES;' >> "${trigger}" || true
-                    fi
+                    showIn "${trigger}" 'OnlyShowIn=GNOME;QUBES;'
                     ;;
 
                 *)

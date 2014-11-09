@@ -3,7 +3,6 @@ interest-noawait /lib/systemd/system/NetworkManager.service
 interest-noawait /lib/systemd/system/NetworkManager-wait-online.service
 interest-noawait /lib/systemd/system/ModemManager.service
 interest-noawait /etc/init/serial.conf
-interest-noawait /etc/xdg/autostart/notification-daemon.desktop
 interest-noawait /etc/selinux/config
 interest-noawait /lib/systemd/system/cups.service
 interest-noawait /lib/systemd/system/haveged.service
@@ -43,3 +42,6 @@ interest-noawait /etc/xdg/autostart/gpk-update-icon.desktop
 
 # Desktop Entry Modification - Only shown in Gnome & Qubes
 interest-noawait /etc/xdg/autostart/nm-applet.desktop
+
+# Desktop Entry Modification - Show in all
+interest-noawait /etc/xdg/autostart/notify-osd.desktop
