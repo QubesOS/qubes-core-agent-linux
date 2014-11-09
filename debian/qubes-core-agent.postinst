@@ -83,7 +83,7 @@ showIn() {
     desktop_entry_qubes="${XDG_CONFIG_QUBES}/autostart/${desktop_entry##*/}"
 
     # Make sure Qubes autostart directory exists
-    mkdir -p "${XDG_CONFIG_QUBES_AUTOSTART}/autostart"
+    mkdir -p "${XDG_CONFIG_QUBES}/autostart"
 
     # Desktop entry exists, so move to Qubes directory and modify it
     if [ -e "${desktop_entry}" ]; then
