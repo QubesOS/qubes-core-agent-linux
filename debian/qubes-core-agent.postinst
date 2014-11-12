@@ -117,28 +117,33 @@ systemdInfo() {
     unit=${1}
     return_global_var=${2}
 
-    declare -A INFO
+    declare -A INFO=()
     while read line; do
         INFO[${line%%=*}]="${line##*=}"
     done < <(systemctl show ${unit} 2> /dev/null)
+
     setArrayAsGlobal INFO $return_global_var
+    return ${#INFO[@]}
 }
 
 displayFailedStatus() {
     action=${1}
     unit=${2}
 
-    systemdInfo ${unit} info
-    echo
-    echo "==================================================="
-    echo "FAILED: systemd ${action} ${unit}"
-    echo "==================================================="
-    echo "    LoadState = ${info[LoadState]}"
-    echo "    LoadError = ${info[LoadError]}"
-    echo "  ActiveState = ${info[ActiveState]}"
-    echo "     SubState = ${info[SubState]}"
-    echo "UnitFileState = ${info[UnitFileState]}"
-    echo
+    # Only display if there are results.  In chroot environmnet there will be 
+    # no results to 'systemctl show' command
+    systemdInfo ${unit} info || {
+        echo
+        echo "==================================================="
+        echo "FAILED: systemd ${action} ${unit}"
+        echo "==================================================="
+        echo "    LoadState = ${info[LoadState]}"
+        echo "    LoadError = ${info[LoadError]}"
+        echo "  ActiveState = ${info[ActiveState]}"
+        echo "     SubState = ${info[SubState]}"
+        echo "UnitFileState = ${info[UnitFileState]}"
+        echo
+    }
 }
 
 # Disable systemd units
