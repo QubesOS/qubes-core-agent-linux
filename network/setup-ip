@@ -50,6 +50,6 @@ dns=$gateway;$secondary_dns
 address1=$ip/32,$gateway
 may-fail=false
 __EOF__
-    chmod 600 /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE
+        chmod 600 /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE
     fi
 fi
