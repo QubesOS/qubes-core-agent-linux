@@ -1,3 +1,12 @@
+qubes-core-agent (2.1.43) jessie; urgency=medium
+
+  * Improve handling of .desktop files
+  * suspend: do not disable network frontend devices
+  * Handle tabs in /etc/hosts
+  * Reenable imsettings service
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 18 Nov 2014 17:28:29 +0100
+
 qubes-core-agent (2.1.42) jessie; urgency=medium
 
   * firewall: show error message only on actual error
