@@ -73,7 +73,7 @@ install-sysvinit:
 install-rh: install-systemd install-sysvinit
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
-	install -D -m 0644 misc/qubes-r2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2.repo
+	install -D -m 0644 misc/qubes-r3.repo $(DESTDIR)/etc/yum.repos.d/qubes-r3.repo
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.nautilus.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
@@ -186,7 +186,7 @@ install-common:
 
 install-deb:
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
-	sed -e "s/@DIST@/`cat /etc/debian_version | cut -d/ -f 1`/" misc/qubes-r2.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r2.list
+	sed -e "s/@DIST@/`cat /etc/debian_version | cut -d/ -f 1`/" misc/qubes-r3.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r3.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 
 install-vm: install-rh install-common
