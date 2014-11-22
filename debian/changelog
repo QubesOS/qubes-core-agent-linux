@@ -1,3 +1,30 @@
+qubes-core-agent (3.0.0) jessie; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Improve handling of .desktop files
+  * suspend: do not disable network frontend devices
+  * Handle tabs in /etc/hosts
+
+  [ Marek Marczykowski ]
+  * Update for new vchan API
+  * spec: add dependencies on vchan package (both R: and BR:)
+  * load xen-gntalloc module required by libxenvchan
+  * spec: get backend_vmm from env variable
+  * rpm: fix typo
+  * Use Qubes DB instead of Xenstore
+  * systemd: fix qubes-service handling
+  * dispvm: restart qubesdb at DispVM start
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: remove dom0 targets from makefile
+  * code style: replace tabs with spaces
+  * qrexec: new protocol - direct data vchan connections
+  * Use xenstore.h instead of xs.h
+  * qrexec: register exec function
+  * Update repos and keys for Qubes R3
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 22 Nov 2014 16:24:17 +0100
+
 qubes-core-agent (2.1.42) jessie; urgency=medium
 
   * firewall: show error message only on actual error
