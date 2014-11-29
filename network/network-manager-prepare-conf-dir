@@ -14,6 +14,6 @@ unmanaged_devices=mac:fe:ff:ff:ff:ff:ff
 #    unmanaged_devices="$unmanaged_devices;mac:$mac"
 #done
 sed -i -e "s/^unmanaged-devices=.*/unmanaged-devices=$unmanaged_devices/" /etc/NetworkManager/NetworkManager.conf
-sed -i -e "s/^plugins=.*/plugins=keyfile,ifcfg-rh/" /etc/NetworkManager/NetworkManager.conf
+sed -i -e "s/^plugins=.*/plugins=keyfile/" /etc/NetworkManager/NetworkManager.conf
 
 exit 0

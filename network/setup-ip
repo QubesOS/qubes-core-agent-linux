@@ -32,14 +32,24 @@ if [ x$ip != x ]; then
 		[ -x /rw/config/qubes_ip_change_hook ] && /rw/config/qubes_ip_change_hook
 	fi
     if [ -f /var/run/qubes-service/network-manager ]; then
-        cat > /etc/sysconfig/network-scripts/ifcfg-$INTERFACE <<__EOF__
-DEVICE=$INTERFACE
-IPADDR=$ip
-NETMASK=255.255.255.255
-NETWORK=$ip
-ONBOOT=yes
-GATEWAYDEV=$INTERFACE
-GATEWAY=$gateway
+        cat > /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE <<__EOF__
+[802-3-ethernet]
+duplex=full
+
+[connection]
+id=VM uplink $INTERFACE
+uuid=de85f79b-8c3d-405f-a652-cb4c10b4f9ef
+type=802-3-ethernet
+
+[ipv6]
+method=ignore
+
+[ipv4]
+method=manual
+dns=$gateway;$secondary_dns
+address1=$ip/32,$gateway
+may-fail=false
 __EOF__
+        chmod 600 /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE
     fi
 fi

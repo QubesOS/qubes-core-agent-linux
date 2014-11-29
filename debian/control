@@ -9,8 +9,11 @@ Vcs-Git: git://git.qubes-os.org/marmarek/core-agent-linux.git
 
 Package: qubes-core-agent
 Architecture: any
-Depends: qubes-utils, libvchan-xen, xenstore-utils, ethtool, python2.7, ${shlibs:Depends}, ${misc:Depends}
-Conflicts: qubes-core-agent-linux
+Depends: qubes-utils, libvchan-xen, xenstore-utils, iptables-persistent, xserver-xorg-video-dummy, xen-utils-common, tinyproxy, ethtool, python2.7, init-system-helpers, xdg-user-dirs, gnome-themes-standard, xsettingsd, gnome-packagekit, chrony, ntpdate, network-manager (>= 0.8.1-1), network-manager-gnome, haveged, iptables, net-tools, nautilus-actions, initscripts, imagemagick, fakeroot, libnotify-bin, notify-osd, systemd, gnome-terminal, locales, sudo, dmsetup, psmisc, ncurses-term, xserver-xorg-core, x11-xserver-utils, xinit, acpid, ${shlibs:Depends}, ${misc:Depends}
+Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec.
+
+# Unresolved depends that exist in rpm_spec
+#qubes-core-vm-kernel-placeholder, qubes-core-vm,
