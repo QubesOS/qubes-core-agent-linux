@@ -34,7 +34,8 @@ start()
 		sed -i -e '/^NotShowIn=.*QUBES/s/;QUBES//' /etc/xdg/autostart/print-applet.desktop
 	else
 		# Disable notification icon
-		sed -i -e '/QUBES/!s/^NotShowIn=.*/\1QUBES;/' /etc/xdg/autostart/print-applet.desktop
+		sed -i -e '/QUBES/!s/^NotShowIn=\(.*\)/NotShowIn=QUBES;\1/' /etc/xdg/autostart/print-applet.desktop
+
 	fi
 
 	echo -n $"Executing Qubes Core scripts for AppVM:"
