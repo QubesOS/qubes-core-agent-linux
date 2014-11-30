@@ -67,7 +67,7 @@ if [ ! -f /etc/systemd/system/cups.service ]; then
         sed -i -e '/^NotShowIn=.*QUBES/s/;QUBES//' /etc/xdg/autostart/print-applet.desktop
     else
         # Disable notification icon
-        sed -i -e '/QUBES/!s/^NotShowIn=.*/\1QUBES;/' /etc/xdg/autostart/print-applet.desktop
+        sed -i -e '/QUBES/!s/^NotShowIn=\(.*\)/NotShowIn=QUBES;\1/' /etc/xdg/autostart/print-applet.desktop
     fi
 fi
 if [ -f /var/run/qubes-service/network-manager ]; then
