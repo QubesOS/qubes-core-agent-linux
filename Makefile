@@ -189,7 +189,7 @@ install-common:
 
 install-deb:
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
-	sed -e "s/@DIST@/`cat /etc/debian_version | cut -d/ -f 1`/" misc/qubes-r3.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r3.list
+	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r3.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r3.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 	install -D -m 644 network/iptables $(DESTDIR)/etc/iptables/rules.v4
 	install -D -m 644 network/ip6tables $(DESTDIR)/etc/iptables/rules.v6
