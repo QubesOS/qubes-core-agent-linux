@@ -91,7 +91,7 @@ EOF
     }
     id -u 'tinyproxy' || {
         groupadd -f tinyproxy
-        useradd -g tinyproxy -M --home /run/tinyproxy --shell /bin/false tinyproxy
+        useradd -g tinyproxy -r -M --home /run/tinyproxy --shell /bin/false tinyproxy
     }
     usermod -p '' root
     usermod -L user
