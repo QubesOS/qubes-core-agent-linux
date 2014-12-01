@@ -1,3 +1,9 @@
+qubes-core-agent (2.1.45) jessie; urgency=medium
+
+  * debian: fix generation of apt sources list file
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 01 Dec 2014 22:32:29 +0100
+
 qubes-core-agent (2.1.44) jessie; urgency=medium
 
   [ Jason Mehring ]
