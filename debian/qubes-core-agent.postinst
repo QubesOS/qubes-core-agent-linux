@@ -232,11 +232,6 @@ case "${1}" in
             echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
             echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
         fi
-        
-        # XXX: Test to see if this will satisify dispatcher dependancy
-        if [ ! -e  "/lib/systemd/system/org.freedesktop.nm_dispatcher.service" ]; then
-            ln -s org.freedesktop.nm_dispatcher.service NetworkManager-dispatcher.service
-        fi
 
         # Remove old firmware updates link
         if [ -L /lib/firmware/updates ]; then
