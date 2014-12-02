@@ -311,7 +311,7 @@ case "${1}" in
             qubes-network.service \
             qubes-firewall.service \
             qubes-updates-proxy.service \
-            qubes-updates-proxy.timer \
+            qubes-update-check.timer \
             qubes-qrexec-agent.service
 
         # Set default "runlevel"
