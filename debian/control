@@ -9,7 +9,7 @@ Vcs-Git: git://git.qubes-os.org/marmarek/core-agent-linux.git
 
 Package: qubes-core-agent
 Architecture: any
-Depends: qubes-utils, libvchan-xen, xenstore-utils, iptables-persistent, xserver-xorg-video-dummy, xen-utils-common, ethtool, python2.7, python-gi, init-system-helpers, xdg-user-dirs, iptables, net-tools, initscripts, imagemagick, fakeroot, systemd, locales, sudo, dmsetup, psmisc, ncurses-term, xserver-xorg-core, x11-xserver-utils, xinit, acpid, ${shlibs:Depends}, ${misc:Depends}
+Depends: qubes-utils, libvchan-xen, xenstore-utils, iptables-persistent, xserver-xorg-video-dummy, xen-utils-common, ethtool, python2.7, python-gi, init-system-helpers, xdg-user-dirs, iptables, net-tools, initscripts, imagemagick, fakeroot, systemd, locales, sudo, dmsetup, psmisc, ncurses-term, xserver-xorg-core, x11-xserver-utils, xinit, ${shlibs:Depends}, ${misc:Depends}
 Recommends: tinyproxy, gnome-themes-standard, xsettingsd, gnome-packagekit, chrony, ntpdate, network-manager (>= 0.8.1-1), network-manager-gnome, haveged, nautilus-actions, libnotify-bin, notify-osd, gnome-terminal
 Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
