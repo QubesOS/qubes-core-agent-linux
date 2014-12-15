@@ -1,3 +1,17 @@
+qubes-core-agent (2.1.46) jessie; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: add missing python-gi to dependencies
+  * debian: remove obsolete code from postinst script
+  * debian: fix service name in postinst script
+  * Update update-proxy rules for debian security fixes repo
+
+  [ HW42 ]
+  * debian: move not strictly required packages to Recommends-Section.
+  * debian: remove unneeded acpid dependency
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 16 Dec 2014 00:54:47 +0100
+
 qubes-core-agent (2.1.45) jessie; urgency=medium
 
   * debian: fix generation of apt sources list file
