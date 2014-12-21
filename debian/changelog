@@ -1,3 +1,10 @@
+qubes-core-agent (2.1.47) jessie; urgency=medium
+
+  * network: set uplink configuration based on MAC (NetworkManager)
+  * network: fix NM config preparation
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 22 Dec 2014 00:05:24 +0100
+
 qubes-core-agent (2.1.46) jessie; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
