@@ -13,18 +13,6 @@ if [ x$ip != x ]; then
     /sbin/ethtool -K $INTERFACE tx off
     echo "nameserver $gateway" > /etc/resolv.conf
     echo "nameserver $secondary_dns" >> /etc/resolv.conf
-	network=$(/usr/bin/qubesdb-read /qubes-netvm-network 2>/dev/null)
-	if [ "x$network" != "x" ]; then
-		gateway=$(/usr/bin/qubesdb-read /qubes-netvm-gateway)
-		netmask=$(/usr/bin/qubesdb-read /qubes-netvm-netmask)
-		secondary_dns=$(/usr/bin/qubesdb-read /qubes-netvm-secondary-dns)
-		echo "NS1=$gateway" > /var/run/qubes/qubes-ns
-		echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
-		/usr/lib/qubes/qubes-setup-dnat-to-ns
-		[ -x /rw/config/qubes-ip-change-hook ] && /rw/config/qubes-ip-change-hook
-		# XXX: Backward compatibility
-		[ -x /rw/config/qubes_ip_change_hook ] && /rw/config/qubes_ip_change_hook
-	fi
     if [ -f /var/run/qubes-service/network-manager ]; then
         cat > /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE <<__EOF__
 [802-3-ethernet]
@@ -48,5 +36,17 @@ address1=$ip/32,$gateway
 may-fail=false
 __EOF__
         chmod 600 /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE
+    fi
+    network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
+    if [ "x$network" != "x" ]; then
+        gateway=$(qubesdb-read /qubes-netvm-gateway)
+        netmask=$(qubesdb-read /qubes-netvm-netmask)
+        secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
+        echo "NS1=$gateway" > /var/run/qubes/qubes-ns
+        echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
+        /usr/lib/qubes/qubes-setup-dnat-to-ns
+        [ -x /rw/config/qubes-ip-change-hook ] && /rw/config/qubes-ip-change-hook
+        # XXX: Backward compatibility
+        [ -x /rw/config/qubes_ip_change_hook ] && /rw/config/qubes_ip_change_hook
     fi
 fi
