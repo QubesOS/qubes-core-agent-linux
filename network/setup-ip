@@ -35,6 +35,9 @@ if [ x$ip != x ]; then
         cat > /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE <<__EOF__
 [802-3-ethernet]
 duplex=full
+ 
+[ethernet]
+mac-address=`ip l show dev $INTERFACE |grep link|awk '{print $2}'`
 
 [connection]
 id=VM uplink $INTERFACE
