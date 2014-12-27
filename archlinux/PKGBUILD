@@ -68,8 +68,8 @@ package() {
 
   # Change the place for iptable rules to match archlinux standard
   mkdir -p $pkgdir/etc/iptables
-  mv $pkgdir/etc/sysconfig/iptables $pkgdir/etc/iptables/iptables.rules
-  mv $pkgdir/etc/sysconfig/ip6tables $pkgdir/etc/iptables/ip6tables.rules
+  mv $pkgdir/usr/lib/qubes/init/iptables $pkgdir/etc/iptables/iptables.rules
+  mv $pkgdir/usr/lib/qubes/init/ip6tables $pkgdir/etc/iptables/ip6tables.rules
 
   # Remove things non wanted in archlinux
   rm -r $pkgdir/etc/yum*
