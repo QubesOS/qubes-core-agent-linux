@@ -95,8 +95,10 @@ install-rh: install-systemd install-sysvinit
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 
-	install -m 0400 -D network/iptables $(DESTDIR)/etc/sysconfig/iptables
-	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/sysconfig/ip6tables
+	#install -m 0400 -D network/iptables $(DESTDIR)/etc/sysconfig/iptables
+	#install -m 0400 -D network/ip6tables $(DESTDIR)/etc/sysconfig/ip6tables
+	install -m 0400 -D network/iptables $(DESTDIR)/usr/lib/qubes/init/iptables
+	install -m 0400 -D network/ip6tables $(DESTDIR)/usr/lib/qubes/init/ip6tables
 
 install-common:
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes

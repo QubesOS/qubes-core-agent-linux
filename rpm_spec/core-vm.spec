@@ -257,6 +257,15 @@ mkdir -p /rw
 #mv /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.orig
 #grep -v HWADDR /etc/sysconfig/network-scripts/ifcfg-eth0.orig > /etc/sysconfig/network-scripts/ifcfg-eth0
 
+# Copy ip(|6)tables into place if they do not already exist in filesystem.
+# This prevents conflict with iptables-service
+if [ ! -f '/etc/sysconfig/iptables' ]; then
+  cp -p /usr/lib/qubes/init/iptables /etc/sysconfig/iptables
+fi
+if [ ! -f '/etc/sysconfig/ip6tables' ]; then
+  cp -p /usr/lib/qubes/init/ip6tables /etc/sysconfig/ip6tables
+fi
+
 %triggerin -- notification-daemon
 # Enable autostart of notification-daemon when installed
 if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
@@ -333,8 +342,8 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.GetImageRGBA
 /etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/sudoers.d/qubes
-%config(noreplace) /etc/sysconfig/iptables
-%config(noreplace) /etc/sysconfig/ip6tables
+/usr/lib/qubes/init/iptables
+/usr/lib/qubes/init/ip6tables
 %config(noreplace) /etc/tinyproxy/filter-updates
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
