@@ -5,6 +5,8 @@ VERSION := $(shell cat version)
 DIST ?= fc18
 KDESERVICEDIR ?= /usr/share/kde4/services
 SBINDIR ?= /usr/sbin
+LIBDIR ?= /usr/lib
+SYSLIBDIR ?= /lib
 
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
@@ -44,18 +46,18 @@ all:
 	make -C qubes-rpc
 
 install-systemd:
-	install -d $(DESTDIR)/lib/systemd/system $(DESTDIR)/usr/lib/qubes/init $(DESTDIR)/lib/modules-load.d
-	install -m 0755 vm-systemd/*.sh $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)/lib/systemd/system/
-	install -m 0644 vm-systemd/ModemManager.service $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/NetworkManager.service $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)/lib/modules-load.d/
-	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)/lib/modules-load.d/
-	install -m 0644 vm-systemd/cups.* $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)/usr/lib/qubes/init/
-	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)/usr/lib/qubes/init/
+	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d
+	install -m 0755 vm-systemd/*.sh $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+	install -m 0644 vm-systemd/ModemManager.service $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -m 0644 vm-systemd/NetworkManager.service $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
+	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
+	install -m 0644 vm-systemd/cups.* $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)$(LIBDIR)/qubes/init/
 
 install-sysvinit:
 	install -d $(DESTDIR)/etc/init.d
@@ -77,18 +79,18 @@ install-rh: install-systemd install-sysvinit
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.nautilus.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -d $(DESTDIR)/usr/lib/yum-plugins/
-	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)/usr/lib/yum-plugins/
+	install -d $(DESTDIR)$(LIBDIR)/yum-plugins/
+	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
 	install -d -m 755 $(DESTDIR)/etc/pki/rpm-gpg
 	install -m 644 misc/RPM-GPG-KEY-qubes* $(DESTDIR)/etc/pki/rpm-gpg/
-	install -D -m 644 misc/session-stop-timeout.conf $(DESTDIR)/usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
+	install -D -m 644 misc/session-stop-timeout.conf $(DESTDIR)$(LIBDIR)/systemd/system/user@.service.d/90-session-stop-timeout.conf
 
 
 	install -d $(DESTDIR)/etc/yum.conf.d
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
-	install misc/qubes-download-dom0-updates.sh $(DESTDIR)/usr/lib/qubes/
+	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
 	install -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 
@@ -106,14 +108,14 @@ install-common:
 	install -D misc/xenstore-watch $(DESTDIR)/usr/bin/xenstore-watch-qubes
 	install -d $(DESTDIR)/etc/udev/rules.d
 	install -m 0644 misc/udev-qubes-misc.rules $(DESTDIR)/etc/udev/rules.d/50-qubes-misc.rules
-	install -d $(DESTDIR)/usr/lib/qubes/
-	install misc/vusb-ctl.py $(DESTDIR)/usr/lib/qubes/
-	install misc/qubes-trigger-sync-appmenus.sh $(DESTDIR)/usr/lib/qubes/
+	install -d $(DESTDIR)$(LIBDIR)/qubes/
+	install misc/vusb-ctl.py $(DESTDIR)$(LIBDIR)/qubes/
+	install misc/qubes-trigger-sync-appmenus.sh $(DESTDIR)$(LIBDIR)/qubes/
 	install -D misc/polkit-1-qubes-allow-all.pkla $(DESTDIR)/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 	install -D misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
 
-	mkdir -p $(DESTDIR)/usr/lib/qubes
+	mkdir -p $(DESTDIR)$(LIBDIR)/qubes
 
 	if [ -r misc/dispvm-dotfiles.$(DIST).tbz ] ; \
 	then \
@@ -122,14 +124,14 @@ install-common:
 		install misc/dispvm-dotfiles.tbz $(DESTDIR)/etc/dispvm-dotfiles.tbz ; \
 	fi;
 
-	install misc/dispvm-prerun.sh $(DESTDIR)/usr/lib/qubes/dispvm-prerun.sh
-	install misc/close-window $(DESTDIR)/usr/lib/qubes/close-window
+	install misc/dispvm-prerun.sh $(DESTDIR)$(LIBDIR)/qubes/dispvm-prerun.sh
+	install misc/close-window $(DESTDIR)$(LIBDIR)/qubes/close-window
 
 	install -m 0644 network/udev-qubes-network.rules $(DESTDIR)/etc/udev/rules.d/99-qubes-network.rules
-	install network/qubes-setup-dnat-to-ns $(DESTDIR)/usr/lib/qubes
-	install network/qubes-fix-nm-conf.sh $(DESTDIR)/usr/lib/qubes
-	install network/setup-ip $(DESTDIR)/usr/lib/qubes/
-	install network/network-manager-prepare-conf-dir $(DESTDIR)/usr/lib/qubes/
+	install network/qubes-setup-dnat-to-ns $(DESTDIR)$(LIBDIR)/qubes
+	install network/qubes-fix-nm-conf.sh $(DESTDIR)$(LIBDIR)/qubes
+	install network/setup-ip $(DESTDIR)$(LIBDIR)/qubes/
+	install network/network-manager-prepare-conf-dir $(DESTDIR)$(LIBDIR)/qubes/
 	install -d $(DESTDIR)/etc/dhclient.d
 	ln -s /usr/lib/qubes/qubes-setup-dnat-to-ns $(DESTDIR)/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 	install -d $(DESTDIR)/etc/NetworkManager/dispatcher.d/
@@ -137,9 +139,9 @@ install-common:
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
 	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
 	install -m 0644 -D network/filter-updates $(DESTDIR)/etc/tinyproxy/filter-updates
-	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)/usr/lib/qubes/iptables-updates-proxy
+	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)$(LIBDIR)/qubes/iptables-updates-proxy
 	install -d $(DESTDIR)/etc/xdg/autostart
-	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)/usr/lib/qubes/show-hide-nm-applet.sh
+	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)$(LIBDIR)/qubes/show-hide-nm-applet.sh
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
 
 	install -d $(DESTDIR)/$(SBINDIR)
@@ -149,18 +151,18 @@ install-common:
 	install -d $(DESTDIR)/usr/bin
 
 	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-move-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
-	install qubes-rpc/wrap-in-html-if-url.sh $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/qvm-move-to-vm.kde $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/qvm-move-to-vm.gnome $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/tar2qfile $(DESTDIR)/usr/lib/qubes
+	install qubes-rpc/wrap-in-html-if-url.sh $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/qvm-move-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/qvm-move-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/tar2qfile $(DESTDIR)$(LIBDIR)/qubes
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
-	install -m 4755  qubes-rpc/qfile-unpacker $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/qrun-in-vm $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/sync-ntp-clock $(DESTDIR)/usr/lib/qubes
-	install qubes-rpc/prepare-suspend $(DESTDIR)/usr/lib/qubes
+	install -m 4755  qubes-rpc/qfile-unpacker $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/qrun-in-vm $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/sync-ntp-clock $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/prepare-suspend $(DESTDIR)$(LIBDIR)/qubes
 	install -d $(DESTDIR)/$(KDESERVICEDIR)
 	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-move.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDESERVICEDIR)
 	install -d $(DESTDIR)/etc/qubes-rpc
