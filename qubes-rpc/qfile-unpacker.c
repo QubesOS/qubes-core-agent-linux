@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <pwd.h>
 #include <sys/stat.h>
+#include <sys/mount.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/fsuid.h>
@@ -34,8 +37,11 @@ int prepare_creds_return_uid(const char *username)
 int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unused__)))
 {
 	char *incoming_dir;
-	int uid;
+	int uid, ret;
+	pid_t pid;
 	const char *remote_domain;
+	char *procdir_path;
+	int procfs_fd;
 
 	uid = prepare_creds_return_uid("user");
 
@@ -50,9 +56,36 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
 	mkdir(incoming_dir, 0700);
 	if (chdir(incoming_dir))
 		gui_fatal("Error chdir to %s", incoming_dir); 
-	if (chroot(incoming_dir)) //impossible
-		gui_fatal("Error chroot to %s", incoming_dir);
-	if (setuid(uid) < 0)
-		gui_fatal("Error changing permissions to '%s'", "user");
-	return do_unpack();
+
+	if (mount(".", ".", NULL, MS_BIND | MS_NODEV | MS_NOEXEC | MS_NOSUID, NULL) < 0)
+		gui_fatal("Failed to mount a directory %s", incoming_dir);
+
+	/* parse the input in unprivileged child process, parent will hold root
+	 * access to unmount incoming dir */
+	switch (pid=fork()) {
+		case -1:
+			gui_fatal("Failed to create new process");
+		case 0:
+			asprintf(&procdir_path, "/proc/%d/fd", getpid());
+			procfs_fd = open(procdir_path, O_DIRECTORY | O_RDONLY);
+			if (procfs_fd < 0)
+				gui_fatal("Failed to open /proc");
+			free(procdir_path);
+			set_procfs_fd(procfs_fd);
+
+			if (chroot("."))
+				gui_fatal("Error chroot to %s", incoming_dir);
+			if (setuid(uid) < 0) {
+				/* no kdialog inside chroot */
+				perror("setuid");
+				exit(1);
+			}
+			return do_unpack();
+	}
+	if (waitpid(pid, &ret, 0) < 0) {
+		gui_fatal("Failed to wait for child process");
+	}
+	if (umount2(".", MNT_DETACH) < 0)
+		gui_fatal("Cannot umount incoming directory");
+	return ret;
 }
