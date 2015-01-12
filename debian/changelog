@@ -1,3 +1,14 @@
+qubes-core-agent (2.1.48) jessie; urgency=medium
+
+  [ Jason Mehring ]
+  * fc21: iptables configurations conflict with fc21 yum package manager
+  * fc21:  Remove left-over code comment
+
+  [ Marek Marczykowski-Górecki ]
+  * fedora: Add security-testing repo definition
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 12 Jan 2015 21:12:36 +0100
+
 qubes-core-agent (2.1.47) jessie; urgency=medium
 
   * network: set uplink configuration based on MAC (NetworkManager)
