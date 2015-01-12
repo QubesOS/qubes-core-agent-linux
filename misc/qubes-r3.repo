@@ -12,6 +12,13 @@ gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
 gpgcheck = 1
 enabled=0
 
+[qubes-vm-r3-security-testing]
+name = Qubes OS Repository for VM (updates-testing)
+baseurl = http://yum.qubes-os.org/r3/security-testing/vm/fc$releasever
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
+gpgcheck = 1
+enabled=0
+
 [qubes-vm-r3-unstable]
 name = Qubes OS Repository for VM (unstable)
 baseurl = http://yum.qubes-os.org/r3/unstable/vm/fc$releasever
