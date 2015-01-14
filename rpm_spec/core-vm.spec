@@ -568,10 +568,10 @@ The Qubes core startup configuration for SystemD init.
 %post systemd
 
 for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-updates-proxy qubes-qrexec-agent; do
-    /bin/systemctl enable $srv.service 2> /dev/null
+    /bin/systemctl --no-reload enable $srv.service 2> /dev/null
 done
 
-/bin/systemctl enable qubes-update-check.timer 2> /dev/null
+/bin/systemctl --no-reload enable qubes-update-check.timer 2> /dev/null
 
 # Set default "runlevel"
 rm -f /etc/systemd/system/default.target
@@ -586,7 +586,7 @@ DISABLE_SERVICES="$DISABLE_SERVICES rngd smartd upower irqbalance colord"
 for srv in $DISABLE_SERVICES; do
     if [ -f /lib/systemd/system/$srv.service ]; then
         if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
-            /bin/systemctl disable $srv.service 2> /dev/null
+            /bin/systemctl --no-reload disable $srv.service 2> /dev/null
         else
             # forcibly disable
             ln -sf /dev/null /etc/systemd/system/$srv.service
@@ -597,13 +597,15 @@ done
 rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 
 # Enable some services
-/bin/systemctl enable iptables.service 2> /dev/null
-/bin/systemctl enable ip6tables.service 2> /dev/null
-/bin/systemctl enable rsyslog.service 2> /dev/null
-/bin/systemctl enable ntpd.service 2> /dev/null
+/bin/systemctl --no-reload enable iptables.service 2> /dev/null
+/bin/systemctl --no-reload enable ip6tables.service 2> /dev/null
+/bin/systemctl --no-reload enable rsyslog.service 2> /dev/null
+/bin/systemctl --no-reload enable ntpd.service 2> /dev/null
 
 # Enable cups only when it is real SystemD service
-[ -e /lib/systemd/system/cups.service ] && /bin/systemctl enable cups.service 2> /dev/null
+[ -e /lib/systemd/system/cups.service ] && /bin/systemctl --no-reload enable cups.service 2> /dev/null
+
+/bin/systemctl daemon-reload
 
 exit 0
 
