@@ -58,6 +58,7 @@ install-systemd:
 	install -m 0644 vm-systemd/cups.* $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -m 0644 vm-systemd/crond.service $(DESTDIR)$(LIBDIR)/qubes/init/
 
 install-sysvinit:
 	install -d $(DESTDIR)/etc/init.d

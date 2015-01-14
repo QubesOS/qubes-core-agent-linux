@@ -561,6 +561,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/cups.path
 /usr/lib/qubes/init/ntpd.service
 /usr/lib/qubes/init/chronyd.service
+/usr/lib/qubes/init/crond.service
 %ghost %attr(0644,root,root) /etc/systemd/system/ModemManager.service
 %ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager.service
 %ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager-wait-online.service
@@ -580,7 +581,7 @@ done
 rm -f /etc/systemd/system/default.target
 ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
-DISABLE_SERVICES="alsa-store alsa-restore auditd avahi avahi-daemon backuppc cpuspeed crond"
+DISABLE_SERVICES="alsa-store alsa-restore auditd avahi avahi-daemon backuppc cpuspeed"
 DISABLE_SERVICES="$DISABLE_SERVICES fedora-autorelabel fedora-autorelabel-mark ipmi hwclock-load hwclock-save"
 DISABLE_SERVICES="$DISABLE_SERVICES mdmonitor multipathd openct rpcbind mcelog fedora-storage-init fedora-storage-init-late"
 DISABLE_SERVICES="$DISABLE_SERVICES plymouth-start plymouth-read-write plymouth-quit plymouth-quit-wait"
@@ -604,6 +605,7 @@ rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 /bin/systemctl --no-reload enable ip6tables.service 2> /dev/null
 /bin/systemctl --no-reload enable rsyslog.service 2> /dev/null
 /bin/systemctl --no-reload enable ntpd.service 2> /dev/null
+/bin/systemctl --no-reload enable crond.service 2> /dev/null
 
 # Enable cups only when it is real SystemD service
 [ -e /lib/systemd/system/cups.service ] && /bin/systemctl --no-reload enable cups.service 2> /dev/null
@@ -622,6 +624,10 @@ exit 0
 
 %triggerin systemd -- cups
 %installOverridenServices cups
+exit 0
+
+%triggerin systemd -- cronie
+%installOverridenServices crond
 exit 0
 
 %triggerin systemd -- haveged
