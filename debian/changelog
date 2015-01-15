@@ -1,3 +1,9 @@
+qubes-core-agent (2.1.49) jessie; urgency=medium
+
+  * fedora: Fix iptables config install script
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 15 Jan 2015 03:50:13 +0100
+
 qubes-core-agent (2.1.48) jessie; urgency=medium
 
   [ Jason Mehring ]
