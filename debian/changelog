@@ -1,3 +1,10 @@
+qubes-core-agent (2.1.50) jessie; urgency=medium
+
+  * filecopy: prevent files/dirs movement outside incoming directory
+    during transfer
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 18 Jan 2015 18:07:07 +0100
+
 qubes-core-agent (2.1.49) jessie; urgency=medium
 
   * fedora: Fix iptables config install script
