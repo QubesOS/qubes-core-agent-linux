@@ -221,6 +221,15 @@ for ip in '127\.0\.0\.1' '::1'; do
     fi
 done
 
+# Copy ip(|6)tables into place if they do not already exist in filesystem.
+# This prevents conflict with iptables-service
+if [ ! -f '/etc/sysconfig/iptables' ]; then
+  cp -p /usr/lib/qubes/init/iptables /etc/sysconfig/iptables
+fi
+if [ ! -f '/etc/sysconfig/ip6tables' ]; then
+  cp -p /usr/lib/qubes/init/ip6tables /etc/sysconfig/ip6tables
+fi
+
 if [ "$1" !=  1 ] ; then
 # do the rest of %post thing only when updating for the first time...
 exit 0
@@ -256,15 +265,6 @@ mkdir -p /rw
 #echo "--> Removing HWADDR setting from /etc/sysconfig/network-scripts/ifcfg-eth0"
 #mv /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.orig
 #grep -v HWADDR /etc/sysconfig/network-scripts/ifcfg-eth0.orig > /etc/sysconfig/network-scripts/ifcfg-eth0
-
-# Copy ip(|6)tables into place if they do not already exist in filesystem.
-# This prevents conflict with iptables-service
-if [ ! -f '/etc/sysconfig/iptables' ]; then
-  cp -p /usr/lib/qubes/init/iptables /etc/sysconfig/iptables
-fi
-if [ ! -f '/etc/sysconfig/ip6tables' ]; then
-  cp -p /usr/lib/qubes/init/ip6tables /etc/sysconfig/ip6tables
-fi
 
 %triggerin -- notification-daemon
 # Enable autostart of notification-daemon when installed
