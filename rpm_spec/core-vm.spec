@@ -116,6 +116,11 @@ for f in ModemManager.service NetworkManager.service \
     cp $RPM_BUILD_ROOT/usr/lib/qubes/init/$f $RPM_BUILD_ROOT/etc/systemd/system/
 done
 
+%if %{fedora} < 21
+cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/iptables $RPM_BUILD_ROOT/etc/sysconfig/iptables
+cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/ip6tables $RPM_BUILD_ROOT/etc/sysconfig/ip6tables
+%endif
+
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
 	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
@@ -345,6 +350,10 @@ rm -f %{name}-%{version}
 /etc/qubes-rpc/qubes.GetImageRGBA
 /etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/sudoers.d/qubes
+%if %{fedora} < 21
+%config(noreplace) /etc/sysconfig/iptables
+%config(noreplace) /etc/sysconfig/ip6tables
+%endif
 /usr/lib/qubes/init/iptables
 /usr/lib/qubes/init/ip6tables
 %config(noreplace) /etc/tinyproxy/filter-updates
