@@ -1,3 +1,10 @@
+qubes-core-agent (2.1.51) jessie; urgency=medium
+
+  * fedora: Fix iptables config installation one more time
+  * version 2.1.49.1
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 21 Jan 2015 06:39:11 +0100
+
 qubes-core-agent (2.1.50) jessie; urgency=medium
 
   * filecopy: prevent files/dirs movement outside incoming directory
