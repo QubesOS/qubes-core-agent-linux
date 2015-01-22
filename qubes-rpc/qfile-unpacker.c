@@ -66,7 +66,9 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
 		case -1:
 			gui_fatal("Failed to create new process");
 		case 0:
-			asprintf(&procdir_path, "/proc/%d/fd", getpid());
+			if (asprintf(&procdir_path, "/proc/%d/fd", getpid()) < 0) {
+				gui_fatal("Error allocating memory");
+			}
 			procfs_fd = open(procdir_path, O_DIRECTORY | O_RDONLY);
 			if (procfs_fd < 0)
 				gui_fatal("Failed to open /proc");
