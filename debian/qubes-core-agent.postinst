@@ -158,9 +158,8 @@ disableSystemdUnits() {
                 if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
                     systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
                 else
-                    # Forcibly disable
-                    echo "Forcibly disabling: ${unit}"
-                    ln -sf /dev/null /etc/systemd/system/${unit}
+                    echo "Masking service: ${unit}"
+                    systemctl mask ${unit}
                 fi
             else
                     systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
