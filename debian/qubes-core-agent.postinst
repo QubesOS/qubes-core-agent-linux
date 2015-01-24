@@ -208,9 +208,7 @@ case "${1}" in
                     splash-manager \
                     start-ttys \
                     tty ; do
-            if [ -e /etc/init/${init}.conf ]; then
-                mv -f /etc/init/${init}.conf /etc/init/${init}.conf.disabled
-            fi
+            dpkg-divert --divert /etc/init/${init}.conf.qubes-disabled --package qubes-core-agent --rename --add /etc/init/${init}.conf
         done
 
         # Stops Qt form using the MIT-SHM X11 Shared Memory Extension
@@ -267,9 +265,7 @@ case "${1}" in
         #    exit 0
         #fi
 
-        if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
-            cp /etc/init/serial.conf /var/lib/qubes/serial.orig
-        fi
+        dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
 
         # Remove most of the udev scripts to speed up the VM boot time
         # Just leave the xen* scripts, that are needed if this VM was
