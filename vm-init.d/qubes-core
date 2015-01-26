@@ -38,6 +38,8 @@ start()
 		echo "ZONE=\"$timezone\"" >> /etc/sysconfig/clock
 	fi
 
+    touch /var/run/qubes-service/set-default-route
+    touch /var/run/qubes-service/set-dns-server
 	yum_proxy_setup=$(/usr/bin/xenstore-read qubes-service/yum-proxy-setup 2> /dev/null || /usr/bin/xenstore-read qubes-service/updates-proxy-setup 2>/dev/null )
     type=$(/usr/bin/xenstore-read qubes-vm-type)
 	if [ "$yum_proxy_setup" != "0" ] || [ -z "$yum_proxy_setup" -a "$type" == "TemplateVM" ]; then
