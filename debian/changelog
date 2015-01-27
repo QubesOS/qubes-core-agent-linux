@@ -1,3 +1,23 @@
+qubes-core-agent (2.1.52) jessie; urgency=medium
+
+  [ HW42 ]
+  * don't ignore asprintf() return value
+
+  [ Marek Marczykowski-Górecki ]
+  * network: support for not setting DNS and/or default gateway
+
+  [ Olivier MEDOC ]
+  * archlinux: fix new packaging requirements related to sbin, lib64,
+    run ...
+  * archlinux: align with fedora changes related to imsettings
+
+  [ Marek Marczykowski-Górecki ]
+  * fedora: reduce code duplication in systemd triggers
+  * fedora: reload systemd only once
+  * systemd: allow to start cron daemon (#909)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 27 Jan 2015 01:07:52 +0100
+
 qubes-core-agent (2.1.51) jessie; urgency=medium
 
   * fedora: Fix iptables config installation one more time
