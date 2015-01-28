@@ -71,9 +71,10 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
 			}
 			procfs_fd = open(procdir_path, O_DIRECTORY | O_RDONLY);
 			if (procfs_fd < 0)
-				gui_fatal("Failed to open /proc");
+				perror("Failed to open /proc");
+			else
+				set_procfs_fd(procfs_fd);
 			free(procdir_path);
-			set_procfs_fd(procfs_fd);
 
 			if (chroot("."))
 				gui_fatal("Error chroot to %s", incoming_dir);
