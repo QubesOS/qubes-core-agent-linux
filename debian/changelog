@@ -1,3 +1,11 @@
+qubes-core-agent (2.1.53) jessie; urgency=medium
+
+  * filecopy: fallback to "open(..., 000)" method when /proc
+    inaccessible
+  * network: support for not setting DNS and/or default gateway (v2)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 29 Jan 2015 03:01:19 +0100
+
 qubes-core-agent (2.1.52) jessie; urgency=medium
 
   [ HW42 ]
