@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # List of services enabled by default (in case of absence of xenstore entry)
-DEFAULT_ENABLED_ALL="set-default-route set-dns-server"
-DEFAULT_ENABLED_NETVM="$DEFAULT_ENABLED_ALL network-manager qubes-network qubes-update-check qubes-updates-proxy"
-DEFAULT_ENABLED_PROXYVM="$DEFAULT_ENABLED_ALL meminfo-writer qubes-network qubes-firewall qubes-netwatcher qubes-update-check"
-DEFAULT_ENABLED_APPVM="$DEFAULT_ENABLED_ALL meminfo-writer cups qubes-update-check"
+DEFAULT_ENABLED_NETVM="network-manager qubes-network qubes-update-check qubes-updates-proxy"
+DEFAULT_ENABLED_PROXYVM="meminfo-writer qubes-network qubes-firewall qubes-netwatcher qubes-update-check"
+DEFAULT_ENABLED_APPVM="meminfo-writer cups qubes-update-check"
 DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup"
-DEFAULT_ENABLED="$DEFAULT_ENABLED_ALL meminfo-writer"
+DEFAULT_ENABLED="meminfo-writer"
 
 XS_READ=/usr/bin/xenstore-read
 [ -x /usr/sbin/xenstore-read ] && XS_READ=/usr/sbin/xenstore-read
