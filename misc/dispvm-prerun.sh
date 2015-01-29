@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 apps="evince /usr/libexec/evinced soffice firefox"
 

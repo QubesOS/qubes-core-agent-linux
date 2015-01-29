@@ -1,11 +1,11 @@
 #!/bin/sh
 
 # Setup gateway for all the VMs this netVM is serviceing...
-network=$(/usr/bin/qubesdb-read /qubes-netvm-network 2>/dev/null)
+network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
 if [ "x$network" != "x" ]; then
-    gateway=$(/usr/bin/qubesdb-read /qubes-netvm-gateway)
-    netmask=$(/usr/bin/qubesdb-read /qubes-netvm-netmask)
-    secondary_dns=$(/usr/bin/qubesdb-read /qubes-netvm-secondary-dns)
+    gateway=$(qubesdb-read /qubes-netvm-gateway)
+    netmask=$(qubesdb-read /qubes-netvm-netmask)
+    secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
     modprobe netbk 2> /dev/null || modprobe xen-netback
     echo "NS1=$gateway" > /var/run/qubes/qubes-ns
     echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns

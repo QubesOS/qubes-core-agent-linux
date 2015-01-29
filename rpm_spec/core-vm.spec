@@ -140,11 +140,11 @@ remove_ShowIn () {
 	fi
 }
 
-# reenable abrt-aplet if disable by some earlier version of package
-remove_ShowIn abrt-applet.desktop
+# reenable if disabled by some earlier version of package
+remove_ShowIn abrt-applet.desktop imsettings-start.desktop
 
 # don't want it at all
-for F in deja-dup-monitor imsettings-start krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
+for F in deja-dup-monitor krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
 	if [ -e /etc/xdg/autostart/$F.desktop ]; then
 		remove_ShowIn $F
 		echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/$F.desktop
@@ -213,6 +213,17 @@ if ! grep -q localhost /etc/hosts; then
 EOF
 fi
 
+# ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
+# in the form expected by qubes-sysinit.sh
+for ip in '127\.0\.0\.1' '::1'; do
+    if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
+        sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
+        sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
+    else
+        echo "${ip} `hostname`" >> /etc/hosts
+    fi
+done
+
 if [ "$1" !=  1 ] ; then
 # do the rest of %post thing only when updating for the first time...
 exit 0
@@ -279,7 +290,7 @@ fi
 if [ $1 -eq 0 ] ; then
     /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
-    if [ -l /lib/firmware/updates ]; then
+    if [ -L /lib/firmware/updates ]; then
       rm /lib/firmware/updates
     fi
 fi

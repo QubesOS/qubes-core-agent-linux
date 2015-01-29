@@ -10,7 +10,7 @@ all:	xenstore-watch python close-window
 xenstore-watch: xenstore-watch.o
 	$(CC) -o xenstore-watch xenstore-watch.o -lxenstore
 close-window: close-window.c
-	$(CC) -lX11 -o $@ $<
+	$(CC) -o $@ $< -lX11
 python:
 	python -m compileall .
 	python -O -m compileall .

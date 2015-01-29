@@ -1,8 +1,8 @@
 #!/bin/sh
 if [ x$2 == xup ]; then
 	INET=$(/sbin/ip addr show dev $1 | /bin/grep inet)
-	/usr/bin/qubesdb-write /qubes-netvm-external-ip "$INET"
+	qubesdb-write /qubes-netvm-external-ip "$INET"
 fi
 if [ x$2 == xdown ]; then
-	/usr/bin/qubesdb-write /qubes-netvm-external-ip ""
+	qubesdb-write /qubes-netvm-external-ip ""
 fi
