@@ -275,17 +275,6 @@ case "${1}" in
         # Set default "runlevel"
         systemctl set-default multi-user.target
 
-        # Copy ip(|6)tables into place if they do not already exist in filesystem.
-        # This prevents conflict with iptables-service with fc21 and also put config
-        # in proper place for debian
-        mkdir -p '/etc/iptables'
-        if [ ! -f '/etc/iptables/rules.v4' ]; then
-            cp -p /usr/lib/qubes/init/iptables /etc/iptables/rules.v4
-        fi
-        if [ ! -f '/etc/iptables/rules.v6' ]; then
-            cp -p /usr/lib/qubes/init/ip6tables /etc/iptables/rules.v6
-        fi
-
         # Process all triggers which will set defaults to wanted values
         triggerTriggers
 
