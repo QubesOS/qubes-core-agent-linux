@@ -273,8 +273,7 @@ case "${1}" in
             qubes-qrexec-agent.service
 
         # Set default "runlevel"
-        rm -f /etc/systemd/system/default.target
-        ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+        systemctl set-default multi-user.target
 
         # Copy ip(|6)tables into place if they do not already exist in filesystem.
         # This prevents conflict with iptables-service with fc21 and also put config
