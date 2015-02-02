@@ -211,18 +211,6 @@ case "${1}" in
             dpkg-divert --divert /etc/init/${init}.conf.qubes-disabled --package qubes-core-agent --rename --add /etc/init/${init}.conf
         done
 
-        # Stops Qt form using the MIT-SHM X11 Shared Memory Extension
-        echo 'export QT_X11_NO_MITSHM=1' > /etc/profile.d/qt_x11_no_mitshm.sh
-        chmod 0755 /etc/profile.d/qt_x11_no_mitshm.sh
-
-        # Sudo's defualt umask is 077 so set sane default of 022
-        # Also don't allow QT to used shared memory to prevent errors
-        echo 'Defaults umask = 0002' > /etc/sudoers.d/umask
-        echo 'Defaults umask_override' >> /etc/sudoers.d/umask
-        chmod 0440 /etc/sudoers.d/umask
-        echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' > /etc/sudoers.d/qt_x11_no_mitshm
-        chmod 0440 /etc/sudoers.d/qt_x11_no_mitshm
-
         # Create NetworkManager configuration if we do not have it
         if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
             echo '[main]' > /etc/NetworkManager/NetworkManager.conf

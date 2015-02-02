@@ -198,5 +198,8 @@ install-deb:
 	install -D -m 644 network/ip6tables $(DESTDIR)/etc/iptables/rules.v6
 	install -d $(DESTDIR)/etc/sysctl.d
 	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/
+	install -D -m 644 misc/profile.d_qt_x11_no_mitshm.sh $(DESTDIR)/etc/profile.d/qt_x11_no_mitshm.sh
+	install -D -m 440 misc/sudoers.d_umask $(DESTDIR)/etc/sudoers.d/umask
+	install -D -m 440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
 
 install-vm: install-rh install-common
