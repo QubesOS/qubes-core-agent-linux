@@ -223,15 +223,6 @@ case "${1}" in
             rm -f /lib/firmware/updates
         fi
 
-        #if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
-        #  echo >> /etc/yum.conf
-        #  echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
-        #  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
-        #fi
-
-        # Revert 'Prevent unnecessary updates in VMs':
-        #sed -i -e '/^exclude = kernel/d' /etc/yum.conf
-
         # ensure that hostname resolves to 127.0.1.1 resp. ::1 and that /etc/hosts is
         # in the form expected by qubes-sysinit.sh
         for ip in '127\.0\.1\.1' '::1'; do
@@ -248,18 +239,7 @@ case "${1}" in
 
         chown user:user /home_volatile/user
 
-        #if [ "${1}" !=  1 ] ; then
-        #    # do the rest of %post thing only when updating for the first time...
-        #    exit 0
-        #fi
-
         dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
-
-        # XXX: TODO: Needs to be implemented still
-        #rm -f /etc/mtab
-        #echo "--> Removing HWADDR setting from /etc/sysconfig/network-scripts/ifcfg-eth0"
-        #mv /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.orig
-        #grep -v HWADDR /etc/sysconfig/network-scripts/ifcfg-eth0.orig > /etc/sysconfig/network-scripts/ifcfg-eth0
 
         # Enable Qubes systemd units
         enableSystemdUnits \
