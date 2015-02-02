@@ -49,6 +49,8 @@ Requires:   nautilus-actions
 Requires:   qubes-core-vm-kernel-placeholder
 Requires:   qubes-utils
 Requires:   initscripts
+# for qubes-desktop-run
+Requires:   pygobject3-base
 %if %{fedora} >= 20
 # gpk-update-viewer required by qubes-manager
 Requires:   gnome-packagekit-updater
