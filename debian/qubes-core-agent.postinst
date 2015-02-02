@@ -255,9 +255,6 @@ case "${1}" in
 
         dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
 
-        # Create /rw directory
-        mkdir -p /rw
-
         # XXX: TODO: Needs to be implemented still
         #rm -f /etc/mtab
         #echo "--> Removing HWADDR setting from /etc/sysconfig/network-scripts/ifcfg-eth0"
