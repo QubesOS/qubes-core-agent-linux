@@ -255,28 +255,6 @@ case "${1}" in
 
         dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
 
-        # Remove most of the udev scripts to speed up the VM boot time
-        # Just leave the xen* scripts, that are needed if this VM was
-        # ever used as a net backend (e.g. as a VPN domain in the future)
-        #echo "--> Removing unnecessary udev scripts..."
-        mkdir -p /var/lib/qubes/removed-udev-scripts
-        for f in /etc/udev/rules.d/*
-        do
-            if [ $(basename ${f}) == "xen-backend.rules" ] ; then
-                continue
-            fi
-
-            if [ $(basename ${f}) == "50-qubes-misc.rules" ] ; then
-                continue
-            fi
-
-            if echo ${f} | grep -q qubes; then
-                continue
-            fi
-
-            mv ${f} /var/lib/qubes/removed-udev-scripts/
-        done
-
         # Create /rw directory
         mkdir -p /rw
 
