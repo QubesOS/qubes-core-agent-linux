@@ -317,13 +317,12 @@ case "${1}" in
 
         # Enable other systemd units
         enableSystemdUnits \
-            rsyslog.service
+            rsyslog.service \
+            netfilter-persistent.service
 
         # XXX: TODO: Needs to be implemented still
         # These do not exist on debian; maybe a different package name
-        #    iptables.service \
         #    ntpd.service \
-        #    ip6tables.service \
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
