@@ -74,8 +74,6 @@ install-sysvinit:
 
 
 install-rh: install-systemd install-sysvinit
-	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
-
 	install -D -m 0644 misc/qubes-r2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2.repo
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
@@ -102,6 +100,8 @@ install-rh: install-systemd install-sysvinit
 	install -m 0400 -D network/ip6tables $(DESTDIR)/usr/lib/qubes/init/ip6tables
 
 install-common:
+	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
+
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 
 	install -d $(DESTDIR)/var/lib/qubes
