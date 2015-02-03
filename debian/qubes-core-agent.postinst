@@ -331,13 +331,11 @@ case "${1}" in
 
                 # Enable cups only when it is real Systemd service
                 /lib/systemd/system/cups.service)
-                    echo "Enabling cups"
                     [ -e /lib/systemd/system/cups.service ] && enableSystemdUnits cups.service
                     ;;
 
                 # "Enable haveged service"
                 /lib/systemd/system/haveged.service)
-                    echo "Enabling haveged service"
                     [ -e /lib/systemd/system/haveged.service ] && enableSystemdUnits haveged.service
                     ;;
 
