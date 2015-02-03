@@ -338,7 +338,7 @@ case "${1}" in
                 # "Enable haveged service"
                 /lib/systemd/system/haveged.service)
                     echo "Enabling haveged service"
-                    enableSystemdUnits haveged.service
+                    [ -e /lib/systemd/system/haveged.service ] && enableSystemdUnits haveged.service
                     ;;
 
                 # Install overridden serial.conf init script 
