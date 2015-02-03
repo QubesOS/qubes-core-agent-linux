@@ -179,9 +179,7 @@ enableSystemdUnits() {
             #displayFailedStatus is-enabled ${unit}
         } || {
             echo "Enabling: ${unit}..."
-            systemctl enable ${unit} > /dev/null 2>&1 && {
-                systemctl start ${unit} > /dev/null 2>&1 || displayFailedStatus start ${unit}
-            } || {
+            systemctl enable ${unit} > /dev/null 2>&1 || {
                 echo "Could not enable: ${unit}"
                 displayFailedStatus enable ${unit}
             }
