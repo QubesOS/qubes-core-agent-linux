@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 PIDFILE=/var/run/qubes/qubes-firewall.pid
@@ -7,10 +7,10 @@ XENSTORE_IPTABLES_HEADER=/qubes-iptables-header
 XENSTORE_ERROR=/qubes-iptables-error
 OLD_RULES=""
 # PIDfile handling
-[[ -e $PIDFILE ]] && kill -s 0 $(<$PIDFILE) 2>/dev/null && exit 0
+[ -e "$PIDFILE" ] && kill -s 0 $(cat "$PIDFILE") 2>/dev/null && exit 0
 echo $$ >$PIDFILE
 
-trap 'exit 0' SIGTERM
+trap 'exit 0' TERM
 
 FIRST_TIME=yes
 
@@ -36,11 +36,11 @@ while true; do
 
 	RULES=$(qubesdb-read $XENSTORE_IPTABLES_HEADER)
 	IPTABLES_SAVE=$(iptables-save | sed '/^\*filter/,/^COMMIT/d')
-	OUT=`echo -e "$RULES\n$IPTABLES_SAVE" | iptables-restore 2>&1 || true`
+	OUT=$(printf '%s\n%s\n' "$RULES" "$IPTABLES_SAVE" | sed 's/\\n/\n/g' | iptables-restore 2>&1 || true)
 
 	for i in $(qubesdb-list -f /qubes-iptables-domainrules) ; do
 		RULES=$(qubesdb-read "$i")
-		ERRS=`echo -e "$RULES" | /sbin/iptables-restore -n 2>&1 || true`
+		ERRS=$(printf '%s\n' "$RULES" | sed 's/\\n/\n/g' | /sbin/iptables-restore -n 2>&1 || true)
 		if [ -n "$ERRS" ]; then
 			echo "Failed applying rules for $i: $ERRS" >&2
 			OUT="$OUT$ERRS"
@@ -48,7 +48,7 @@ while true; do
 	done		
 	qubesdb-write $XENSTORE_ERROR "$OUT"
 	if [ -n "$OUT" ]; then
-		DISPLAY=:0 /usr/bin/notify-send -t 3000 "Firewall loading error ($HOSTNAME)" "$OUT" || :
+		DISPLAY=:0 /usr/bin/notify-send -t 3000 "Firewall loading error ($(hostname))" "$OUT" || :
 	fi
 
 	# Check if user didn't define some custom rules to be applied as well...

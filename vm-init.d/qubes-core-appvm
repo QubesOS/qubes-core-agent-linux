@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # chkconfig: 345 85 85
 # description: Executes Qubes core scripts at AppVM boot

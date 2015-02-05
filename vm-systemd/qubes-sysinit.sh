@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # List of services enabled by default (in case of absence of qubesdb entry)
 DEFAULT_ENABLED_NETVM="network-manager qubes-network qubes-update-check qubes-updates-proxy"
