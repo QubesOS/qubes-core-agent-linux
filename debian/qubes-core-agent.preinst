@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # preinst script for core-agent-linux
 #
 # see: dh_installdeb(1)
@@ -40,13 +40,6 @@ if [ "$1" = "install" ] ; then
     mkdir -p /var/lib/qubes
     mkdir -p /lib/modules
     #mkdir -p -m 0700 /var/log/xen  # xen-utils-common should do this
-
-    # --------------------------------------------------------------------------
-    # Many Qubes scripts reference /bin/sh expecting the shell to be bash but
-    # in Debian it is dash so some scripts will fail so force an alternate for
-    # /bin/sh to be /bin/bash
-    # --------------------------------------------------------------------------
-    update-alternatives --force --install /bin/sh sh /bin/bash 999
 
     # --------------------------------------------------------------------------
     # Remove `mesg` from root/.profile?

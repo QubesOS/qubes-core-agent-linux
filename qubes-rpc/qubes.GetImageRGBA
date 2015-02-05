@@ -1,31 +1,31 @@
 set -e
 read filename
 
-if [[ "${filename}" = xdgicon:* ]]; then
+if [ "${filename%%:*}" = xdgicon ]; then
     # get biggest icon from hicolor theme
 
     filename="${filename#*:}.png"
     candidate=
-    for dir in /usr/share/icons/{hicolor/,}; do
+    for dir in /usr/share/icons/hicolor/ /usr/share/icons/; do
         candidate=$(find -L "${dir}" -type f -name "${filename}")
-        if [[ -n "${candidate}" ]]; then
+        if [ -n "${candidate}" ]; then
             candidate=$(echo "${candidate}" | xargs ls --sort=size | head -1)
             break
         fi
     done
 
-    [[ -n "${candidate}" ]]
+    [ -n "${candidate}" ]
     filename="${candidate}"
 
-elif [[ "${filename}" = "-" ]] || [[ "${filename}" = *":-" ]]; then
+elif [ "${filename}" = "-" ] || [ "${filename##*:}" = "-" ]; then
     tmpfile="$(mktemp /tmp/qimg-XXXXXXXX)"
     cat > "${tmpfile}"
-    if [[ "$filename" = *":-" ]]; then
+    if [ "${filename##*:}" = "-" ]; then
         tmpfile="${filename%:*}:${tmpfile}"
     fi
     filename="${tmpfile}"
 
-elif ! [[ -r "${filename}" ]]; then
+elif ! [ -r "${filename}" ]; then
     exit 1
 fi
 
@@ -34,6 +34,6 @@ fi
 identify -format '%w %h\n' "$filename" | sed -e '/^$/d'
 convert -depth 8 "$filename" rgba:-
 
-[[ -n "${tmpfile}" ]] && rm -f ${tmpfile} || true
+[ -n "${tmpfile}" ] && rm -f ${tmpfile} || true
 
 # vim: ft=sh ts=4 sw=4 et

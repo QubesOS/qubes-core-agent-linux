@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 apps="evince /usr/libexec/evinced soffice firefox"
 
@@ -18,7 +18,7 @@ echo "Sleeping..."
 PREV_IO=0
 while true; do
 	IO=`vmstat -D | awk '/read|write/ {IOs+=$1} END {print IOs}'`
-	if [ $IO -lt $[ $PREV_IO + 50 ] ]; then
+	if [ $IO -lt $(( $PREV_IO + 50 )) ]; then
 		break;
 	fi
 	PREV_IO=$IO

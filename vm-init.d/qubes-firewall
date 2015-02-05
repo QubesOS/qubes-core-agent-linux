@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # chkconfig: 345 91 91
 # description: Starts Qubes Firewall monitor

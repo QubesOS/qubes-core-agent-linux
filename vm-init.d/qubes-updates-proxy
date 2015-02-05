@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # tinyproxy     Startup script for the tinyproxy server as Qubes updates proxy
 #

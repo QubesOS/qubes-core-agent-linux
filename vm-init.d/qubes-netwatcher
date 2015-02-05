@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # chkconfig: 345 92 92
 # description: Starts Qubes Network monitor

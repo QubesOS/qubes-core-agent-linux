@@ -11,7 +11,7 @@ if [ -r /rw/config/suspend-module-blacklist ]; then
     MODULES_BLACKLIST="$MODULES_BLACKLIST `cat /rw/config/suspend-module-blacklist`"
 fi
 
-if [ x"$action" == x"suspend" ]; then
+if [ x"$action" = x"suspend" ]; then
     dbus-send --system --print-reply          \
         --dest=org.freedesktop.NetworkManager \ 
         /org/freedesktop/NetworkManager       \
@@ -19,7 +19,7 @@ if [ x"$action" == x"suspend" ]; then
         service NetworkManager stop
     # Force interfaces down, just in case when NM didn't done it
     for if in `ls /sys/class/net|grep -v "lo\|vif"`; do 
-        if [ "`cat /sys/class/net/$if/device/devtype 2>/dev/null`" == "vif" ]; then
+        if [ "`cat /sys/class/net/$if/device/devtype 2>/dev/null`" = "vif" ]; then
             continue
         fi
         ip l s $if down
