@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # prerm script for core-agent-linux
 #
 # see: dh_installdeb(1)

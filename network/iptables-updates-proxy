@@ -3,7 +3,7 @@
 RULE_FILTER="INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT"
 RULE_NAT="PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT"
 
-if [ "$1" == "start" ]; then
+if [ "$1" = "start" ]; then
 cat <<__EOF__ | iptables-restore -n
 *filter
 -I $RULE_FILTER
