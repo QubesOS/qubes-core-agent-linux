@@ -49,13 +49,11 @@ if [ "$1" = "install" ] ; then
     # --------------------------------------------------------------------------
     # User add / modifications
     # --------------------------------------------------------------------------
-    id -u 'user' || {
-        groupadd -f user
-        useradd -g user -G dialout,cdrom,floppy,sudo,audio,dip,video,plugdev -m -s /bin/bash user
+    id -u 'user' >/dev/null 2>&1 || {
+        useradd -U -G dialout,cdrom,floppy,sudo,audio,dip,video,plugdev -m -s /bin/bash user
     }
-    id -u 'tinyproxy' || {
-        groupadd -f tinyproxy
-        useradd -g tinyproxy -r -M --home /run/tinyproxy --shell /bin/false tinyproxy
+    id -u 'tinyproxy' >/dev/null 2>&1 || {
+        useradd -U -r -M --home /run/tinyproxy --shell /bin/false tinyproxy
     }
     usermod -p '' root
     usermod -L user
