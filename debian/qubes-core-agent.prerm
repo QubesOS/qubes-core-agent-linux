@@ -42,6 +42,16 @@ if [ "$1" = "remove" ] ; then
     if [ -e /var/lib/qubes/serial.orig ] ; then
         mv /var/lib/qubes/serial.orig /etc/init/serial.conf
     fi
+
+    for init in plymouth-shutdown \
+            prefdm \
+            splash-manager \
+            start-ttys \
+            tty ; do
+        dpkg-divert --divert /etc/init/${init}.conf.qubes-disabled --package qubes-core-agent --remove /etc/init/${init}.conf
+    done
+
+    dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --remove /etc/init/serial.conf
 fi
 
 # dh_installdeb will replace this with shell code automatically

@@ -158,9 +158,8 @@ disableSystemdUnits() {
                 if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
                     systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
                 else
-                    # Forcibly disable
-                    echo "Forcibly disabling: ${unit}"
-                    ln -sf /dev/null /etc/systemd/system/${unit}
+                    echo "Masking service: ${unit}"
+                    systemctl mask ${unit}
                 fi
             else
                     systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
@@ -180,9 +179,7 @@ enableSystemdUnits() {
             #displayFailedStatus is-enabled ${unit}
         } || {
             echo "Enabling: ${unit}..."
-            systemctl enable ${unit} > /dev/null 2>&1 && {
-                systemctl start ${unit} > /dev/null 2>&1 || displayFailedStatus start ${unit}
-            } || {
+            systemctl enable ${unit} > /dev/null 2>&1 || {
                 echo "Could not enable: ${unit}"
                 displayFailedStatus enable ${unit}
             }
@@ -209,22 +206,8 @@ case "${1}" in
                     splash-manager \
                     start-ttys \
                     tty ; do
-            if [ -e /etc/init/${init}.conf ]; then
-                mv -f /etc/init/${init}.conf /etc/init/${init}.conf.disabled
-            fi
+            dpkg-divert --divert /etc/init/${init}.conf.qubes-disabled --package qubes-core-agent --rename --add /etc/init/${init}.conf
         done
-
-        # Stops Qt form using the MIT-SHM X11 Shared Memory Extension
-        echo 'export QT_X11_NO_MITSHM=1' > /etc/profile.d/qt_x11_no_mitshm.sh
-        chmod 0755 /etc/profile.d/qt_x11_no_mitshm.sh
-
-        # Sudo's defualt umask is 077 so set sane default of 022
-        # Also don't allow QT to used shared memory to prevent errors
-        echo 'Defaults umask = 0002' > /etc/sudoers.d/umask
-        echo 'Defaults umask_override' >> /etc/sudoers.d/umask
-        chmod 0440 /etc/sudoers.d/umask
-        echo 'Defaults env_keep += "QT_X11_NO_MITSHM"' > /etc/sudoers.d/qt_x11_no_mitshm
-        chmod 0440 /etc/sudoers.d/qt_x11_no_mitshm
 
         # Create NetworkManager configuration if we do not have it
         if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
@@ -237,15 +220,6 @@ case "${1}" in
         if [ -L /lib/firmware/updates ]; then
             rm -f /lib/firmware/updates
         fi
-
-        #if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
-        #  echo >> /etc/yum.conf
-        #  echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
-        #  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
-        #fi
-
-        # Revert 'Prevent unnecessary updates in VMs':
-        #sed -i -e '/^exclude = kernel/d' /etc/yum.conf
 
         # ensure that hostname resolves to 127.0.1.1 resp. ::1 and that /etc/hosts is
         # in the form expected by qubes-sysinit.sh
@@ -263,45 +237,7 @@ case "${1}" in
 
         chown user:user /home_volatile/user
 
-        #if [ "${1}" !=  1 ] ; then
-        #    # do the rest of %post thing only when updating for the first time...
-        #    exit 0
-        #fi
-
-        if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
-            cp /etc/init/serial.conf /var/lib/qubes/serial.orig
-        fi
-
-        # Remove most of the udev scripts to speed up the VM boot time
-        # Just leave the xen* scripts, that are needed if this VM was
-        # ever used as a net backend (e.g. as a VPN domain in the future)
-        #echo "--> Removing unnecessary udev scripts..."
-        mkdir -p /var/lib/qubes/removed-udev-scripts
-        for f in /etc/udev/rules.d/*
-        do
-            if [ $(basename ${f}) == "xen-backend.rules" ] ; then
-                continue
-            fi
-
-            if [ $(basename ${f}) == "50-qubes-misc.rules" ] ; then
-                continue
-            fi
-
-            if echo ${f} | grep -q qubes; then
-                continue
-            fi
-
-            mv ${f} /var/lib/qubes/removed-udev-scripts/
-        done
-
-        # Create /rw directory
-        mkdir -p /rw
-
-        # XXX: TODO: Needs to be implemented still
-        #rm -f /etc/mtab
-        #echo "--> Removing HWADDR setting from /etc/sysconfig/network-scripts/ifcfg-eth0"
-        #mv /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.orig
-        #grep -v HWADDR /etc/sysconfig/network-scripts/ifcfg-eth0.orig > /etc/sysconfig/network-scripts/ifcfg-eth0
+        dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
 
         # Enable Qubes systemd units
         enableSystemdUnits \
@@ -315,19 +251,7 @@ case "${1}" in
             qubes-qrexec-agent.service
 
         # Set default "runlevel"
-        rm -f /etc/systemd/system/default.target
-        ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
-
-        # Copy ip(|6)tables into place if they do not already exist in filesystem.
-        # This prevents conflict with iptables-service with fc21 and also put config
-        # in proper place for debian
-        mkdir -p '/etc/iptables'
-        if [ ! -f '/etc/iptables/rules.v4' ]; then
-            cp -p /usr/lib/qubes/init/iptables /etc/iptables/rules.v4
-        fi
-        if [ ! -f '/etc/iptables/rules.v6' ]; then
-            cp -p /usr/lib/qubes/init/ip6tables /etc/iptables/rules.v6
-        fi
+        systemctl set-default multi-user.target
 
         # Process all triggers which will set defaults to wanted values
         triggerTriggers
@@ -371,13 +295,12 @@ case "${1}" in
 
         # Enable other systemd units
         enableSystemdUnits \
-            rsyslog.service
+            rsyslog.service \
+            netfilter-persistent.service
 
         # XXX: TODO: Needs to be implemented still
         # These do not exist on debian; maybe a different package name
-        #    iptables.service \
         #    ntpd.service \
-        #    ip6tables.service \
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -408,14 +331,12 @@ case "${1}" in
 
                 # Enable cups only when it is real Systemd service
                 /lib/systemd/system/cups.service)
-                    echo "Enabling cups"
                     [ -e /lib/systemd/system/cups.service ] && enableSystemdUnits cups.service
                     ;;
 
                 # "Enable haveged service"
                 /lib/systemd/system/haveged.service)
-                    echo "Enabling haveged service"
-                    enableSystemdUnits haveged.service
+                    [ -e /lib/systemd/system/haveged.service ] && enableSystemdUnits haveged.service
                     ;;
 
                 # Install overridden serial.conf init script 

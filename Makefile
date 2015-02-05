@@ -74,8 +74,6 @@ install-sysvinit:
 
 
 install-rh: install-systemd install-sysvinit
-	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
-
 	install -D -m 0644 misc/qubes-r2.repo $(DESTDIR)/etc/yum.repos.d/qubes-r2.repo
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
@@ -102,6 +100,8 @@ install-rh: install-systemd install-sysvinit
 	install -m 0400 -D network/ip6tables $(DESTDIR)/usr/lib/qubes/init/ip6tables
 
 install-common:
+	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
+
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 
 	install -d $(DESTDIR)/var/lib/qubes
@@ -198,5 +198,8 @@ install-deb:
 	install -D -m 644 network/ip6tables $(DESTDIR)/etc/iptables/rules.v6
 	install -d $(DESTDIR)/etc/sysctl.d
 	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/
+	install -D -m 644 misc/profile.d_qt_x11_no_mitshm.sh $(DESTDIR)/etc/profile.d/qt_x11_no_mitshm.sh
+	install -D -m 440 misc/sudoers.d_umask $(DESTDIR)/etc/sudoers.d/umask
+	install -D -m 440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
 
 install-vm: install-rh install-common

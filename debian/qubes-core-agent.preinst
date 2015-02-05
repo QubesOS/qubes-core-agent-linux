@@ -41,10 +41,6 @@ if [ "$1" = "install" ] ; then
     mkdir -p /lib/modules
     #mkdir -p -m 0700 /var/log/xen  # xen-utils-common should do this
 
-    if [ -e /etc/fstab ] ; then 
-        mv /etc/fstab /var/lib/qubes/fstab.orig
-    fi
-
     # --------------------------------------------------------------------------
     # Many Qubes scripts reference /bin/sh expecting the shell to be bash but
     # in Debian it is dash so some scripts will fail so force an alternate for
@@ -53,34 +49,9 @@ if [ "$1" = "install" ] ; then
     update-alternatives --force --install /bin/sh sh /bin/bash 999
 
     # --------------------------------------------------------------------------
-    # Modules setup
-    # --------------------------------------------------------------------------
-    echo "xen_netfront" >> /etc/modules
-
-    # --------------------------------------------------------------------------
     # Remove `mesg` from root/.profile?
     # --------------------------------------------------------------------------
     sed -i -e '/^mesg n/d' /root/.profile
-
-    # --------------------------------------------------------------------------
-    # Update /etc/fstab
-    # --------------------------------------------------------------------------
-    cat > /etc/fstab <<EOF
-/dev/mapper/dmroot /         ext4 defaults,noatime 1 1
-/dev/xvdc1 swap              swap    defaults 0 0
-
-/dev/xvdb /rw                ext4    noauto,defaults,discard 1 2
-/rw/home /home               none    noauto,bind,defaults 0 0
-
-tmpfs /dev/shm               tmpfs   defaults 0 0
-devpts /dev/pts              devpts  gid=5,mode=620 0 0
-proc /proc                   proc    defaults 0 0
-sysfs /sys                   sysfs   defaults 0 0
-xen /proc/xen                xenfs   defaults 0 0
-
-/dev/xvdi /mnt/removable     auto    noauto,user,rw 0 0
-/dev/xvdd /lib/modules       ext3    defaults 0 0
-EOF
 
     # --------------------------------------------------------------------------
     # User add / modifications
