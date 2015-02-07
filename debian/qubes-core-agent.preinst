@@ -57,11 +57,10 @@ if [ "$1" = "install" ] ; then
     }
     usermod -p '' root
     usermod -L user
-    exit 0
 fi
 
 if [ "$1" = "upgrade" ] ; then
-    exit 0
+    true 
 fi
 
 # dh_installdeb will replace this with shell code automatically
