@@ -111,6 +111,12 @@ for dir in qubes-rpc qrexec misc; do
 done
 
 %pre
+# Make sure there is a qubes group
+groupadd --force --system --gid 98 qubes
+id -u 'user' >/dev/null 2>&1 || {
+  useradd --user-group --create-home --shell /bin/bash user
+}
+usermod --groups qubes user
 
 if [ "$1" !=  1 ] ; then
 # do this whole %pre thing only when updating for the first time...
@@ -122,7 +128,6 @@ if [ -e /etc/fstab ] ; then
 mv /etc/fstab /var/lib/qubes/fstab.orig
 fi
 
-adduser --create-home user
 usermod -p '' root
 usermod -L user
 
