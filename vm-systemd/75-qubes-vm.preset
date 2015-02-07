@@ -1,0 +1,51 @@
+# Units that should not run by default in Qubes VMs.
+#
+# This file is part of the qubes-core-vm-systemd package.  To ensure that the
+# default configuration is applied to all units in the list regardless of
+# package installation order, including units added to the list by
+# qubes-core-vm-systemd upgrades, all units in the list are preset by a
+# scriptlet every time qubes-core-vm-systemd is installed or upgraded.  That
+# means that to permanently enable a unit with an [Install] section, you must
+# create your own higher-priority preset file.  (It might be possible to be
+# smarter and keep a list of units previously preset, but this is not
+# implemented.)
+#
+# For units below with no [Install] section, the scriptlet masks them instead.
+# Qubes currently does not provide a way to permanently prevent such units from
+# being masked.
+#
+# https://groups.google.com/d/topic/qubes-users/dpM_GHfmEOk/discussion
+
+disable alsa-store.service
+disable alsa-restore.service
+disable auditd.service
+disable avahi.service
+disable avahi-daemon.service
+disable backuppc.service
+disable cpuspeed.service
+disable fedora-autorelabel.service
+disable fedora-autorelabel-mark.service
+disable ipmi.service
+disable hwclock-load.service
+disable hwclock-save.service
+disable mdmonitor.service
+disable multipathd.service
+disable openct.service
+disable rpcbind.service
+disable mcelog.service
+disable fedora-storage-init.service
+disable fedora-storage-init-late.service
+disable plymouth-start.service
+disable plymouth-read-write.service
+disable plymouth-quit.service
+disable plymouth-quit-wait.service
+disable sshd.service
+disable tcsd.service
+disable sm-client.service
+disable sendmail.service
+disable mdmonitor-takeover.service
+disable rngd.service
+disable smartd.service
+disable upower.service
+disable irqbalance.service
+disable colord.service

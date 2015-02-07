@@ -547,6 +547,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-update-check.timer
 /lib/systemd/system/qubes-updates-proxy.service
 /lib/systemd/system/qubes-qrexec-agent.service
+/lib/systemd/system-preset/75-qubes-vm.preset
 /lib/modules-load.d/qubes-core.conf
 /lib/modules-load.d/qubes-misc.conf
 %dir /usr/lib/qubes/init
@@ -583,21 +584,19 @@ done
 rm -f /etc/systemd/system/default.target
 ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
-DISABLE_SERVICES="alsa-store alsa-restore auditd avahi avahi-daemon backuppc cpuspeed"
-DISABLE_SERVICES="$DISABLE_SERVICES fedora-autorelabel fedora-autorelabel-mark ipmi hwclock-load hwclock-save"
-DISABLE_SERVICES="$DISABLE_SERVICES mdmonitor multipathd openct rpcbind mcelog fedora-storage-init fedora-storage-init-late"
-DISABLE_SERVICES="$DISABLE_SERVICES plymouth-start plymouth-read-write plymouth-quit plymouth-quit-wait"
-DISABLE_SERVICES="$DISABLE_SERVICES sshd tcsd sm-client sendmail mdmonitor-takeover"
-DISABLE_SERVICES="$DISABLE_SERVICES rngd smartd upower irqbalance colord"
-for srv in $DISABLE_SERVICES; do
-    if [ -f /lib/systemd/system/$srv.service ]; then
-        if fgrep -q '[Install]' /lib/systemd/system/$srv.service; then
-            /bin/systemctl --no-reload disable $srv.service 2> /dev/null
-        else
-            # forcibly disable
-            ln -sf /dev/null /etc/systemd/system/$srv.service
+grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
+    case "$action" in
+    (disable)
+        if [ -f /lib/systemd/system/$unit_name.service ]; then
+            if fgrep -q '[Install]' /lib/systemd/system/$unit_name; then
+                /bin/systemctl --no-reload preset $unit_name 2> /dev/null
+            else
+                # forcibly disable
+                ln -sf /dev/null /etc/systemd/system/$unit_name
+            fi
         fi
-    fi
+        ;;
+    esac
 done
 
 rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service

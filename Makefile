@@ -46,10 +46,11 @@ all:
 	make -C qubes-rpc
 
 install-systemd:
-	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d
+	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d
 	install -m 0755 vm-systemd/*.sh $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
 	install -m 0644 vm-systemd/ModemManager.service $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager.service $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)$(LIBDIR)/qubes/init/
