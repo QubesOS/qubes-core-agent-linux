@@ -412,7 +412,6 @@ case "${1}" in
                     ;;
             esac
         done
-        exit 0
         ;;
 
     *)
