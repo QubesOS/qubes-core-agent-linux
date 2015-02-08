@@ -1,4 +1,45 @@
-#!/bin/sh
-# pass aguments to the remote stdin, shovel back the remote output
-echo "$@"
-exec /bin/cat >&$SAVED_FD_1
+#!/usr/bin/python
+# Send the command to the remote side, and then transfer stdin from local to
+# remote and stdout from remote to local.
+#
+# The tricky part is delimiting the command from the stdin data.  If we were
+# implementing this from scratch, we'd probably use a null byte.  However, we'd
+# like to work with the existing qubes.VMShell service, whose implementation is
+# simply "/bin/bash", so users don't have to maintain duplicate RPC policy.  We
+# take advantage of the fact that when bash is executing commands from a pipe,
+# it reads one character at a time until it gets a newline that ends a command.
+# So the initial qubes.VMShell bash process, which is executing commands from
+# stdin, consumes exactly the line from the "write" below and then either
+# completes the "exec" or exits.  In no event does it touch the stdin data
+# intended for the command.
+
+import os
+import subprocess
+import sys
+
+cmd = ' '.join(sys.argv[1:])
+sys.stdout.write("exec bash -c '%s' || exit 127\n" % cmd.replace("'", "'\\''"))
+sys.stdout.flush()
+
+local_stdin = int(os.environ['SAVED_FD_0'])
+local_stdout = int(os.environ['SAVED_FD_1'])
+stdin_sender = subprocess.Popen(['cat'], stdin=local_stdin)
+stdout_receiver = subprocess.Popen(['cat'], stdout=local_stdout)
+
+# sys.std{in,out}.close() do not close the FDs, but they apparently stop Python
+# from trying to close the FDs again on exit and generating an exception.
+sys.stdin.close()
+sys.stdout.close()
+os.close(0)
+# The really important step, so this process doesn't prevent qrexec-client-vm
+# from seeing EOF on input.
+os.close(1)
+os.close(local_stdin)
+os.close(local_stdout)
+
+stdout_receiver.wait()
+# With the current Qubes RPC implementation, the stdout receiver doesn't get EOF
+# until the remote process has exited.  At that point, we want to finish and not
+# try to send more input.  This is the same behavior ssh appears to have.
+stdin_sender.terminate()
+stdin_sender.wait()
