@@ -1,4 +1,4 @@
-qubes-core-agent (3.0.0) jessie; urgency=medium
+qubes-core-agent (3.0.0-1) jessie; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
   * Improve handling of .desktop files
