@@ -191,6 +191,10 @@ install-common:
 	install -d $(DESTDIR)/home_volatile/user
 	install -d $(DESTDIR)/rw
 
+# Create a quilt orig package so we can build xen in Debian
+dist: 	
+	tar cvfz "../qubes-core-agent_$(VERSION).orig.tar.gz" --exclude-vcs --exclude=debian .
+
 install-deb:
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
 	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r3.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r3.list

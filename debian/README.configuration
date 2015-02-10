@@ -1,0 +1,77 @@
+Debian Packaging Guide
+----------------------
+https://www.debian.org/doc/manuals/maint-guide/first.en.html
+
+
+===============================================================================
+                               Bash.rc
+===============================================================================
+# Assume usename 'user' running this, otherwise
+# /home/user/.bashrc
+cat >>~/.bashrc <<'EOF'
+DEBMAIL="user@chroot.local"
+DEBFULLNAME="Qubes Builder"
+export DEBMAIL DEBFULLNAME
+
+alias dquilt="quilt --quiltrc=${HOME}/.quiltrc-dpkg"
+complete -F _quilt_completion $_quilt_complete_opt dquilt
+EOF
+
+
+===============================================================================
+                              Quilt RC
+===============================================================================
+cat >>~/.quiltrc-dpkg <<'EOF'
+d=. ; while [ ! -d $d/debian -a `readlink -e $d` != / ]; do d=$d/..; done
+if [ -d $d/debian ] && [ -z $QUILT_PATCHES ]; then
+    # if in Debian packaging tree with unset $QUILT_PATCHES
+    QUILT_PATCHES="debian/patches"
+    QUILT_PATCH_OPTS="--reject-format=unified"
+    QUILT_DIFF_ARGS="-p ab --no-timestamps --no-index --color=auto"
+    QUILT_REFRESH_ARGS="-p ab --no-timestamps --no-index"
+    QUILT_COLORS="diff_hdr=1;32:diff_add=1;34:diff_rem=1;31:diff_hunk=1;33:diff_ctx=35:diff_cctx=33"
+    if ! [ -d $d/debian/patches ]; then mkdir $d/debian/patches; fi
+fi
+EOF
+
+===============================================================================
+                  Create a fresh Debian configuration
+===============================================================================
+apt-get dh-make
+
+# Example
+$ cd ~/gentoo
+$ wget http://example.org/gentoo-0.9.12.tar.gz
+$ tar -xvzf gentoo-0.9.12.tar.gz
+$ cd gentoo-0.9.12
+$ dh_make -f ../gentoo-0.9.12.tar.gz
+
+
+===============================================================================
+                              Adding Patches
+===============================================================================
+https://www.debian.org/doc/manuals/maint-guide/modify.en.html
+
+# When anyone (including yourself) provides a patch foo.patch to the source 
+# later, modifying a 3.0 (quilt) source package is quite simple:
+$ dpkg-source -x gentoo_0.9.12.dsc
+$ cd gentoo-0.9.12
+$ dquilt import ../foo.patch
+$ dquilt push
+$ dquilt refresh
+$ dquilt header -e
+... describe patch
+
+
+
+===============================================================================
+                                   Other
+===============================================================================
+# To list all dh_ modules...
+man -k dh_
+
+# To indicate what build-depends are required!
+dpkg-depcheck -d ./configure
+
+# Test build (unsigned)
+dpkg-buildpackage -us -uc
