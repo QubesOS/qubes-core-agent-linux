@@ -251,7 +251,8 @@ case "${1}" in
             qubes-qrexec-agent.service
 
         # Set default "runlevel"
-        systemctl set-default multi-user.target
+        rm -f /etc/systemd/system/default.target
+        ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
         # Process all triggers which will set defaults to wanted values
         triggerTriggers
