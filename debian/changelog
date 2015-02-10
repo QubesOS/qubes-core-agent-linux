@@ -1,3 +1,9 @@
+qubes-core-agent (2.1.55) jessie; urgency=medium
+
+  * debian: change systemctl set-default back to manual symlink
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 10 Feb 2015 17:17:29 +0100
+
 qubes-core-agent (2.1.54) jessie; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
