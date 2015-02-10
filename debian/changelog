@@ -1,3 +1,32 @@
+qubes-core-agent (2.1.54) jessie; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: add missing R: pygobject3-base
+
+  [ HW42 ]
+  * debian: fix for QSB #014 requires up to date qubes-utils
+  * debian: postinst: use systemctl mask
+  * debian: postinst: use dpkg-divert
+  * debian: don't generate regular conf files in postinst
+  * debian: postinst: don't remove /etc/udev/rules.d/*
+  * debian: postinst: don't create /rw - it is already part of the
+    package
+  * debian: postinst: use systemctl to set default target
+  * debian: postinst: remove fedora specific code
+  * debian: postinst: enable netfilter-persistent service
+  * debian: postinst: cleanup
+  * debian: postinst: don't start systemd services
+  * debian: postinst: enable haveged only if installed
+  * debian: postinst: remove redundant and misleading trigger output
+  * debian: install fstab as normal config file
+  * debian: preinst: remove modification of /etc/modules
+  * remove 'bashisms' or explicit use bash
+  * debian: preinst: don't force the default shell to bash
+  * debian: prerm: remove obsolete code
+  * debian: preinst: cleanup user creation
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 10 Feb 2015 14:57:57 +0100
+
 qubes-core-agent (2.1.53) jessie; urgency=medium
 
   * filecopy: fallback to "open(..., 000)" method when /proc
