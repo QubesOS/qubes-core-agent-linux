@@ -1,0 +1,31 @@
+#!/bin/bash
+# vim: set ts=4 sw=4 sts=4 et :
+#
+# Given a series.conf file and debian patches directory, patches
+# are copied to debian patch directory
+
+USAGE="${0} <series.conf> <patchdir>"
+
+set -e
+set -o pipefail
+
+DIR="${0%/*}"
+SERIES_CONF="${1}"
+PATCH_DIR="${2}"
+
+if test $# -lt 2 || [ ! -e "${SERIES_CONF}" ] || [ ! -d "${PATCH_DIR}" ] ; then
+	echo "${USAGE}" >&2
+	exit 1
+fi
+
+# Clear patch series.conf file
+rm -f "${PATCH_DIR}/series"
+touch "${PATCH_DIR}/series"
+
+while read patch_file
+do
+    if [ -e "${DIR}/${patch_file}" ]; then
+        echo -e "${patch_file##*/}" >> "${PATCH_DIR}/series"
+        cp "${DIR}/${patch_file}" "${PATCH_DIR}"
+    fi
+done < "${SERIES_CONF}"

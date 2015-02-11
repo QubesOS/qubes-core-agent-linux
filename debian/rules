@@ -4,13 +4,11 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/default.mk
-
 export DESTDIR=$(shell pwd)/debian/qubes-core-agent
 
 %:
-	dh $@ --with systemd --with autotools-dev
+	dh $@ --with systemd
 
 override_dh_auto_build:
 	make all
