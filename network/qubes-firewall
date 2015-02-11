@@ -36,11 +36,12 @@ while true; do
 
 	RULES=$(xenstore-read $XENSTORE_IPTABLES_HEADER)
 	IPTABLES_SAVE=$(iptables-save | sed '/^\*filter/,/^COMMIT/d')
-	OUT=$(printf '%s\n%s\n' "$RULES" "$IPTABLES_SAVE" | sed 's/\\n/\n/g' | iptables-restore 2>&1 || true)
+	OUT=$(printf '%s\n%s\n' "$RULES" "$IPTABLES_SAVE" | sed 's/\\n\|\\x0a/\n/g' | iptables-restore 2>&1 || true)
 
 	for i in $(xenstore-list qubes-iptables-domainrules) ; do
 		RULES=$(xenstore-read qubes-iptables-domainrules/"$i")
 		ERRS=$(printf '%s\n' "$RULES" | sed 's/\\n/\n/g' | /sbin/iptables-restore -n 2>&1 || true)
+		ERRS=$(printf '%s\n' "$RULES" | sed 's/\\n\|\\x0a/\n/g' | /sbin/iptables-restore -n 2>&1 || true)
 		if [ -n "$ERRS" ]; then
 			echo "Failed applying rules for $i: $ERRS" >&2
 			OUT="$OUT$ERRS"
