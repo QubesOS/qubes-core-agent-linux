@@ -116,7 +116,7 @@ groupadd --force --system --gid 98 qubes
 id -u 'user' >/dev/null 2>&1 || {
   useradd --user-group --create-home --shell /bin/bash user
 }
-usermod --groups qubes user
+usermod -a --groups qubes user
 
 if [ "$1" !=  1 ] ; then
 # do this whole %pre thing only when updating for the first time...

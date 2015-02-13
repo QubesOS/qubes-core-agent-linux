@@ -50,7 +50,7 @@ if [ "$1" = "install" ] ; then
         useradd --user-group --system -M --home /run/tinyproxy --shell /bin/false tinyproxy
     }
     usermod -p '' root
-    usermod -L --groups qubes,sudo user
+    usermod -L -a --groups qubes,sudo user
 
     # --------------------------------------------------------------------------
     # Remove `mesg` from root/.profile?
