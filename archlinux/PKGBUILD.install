@@ -209,9 +209,13 @@ pre_install() {
   # Add qubes core related fstab entries
   echo "xen	/proc/xen	xenfs	defaults	0 0" >> /etc/fstab
 
+  # Add a qubes group
+  groupadd --force --system --gid 98 qubes
+
   # Archlinux bash version has a 'bug' when running su -c, /etc/profile is not loaded because bash consider there is no interactive pty when running 'su - user -c' or something like this.
   # See https://bugs.archlinux.org/task/31831
   useradd --shell /bin/zsh --create-home user
+  usermod -a --groups qubes user
 }
 
 ## arg 1:  the new package version

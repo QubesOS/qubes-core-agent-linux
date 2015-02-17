@@ -1,0 +1,19 @@
+qrexec: Disable all warnings being treated as errors
+
+gcc -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -I. -g -Wall -Wextra -Werror -pie -fPIC `pkg-config --cflags vchan-xen` -D_FORTIFY_SOURCE=2  -c -o qrexec-agent-data.o qrexec-agent-data.c
+qrexec-agent-data.c: In function 'handle_remote_data':
+qrexec-agent-data.c:217:17: error: dereferencing type-punned pointer will break strict-aliasing rules [-Werror=strict-aliasing]
+                 status = *(unsigned int *)buf;
+                 ^
+cc1: all warnings being treated as errors
+<builtin>: recipe for target 'qrexec-agent-data.o' failed
+
+--- a/qrexec/Makefile
++++ b/qrexec/Makefile
+@@ -1,5 +1,5 @@
+ CC=gcc
+-CFLAGS+=-I. -g -Wall -Wextra -Werror -pie -fPIC `pkg-config --cflags vchan-$(BACKEND_VMM)`
++CFLAGS+=-I. -g -Wall -Wextra -pie -fPIC `pkg-config --cflags vchan-$(BACKEND_VMM)`
+ LIBS=`pkg-config --libs vchan-$(BACKEND_VMM)` -lqrexec-utils
+ 
+ all: qrexec-agent qrexec-client-vm

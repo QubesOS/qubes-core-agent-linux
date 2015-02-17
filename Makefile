@@ -73,7 +73,6 @@ install-sysvinit:
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install -D vm-init.d/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
 
-
 install-rh: install-systemd install-sysvinit
 	install -D -m 0644 misc/qubes-r3.repo $(DESTDIR)/etc/yum.repos.d/qubes-r3.repo
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
@@ -85,7 +84,6 @@ install-rh: install-systemd install-sysvinit
 	install -d -m 755 $(DESTDIR)/etc/pki/rpm-gpg
 	install -m 644 misc/RPM-GPG-KEY-qubes* $(DESTDIR)/etc/pki/rpm-gpg/
 	install -D -m 644 misc/session-stop-timeout.conf $(DESTDIR)$(LIBDIR)/systemd/system/user@.service.d/90-session-stop-timeout.conf
-
 
 	install -d $(DESTDIR)/etc/yum.conf.d
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf

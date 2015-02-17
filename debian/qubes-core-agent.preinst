@@ -35,33 +35,31 @@ set -e
 
 if [ "$1" = "install" ] ; then
     # --------------------------------------------------------------------------
-    # Create required directories
+    # Required groups
     # --------------------------------------------------------------------------
-    mkdir -p /var/lib/qubes
-    mkdir -p /lib/modules
-    #mkdir -p -m 0700 /var/log/xen  # xen-utils-common should do this
-
-    # --------------------------------------------------------------------------
-    # Remove `mesg` from root/.profile?
-    # --------------------------------------------------------------------------
-    sed -i -e '/^mesg n/d' /root/.profile
+    groupadd --force --system --gid 98 qubes
+    groupadd --force --system sudo
 
     # --------------------------------------------------------------------------
     # User add / modifications
     # --------------------------------------------------------------------------
     id -u 'user' >/dev/null 2>&1 || {
-        useradd -U -G dialout,cdrom,floppy,sudo,audio,dip,video,plugdev -m -s /bin/bash user
+        useradd --user-group --create-home --shell /bin/bash user
     }
     id -u 'tinyproxy' >/dev/null 2>&1 || {
-        useradd -U -r -M --home /run/tinyproxy --shell /bin/false tinyproxy
+        useradd --user-group --system -M --home /run/tinyproxy --shell /bin/false tinyproxy
     }
     usermod -p '' root
-    usermod -L user
-    exit 0
+    usermod -L -a --groups qubes,sudo user
+
+    # --------------------------------------------------------------------------
+    # Remove `mesg` from root/.profile?
+    # --------------------------------------------------------------------------
+    sed -i -e '/^mesg n/d' /root/.profile
 fi
 
 if [ "$1" = "upgrade" ] ; then
-    exit 0
+    true 
 fi
 
 # dh_installdeb will replace this with shell code automatically

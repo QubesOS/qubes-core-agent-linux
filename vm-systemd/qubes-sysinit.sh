@@ -34,6 +34,10 @@ mkdir -p /var/run/xen-hotplug
 # Set permissions to /proc/xen/xenbus, so normal user can use qubesdb-read
 chmod 666 /proc/xen/xenbus
 
+# Set permissions to /proc/xen/privcmd, so a user in qubes group can access
+chmod 660 /proc/xen/privcmd
+chgrp qubes /proc/xen/privcmd
+
 [ -e /proc/u2mfn ] || modprobe u2mfn
 # Set permissions to files needed to listen at vchan
 chmod 666 /proc/u2mfn
