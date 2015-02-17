@@ -243,7 +243,10 @@ int handle_remote_data(libvchan_t *data_vchan, int stdin_fd)
             case MSG_DATA_EXIT_CODE:
                 /* remote process exited, so there is no sense to send any data
                  * to it */
-                status = *(unsigned int *)buf;
+                if (hdr.len < sizeof(status))
+                    status = 255;
+                else
+                    memcpy(&status, buf, sizeof(status));
                 fprintf(stderr, "Remote service process exited with code %d\n", status);
                 return -2;
         }
