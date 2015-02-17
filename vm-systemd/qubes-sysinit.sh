@@ -26,6 +26,8 @@ while [ ! -e /proc/xen/xenbus ]; do
 done
 
 mkdir -p /var/run/qubes
+chgrp qubes /var/run/qubes
+chmod 0775 /var/run/qubes
 mkdir -p /var/run/qubes-service
 mkdir -p /var/run/xen-hotplug
 

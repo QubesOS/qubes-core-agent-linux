@@ -48,6 +48,8 @@ start()
 	INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
 	mkdir -p /var/run/qubes
+	chgrp qubes /var/run/qubes
+	chmod 0775 /var/run/qubes
 
 	if [ -e /dev/xvdb ] ; then
 		resize2fs /dev/xvdb 2> /dev/null || echo "'resize2fs /dev/xvdb' failed"
