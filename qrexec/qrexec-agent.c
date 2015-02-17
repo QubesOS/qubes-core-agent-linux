@@ -19,7 +19,10 @@
  *
  */
 
+#define _GNU_SOURCE
 #include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -38,7 +41,8 @@
 #include "qrexec-agent.h"
 
 struct _connection_info {
-    int pid;
+    int pid; /* pid of child process handling the data */
+    int fd;  /* socket to process handling the data (wait for EOF here) */
     int connect_domain;
     int connect_port;
 };
@@ -147,13 +151,70 @@ void wake_meminfo_writer()
     meminfo_write_started = 1;
 }
 
-void register_vchan_connection(pid_t pid, int domain, int port)
+int try_fork_server(int type, int connect_domain, int connect_port,
+        char *cmdline, int cmdline_len) {
+    char username[cmdline_len];
+    char *colon;
+    char *fork_server_socket_path;
+    int s, len;
+    struct sockaddr_un remote;
+    struct qrexec_cmd_info info;
+
+    strncpy(username, cmdline, cmdline_len);
+    colon = index(username, ':');
+    if (!colon)
+        return -1;
+    *colon = '\0';
+
+    if (asprintf(&fork_server_socket_path, QREXEC_FORK_SERVER_SOCKET, username) < 0) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return -1;
+    }
+
+    remote.sun_family = AF_UNIX;
+    strncpy(remote.sun_path, fork_server_socket_path,
+            sizeof(remote.sun_path));
+    free(fork_server_socket_path);
+
+    if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+        perror("socket");
+        return -1;
+    }
+    len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+    if (connect(s, (struct sockaddr *) &remote, len) == -1) {
+        if (errno != ECONNREFUSED)
+            perror("connect");
+        close(s);
+        return -1;
+    }
+
+    info.type = type;
+    info.connect_domain = connect_domain;
+    info.connect_port = connect_port;
+    info.cmdline_len = cmdline_len-(strlen(username)+1);
+    if (!write_all(s, &info, sizeof(info))) {
+        perror("write");
+        close(s);
+        return -1;
+    }
+    if (!write_all(s, colon+1, info.cmdline_len)) {
+        perror("write");
+        close(s);
+        return -1;
+    }
+
+    return s;
+}
+
+
+void register_vchan_connection(pid_t pid, int fd, int domain, int port)
 {
     int i;
 
     for (i = 0; i < MAX_FDS; i++) {
         if (connection_info[i].pid == 0) {
             connection_info[i].pid = pid;
+            connection_info[i].fd = fd;
             connection_info[i].connect_domain = domain;
             connection_info[i].connect_port = port;
             return;
@@ -176,11 +237,23 @@ void handle_server_exec_request(struct msg_header *hdr)
     if (libvchan_recv(ctrl_vchan, buf, hdr->len-sizeof(params)) < 0)
         handle_vchan_error("read exec cmd");
 
+    if ((hdr->type == MSG_EXEC_CMDLINE || hdr->type == MSG_JUST_EXEC) &&
+            !strstr(buf, ":nogui:")) {
+        int child_socket = try_fork_server(hdr->type,
+                params.connect_domain, params.connect_port,
+                buf, hdr->len-sizeof(params));
+        if (child_socket >= 0) {
+            register_vchan_connection(-1, child_socket,
+                    params.connect_domain, params.connect_port);
+            return;
+        }
+    }
+
     child_agent = handle_new_process(hdr->type,
             params.connect_domain, params.connect_port,
             buf, hdr->len-sizeof(params));
 
-    register_vchan_connection(child_agent,
+    register_vchan_connection(child_agent, -1,
             params.connect_domain, params.connect_port);
 }
 
@@ -280,6 +353,7 @@ void reap_children()
 int fill_fds_for_select(fd_set * rdset, fd_set * wrset)
 {
     int max = -1;
+    int i;
     FD_ZERO(rdset);
     FD_ZERO(wrset);
 
@@ -289,6 +363,14 @@ int fill_fds_for_select(fd_set * rdset, fd_set * wrset)
     FD_SET(passfd_socket, rdset);
     if (passfd_socket > max)
         max = passfd_socket;
+
+    for (i = 0; i < MAX_FDS; i++) {
+        if (connection_info[i].pid != 0 && connection_info[i].fd != -1) {
+            FD_SET(connection_info[i].fd, rdset);
+            if (connection_info[i].fd > max)
+                max = connection_info[i].fd;
+        }
+    }
     return max;
 }
 
@@ -329,6 +411,24 @@ void handle_trigger_io()
     }
 }
 
+void handle_terminated_fork_client(fd_set *rdset) {
+    int i, ret;
+    char buf[2];
+
+    for (i = 0; i < MAX_FDS; i++) {
+        if (connection_info[i].pid && connection_info[i].fd >= 0 &&
+                FD_ISSET(connection_info[i].fd, rdset)) {
+            ret = read(connection_info[i].fd, buf, sizeof(buf));
+            if (ret == 0 || (ret == -1 && errno == ECONNRESET)) {
+                close(connection_info[i].fd);
+                release_connection(i);
+            } else {
+                fprintf(stderr, "Unexpected read on fork-server connection: %d(%s)\n", ret, strerror(errno));
+            }
+        }
+    }
+}
+
 int main()
 {
     fd_set rdset, wrset;
@@ -362,5 +462,7 @@ int main()
 
         if (FD_ISSET(trigger_fd, &rdset))
             handle_trigger_io();
+
+        handle_terminated_fork_client(&rdset);
     }
 }

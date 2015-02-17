@@ -19,6 +19,8 @@
  *
  */
 
+#define QREXEC_FORK_SERVER_SOCKET "/var/run/qubes/qrexec-server.%s.sock"
+
 int handle_handshake(libvchan_t *ctrl);
 void handle_vchan_error(const char *op);
 void do_exec(const char *cmd);
@@ -26,3 +28,11 @@ void do_exec(const char *cmd);
 pid_t handle_new_process(int type,
         int connect_domain, int connect_port,
         char *cmdline, int cmdline_len);
+
+struct qrexec_cmd_info {
+	int type;
+	int connect_domain;
+	int connect_port;
+	int cmdline_len;
+	char cmdline[0];
+};
