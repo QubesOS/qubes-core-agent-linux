@@ -55,57 +55,43 @@ int passfd_socket;
 
 int meminfo_write_started = 0;
 
-void do_exec(const char *cmd);
+void no_colon_in_cmd()
+{
+    fprintf(stderr,
+            "cmdline is supposed to be in user:command form\n");
+    exit(1);
+}
+
+void do_exec(const char *cmd)
+{
+    char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - strlen(RPC_REQUEST_COMMAND) + 1];
+    char *realcmd = index(cmd, ':');
+    if (!realcmd)
+        no_colon_in_cmd();
+    /* mark end of username and move to command */
+    *realcmd = 0;
+    realcmd++;
+    /* ignore "nogui:" prefix in linux agent */
+    if (strncmp(realcmd, "nogui:", 6) == 0)
+        realcmd+=6;
+    /* replace magic RPC cmd with RPC multiplexer path */
+    if (strncmp(realcmd, RPC_REQUEST_COMMAND " ", strlen(RPC_REQUEST_COMMAND)+1)==0) {
+        strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
+        strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + strlen(RPC_REQUEST_COMMAND));
+        realcmd = buf;
+    }
+    signal(SIGCHLD, SIG_DFL);
+    signal(SIGPIPE, SIG_DFL);
+
+    execl("/bin/su", "su", "-", cmd, "-c", realcmd, NULL);
+    perror("execl");
+    exit(1);
+}
 
 void handle_vchan_error(const char *op)
 {
     fprintf(stderr, "Error while vchan %s, exiting\n", op);
     exit(1);
-}
-
-int handle_handshake(libvchan_t *ctrl)
-{
-    struct msg_header hdr;
-    struct peer_info info;
-
-    /* send own HELLO */
-    hdr.type = MSG_HELLO;
-    hdr.len = sizeof(info);
-    info.version = QREXEC_PROTOCOL_VERSION;
-
-    if (libvchan_send(ctrl, &hdr, sizeof(hdr)) != sizeof(hdr)) {
-        fprintf(stderr, "Failed to send HELLO hdr to agent\n");
-        return -1;
-    }
-
-    if (libvchan_send(ctrl, &info, sizeof(info)) != sizeof(info)) {
-        fprintf(stderr, "Failed to send HELLO hdr to agent\n");
-        return -1;
-    }
-
-    /* receive MSG_HELLO from remote */
-    if (libvchan_recv(ctrl, &hdr, sizeof(hdr)) != sizeof(hdr)) {
-        fprintf(stderr, "Failed to read agent HELLO hdr\n");
-        return -1;
-    }
-
-    if (hdr.type != MSG_HELLO || hdr.len != sizeof(info)) {
-        fprintf(stderr, "Invalid HELLO packet received: type %d, len %d\n", hdr.type, hdr.len);
-        return -1;
-    }
-
-    if (libvchan_recv(ctrl, &info, sizeof(info)) != sizeof(info)) {
-        fprintf(stderr, "Failed to read agent HELLO body\n");
-        return -1;
-    }
-
-    if (info.version != QREXEC_PROTOCOL_VERSION) {
-        fprintf(stderr, "Incompatible agent protocol version (remote %d, local %d)\n", info.version, QREXEC_PROTOCOL_VERSION);
-        return -1;
-    }
-
-
-    return 0;
 }
 
 void init()
@@ -262,27 +248,31 @@ int find_connection(int pid)
     return -1;
 }
 
+void release_connection(int id) {
+    struct msg_header hdr;
+    struct exec_params params;
+
+    hdr.type = MSG_CONNECTION_TERMINATED;
+    hdr.len = sizeof(struct exec_params);
+    params.connect_domain = connection_info[id].connect_domain;
+    params.connect_port = connection_info[id].connect_port;
+    if (libvchan_send(ctrl_vchan, &hdr, sizeof(hdr)) < 0)
+        handle_vchan_error("send");
+    if (libvchan_send(ctrl_vchan, &params, sizeof(params)) < 0)
+        handle_vchan_error("send");
+    connection_info[id].pid = 0;
+}
 
 void reap_children()
 {
     int status;
     int pid;
     int id;
-    struct msg_header hdr;
-    struct exec_params params;
     while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
         id = find_connection(pid);
         if (id < 0)
             continue;
-        hdr.type = MSG_CONNECTION_TERMINATED;
-        hdr.len = sizeof(struct exec_params);
-        params.connect_domain = connection_info[id].connect_domain;
-        params.connect_port = connection_info[id].connect_port;
-        if (libvchan_send(ctrl_vchan, &hdr, sizeof(hdr)) < 0)
-            handle_vchan_error("send");
-        if (libvchan_send(ctrl_vchan, &params, sizeof(params)) < 0)
-            handle_vchan_error("send");
-        connection_info[id].pid = 0;
+        release_connection(id);
     }
     child_exited = 0;
 }

@@ -21,6 +21,7 @@
 
 int handle_handshake(libvchan_t *ctrl);
 void handle_vchan_error(const char *op);
+void do_exec(const char *cmd);
 
 pid_t handle_new_process(int type,
         int connect_domain, int connect_port,

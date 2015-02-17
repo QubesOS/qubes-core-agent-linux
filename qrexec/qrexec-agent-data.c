@@ -45,8 +45,8 @@ pid_t child_process_pid;
 
 static void sigchld_handler(int __attribute__((__unused__))x)
 {
-	child_exited = 1;
-	signal(SIGCHLD, sigchld_handler);
+    child_exited = 1;
+    signal(SIGCHLD, sigchld_handler);
 }
 
 static void sigusr1_handler(int __attribute__((__unused__))x)
@@ -55,43 +55,55 @@ static void sigusr1_handler(int __attribute__((__unused__))x)
     signal(SIGUSR1, SIG_IGN);
 }
 
-
-void no_colon_in_cmd()
+int handle_handshake(libvchan_t *ctrl)
 {
-	fprintf(stderr,
-		"cmdline is supposed to be in user:command form\n");
-	exit(1);
+    struct msg_header hdr;
+    struct peer_info info;
+
+    /* send own HELLO */
+    hdr.type = MSG_HELLO;
+    hdr.len = sizeof(info);
+    info.version = QREXEC_PROTOCOL_VERSION;
+
+    if (libvchan_send(ctrl, &hdr, sizeof(hdr)) != sizeof(hdr)) {
+        fprintf(stderr, "Failed to send HELLO hdr to agent\n");
+        return -1;
+    }
+
+    if (libvchan_send(ctrl, &info, sizeof(info)) != sizeof(info)) {
+        fprintf(stderr, "Failed to send HELLO hdr to agent\n");
+        return -1;
+    }
+
+    /* receive MSG_HELLO from remote */
+    if (libvchan_recv(ctrl, &hdr, sizeof(hdr)) != sizeof(hdr)) {
+        fprintf(stderr, "Failed to read agent HELLO hdr\n");
+        return -1;
+    }
+
+    if (hdr.type != MSG_HELLO || hdr.len != sizeof(info)) {
+        fprintf(stderr, "Invalid HELLO packet received: type %d, len %d\n", hdr.type, hdr.len);
+        return -1;
+    }
+
+    if (libvchan_recv(ctrl, &info, sizeof(info)) != sizeof(info)) {
+        fprintf(stderr, "Failed to read agent HELLO body\n");
+        return -1;
+    }
+
+    if (info.version != QREXEC_PROTOCOL_VERSION) {
+        fprintf(stderr, "Incompatible agent protocol version (remote %d, local %d)\n", info.version, QREXEC_PROTOCOL_VERSION);
+        return -1;
+    }
+
+
+    return 0;
 }
 
-void do_exec(char *cmd)
-{
-	char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - strlen(RPC_REQUEST_COMMAND) + 1];
-	char *realcmd = index(cmd, ':');
-	if (!realcmd)
-		no_colon_in_cmd();
-	/* mark end of username and move to command */
-	*realcmd = 0;
-	realcmd++;
-	/* ignore "nogui:" prefix in linux agent */
-	if (strncmp(realcmd, "nogui:", 6) == 0)
-		realcmd+=6;
-	/* replace magic RPC cmd with RPC multiplexer path */
-	if (strncmp(realcmd, RPC_REQUEST_COMMAND " ", strlen(RPC_REQUEST_COMMAND)+1)==0) {
-		strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
-		strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + strlen(RPC_REQUEST_COMMAND));
-		realcmd = buf;
-	}
-	signal(SIGCHLD, SIG_DFL);
-	signal(SIGPIPE, SIG_DFL);
-
-	execl("/bin/su", "su", "-", cmd, "-c", realcmd, NULL);
-	perror("execl");
-	exit(1);
-}
 
 int handle_just_exec(char *cmdline)
 {
-	int fdn, pid;
+    int fdn, pid;
 
     switch (pid = fork()) {
         case -1:
@@ -105,20 +117,20 @@ int handle_just_exec(char *cmdline)
             exit(1);
         default:;
     }
-	fprintf(stderr, "executed (nowait) %s pid %d\n", cmdline, pid);
+    fprintf(stderr, "executed (nowait) %s pid %d\n", cmdline, pid);
     return 0;
 }
 
 void send_exit_code(libvchan_t *data_vchan, int status)
 {
-	struct msg_header hdr;
-	hdr.type = MSG_DATA_EXIT_CODE;
-	hdr.len = sizeof(status);
-	if (libvchan_send(data_vchan, &hdr, sizeof(hdr)) < 0)
-		handle_vchan_error("write hdr");
-	if (libvchan_send(data_vchan, &status, sizeof(status)) < 0)
-		handle_vchan_error("write status");
-	fprintf(stderr, "send exit code %d\n", status);
+    struct msg_header hdr;
+    hdr.type = MSG_DATA_EXIT_CODE;
+    hdr.len = sizeof(status);
+    if (libvchan_send(data_vchan, &hdr, sizeof(hdr)) < 0)
+        handle_vchan_error("write hdr");
+    if (libvchan_send(data_vchan, &status, sizeof(status)) < 0)
+        handle_vchan_error("write status");
+    fprintf(stderr, "send exit code %d\n", status);
 }
 
 /* handle data from specified FD and send over vchan link
