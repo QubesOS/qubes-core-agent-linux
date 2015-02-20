@@ -15,6 +15,6 @@ source-debian-quilt-copy-in: VERSION = $(shell cat $(ORIG_SRC)/version)
 source-debian-quilt-copy-in: ORIG_FILE = "$(CHROOT_DIR)/$(DIST_SRC)/../qubes-core-agent_$(VERSION).orig.tar.gz"
 source-debian-quilt-copy-in:
 	-$(shell $(ORIG_SRC)/debian-quilt $(ORIG_SRC)/series-debian-vm.conf $(CHROOT_DIR)/$(DIST_SRC)/debian/patches)
-	tar cvfz $(ORIG_FILE) --exclude-vcs --exclude=deb --exclude=rpm --exclude=pkgs --exclude=debian -C $(CHROOT_DIR)/$(DIST_SRC) .
+	tar cfz $(ORIG_FILE) --exclude-vcs --exclude=rpm --exclude=pkgs --exclude=deb --exclude=debian -C $(CHROOT_DIR)/$(DIST_SRC) .
 
 # vim: filetype=make
