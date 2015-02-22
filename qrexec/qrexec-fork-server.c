@@ -94,6 +94,16 @@ int main(int argc, char **argv) {
 		perror("fcntl");
 		exit(1);
 	}
+    /* fork into background */
+    switch (fork()) {
+        case -1:
+            perror("fork");
+            exit(1);
+        case 0:
+            break;
+        default:
+            exit(0);
+    }
 	signal(SIGCHLD, SIG_IGN);
     register_exec_func(do_exec);
 
