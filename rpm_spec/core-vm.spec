@@ -266,11 +266,6 @@ if [ ! -f '/etc/sysconfig/ip6tables' ]; then
   cp -p /usr/lib/qubes/init/ip6tables /etc/sysconfig/ip6tables
 fi
 
-# Remove Nautilus actions as they have been replaced with nautilus-python
-rm -f /usr/share/file-manager/actions/qvm-copy-gnome.desktop
-rm -f /usr/share/file-manager/actions/qvm-move-gnome.desktop
-rm -f /usr/share/file-manager/actions/qvm-dvm-gnome.desktop
-
 if [ "$1" !=  1 ] ; then
 # do the rest of %post thing only when updating for the first time...
 exit 0
