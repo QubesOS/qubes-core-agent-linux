@@ -302,6 +302,11 @@ case "${1}" in
         # XXX: TODO: Needs to be implemented still
         # These do not exist on debian; maybe a different package name
         #    ntpd.service \
+
+        # Remove Nautilus actions as they have been replaced with nautilus-python
+        rm -f /usr/share/file-manager/actions/qvm-copy-gnome.desktop
+        rm -f /usr/share/file-manager/actions/qvm-move-gnome.desktop
+        rm -f /usr/share/file-manager/actions/qvm-dvm-gnome.desktop
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
