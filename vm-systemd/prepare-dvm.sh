@@ -9,7 +9,7 @@ possibly_run_save_script()
 	Xorg -config /etc/X11/xorg-preload-apps.conf :0 &
 	while ! [ -S /tmp/.X11-unix/X0 ]; do sleep 0.5; done
 	DISPLAY=:0 su - user -c /tmp/qubes-save-script
-	killall Xorg
+	killall Xorg Xorg.bin
 }
 
 if xenstore-read qubes-save-request 2>/dev/null ; then
