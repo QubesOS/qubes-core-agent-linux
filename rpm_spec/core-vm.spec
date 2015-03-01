@@ -45,7 +45,7 @@ Requires:   ethtool
 Requires:   tinyproxy
 Requires:   ntpdate
 Requires:   net-tools
-Requires:   nautilus-actions
+Requires:   nautilus-python
 Requires:   qubes-core-vm-kernel-placeholder
 Requires:   qubes-utils
 Requires:   initscripts
@@ -389,7 +389,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
 /etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
-/etc/xdg/nautilus-actions/nautilus-actions.conf
 /etc/xen/scripts/vif-route-qubes
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo
@@ -441,9 +440,10 @@ rm -f %{name}-%{version}
 /usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
 /usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.override
-/usr/share/file-manager/actions/qvm-copy-gnome.desktop
-/usr/share/file-manager/actions/qvm-move-gnome.desktop
-/usr/share/file-manager/actions/qvm-dvm-gnome.desktop
+/usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
+/usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
+/usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
+
 %dir /usr/share/qubes
 /usr/share/qubes/mime-override/globs
 %dir /home_volatile
