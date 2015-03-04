@@ -6,15 +6,11 @@ possibly_run_save_script()
 	if [ -z "$ENCODED_SCRIPT" ] ; then return ; fi
 	echo $ENCODED_SCRIPT|perl -e 'use MIME::Base64 qw(decode_base64); local($/) = undef;print decode_base64(<STDIN>)' >/tmp/qubes-save-script
 	chmod 755 /tmp/qubes-save-script
-	while ! [ -S /tmp/.X11-unix/X0 ]; do sleep 0.5; done
 	DISPLAY=:0 su - user -c /tmp/qubes-save-script
 }
 
 if true; then
-    systemctl --ignore-dependencies start qubes-gui-agent.service
-    while ! xenstore-read qubes-save-request 2>/dev/null ; do
-        usleep 10
-    done
+    echo user | /bin/sh /etc/qubes-rpc/qubes.WaitForSession
     possibly_run_save_script
     umount /rw
     dmesg -c >/dev/null
