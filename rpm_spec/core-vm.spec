@@ -546,6 +546,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-dvm.service
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-firewall.service
+/lib/systemd/system/qubes-mount-home.service
 /lib/systemd/system/qubes-netwatcher.service
 /lib/systemd/system/qubes-network.service
 /lib/systemd/system/qubes-sysinit.service
@@ -561,6 +562,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/network-proxy-setup.sh
 /usr/lib/qubes/init/misc-post.sh
 /usr/lib/qubes/init/misc-post-stop.sh
+/usr/lib/qubes/init/mount-home.sh
 /usr/lib/qubes/init/qubes-sysinit.sh
 /usr/lib/qubes/init/ModemManager.service
 /usr/lib/qubes/init/NetworkManager.service
@@ -580,7 +582,7 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
-for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-firewall qubes-updates-proxy qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-home qubes-netwatcher qubes-network qubes-firewall qubes-updates-proxy qubes-qrexec-agent; do
     /bin/systemctl --no-reload enable $srv.service 2> /dev/null
 done
 
@@ -648,6 +650,6 @@ if [ "$1" != 0 ] ; then
     exit 0
 fi
 
-for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-netwatcher qubes-network qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-home qubes-netwatcher qubes-network qubes-qrexec-agent; do
     /bin/systemctl disable $srv.service
 do

@@ -11,17 +11,10 @@ possibly_run_save_script()
 }
 
 if true; then
-    if [ -L /home ]; then
-        rm /home
-        mkdir /home
-    fi
-    mount --bind /home_volatile /home
-    touch /etc/this-is-dvm
     systemctl --ignore-dependencies start qubes-gui-agent.service
     while ! xenstore-read qubes-save-request 2>/dev/null ; do
         usleep 10
     done
-    mount /rw
     possibly_run_save_script
     umount /rw
     dmesg -c >/dev/null

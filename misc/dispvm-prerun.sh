@@ -32,10 +32,4 @@ echo "Closing windows..."
 sleep 1
 fuser -vkm /rw
 
-if [ -e /rw/home/user/.qubes-dispvm-customized ]; then
-	cp -af /rw/home/user /home/
-else
-	cat /etc/dispvm-dotfiles.tbz | tar -xjf- --overwrite -C /home/user --owner user 2>&1 >>/tmp/dispvm-dotfiles-errors.log
-fi
-
 echo done.
