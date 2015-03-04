@@ -14,18 +14,13 @@ if true; then
     possibly_run_save_script
     umount /rw
     dmesg -c >/dev/null
+    qubesdb-watch /qubes-restore-complete &
+    watch_pid=$!
     free | grep Mem: | 
         (read label total used free shared buffers cached; qubesdb-write /qubes-used-mem $[ $used + $cached ])
-    # give dom0 time to read some entries, when done it will shutdown qubesdb,
-    # so wait for it
-    qubesdb-watch /stop-qubesdb
-    # just to make sure
-    systemctl stop qubes-db.service
-
     # we're still running in DispVM template
     echo "Waiting for save/restore..."
-    # the service will start only after successful restore
-    systemctl start qubes-db.service
+    qubesdb-read /qubes-restore-complete || wait $watch_pid
     echo Back to life.
 fi
 
