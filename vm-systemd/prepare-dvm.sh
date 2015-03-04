@@ -15,7 +15,7 @@ if true; then
     umount /rw
     dmesg -c >/dev/null
     free | grep Mem: | 
-        (read a b c d ; qubesdb-write /qubes-used-mem $c)
+        (read label total used free shared buffers cached; qubesdb-write /qubes-used-mem $[ $used + $cached ])
     # give dom0 time to read some entries, when done it will shutdown qubesdb,
     # so wait for it
     qubesdb-watch /stop-qubesdb
