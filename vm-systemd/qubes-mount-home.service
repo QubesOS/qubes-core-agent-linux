@@ -1,0 +1,13 @@
+[Unit]
+Description=Mount /rw and /home, initialize them if needed
+Before=qubes-gui-agent.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/qubes/init/mount-home.sh
+ExecStop=/sbin/fuser -kMm /home ; /bin/umount /home
+ExecStopPost=-/bin/umount /rw
+
+[Install]
+WantedBy=multi-user.target

@@ -15,15 +15,26 @@ int close_window(Display *d, XID window) {
 	return XSendEvent(ev.display, ev.window, True, 0, (XEvent *) & ev);
 }
 
+int is_window_visible(Display *d, XID window) {
+    XWindowAttributes xwa;
+
+    if (!XGetWindowAttributes(d, window, &xwa))
+        return 0;
+    return xwa.map_state == IsViewable;
+}
+
 int main(int argc, char **argv) {
 	int i;
 	Display *d;
+	XID w;
 
 	d = XOpenDisplay(NULL);
 	if (!d)
 		exit(1);
 	for (i=1; i<argc; i++) {
-		close_window(d, strtoul(argv[i], NULL, 0));
+        w = strtoul(argv[i], NULL, 0);
+        if (is_window_visible(d, w))
+                close_window(d, w);
 	}
 	XSync(d, False);
 	XCloseDisplay(d);

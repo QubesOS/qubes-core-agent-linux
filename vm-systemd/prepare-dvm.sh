@@ -6,35 +6,21 @@ possibly_run_save_script()
 	if [ -z "$ENCODED_SCRIPT" ] ; then return ; fi
 	echo $ENCODED_SCRIPT|perl -e 'use MIME::Base64 qw(decode_base64); local($/) = undef;print decode_base64(<STDIN>)' >/tmp/qubes-save-script
 	chmod 755 /tmp/qubes-save-script
-	Xorg -config /etc/X11/xorg-preload-apps.conf :0 &
-	while ! [ -S /tmp/.X11-unix/X0 ]; do sleep 0.5; done
 	DISPLAY=:0 su - user -c /tmp/qubes-save-script
-	killall Xorg Xorg.bin
 }
 
-if qubesdb-read /qubes-save-request 2>/dev/null ; then
-    if [ -L /home ]; then
-        rm /home
-        mkdir /home
-    fi
-    mount --bind /home_volatile /home
-    touch /etc/this-is-dvm
-    mount /rw
+if true; then
+    echo user | /bin/sh /etc/qubes-rpc/qubes.WaitForSession
     possibly_run_save_script
     umount /rw
     dmesg -c >/dev/null
+    qubesdb-watch /qubes-restore-complete &
+    watch_pid=$!
     free | grep Mem: | 
-        (read a b c d ; qubesdb-write /qubes-used-mem $c)
-    # give dom0 time to read some entries, when done it will shutdown qubesdb,
-    # so wait for it
-    qubesdb-watch /stop-qubesdb
-    # just to make sure
-    systemctl stop qubes-db.service
-
+        (read label total used free shared buffers cached; qubesdb-write /qubes-used-mem $[ $used + $cached ])
     # we're still running in DispVM template
     echo "Waiting for save/restore..."
-    # the service will start only after successful restore
-    systemctl start qubes-db.service
+    qubesdb-read /qubes-restore-complete || wait $watch_pid
     echo Back to life.
 fi
 
