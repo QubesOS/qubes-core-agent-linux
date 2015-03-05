@@ -1,3 +1,29 @@
+qubes-core-agent (2.1.56) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * network: fix handling newline in firewall rules
+  * updates-proxy: allow xz compressed metadata (fc21)
+  * backup: fix qubes.Restore service - do not send garbage as backup
+    data
+  * Fix "backup: fix qubes.Restore service - do not send garbage as
+    backup data"
+
+  [ Jason Mehring ]
+  * Switched qvm-move-to-vm.{gnome,kde} scripts to use bash not sh
+  * Removed nautilus-actions depend and replaced with nautilus-python
+  * Removed code that deleted original nautilus actions
+
+  [ Marek Marczykowski-Górecki ]
+  * fc21: fix DispVM preparation - Xorg has new name
+  * dispvm: kill all process after populating caches
+  * dispvm: close only visible windows during DispVM preparation
+
+  [ Jason Mehring ]
+  * debian: Remove 'exit 0' in maintainer section scripts to all other
+    debhelpers (if any) to also execute
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 05 Mar 2015 03:40:08 +0100
+
 qubes-core-agent (2.1.55) jessie; urgency=medium
 
   * debian: change systemctl set-default back to manual symlink
