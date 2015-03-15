@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <errno.h>
 #include "qrexec.h"
 int connect_unix_socket()
 {
@@ -57,20 +58,60 @@ char *get_program_name(char *prog)
         return prog;
 }
 
+/* Returns:
+ *  0  - ok
+ *  -1 - EOF, FDs closed
+ *  -2 - error, already reported, break the loop
+ */
+static int handle_fd_data(int src, int dst) {
+    char buf[4096];
+    int buf_len, len, ret;
+
+    ret = read(src, buf, sizeof(buf));
+    if (ret == -1) {
+        perror("read");
+        return -2;
+    }
+    if (ret == 0) {
+        close(src);
+        close(dst);
+        return -1;
+    } else {
+        len = 0;
+        buf_len = ret;
+        while (len < buf_len) {
+            ret = write(dst, buf, ret);
+            if (ret == -1) {
+                if (errno == ECONNRESET || errno == EPIPE) {
+                    close(src);
+                    close(dst);
+                    return -1;
+                } else
+                    return -2;
+            } else
+                len += ret;
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     int trigger_fd;
     struct trigger_connect_params params;
     int local_fd[3], remote_fd[3];
     int i;
+    int exec_local_process = 0;
     char *abs_exec_path;
 
-    if (argc < 4) {
+    if (argc < 3) {
         fprintf(stderr,
-            "usage: %s target_vmname program_ident local_program [local program arguments]\n",
-            argv[0]);
+                "usage: %s target_vmname program_ident [local_program [local program arguments]]\n",
+                argv[0]);
         exit(1);
     }
+    if (argc > 3)
+        exec_local_process = 1;
 
     trigger_fd = open(QREXEC_AGENT_TRIGGER_PATH, O_WRONLY);
     if (trigger_fd < 0) {
@@ -84,15 +125,18 @@ int main(int argc, char **argv)
             perror("read client fd");
             exit(1);
         }
-        if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
-            char *env;
-            if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
-                perror("prepare SAVED_FD_");
-                exit(1);
-            }
-            putenv(env);
-            dup2(local_fd[i], i);
-            close(local_fd[i]);
+        if (exec_local_process) {
+            if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
+                char *env;
+                if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
+                    perror("prepare SAVED_FD_");
+                    exit(1);
+                }
+                putenv(env);
+                dup2(local_fd[i], i);
+                close(local_fd[i]);
+            } else
+                close(local_fd[i]);
         }
     }
 
@@ -112,9 +156,50 @@ int main(int argc, char **argv)
 
     close(trigger_fd);
 
-    abs_exec_path = strdup(argv[3]);
-    argv[3] = get_program_name(argv[3]);
-    execv(abs_exec_path, argv + 3);
-    perror("execv");
-    return 1;
+    if (exec_local_process) {
+        abs_exec_path = strdup(argv[3]);
+        argv[3] = get_program_name(argv[3]);
+        execv(abs_exec_path, argv + 3);
+        perror("execv");
+        return 1;
+    } else {
+        fd_set rd_set;
+        int ret, max_fd;
+
+        while (local_fd[0] > 0 || local_fd[1] > 0) {
+            FD_ZERO(&rd_set);
+            max_fd = 0;
+            if (local_fd[1] > 0) {
+                FD_SET(0, &rd_set);
+            }
+            if (local_fd[0] > 0) {
+                FD_SET(local_fd[0], &rd_set);
+                max_fd = local_fd[0];
+            }
+            ret = select(max_fd+1, &rd_set, NULL, NULL, NULL);
+            if (ret == -1) {
+                perror("select");
+                break;
+            }
+            if (FD_ISSET(0, &rd_set)) {
+                switch (handle_fd_data(0, local_fd[1])) {
+                    case -1:
+                        local_fd[1] = -1;
+                        break;
+                    case -2:
+                        exit(1);
+                }
+            }
+            if (FD_ISSET(local_fd[0], &rd_set)) {
+                switch (handle_fd_data(local_fd[0], 1)) {
+                    case -1:
+                        local_fd[0] = -1;
+                        break;
+                    case -2:
+                        exit(1);
+                }
+            }
+        }
+    }
+    return 0;
 }
