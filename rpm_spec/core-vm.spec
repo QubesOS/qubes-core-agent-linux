@@ -396,6 +396,7 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-mru-entry
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
+/usr/bin/qrexec-client-vm
 %dir /usr/lib/qubes
 /usr/lib/qubes/vusb-ctl.py*
 /usr/lib/qubes/dispvm-prerun.sh
