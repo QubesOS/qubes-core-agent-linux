@@ -28,6 +28,10 @@ void do_exec(const char *cmd);
 pid_t handle_new_process(int type,
         int connect_domain, int connect_port,
         char *cmdline, int cmdline_len);
+void handle_data_client(int type,
+        int connect_domain, int connect_port,
+        int stdin_fd, int stdout_fd, int stderr_fd);
+
 
 struct qrexec_cmd_info {
 	int type;

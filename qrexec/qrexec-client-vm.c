@@ -20,14 +20,29 @@
  */
 #define _GNU_SOURCE
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <sys/un.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include "libqrexec-utils.h"
 #include "qrexec.h"
-int connect_unix_socket()
+#include "qrexec-agent.h"
+
+void handle_vchan_error(const char *op)
+{
+    fprintf(stderr, "Error while vchan %s, exiting\n", op);
+    exit(1);
+}
+
+void do_exec(const char *cmd __attribute__((__unused__))) {
+    fprintf(stderr, "BUG: do_exec function shouldn't be called!\n");
+    exit(1);
+}
+
+int connect_unix_socket(char *path)
 {
     int s, len;
     struct sockaddr_un remote;
@@ -38,7 +53,7 @@ int connect_unix_socket()
     }
 
     remote.sun_family = AF_UNIX;
-    strncpy(remote.sun_path, QREXEC_AGENT_FDPASS_PATH,
+    strncpy(remote.sun_path, path,
             sizeof(remote.sun_path));
     len = strlen(remote.sun_path) + sizeof(remote.sun_family);
     if (connect(s, (struct sockaddr *) &remote, len) == -1) {
@@ -61,9 +76,12 @@ int main(int argc, char **argv)
 {
     int trigger_fd;
     struct trigger_service_params params;
-    int local_fd[3], remote_fd[3];
-    int i;
+    struct exec_params exec_params;
+    int ret, i;
     char *abs_exec_path;
+    pid_t child_pid;
+    int inpipe[2], outpipe[2];
+    char pid_s[10];
 
     if (argc < 4) {
         fprintf(stderr,
@@ -72,50 +90,76 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    trigger_fd = open(QREXEC_AGENT_TRIGGER_PATH, O_WRONLY);
-    if (trigger_fd < 0) {
-        perror("open " QREXEC_AGENT_TRIGGER_PATH);
-        exit(1);
-    }
-
-    for (i = 0; i < 3; i++) {
-        local_fd[i] = connect_unix_socket();
-        if (read(local_fd[i], &remote_fd[i], sizeof(remote_fd[i])) != sizeof(remote_fd[i])) {
-            perror("read client fd");
-            exit(1);
-        }
-        if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
-            char *env;
-            if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
-                perror("prepare SAVED_FD_");
-                exit(1);
-            }
-            putenv(env);
-            dup2(local_fd[i], i);
-            close(local_fd[i]);
-        } else
-            close(local_fd[i]);
-    }
+    trigger_fd = connect_unix_socket(QREXEC_AGENT_TRIGGER_PATH);
 
     memset(&params, 0, sizeof(params));
     strncpy(params.service_name, argv[2], sizeof(params.service_name));
     strncpy(params.target_domain, argv[1],
             sizeof(params.target_domain));
     snprintf(params.request_id.ident,
-            sizeof(params.request_id.ident), "%d %d %d",
-            remote_fd[0], remote_fd[1], remote_fd[2]);
+            sizeof(params.request_id.ident), "SOCKET");
 
     if (write(trigger_fd, &params, sizeof(params)) < 0) {
-        if (!getenv("PASS_LOCAL_STDERR"))
-            perror("write to agent");
+        perror("write to agent");
+        exit(1);
+    }
+    ret = read(trigger_fd, &exec_params, sizeof(exec_params));
+    if (ret == 0) {
+        fprintf(stderr, "Request refused\n");
+        exit(1);
+    }
+    if (ret < 0 || ret != sizeof(exec_params)) {
+        perror("read");
         exit(1);
     }
 
-    close(trigger_fd);
+    if (socketpair(AF_UNIX, SOCK_STREAM, 0, inpipe) ||
+            socketpair(AF_UNIX, SOCK_STREAM, 0, outpipe)) {
+        perror("socketpair");
+        exit(1);
+    }
+    snprintf(pid_s, sizeof(pid_s), "%d", getpid());
+    setenv("QREXEC_AGENT_PID", pid_s, 1);
 
-    abs_exec_path = strdup(argv[3]);
-    argv[3] = get_program_name(argv[3]);
-    execv(abs_exec_path, argv + 3);
-    perror("execv");
-    return 1;
+    switch (child_pid = fork()) {
+    case -1:
+        perror("fork");
+        exit(-1);
+    case 0:
+        close(inpipe[1]);
+        close(outpipe[0]);
+        close(trigger_fd);
+        for (i = 0; i < 3; i++) {
+            if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
+                char *env;
+                if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
+                    perror("prepare SAVED_FD_");
+                    exit(1);
+                }
+                putenv(env);
+            }
+        }
+
+        dup2(inpipe[0], 0);
+        dup2(outpipe[1], 1);
+        close(inpipe[0]);
+        close(outpipe[1]);
+
+        abs_exec_path = strdup(argv[3]);
+        argv[3] = get_program_name(argv[3]);
+        execv(abs_exec_path, argv + 3);
+        perror("execv");
+        exit(-1);
+    }
+    close(inpipe[0]);
+    close(outpipe[1]);
+
+    handle_data_client(MSG_SERVICE_CONNECT,
+            exec_params.connect_domain, exec_params.connect_port,
+            inpipe[1], outpipe[0], -1);
+
+    close(trigger_fd);
+    waitpid(child_pid, &i, 0);
+
+    return 0;
 }

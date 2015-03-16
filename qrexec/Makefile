@@ -6,7 +6,7 @@ LDLIBS=`pkg-config --libs vchan-$(BACKEND_VMM)` -lqrexec-utils
 all: qrexec-agent qrexec-client-vm qrexec-fork-server
 qrexec-agent: qrexec-agent.o qrexec-agent-data.o
 qrexec-fork-server: qrexec-fork-server.o qrexec-agent-data.o
-qrexec-client-vm: qrexec-client-vm.o
+qrexec-client-vm: qrexec-client-vm.o qrexec-agent-data.o
 clean:
 	rm -f *.o *~ qrexec-agent qrexec-client-vm
 

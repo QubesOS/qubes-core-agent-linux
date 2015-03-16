@@ -32,6 +32,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <libvchan.h>
+#include <assert.h>
 #include "qrexec.h"
 #include "libqrexec-utils.h"
 #include "qrexec-agent.h"
@@ -42,6 +43,7 @@ static volatile int child_exited;
 static volatile int stdio_socket_requested;
 int stdout_msg_type = MSG_DATA_STDOUT;
 pid_t child_process_pid;
+int remote_process_status = 0;
 
 static void sigchld_handler(int __attribute__((__unused__))x)
 {
@@ -386,45 +388,37 @@ void process_child_io(libvchan_t *data_vchan,
                 stdout_fd = -1;
                 close(stderr_fd);
                 stderr_fd = -1;
+                /* we do not care for any local process */
+                return;
                 break;
         }
     }
 }
 
-pid_t handle_new_process(int type, int connect_domain, int connect_port,
-        char *cmdline, int cmdline_len)
+/* Behaviour depends on type parameter:
+ *  MSG_SERVICE_CONNECT - create vchan server, pass the data to/from given FDs
+ *    (stdin_fd, stdout_fd, stderr_fd), then return 0
+ *  MSG_JUST_EXEC - connect to vchan server, fork+exec process given by cmdline
+ *    parameter, send artificial exit code "0" (local process can still be
+ *    running), then return 0
+ *  MSG_EXEC_CMDLINE - connect to vchan server, fork+exec process given by
+ *    cmdline parameter, pass the data to/from that process, then return local
+ *    process exit code
+ */
+int handle_new_process_common(int type, int connect_domain, int connect_port,
+                char *cmdline, int cmdline_len, /* MSG_JUST_EXEC and MSG_EXEC_CMDLINE */
+                int stdin_fd, int stdout_fd, int stderr_fd /* MSG_SERVICE_CONNECT */)
 {
-    struct service_params *svc_params = (struct service_params*)cmdline;
     libvchan_t *data_vchan;
+    int exit_code = 0;
     pid_t pid;
-    int stdin_fd, stdout_fd, stderr_fd;
     char pid_s[10];
 
-    if (type == MSG_SERVICE_CONNECT) {
-        if (cmdline_len != sizeof(*svc_params)) {
-            fprintf(stderr, "Invalid MSG_SERVICE_CONNECT packet (cmdline len %d)\n", cmdline_len);
-            return -1;
-        }
-        sscanf(cmdline, "%d %d %d", &stdin_fd, &stdout_fd, &stderr_fd);
+    if (type != MSG_SERVICE_CONNECT) {
+        assert(cmdline != NULL);
+        cmdline[cmdline_len-1] = 0;
     }
 
-    switch (pid=fork()){
-        case -1:
-            perror("fork");
-            return -1;
-        case 0:
-            break;
-        default:
-            if (type == MSG_SERVICE_CONNECT) {
-                /* no longer needed in parent process */
-                close(stdin_fd);
-                close(stdout_fd);
-                close(stderr_fd);
-            }
-            return pid;
-    }
-
-    /* child process */
     if (type == MSG_SERVICE_CONNECT) {
         data_vchan = libvchan_server_init(connect_domain, connect_port,
                 VCHAN_BUFFER_SIZE, VCHAN_BUFFER_SIZE);
@@ -448,13 +442,13 @@ pid_t handle_new_process(int type, int connect_domain, int connect_port,
     switch (type) {
         case MSG_JUST_EXEC:
             send_exit_code(data_vchan, handle_just_exec(cmdline));
-            libvchan_close(data_vchan);
             break;
         case MSG_EXEC_CMDLINE:
             do_fork_exec(cmdline, &pid, &stdin_fd, &stdout_fd, &stderr_fd);
             fprintf(stderr, "executed %s pid %d\n", cmdline, pid);
             child_process_pid = pid;
-            process_child_io(data_vchan, stdin_fd, stdout_fd, stderr_fd);
+            exit_code = process_child_io(data_vchan, stdin_fd, stdout_fd, stderr_fd);
+            fprintf(stderr, "pid %d exited with %d\n", pid, exit_code);
             break;
         case MSG_SERVICE_CONNECT:
             child_process_pid = 0;
@@ -462,7 +456,44 @@ pid_t handle_new_process(int type, int connect_domain, int connect_port,
             process_child_io(data_vchan, stdin_fd, stdout_fd, stderr_fd);
             break;
     }
-    exit(0);
+    libvchan_close(data_vchan);
+    return exit_code;
+}
+
+/* Returns PID of data processing process */
+pid_t handle_new_process(int type, int connect_domain, int connect_port,
+        char *cmdline, int cmdline_len)
+{
+    int exit_code;
+    pid_t pid;
+    assert(type != MSG_SERVICE_CONNECT);
+
+    switch (pid=fork()){
+        case -1:
+            perror("fork");
+            return -1;
+        case 0:
+            break;
+        default:
+            return pid;
+    }
+
+    /* child process */
+    exit_code = handle_new_process_common(type, connect_domain, connect_port,
+            cmdline, cmdline_len,
+            -1, -1, -1);
+
+    exit(exit_code);
     /* suppress warning */
     return 0;
+}
+
+void handle_data_client(int type, int connect_domain, int connect_port,
+                int stdin_fd, int stdout_fd, int stderr_fd)
+{
+
+    assert(type == MSG_SERVICE_CONNECT);
+
+    handle_new_process_common(type, connect_domain, connect_port,
+            NULL, 0, stdin_fd, stdout_fd, stderr_fd);
 }

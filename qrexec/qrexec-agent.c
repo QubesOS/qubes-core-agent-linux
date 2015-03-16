@@ -55,7 +55,6 @@ struct _connection_info connection_info[MAX_FDS];
 libvchan_t *ctrl_vchan;
 
 int trigger_fd;
-int passfd_socket;
 
 int meminfo_write_started = 0;
 
@@ -107,11 +106,8 @@ void init()
     if (handle_handshake(ctrl_vchan) < 0)
         exit(1);
     umask(0);
-    mkfifo(QREXEC_AGENT_TRIGGER_PATH, 0666);
-    passfd_socket = get_server_socket(QREXEC_AGENT_FDPASS_PATH);
+    trigger_fd = get_server_socket(QREXEC_AGENT_TRIGGER_PATH);
     umask(077);
-    trigger_fd =
-        open(QREXEC_AGENT_TRIGGER_PATH, O_RDONLY | O_NONBLOCK);
     register_exec_func(do_exec);
 
     /* wait for qrexec daemon */
@@ -229,6 +225,7 @@ void handle_server_exec_request(struct msg_header *hdr)
     struct exec_params params;
     char buf[hdr->len-sizeof(params)];
     pid_t child_agent;
+    int client_fd;
 
     assert(hdr->len >= sizeof(params));
 
@@ -248,7 +245,24 @@ void handle_server_exec_request(struct msg_header *hdr)
             return;
         }
     }
+    if (hdr->type == MSG_SERVICE_CONNECT && sscanf(buf, "SOCKET%d", &client_fd)) {
+        /* FIXME: Maybe add some check if client_fd is really FD to some
+         * qrexec-client-vm process; but this data comes from qrexec-daemon
+         * (which sends back what it got from us earlier), so it isn't critical.
+         */
+        write(client_fd, &params, sizeof(params));
+        /* No need to send request_id (buf) - the client don't need it, there
+         * is only meaningless (for the client) socket FD */
+        /* Register connection even if there was an error sending params to
+         * qrexec-client-vm. This way the mainloop will clean the things up
+         * (close socket, send MSG_CONNECTION_TERMINATED) when qrexec-client-vm
+         * will close the socket (terminate itself). */
+        register_vchan_connection(-1, client_fd,
+                params.connect_domain, params.connect_port);
+        return;
+    }
 
+    /* No fork server case */
     child_agent = handle_new_process(hdr->type,
             params.connect_domain, params.connect_port,
             buf, hdr->len-sizeof(params));
@@ -260,7 +274,7 @@ void handle_server_exec_request(struct msg_header *hdr)
 void handle_service_refused(struct msg_header *hdr)
 {
     struct service_params params;
-    int stdin_fd, stdout_fd, stderr_fd;
+    int socket_fd;
 
     if (hdr->len != sizeof(params)) {
         fprintf(stderr, "Invalid msg 0x%x length (%d)\n", MSG_SERVICE_REFUSED, hdr->len);
@@ -270,11 +284,10 @@ void handle_service_refused(struct msg_header *hdr)
     if (libvchan_recv(ctrl_vchan, &params, sizeof(params)) < 0)
         handle_vchan_error("read exec params");
 
-    sscanf(params.ident, "%d %d %d", &stdin_fd, &stdout_fd, &stderr_fd);
-    /* TODO: send some signal? some response? */
-    close(stdin_fd);
-    close(stdout_fd);
-    close(stderr_fd);
+    if (sscanf(params.ident, "SOCKET%d", &socket_fd))
+        close(socket_fd);
+    else
+        fprintf(stderr, "Received REFUSED for unknown service request '%s'\n", params.ident);
 }
 
 void handle_server_cmd()
@@ -360,9 +373,6 @@ int fill_fds_for_select(fd_set * rdset, fd_set * wrset)
     FD_SET(trigger_fd, rdset);
     if (trigger_fd > max)
         max = trigger_fd;
-    FD_SET(passfd_socket, rdset);
-    if (passfd_socket > max)
-        max = passfd_socket;
 
     for (i = 0; i < MAX_FDS; i++) {
         if (connection_info[i].pid != 0 && connection_info[i].fd != -1) {
@@ -374,41 +384,31 @@ int fill_fds_for_select(fd_set * rdset, fd_set * wrset)
     return max;
 }
 
-void handle_new_passfd()
-{
-    int fd = do_accept(passfd_socket);
-    if (fd >= MAX_FDS) {
-        fprintf(stderr, "too many clients ?\n");
-        exit(1);
-    }
-    // let client know what fd has been allocated
-    if (write(fd, &fd, sizeof(fd)) != sizeof(fd)) {
-        perror("write to client");
-    }
-}
-
 void handle_trigger_io()
 {
     struct msg_header hdr;
     struct trigger_service_params params;
     int ret;
+    int client_fd;
 
+    client_fd = do_accept(trigger_fd);
+    if (client_fd < 0)
+        return;
     hdr.len = sizeof(params);
-    ret = read(trigger_fd, &params, sizeof(params));
+    ret = read(client_fd, &params, sizeof(params));
     if (ret == sizeof(params)) {
         hdr.type = MSG_TRIGGER_SERVICE;
+        snprintf(params.request_id.ident, sizeof(params.request_id), "SOCKET%d", client_fd);
         if (libvchan_send(ctrl_vchan, &hdr, sizeof(hdr)) < 0)
             handle_vchan_error("write hdr");
         if (libvchan_send(ctrl_vchan, &params, sizeof(params)) < 0)
             handle_vchan_error("write params");
     }
-    // trigger_fd is nonblock - so no need to reopen
-    // not really, need to reopen at EOF
     if (ret <= 0) {
-        close(trigger_fd);
-        trigger_fd =
-            open(QREXEC_AGENT_TRIGGER_PATH, O_RDONLY | O_NONBLOCK);
+        close(client_fd);
     }
+    /* do not close client_fd - we'll need it to send the connection details
+     * later (when dom0 accepts the request) */
 }
 
 void handle_terminated_fork_client(fd_set *rdset) {
@@ -453,9 +453,6 @@ int main()
 
         wait_for_vchan_or_argfd(ctrl_vchan, max, &rdset, &wrset);
         sigprocmask(SIG_UNBLOCK, &chld_set, NULL);
-
-        if (FD_ISSET(passfd_socket, &rdset))
-            handle_new_passfd();
 
         while (libvchan_data_ready(ctrl_vchan))
             handle_server_cmd();
