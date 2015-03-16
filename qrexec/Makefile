@@ -1,14 +1,12 @@
 CC=gcc
 CFLAGS+=-I. -g -Wall -Wextra -Werror -pie -fPIC `pkg-config --cflags vchan-$(BACKEND_VMM)`
-LIBS=`pkg-config --libs vchan-$(BACKEND_VMM)` -lqrexec-utils
+LDFLAGS=-pie
+LDLIBS=`pkg-config --libs vchan-$(BACKEND_VMM)` -lqrexec-utils
 
 all: qrexec-agent qrexec-client-vm qrexec-fork-server
 qrexec-agent: qrexec-agent.o qrexec-agent-data.o
-	$(CC) -pie -g -o qrexec-agent qrexec-agent.o qrexec-agent-data.o $(LIBS)
 qrexec-fork-server: qrexec-fork-server.o qrexec-agent-data.o
-	$(CC) -pie -g -o qrexec-fork-server qrexec-fork-server.o qrexec-agent-data.o $(LIBS)
 qrexec-client-vm: qrexec-client-vm.o
-	$(CC) -pie -g -o qrexec-client-vm qrexec-client-vm.o
 clean:
 	rm -f *.o *~ qrexec-agent qrexec-client-vm
 
