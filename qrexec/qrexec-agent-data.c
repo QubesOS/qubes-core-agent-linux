@@ -181,16 +181,17 @@ int handle_input(libvchan_t *vchan, int fd, int msg_type)
 /* handle data from vchan and send it to specified FD
  * Return:
  *  -2 - remote process terminated, do not send more data to it
+ *       in this case "status" will be set
  *  -1 - vchan error occurred
  *  0 - EOF received, do not attempt to access this FD again
  *  1 - some data processed, call it again when buffer space and more data
  *      available
  */
-int handle_remote_data(libvchan_t *data_vchan, int stdin_fd)
+
+int handle_remote_data(libvchan_t *data_vchan, int stdin_fd, int *status)
 {
 	struct msg_header hdr;
     char buf[MAX_DATA_CHUNK];
-    int status;
 
     /* TODO: set stdin_fd to non-blocking mode and handle its buffering */
     while (libvchan_data_ready(data_vchan) > 0) {
@@ -245,24 +246,24 @@ int handle_remote_data(libvchan_t *data_vchan, int stdin_fd)
             case MSG_DATA_EXIT_CODE:
                 /* remote process exited, so there is no sense to send any data
                  * to it */
-                if (hdr.len < sizeof(status))
-                    status = 255;
+                if (hdr.len < sizeof(*status))
+                    *status = 255;
                 else
-                    memcpy(&status, buf, sizeof(status));
-                fprintf(stderr, "Remote service process exited with code %d\n", status);
+                    memcpy(status, buf, sizeof(*status));
                 return -2;
         }
     }
     return 1;
 }
 
-void process_child_io(libvchan_t *data_vchan,
+int process_child_io(libvchan_t *data_vchan,
         int stdin_fd, int stdout_fd, int stderr_fd)
 {
     fd_set rdset, wrset;
     int vchan_fd;
     sigset_t selectmask;
     int child_process_status = -1;
+    int remote_process_status = -1;
     int ret, max_fd;
     struct timespec zero_timeout = { 0, 0 };
 
@@ -372,7 +373,7 @@ void process_child_io(libvchan_t *data_vchan,
             }
         }
         /* handle_remote_data will check if any data is available */
-        switch (handle_remote_data(data_vchan, stdin_fd)) {
+        switch (handle_remote_data(data_vchan, stdin_fd, &remote_process_status)) {
             case -1:
                 handle_vchan_error("read");
                 break;
@@ -388,16 +389,18 @@ void process_child_io(libvchan_t *data_vchan,
                 stdout_fd = -1;
                 close(stderr_fd);
                 stderr_fd = -1;
-                /* we do not care for any local process */
-                return;
+                /* if we do not care for any local process, return remote process code */
+                if (child_process_pid == 0)
+                    return remote_process_status;
                 break;
         }
     }
+    return child_process_status;
 }
 
 /* Behaviour depends on type parameter:
  *  MSG_SERVICE_CONNECT - create vchan server, pass the data to/from given FDs
- *    (stdin_fd, stdout_fd, stderr_fd), then return 0
+ *    (stdin_fd, stdout_fd, stderr_fd), then return remote process exit code
  *  MSG_JUST_EXEC - connect to vchan server, fork+exec process given by cmdline
  *    parameter, send artificial exit code "0" (local process can still be
  *    running), then return 0
@@ -453,7 +456,7 @@ int handle_new_process_common(int type, int connect_domain, int connect_port,
         case MSG_SERVICE_CONNECT:
             child_process_pid = 0;
             stdout_msg_type = MSG_DATA_STDIN;
-            process_child_io(data_vchan, stdin_fd, stdout_fd, stderr_fd);
+            exit_code = process_child_io(data_vchan, stdin_fd, stdout_fd, stderr_fd);
             break;
     }
     libvchan_close(data_vchan);
@@ -488,12 +491,15 @@ pid_t handle_new_process(int type, int connect_domain, int connect_port,
     return 0;
 }
 
-void handle_data_client(int type, int connect_domain, int connect_port,
+/* Returns exit code of remote process */
+int handle_data_client(int type, int connect_domain, int connect_port,
                 int stdin_fd, int stdout_fd, int stderr_fd)
 {
+    int exit_code;
 
     assert(type == MSG_SERVICE_CONNECT);
 
-    handle_new_process_common(type, connect_domain, connect_port,
+    exit_code = handle_new_process_common(type, connect_domain, connect_port,
             NULL, 0, stdin_fd, stdout_fd, stderr_fd);
+    return exit_code;
 }

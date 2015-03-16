@@ -154,12 +154,12 @@ int main(int argc, char **argv)
     close(inpipe[0]);
     close(outpipe[1]);
 
-    handle_data_client(MSG_SERVICE_CONNECT,
+    ret = handle_data_client(MSG_SERVICE_CONNECT,
             exec_params.connect_domain, exec_params.connect_port,
             inpipe[1], outpipe[0], -1);
 
     close(trigger_fd);
     waitpid(child_pid, &i, 0);
 
-    return 0;
+    return ret;
 }
