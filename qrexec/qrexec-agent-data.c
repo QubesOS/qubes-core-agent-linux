@@ -313,7 +313,7 @@ int process_child_io(libvchan_t *data_vchan,
         }
         /* child signaled desire to use single socket for both stdin and stdout */
         if (stdio_socket_requested) {
-            if (stdout_fd != -1)
+            if (stdout_fd != -1 && stdout_fd != stdin_fd)
                 close(stdout_fd);
             stdout_fd = stdin_fd;
             stdio_socket_requested = 0;
