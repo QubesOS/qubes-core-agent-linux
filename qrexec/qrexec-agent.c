@@ -223,7 +223,8 @@ void register_vchan_connection(pid_t pid, int fd, int domain, int port)
 void handle_server_exec_request(struct msg_header *hdr)
 {
     struct exec_params params;
-    char buf[hdr->len-sizeof(params)];
+    int buf_len = hdr->len-sizeof(params);
+    char buf[buf_len];
     pid_t child_agent;
     int client_fd;
 
@@ -231,14 +232,14 @@ void handle_server_exec_request(struct msg_header *hdr)
 
     if (libvchan_recv(ctrl_vchan, &params, sizeof(params)) < 0)
         handle_vchan_error("read exec params");
-    if (libvchan_recv(ctrl_vchan, buf, hdr->len-sizeof(params)) < 0)
+    if (libvchan_recv(ctrl_vchan, buf, buf_len) < 0)
         handle_vchan_error("read exec cmd");
 
     if ((hdr->type == MSG_EXEC_CMDLINE || hdr->type == MSG_JUST_EXEC) &&
             !strstr(buf, ":nogui:")) {
         int child_socket = try_fork_server(hdr->type,
                 params.connect_domain, params.connect_port,
-                buf, hdr->len-sizeof(params));
+                buf, buf_len);
         if (child_socket >= 0) {
             register_vchan_connection(-1, child_socket,
                     params.connect_domain, params.connect_port);
@@ -265,7 +266,7 @@ void handle_server_exec_request(struct msg_header *hdr)
     /* No fork server case */
     child_agent = handle_new_process(hdr->type,
             params.connect_domain, params.connect_port,
-            buf, hdr->len-sizeof(params));
+            buf, buf_len);
 
     register_vchan_connection(child_agent, -1,
             params.connect_domain, params.connect_port);
