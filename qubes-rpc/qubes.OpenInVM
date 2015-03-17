@@ -1,1 +1,1 @@
-/usr/lib/qubes/vm-file-editor
+exec /usr/lib/qubes/vm-file-editor

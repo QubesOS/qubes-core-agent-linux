@@ -1,1 +1,1 @@
-/usr/lib/qubes/qfile-unpacker
+exec /usr/lib/qubes/qfile-unpacker
