@@ -52,6 +52,14 @@ start()
 	chmod 0775 /var/run/qubes
 
 	if [ -e /dev/xvdb ] ; then
+		# check if private.img (xvdb) is empty - all zeros
+		private_size_512=`blockdev --getsz /dev/xvdb`
+		if dd if=/dev/zero bs=512 count=$private_size_512 | diff /dev/xvdb - >/dev/null; then
+			# the device is empty, create filesystem
+			echo "--> Virgin boot of the VM: creating filesystem on private.img"
+			mkfs.ext4 -m 0 -q /dev/xvdb || exit 1
+		fi
+
 		resize2fs /dev/xvdb 2> /dev/null || echo "'resize2fs /dev/xvdb' failed"
 		mount /rw
 
