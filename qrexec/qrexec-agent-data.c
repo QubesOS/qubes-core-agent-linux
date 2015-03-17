@@ -361,26 +361,6 @@ int process_child_io(libvchan_t *data_vchan,
                 handle_vchan_error("wait");
         }
 
-        if (stdout_fd >= 0 && FD_ISSET(stdout_fd, &rdset)) {
-            switch (handle_input(data_vchan, stdout_fd, stdout_msg_type)) {
-                case -1:
-                    handle_vchan_error("send");
-                    break;
-                case 0:
-                    stdout_fd = -1;
-                    break;
-            }
-        }
-        if (stderr_fd >= 0 && FD_ISSET(stderr_fd, &rdset)) {
-            switch (handle_input(data_vchan, stderr_fd, MSG_DATA_STDERR)) {
-                case -1:
-                    handle_vchan_error("send");
-                    break;
-                case 0:
-                    stderr_fd = -1;
-                    break;
-            }
-        }
         /* handle_remote_data will check if any data is available */
         switch (handle_remote_data(data_vchan, stdin_fd, &remote_process_status)) {
             case -1:
@@ -402,6 +382,26 @@ int process_child_io(libvchan_t *data_vchan,
                 if (child_process_pid == 0)
                     return remote_process_status;
                 break;
+        }
+        if (stdout_fd >= 0 && FD_ISSET(stdout_fd, &rdset)) {
+            switch (handle_input(data_vchan, stdout_fd, stdout_msg_type)) {
+                case -1:
+                    handle_vchan_error("send");
+                    break;
+                case 0:
+                    stdout_fd = -1;
+                    break;
+            }
+        }
+        if (stderr_fd >= 0 && FD_ISSET(stderr_fd, &rdset)) {
+            switch (handle_input(data_vchan, stderr_fd, MSG_DATA_STDERR)) {
+                case -1:
+                    handle_vchan_error("send");
+                    break;
+                case 0:
+                    stderr_fd = -1;
+                    break;
+            }
         }
     }
     return child_process_status;
