@@ -78,16 +78,20 @@ int main(int argc, char **argv)
     struct trigger_service_params params;
     struct exec_params exec_params;
     int ret, i;
+    int start_local_process = 0;
     char *abs_exec_path;
     pid_t child_pid;
     int inpipe[2], outpipe[2];
     char pid_s[10];
 
-    if (argc < 4) {
+    if (argc < 3) {
         fprintf(stderr,
-                "usage: %s target_vmname program_ident local_program [local program arguments]\n",
+                "usage: %s target_vmname program_ident [local_program [local program arguments]]\n",
                 argv[0]);
         exit(1);
+    }
+    if (argc > 3) {
+        start_local_process = 1;
     }
 
     trigger_fd = connect_unix_socket(QREXEC_AGENT_TRIGGER_PATH);
@@ -113,50 +117,56 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (socketpair(AF_UNIX, SOCK_STREAM, 0, inpipe) ||
-            socketpair(AF_UNIX, SOCK_STREAM, 0, outpipe)) {
-        perror("socketpair");
-        exit(1);
-    }
-    snprintf(pid_s, sizeof(pid_s), "%d", getpid());
-    setenv("QREXEC_AGENT_PID", pid_s, 1);
-
-    switch (child_pid = fork()) {
-    case -1:
-        perror("fork");
-        exit(-1);
-    case 0:
-        close(inpipe[1]);
-        close(outpipe[0]);
-        close(trigger_fd);
-        for (i = 0; i < 3; i++) {
-            if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
-                char *env;
-                if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
-                    perror("prepare SAVED_FD_");
-                    exit(1);
-                }
-                putenv(env);
-            }
+    if (start_local_process) {
+        if (socketpair(AF_UNIX, SOCK_STREAM, 0, inpipe) ||
+                socketpair(AF_UNIX, SOCK_STREAM, 0, outpipe)) {
+            perror("socketpair");
+            exit(1);
         }
+        snprintf(pid_s, sizeof(pid_s), "%d", getpid());
+        setenv("QREXEC_AGENT_PID", pid_s, 1);
 
-        dup2(inpipe[0], 0);
-        dup2(outpipe[1], 1);
+        switch (child_pid = fork()) {
+            case -1:
+                perror("fork");
+                exit(-1);
+            case 0:
+                close(inpipe[1]);
+                close(outpipe[0]);
+                close(trigger_fd);
+                for (i = 0; i < 3; i++) {
+                    if (i != 2 || getenv("PASS_LOCAL_STDERR")) {
+                        char *env;
+                        if (asprintf(&env, "SAVED_FD_%d=%d", i, dup(i)) < 0) {
+                            perror("prepare SAVED_FD_");
+                            exit(1);
+                        }
+                        putenv(env);
+                    }
+                }
+
+                dup2(inpipe[0], 0);
+                dup2(outpipe[1], 1);
+                close(inpipe[0]);
+                close(outpipe[1]);
+
+                abs_exec_path = strdup(argv[3]);
+                argv[3] = get_program_name(argv[3]);
+                execv(abs_exec_path, argv + 3);
+                perror("execv");
+                exit(-1);
+        }
         close(inpipe[0]);
         close(outpipe[1]);
 
-        abs_exec_path = strdup(argv[3]);
-        argv[3] = get_program_name(argv[3]);
-        execv(abs_exec_path, argv + 3);
-        perror("execv");
-        exit(-1);
+        ret = handle_data_client(MSG_SERVICE_CONNECT,
+                exec_params.connect_domain, exec_params.connect_port,
+                inpipe[1], outpipe[0], -1);
+    } else {
+        ret = handle_data_client(MSG_SERVICE_CONNECT,
+                exec_params.connect_domain, exec_params.connect_port,
+                1, 0, -1);
     }
-    close(inpipe[0]);
-    close(outpipe[1]);
-
-    ret = handle_data_client(MSG_SERVICE_CONNECT,
-            exec_params.connect_domain, exec_params.connect_port,
-            inpipe[1], outpipe[0], -1);
 
     close(trigger_fd);
     waitpid(child_pid, &i, 0);
