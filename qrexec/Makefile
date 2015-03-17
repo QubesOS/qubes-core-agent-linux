@@ -14,8 +14,9 @@ install:
 	install -d $(DESTDIR)/etc/qubes-rpc
 	install -d $(DESTDIR)/usr/lib/qubes $(DESTDIR)/usr/bin
 	install qrexec-agent $(DESTDIR)/usr/lib/qubes
-	install qrexec-client-vm $(DESTDIR)/usr/lib/qubes
-	ln -s qrexec-client-vm $(DESTDIR)/usr/lib/qubes/qrexec_client_vm
+	install qrexec-client-vm $(DESTDIR)/usr/bin
+	ln -s ../../bin/qrexec-client-vm $(DESTDIR)/usr/lib/qubes/qrexec-client-vm
+	ln -s ../../bin/qrexec-client-vm $(DESTDIR)/usr/lib/qubes/qrexec_client_vm
 	install qrexec-fork-server $(DESTDIR)/usr/bin
 	install qubes-rpc-multiplexer $(DESTDIR)/usr/lib/qubes
 
