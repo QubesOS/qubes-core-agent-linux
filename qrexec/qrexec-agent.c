@@ -251,7 +251,9 @@ void handle_server_exec_request(struct msg_header *hdr)
          * qrexec-client-vm process; but this data comes from qrexec-daemon
          * (which sends back what it got from us earlier), so it isn't critical.
          */
-        write(client_fd, &params, sizeof(params));
+        if (write(client_fd, &params, sizeof(params)) < 0) {
+            /* ignore */
+        }
         /* No need to send request_id (buf) - the client don't need it, there
          * is only meaningless (for the client) socket FD */
         /* Register connection even if there was an error sending params to
