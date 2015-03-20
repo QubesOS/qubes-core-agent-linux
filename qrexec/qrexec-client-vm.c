@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     int ret, i;
     int start_local_process = 0;
     char *abs_exec_path;
-    pid_t child_pid;
+    pid_t child_pid = 0;
     int inpipe[2], outpipe[2];
     char pid_s[10];
 
@@ -169,7 +169,8 @@ int main(int argc, char **argv)
     }
 
     close(trigger_fd);
-    waitpid(child_pid, &i, 0);
+    if (start_local_process)
+        waitpid(child_pid, &i, 0);
 
     return ret;
 }
