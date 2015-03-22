@@ -259,10 +259,10 @@ done
 
 # Copy ip(|6)tables into place if they do not already exist in filesystem.
 # This prevents conflict with iptables-service
-if [ ! -f '/etc/sysconfig/iptables' ]; then
+if [ ! -f '/etc/sysconfig/iptables' -o $1 = 1 ]; then
   cp -p /usr/lib/qubes/init/iptables /etc/sysconfig/iptables
 fi
-if [ ! -f '/etc/sysconfig/ip6tables' ]; then
+if [ ! -f '/etc/sysconfig/ip6tables' -o $1 = 1 ]; then
   cp -p /usr/lib/qubes/init/ip6tables /etc/sysconfig/ip6tables
 fi
 
