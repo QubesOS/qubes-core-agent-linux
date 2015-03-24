@@ -21,7 +21,7 @@ if ! dmesg | grep -q "$systemd_pkg_version running in system mode."; then
 fi
 
 # Wait for evtchn initialization
-while [ ! -e /proc/xen/xenbus ]; do
+while [ ! -e /dev/xen/xenbus ]; do
   sleep 0.1
 done
 
@@ -31,7 +31,9 @@ chmod 0775 /var/run/qubes
 mkdir -p /var/run/qubes-service
 mkdir -p /var/run/xen-hotplug
 
-# Set permissions to /proc/xen/xenbus, so normal user can use qubesdb-read
+# Set permissions to /proc/xen/xenbus, so normal user can talk to xenstore, to
+# open vchan connection. Note that new code uses /dev/xen/xenbus (which have
+# permissions set by udev), so this probably can go away soon
 chmod 666 /proc/xen/xenbus
 
 # Set permissions to /proc/xen/privcmd, so a user in qubes group can access
@@ -39,7 +41,7 @@ chmod 660 /proc/xen/privcmd
 chgrp qubes /proc/xen/privcmd
 
 [ -e /proc/u2mfn ] || modprobe u2mfn
-# Set permissions to files needed to listen at vchan
+# Set permissions to files needed by gui-agent
 chmod 666 /proc/u2mfn
 
 # Set default services depending on VM type

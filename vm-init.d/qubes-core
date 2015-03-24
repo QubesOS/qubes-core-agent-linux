@@ -10,9 +10,9 @@ start()
 {
 	echo -n $"Executing Qubes Core scripts:"
 
-	# Set permissions to /proc/xen/xenbus, so normal user can use qubesdb-read
+	# Set permissions to /proc/xen/xenbus, so normal user can access xenstore
 	chmod 666 /proc/xen/xenbus
-	# Set permissions to files needed to listen at vchan
+	# Set permissions to files needed by gui-agent
 	chmod 666 /proc/u2mfn
 
 	mkdir -p /var/run/xen-hotplug
