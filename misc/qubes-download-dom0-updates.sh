@@ -8,6 +8,8 @@ CLEAN=0
 CHECK_ONLY=0
 OPTS="--installroot $DOM0_UPDATES_DIR --config=$DOM0_UPDATES_DIR/etc/yum.conf"
 PKGLIST=
+YUM_ACTION=
+
 export LC_ALL=C
 
 while [ -n "$1" ]; do
@@ -27,15 +29,25 @@ while [ -n "$1" ]; do
         --check-only)
             CHECK_ONLY=1
             ;;
+        --action=*)
+            YUM_ACTION=${1#--action=}
+            ;;
         -*)
             OPTS="$OPTS $1"
             ;;
         *)
             PKGLIST="$PKGLIST $1"
+            if [ -z "$YUM_ACTION" ]; then
+                YUM_ACTION=install
+            fi
             ;;
     esac
     shift
 done
+
+if [ -z "$YUM_ACTION" ]; then
+    YUM_ACTION=upgrade
+fi
 
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
     echo "Dom0 updates dir does not exists: $DOM0_UPDATES_DIR" >&2
@@ -77,12 +89,6 @@ fi
 if [ "$DOIT" != "1" -a "$PKGS_FROM_CMDLINE" != "1" ]; then
     zenity --question --title="Qubes Dom0 updates" \
       --text="There are updates for dom0 available, do you want to download them now?" || exit 0
-fi
-
-YUM_ACTION=upgrade
-if [ "$PKGS_FROM_CMDLINE" == 1 ]; then
-    GUI=0
-    YUM_ACTION=install
 fi
 
 mkdir -p "$DOM0_UPDATES_DIR/packages"
