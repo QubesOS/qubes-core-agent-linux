@@ -1,3 +1,61 @@
+qubes-core-agent (3.0.2-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: fix version number
+  * backup: fix qubes.Restore service - do not send garbage as backup
+    data
+
+  [ Jason Mehring ]
+  * debian:  Add extend-diff-ignore options to debian packager
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: fork into background after setting up qrexec-fork-server
+    socket
+  * Fix "backup: fix qubes.Restore service - do not send garbage as
+    backup data"
+
+  [ Jason Mehring ]
+  * Switched qvm-move-to-vm.{gnome,kde} scripts to use bash not sh
+  * Removed nautilus-actions depend and replaced with nautilus-python
+  * Removed code that deleted original nautilus actions
+
+  [ Marek Marczykowski-Górecki ]
+  * fc21: fix DispVM preparation - Xorg has new name
+  * dispvm: kill all process after populating caches
+  * dispvm: start gui agent early, do not kill Xorg
+  * dispvm: close only visible windows during DispVM preparation
+  * Move mounting /rw and /home to separate service
+  * dispvm: use qubes.WaitForSession to wait for gui-agent startup
+  * dispvm: include memory caches in "used memory" notification
+  * dispvm: do not restart qubesdb-daemon, use watch instead
+  * qrexec: simplify makefile
+  * qrexec: handle data vchan directly from qrexec-client-vm
+  * qrexec: return remote process status as qrexec-client-vm exit code
+  * qrexec: better handle remote process termination
+  * qrexec: do not break connection on duplicated SIGUSR1
+  * qrexec: minor readability fix
+  * qrexec: process vchan data queue (esp MSG_EXIT_CODE) before sending
+    anything
+  * qrexec: add option to use real stdin/out of qrexec-client-vm
+  * qrexec: do not leak FDs to logger process
+  * qrexec: execute RPC service directly (without a shell) if it has
+    executable bit set
+  * qrexec: get rid of shell in services using EOF for any signaling
+  * qrexec: move qrexec-client-vm to /usr/bin
+  * Add support for comments in qubes-suspend-module-blacklist
+  * Create filesystem if the private.img is empty
+  * Provide stub files in /rw/config
+  * qrexec: fix compile warning
+  * qrexec: do not wait for local process if no one exists
+  * qrexec: enable compiler optimization
+  * Do not load xen-usbfront automatically
+  * fedora: override iptables configuration on initial installation
+  * Update comments and xenbus intf in startup scripts regarding vchan
+    requirements
+  * dom0-update: allow to specify custom yum action
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 26 Mar 2015 23:56:25 +0100
+
 qubes-core-agent (3.0.1-1) jessie; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
