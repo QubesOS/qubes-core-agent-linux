@@ -427,6 +427,8 @@ void handle_terminated_fork_client(fd_set *rdset) {
                 release_connection(i);
             } else {
                 fprintf(stderr, "Unexpected read on fork-server connection: %d(%s)\n", ret, strerror(errno));
+                close(connection_info[i].fd);
+                release_connection(i);
             }
         }
     }
