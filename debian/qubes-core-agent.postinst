@@ -210,6 +210,7 @@ case "${1}" in
             echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
             echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
         fi
+        /usr/lib/qubes/qubes-fix-nm-conf.sh
 
         # Remove old firmware updates link
         if [ -L /lib/firmware/updates ]; then
