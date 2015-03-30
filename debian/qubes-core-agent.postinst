@@ -149,25 +149,20 @@ displayFailedStatus() {
 # Disable systemd units
 disableSystemdUnits() {
     for unit in $*; do
-        systemctl is-enabled ${unit} > /dev/null 2>&1 && {
-            echo "Disabling ${unit}..."
-            systemctl is-active ${unit} > /dev/null 2>&1 && {
-                systemctl stop ${unit} > /dev/null 2>&1 || displayFailedStatus stop ${unit}
-            }
-            if [ -f /lib/systemd/system/${unit} ]; then
-                if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
-                    systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
-                else
-                    echo "Masking service: ${unit}"
-                    systemctl mask ${unit}
-                fi
-            else
-                    systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
-            fi
-        } || {
-            echo "It appears ${unit} is already disabled!"
-            #displayFailedStatus is-disabled ${unit}
+        echo "Disabling ${unit}..."
+        systemctl is-active ${unit} > /dev/null 2>&1 && {
+            systemctl stop ${unit} > /dev/null 2>&1 || displayFailedStatus stop ${unit}
         }
+        if [ -f /lib/systemd/system/${unit} ]; then
+            if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
+                systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
+            else
+                echo "Masking service: ${unit}"
+                systemctl mask ${unit}
+            fi
+        else
+                systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
+        fi
     done
 }
 
