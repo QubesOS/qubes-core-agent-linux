@@ -66,6 +66,7 @@ Obsoletes:  qubes-core-proxyvm
 Obsoletes:  qubes-upgrade-vm < 2.0
 BuildRequires: xen-devel
 BuildRequires: qubes-utils-devel >= 2.0.5
+BuildRequires: libX11-devel
 
 %define _builddir %(pwd)
 
