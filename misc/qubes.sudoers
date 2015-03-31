@@ -1,3 +1,4 @@
+Defaults !requiretty
 user ALL=(ALL) NOPASSWD: ALL
 
 # WTF?! Have you lost your mind?!
@@ -44,3 +45,5 @@ user ALL=(ALL) NOPASSWD: ALL
 # be seen by the xinput program...)
 #
 # joanna.
+
+# vim: ft=sudoers

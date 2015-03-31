@@ -6,23 +6,19 @@ exec 2>/tmp/qrexec-rpc-stderr.$$
 rm -f /tmp/qrexec-rpc-stderr.$$
 
 QUBES_RPC=/etc/qubes-rpc
-# XXX: Backward compatibility
-DEPRECATED_QUBES_RPC=/etc/qubes_rpc
+LOCAL_QUBES_RPC=/usr/local/etc/qubes-rpc
+
 if ! [ $# = 2 ] ; then
 	echo $0: bad argument count, usage: $0 SERVICE-NAME REMOTE-DOMAIN-NAME >&2
 	exit 1
 fi
 export QREXEC_REMOTE_DOMAIN="$2"
 
-if [ -s "$QUBES_RPC/$1" ]; then
-    CFG_FILE=$QUBES_RPC/"$1"
-elif [ -s "$DEPRECATED_QUBES_RPC/$1" ]; then
-    echo "$0: RPC service '$1' uses deprecated directory, please move to $QUBES_RPC" >&2
-    CFG_FILE=$DEPRECATED_QUBES_RPC/"$1"
-else
-    echo "$0: Cannot find service $1 file in $QUBES_RPC" >&2
-    exit 1
-fi
+for CFG_FILE in $QUBES_RPC/"$1" $LOCAL_QUBES_RPC/"$1"; do
+	if [ -s "$CFG_FILE" ]; then
+        break
+	fi
+done
 
 if [ -x "$CFG_FILE" ] ; then
 	exec "$CFG_FILE"
