@@ -1,11 +1,11 @@
 # Main qubes updates repository
-deb [arch=amd64] http://deb.qubes-os.org/r3/vm @DIST@ main
-deb-src http://deb.qubes-os.org/r3/vm @DIST@ main
+deb [arch=amd64] http://deb.qubes-os.org/r3.0/vm @DIST@ main
+deb-src http://deb.qubes-os.org/r3.0/vm @DIST@ main
 
 # Qubes updates candidates repository
-#deb [arch=amd64] http://deb.qubes-os.org/r3/vm @DIST@-testing main
-#deb-src http://deb.qubes-os.org/r3/vm @DIST@-testing main
+#deb [arch=amd64] http://deb.qubes-os.org/r3.0/vm @DIST@-testing main
+#deb-src http://deb.qubes-os.org/r3.0/vm @DIST@-testing main
 
 # Qubes experimental/unstable repository
-#deb [arch=amd64] http://deb.qubes-os.org/r3/vm @DIST@-unstable main
-#deb-src http://deb.qubes-os.org/r3/vm @DIST@-unstable main
+#deb [arch=amd64] http://deb.qubes-os.org/r3.0/vm @DIST@-unstable main
+#deb-src http://deb.qubes-os.org/r3.0/vm @DIST@-unstable main
