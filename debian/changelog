@@ -1,3 +1,20 @@
+qubes-core-agent (3.0.4-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: try to recover from fork-server communication error
+  * rpm: add missing BuildRequires: libX11-devel
+  * debian: fix handling SysV units in disableSystemdUnits
+  * debian: update NetworkManager configuration
+
+  [ Wojtek Porczyk ]
+  * qubes-rpc-multiplexer: deprecate /etc/qubes_rpc, allow /usr/local
+  * sudoers: do not require TTY
+
+  [ Marek Marczykowski-Górecki ]
+  * Update repository definition: r3 -> r3.0
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 02 Apr 2015 00:55:09 +0200
+
 qubes-core-agent (3.0.3-1) wheezy; urgency=medium
 
   * Enable updates repos by default
