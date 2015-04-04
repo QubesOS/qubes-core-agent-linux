@@ -1,3 +1,13 @@
+qubes-core-agent (2.1.57) wheezy; urgency=medium
+
+  * qrexec: expand tabs, no functional change
+  * qrexec: add simple stdio handling in qrexec-client-vm without a
+    child process
+  * qrexec: move qrexec-client-vm to /usr/bin
+  * rpm: add missing BuildRequires: libX11-devel
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 04 Apr 2015 18:57:40 +0200
+
 qubes-core-agent (2.1.56) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
