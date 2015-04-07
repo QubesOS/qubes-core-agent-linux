@@ -1,3 +1,10 @@
+qubes-core-agent (3.0.5-1) wheezy; urgency=medium
+
+  * systemd: use presets to enable services, call preset-all
+  * systemd: install overridden unit file for chronyd
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 07 Apr 2015 14:58:36 +0200
+
 qubes-core-agent (3.0.4-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
