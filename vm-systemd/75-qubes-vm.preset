@@ -49,3 +49,22 @@ disable smartd.service
 disable upower.service
 disable irqbalance.service
 disable colord.service
+
+enable qubes-sysinit.service
+enable qubes-db.service
+enable qubes-gui-agent.service
+enable qubes-update-check.timer
+enable qubes-update-check.timer
+enable qubes-misc-post.service
+enable qubes-updates-proxy.service
+enable qubes-dvm.service
+enable qubes-network.service
+enable qubes-qrexec-agent.service
+enable qubes-mount-home.service
+enable qubes-firewall.service
+enable qubes-netwatcher.service
+enable qubes-meminfo-writer.service
+enable iptables.service
+enable ip6tables.service
+enable haveged.service
+enable chronyd.service

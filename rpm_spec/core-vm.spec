@@ -584,11 +584,7 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
-for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-home qubes-netwatcher qubes-network qubes-firewall qubes-updates-proxy qubes-qrexec-agent; do
-    /bin/systemctl --no-reload enable $srv.service 2> /dev/null
-done
-
-/bin/systemctl --no-reload enable qubes-update-check.timer 2> /dev/null
+/bin/systemctl --no-reload preset-all
 
 # Set default "runlevel"
 rm -f /etc/systemd/system/default.target
@@ -598,9 +594,7 @@ grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while 
     case "$action" in
     (disable)
         if [ -f /lib/systemd/system/$unit_name.service ]; then
-            if fgrep -q '[Install]' /lib/systemd/system/$unit_name; then
-                /bin/systemctl --no-reload preset $unit_name 2> /dev/null
-            else
+            if ! fgrep -q '[Install]' /lib/systemd/system/$unit_name; then
                 # forcibly disable
                 ln -sf /dev/null /etc/systemd/system/$unit_name
             fi
@@ -610,16 +604,6 @@ grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while 
 done
 
 rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
-
-# Enable some services
-/bin/systemctl --no-reload enable iptables.service 2> /dev/null
-/bin/systemctl --no-reload enable ip6tables.service 2> /dev/null
-/bin/systemctl --no-reload enable rsyslog.service 2> /dev/null
-/bin/systemctl --no-reload enable ntpd.service 2> /dev/null
-/bin/systemctl --no-reload enable crond.service 2> /dev/null
-
-# Enable cups only when it is real SystemD service
-[ -e /lib/systemd/system/cups.service ] && /bin/systemctl --no-reload enable cups.service 2> /dev/null
 
 /bin/systemctl daemon-reload
 
@@ -641,8 +625,6 @@ exit 0
 %installOverridenServices crond
 exit 0
 
-%triggerin systemd -- haveged
-/bin/systemctl enable haveged.service 2> /dev/null
 exit 0
 
 %postun systemd
