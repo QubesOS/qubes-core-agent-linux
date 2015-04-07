@@ -625,6 +625,8 @@ exit 0
 %installOverridenServices crond
 exit 0
 
+%triggerin systemd -- chrony
+%installOverridenServices chronyd
 exit 0
 
 %postun systemd
