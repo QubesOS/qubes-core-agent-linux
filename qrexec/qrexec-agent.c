@@ -99,15 +99,16 @@ void handle_vchan_error(const char *op)
 
 void init()
 {
+    mode_t old_umask;
     /* FIXME: This 0 is remote domain ID */
     ctrl_vchan = libvchan_server_init(0, VCHAN_BASE_PORT, 4096, 4096);
     if (!ctrl_vchan)
         handle_vchan_error("server_init");
     if (handle_handshake(ctrl_vchan) < 0)
         exit(1);
-    umask(0);
+    old_umask = umask(0);
     trigger_fd = get_server_socket(QREXEC_AGENT_TRIGGER_PATH);
-    umask(077);
+    umask(old_umask);
     register_exec_func(do_exec);
 
     /* wait for qrexec daemon */
