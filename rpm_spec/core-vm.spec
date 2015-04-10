@@ -584,7 +584,13 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
-/bin/systemctl --no-reload preset-all
+if [ $1 -eq 1 ]; then
+    /bin/systemctl --no-reload preset-all
+else
+    for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-home qubes-netwatcher qubes-network qubes-qrexec-agent; do
+        /bin/systemctl --no-reload preset $srv
+    done
+fi
 
 # Set default "runlevel"
 rm -f /etc/systemd/system/default.target
