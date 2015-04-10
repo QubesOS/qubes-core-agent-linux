@@ -21,8 +21,10 @@ disable alsa-restore.service
 disable auditd.service
 disable avahi.service
 disable avahi-daemon.service
+disable avahi-daemon.socket
 disable backuppc.service
 disable cpuspeed.service
+disable dnf-makecache.timer
 disable fedora-autorelabel.service
 disable fedora-autorelabel-mark.service
 disable ipmi.service
