@@ -2,7 +2,7 @@
 
 # check if private.img (xvdb) is empty - all zeros
 private_size_512=`blockdev --getsz /dev/xvdb`
-if dd if=/dev/zero bs=512 count=$private_size_512 | diff /dev/xvdb - >/dev/null; then
+if dd if=/dev/zero bs=512 count=$private_size_512 2>/dev/null | diff /dev/xvdb - >/dev/null; then
     # the device is empty, create filesystem
     echo "--> Virgin boot of the VM: creating filesystem on private.img"
     mkfs.ext4 -m 0 -q /dev/xvdb || exit 1

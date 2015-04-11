@@ -1,5 +1,5 @@
 [Unit]
-Description=Mount /rw and /home, initialize them if needed
+Description=Initialize and mount /rw and /home
 Before=qubes-gui-agent.service
 
 [Service]
