@@ -1,3 +1,14 @@
+qubes-core-agent (3.0.6-1) wheezy; urgency=medium
+
+  * qrexec: do not reset umask to 077 for every started process
+  * rpm/systemd: do not use preset-all during package upgrade
+  * systemd: disable avahi-daemon and dnf-makecache
+  * dispvm: do not start GUI apps during prerun
+  * Fix resizing of /rw partition (private.img)
+  * Minor fixes in mount-home.sh
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 11 Apr 2015 03:40:57 +0200
+
 qubes-core-agent (3.0.5-1) wheezy; urgency=medium
 
   * systemd: use presets to enable services, call preset-all
