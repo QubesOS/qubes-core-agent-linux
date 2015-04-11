@@ -8,9 +8,9 @@ if dd if=/dev/zero bs=512 count=$private_size_512 | diff /dev/xvdb - >/dev/null;
     mkfs.ext4 -m 0 -q /dev/xvdb || exit 1
 fi
 
-resize2fs /dev/xvdb 2> /dev/null || echo "'resize2fs /dev/xvdb' failed"
 tune2fs -m 0 /dev/xvdb
 mount /rw
+resize2fs /dev/xvdb 2> /dev/null || echo "'resize2fs /dev/xvdb' failed"
 
 if ! [ -d /rw/home ] ; then
     echo
