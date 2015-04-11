@@ -1,6 +1,6 @@
 #!/bin/sh
 
-apps="evince /usr/libexec/evinced soffice firefox"
+apps="/usr/libexec/evinced"
 
 #If user have customized DispVM settings, use its home instead of default dotfiles
 if [ -e /rw/home/user/.qubes-dispvm-customized ]; then
@@ -22,10 +22,10 @@ while true; do
 		break;
 	fi
 	PREV_IO=$IO
-	sleep 1
+	sleep 2
 done
 
-ps ax > /tmp/dispvm-prerun-proclist.log
+ps aufwwx > /tmp/dispvm-prerun-proclist.log
 
 echo "Closing windows..."
 /usr/lib/qubes/close-window `xwininfo -root -children|tail -n +7 |awk '{print $1}'`
