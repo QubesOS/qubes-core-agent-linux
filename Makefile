@@ -90,8 +90,6 @@ install-rh: install-systemd install-sysvinit
 	install -d $(DESTDIR)/etc/yum.conf.d
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
-	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
-	install -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
@@ -116,8 +114,8 @@ install-common:
 	install -D misc/polkit-1-qubes-allow-all.pkla $(DESTDIR)/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 	install -D misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
-
-	mkdir -p $(DESTDIR)$(LIBDIR)/qubes
+	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
+	install -d $(DESTDIR)/var/lib/qubes/dom0-updates
 
 	if [ -r misc/dispvm-dotfiles.$(DIST).tbz ] ; \
 	then \

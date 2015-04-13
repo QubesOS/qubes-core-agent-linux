@@ -10,7 +10,7 @@ Vcs-Git: git://git.qubes-os.org/marmarek/core-agent-linux.git
 Package: qubes-core-agent
 Architecture: any
 Depends: qubes-utils (>= 2.0.17), libvchan-xen, xenstore-utils, iptables-persistent, xserver-xorg-video-dummy, xen-utils-common, ethtool, python2.7, python-gi, init-system-helpers, xdg-user-dirs, iptables, net-tools, initscripts, imagemagick, fakeroot, systemd, locales, sudo, dmsetup, psmisc, ncurses-term, xserver-xorg-core, x11-xserver-utils, xinit, ${shlibs:Depends}, ${misc:Depends}
-Recommends: tinyproxy, gnome-themes-standard, chrony, ntpdate, haveged, network-manager (>= 0.8.1-1), network-manager-gnome, xsettingsd, libnotify-bin, notify-osd, gnome-packagekit, gnome-terminal, python-nautilus
+Recommends: tinyproxy, gnome-themes-standard, chrony, ntpdate, haveged, network-manager (>= 0.8.1-1), network-manager-gnome, xsettingsd, libnotify-bin, notify-osd, gnome-packagekit, gnome-terminal, python-nautilus, yum
 Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
