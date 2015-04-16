@@ -1,3 +1,23 @@
+qubes-core-agent (2.1.58) wheezy; urgency=medium
+
+  [ Matt McCutchen ]
+  * Make qvm-run bidirectional and document its limitations.
+  * Switch to preset file for systemd units to disable.
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix resizing of /rw partition (private.img)
+  * debian: install qubes-download-dom0-updates.sh
+  * debian: update NetworkManager configuration
+  * debian: fix handling SysV units in disableSystemdUnits
+
+  [ Wojtek Porczyk ]
+  * sudoers: do not require TTY
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not load xen-usbfront automatically
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 16 Apr 2015 03:40:01 +0200
+
 qubes-core-agent (2.1.57) wheezy; urgency=medium
 
   * qrexec: expand tabs, no functional change
