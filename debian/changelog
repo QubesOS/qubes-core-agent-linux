@@ -1,3 +1,9 @@
+qubes-core-agent (2.1.59) wheezy; urgency=medium
+
+  * systemd: disable avahi-daemon and dnf-makecache
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 16 Apr 2015 15:55:55 +0200
+
 qubes-core-agent (2.1.58) wheezy; urgency=medium
 
   [ Matt McCutchen ]
