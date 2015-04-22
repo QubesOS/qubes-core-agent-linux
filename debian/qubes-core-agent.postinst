@@ -105,80 +105,47 @@ showIn() {
     fi
 }
 
-setArrayAsGlobal() {
-    local array="$1"
-    local export_as="$2"
-    local code=$(declare -p "$array")
-    local replaced="${code/$array/$export_as}"
-    eval ${replaced/declare -/declare -g}
-}
-
-systemdInfo() {
+changeSystemdStatus() {
     unit=${1}
-    return_global_var=${2}
+    disable=${2-0}
+    
+    # Check if unit file is currently active (running)
+    systemctl is-active ${unit} > /dev/null 2>&1 && active=true || unset active
 
-    declare -A INFO=()
-    while read line; do
-        INFO[${line%%=*}]="${line##*=}"
-    done < <(systemctl show ${unit} 2> /dev/null)
+    case ${disable} in
+        0)
+            systemctl --quiet enable ${unit} > /dev/null 2>&1 || true
+            ;;
+        1)  
+            if [ $active ]; then
+                systemctl --quiet stop ${unit} > /dev/null 2>&1 || true
+            fi  
 
-    setArrayAsGlobal INFO $return_global_var
-    return ${#INFO[@]}
-}
-
-displayFailedStatus() {
-    action=${1}
-    unit=${2}
-
-    # Only display if there are results.  In chroot environmnet there will be 
-    # no results to 'systemctl show' command
-    systemdInfo ${unit} info || {
-        echo
-        echo "==================================================="
-        echo "FAILED: systemd ${action} ${unit}"
-        echo "==================================================="
-        echo "    LoadState = ${info[LoadState]}"
-        echo "    LoadError = ${info[LoadError]}"
-        echo "  ActiveState = ${info[ActiveState]}"
-        echo "     SubState = ${info[SubState]}"
-        echo "UnitFileState = ${info[UnitFileState]}"
-        echo
-    }
-}
-
-# Disable systemd units
-disableSystemdUnits() {
-    for unit in $*; do
-        echo "Disabling ${unit}..."
-        systemctl is-active ${unit} > /dev/null 2>&1 && {
-            systemctl stop ${unit} > /dev/null 2>&1 || displayFailedStatus stop ${unit}
-        }
-        if [ -f /lib/systemd/system/${unit} ]; then
-            if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
-                systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
+            if [ -f /lib/systemd/system/${unit} ]; then
+                if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
+                    systemctl --quiet disable ${unit} > /dev/null 2>&1 || true
+                else
+                    # Forcibly disable
+                    ln -sf /dev/null /etc/systemd/system/${unit}
+                fi
             else
-                echo "Masking service: ${unit}"
-                systemctl mask ${unit}
+                systemctl --quiet disable ${unit} > /dev/null 2>&1 || true
             fi
-        else
-                systemctl disable ${unit} > /dev/null 2>&1 || displayFailedStatus disable ${unit}
-        fi
-    done
+            ;;
+    esac
 }
 
 # Enable systemd units
 enableSystemdUnits() {
     for unit in $*; do
-        systemctl is-enabled ${unit} > /dev/null 2>&1 && {
-            echo "It appears ${unit} is already enabled!"
-            #displayFailedStatus is-enabled ${unit}
-        } || {
-            echo "Enabling: ${unit}..."
-            systemctl enable ${unit} > /dev/null 2>&1 || {
-                echo "Could not enable: ${unit}"
-                displayFailedStatus enable ${unit}
-            }
-        }
+        changeSystemdStatus ${unit} 0 || true
+    done
+}
+
+# Disable systemd units
+disableSystemdUnits() {
+    for unit in $*; do
+        changeSystemdStatus ${unit} 1 || true
     done
 }
 
@@ -204,6 +171,9 @@ case "${1}" in
             dpkg-divert --divert /etc/init/${init}.conf.qubes-disabled --package qubes-core-agent --rename --add /etc/init/${init}.conf
         done
 
+        # Disable sysv init network-manager
+        disableSystemdUnits network-manager
+
         # Create NetworkManager configuration if we do not have it
         if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
             echo '[main]' > /etc/NetworkManager/NetworkManager.conf
@@ -217,19 +187,27 @@ case "${1}" in
             rm -f /lib/firmware/updates
         fi
 
+        # Location of files which contains list of protected files
+        PROTECTED_FILE_LIST='/var/lib/qubes/protected-files'
+
         # ensure that hostname resolves to 127.0.1.1 resp. ::1 and that /etc/hosts is
         # in the form expected by qubes-sysinit.sh
-        for ip in '127\.0\.1\.1' '::1'; do
-            if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
-                sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
-                sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
-            else
-                echo "${ip//\\/} `hostname`" >> /etc/hosts
-            fi
-        done
+        if ! grep -q "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+            for ip in '127\.0\.1\.1' '::1'; do
+                if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
+                    sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
+                    sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts || true
+                else
+                    echo "${ip//\\/} `hostname`" >> /etc/hosts || true
+                fi
+            done
+        fi
+
         # remove hostname from 127.0.0.1 line (in debian the hostname is by default
         # resolved to 127.0.1.1)
-        sed -i "/^127\.0\.0\.1\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
+        if ! grep -q "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+            sed -i "/^127\.0\.0\.1\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
+        fi
 
         chown user:user /home_volatile/user
 
@@ -286,7 +264,7 @@ case "${1}" in
             rngd smartd.service \
             upower.service \
             irqbalance.service \
-            colord.service
+            colord.service 
 
         rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 
