@@ -239,24 +239,31 @@ fi
 # Revert 'Prevent unnecessary updates in VMs':
 sed -i -e '/^exclude = kernel/d' /etc/yum.conf
 
+# Location of files which contains list of protected files
+PROTECTED_FILE_LIST='/var/lib/qubes/protected-files'
+
 # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
-if ! grep -q localhost /etc/hosts; then
-  cat <<EOF > /etc/hosts
+if ! grep -q "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+    if ! grep -q localhost /etc/hosts; then
+      cat <<EOF > /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 `hostname`
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 EOF
+    fi
 fi
 
 # ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
 # in the form expected by qubes-sysinit.sh
-for ip in '127\.0\.0\.1' '::1'; do
-    if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
-        sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
-        sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
-    else
-        echo "${ip} `hostname`" >> /etc/hosts
-    fi
-done
+if ! grep -q "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+    for ip in '127\.0\.0\.1' '::1'; do
+        if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
+            sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
+            sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
+        else
+            echo "${ip} `hostname`" >> /etc/hosts
+        fi
+    done
+fi
 
 # Copy ip(|6)tables into place if they do not already exist in filesystem.
 # This prevents conflict with iptables-service
