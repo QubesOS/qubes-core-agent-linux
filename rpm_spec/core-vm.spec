@@ -65,7 +65,7 @@ Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
 Obsoletes:  qubes-core-netvm
 Obsoletes:  qubes-core-proxyvm
-Obsoletes:  qubes-upgrade-vm < 2.0
+Obsoletes:  qubes-upgrade-vm < 3.0
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.0.1
