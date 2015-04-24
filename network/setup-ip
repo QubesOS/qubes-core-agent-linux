@@ -76,3 +76,8 @@ __EOF__
 		[ -x /rw/config/qubes_ip_change_hook ] && /rw/config/qubes_ip_change_hook
 	fi
 fi
+
+# tinyproxy loads /etc/resolv.conf only on startup, so need a restart after
+# network change
+service qubes-updates-proxy restart --no-block
+exit 0
