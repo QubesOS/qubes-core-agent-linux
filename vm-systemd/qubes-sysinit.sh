@@ -11,7 +11,7 @@ QDB_READ=qubesdb-read
 QDB_LS=qubesdb-multiread
 
 # Location of files which contains list of protected files
-PROTECTED_FILE_LIST='/var/lib/qubes/protected-files'
+PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
 
 read_service() {
     $QDB_READ /qubes-service/$1 2> /dev/null
@@ -70,7 +70,7 @@ for srv in `$QDB_LS /qubes-service/ 2>/dev/null |grep ' = 0'|cut -f 1 -d ' '`; d
 done
 
 # Set the hostname
-if ! grep -q "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
     name=`$QDB_READ /name`
     if [ -n "$name" ]; then
         hostname $name
@@ -85,7 +85,7 @@ if ! grep -q "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
 fi
 
 # Set the timezone
-if ! grep -q "^/etc/timezone$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+if ! grep -rq "^/etc/timezone$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
     timezone=`$QDB_READ /qubes-timezone 2> /dev/null`
     if [ -n "$timezone" ]; then
         cp -p /usr/share/zoneinfo/$timezone /etc/localtime

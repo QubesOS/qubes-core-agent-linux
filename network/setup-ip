@@ -7,7 +7,7 @@ disablegw=`qubesdb-read /qubes-service/disable-default-route 2> /dev/null`
 disabledns=`qubesdb-read /qubes-service/disable-dns-server 2> /dev/null`
 
 # Location of files which contains list of protected files
-PROTECTED_FILE_LIST='/var/lib/qubes/protected-files'
+PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
 
 ip=`/usr/bin/qubesdb-read /qubes-ip 2> /dev/null`
 if [ x$ip != x ]; then
@@ -22,7 +22,7 @@ if [ x$ip != x ]; then
     fi
     /sbin/ethtool -K $INTERFACE sg off
     /sbin/ethtool -K $INTERFACE tx off
-    if ! grep -q "^/etc/resolv[.]conf$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+    if ! grep -rq "^/etc/resolv[.]conf$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
    	echo > /etc/resolv.conf
         if [ "x$disabledns" != "x1" ]; then
             echo "nameserver $gateway" > /etc/resolv.conf

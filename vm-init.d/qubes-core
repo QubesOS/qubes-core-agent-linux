@@ -21,10 +21,10 @@ start()
 	chmod 0775 /var/run/qubes
 
 	# Location of files which contains list of protected files
-	PROTECTED_FILE_LIST='/var/lib/qubes/protected-files'
+	PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
 
 	# Set the hostname
-	if ! grep -q "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+	if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
 		name=$(/usr/bin/qubesdb-read /name)
 		if ! [ -f /etc/this-is-dvm ] ; then
 			# we don't want to set hostname for DispVM
@@ -36,7 +36,7 @@ start()
 	fi
 
 	# Set the timezone
-	if ! grep -q "^/etc/timezone$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+	if ! grep -rq "^/etc/timezone$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
 		timezone=`/usr/bin/qubesdb-read /qubes-timezone 2> /dev/null`
 		if [ -n "$timezone" ]; then
 			ln -f /usr/share/zoneinfo/$timezone /etc/localtime
