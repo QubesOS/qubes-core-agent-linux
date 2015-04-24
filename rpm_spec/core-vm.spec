@@ -232,10 +232,11 @@ fi
 sed -i -e '/^exclude = kernel/d' /etc/yum.conf
 
 # Location of files which contains list of protected files
-PROTECTED_FILE_LIST='/var/lib/qubes/protected-files'
+mkdir -p /etc/qubes/protected-files.d
+PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
 
 # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
-if ! grep -q "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+if ! grep -rq "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
     if ! grep -q localhost /etc/hosts; then
       cat <<EOF > /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 `hostname`
@@ -246,7 +247,7 @@ fi
 
 # ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
 # in the form expected by qubes-sysinit.sh
-if ! grep -q "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
     for ip in '127\.0\.0\.1' '::1'; do
         if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
             sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts

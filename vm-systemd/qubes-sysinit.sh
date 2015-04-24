@@ -13,7 +13,7 @@ XS_LS=/usr/bin/xenstore-ls
 [ -x /usr/sbin/xenstore-ls ] && XS_LS=/usr/sbin/xenstore-ls
 
 # Location of files which contains list of protected files
-PROTECTED_FILE_LIST='/var/lib/qubes/protected-files'
+PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
 
 read_service() {
     $XS_READ qubes-service/$1 2> /dev/null
@@ -64,7 +64,7 @@ for srv in `$XS_LS qubes-service 2>/dev/null |grep ' = "0"'|cut -f 1 -d ' '`; do
 done
 
 # Set the hostname
-if ! grep -q "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
     name=`$XS_READ name`
     if [ -n "$name" ]; then
         hostname $name
@@ -79,7 +79,7 @@ if ! grep -q "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
 fi
 
 # Set the timezone
-if ! grep -q "^/etc/timezone$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+if ! grep -rq "^/etc/timezone$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
     timezone=`$XS_READ qubes-timezone 2> /dev/null`
     if [ -n "$timezone" ]; then
         cp -p /usr/share/zoneinfo/$timezone /etc/localtime
