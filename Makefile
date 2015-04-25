@@ -192,6 +192,7 @@ install-deb:
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 	install -D -m 644 network/iptables $(DESTDIR)/etc/iptables/rules.v4
 	install -D -m 644 network/ip6tables $(DESTDIR)/etc/iptables/rules.v6
+	install -D -m 644 network/00notiy-hook $(DESTDIR)/etc/apt/apt.conf.d/00notiy-hook
 	install -d $(DESTDIR)/etc/sysctl.d
 	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/
 	install -D -m 644 misc/profile.d_qt_x11_no_mitshm.sh $(DESTDIR)/etc/profile.d/qt_x11_no_mitshm.sh

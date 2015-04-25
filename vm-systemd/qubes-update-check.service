@@ -4,4 +4,4 @@ ConditionPathExists=/var/run/qubes-service/qubes-update-check
 
 [Service]
 Type=oneshot
-ExecStart=/usr/lib/qubes/qrexec-client-vm dom0 qubes.NotifyUpdates /bin/sh -c 'if [ -e /usr/bin/yum ]; then yum -q check-update >/dev/null; [ $? -eq 100 ] && echo 1 || echo 0; else apt-get -q update > /dev/null; apt-get -s upgrade | awk "/^Inst/{ print $2 }" | [ $(wc -L) -eq 0 ] && echo 0 || echo 1; fi'
+ExecStart=/usr/lib/qubes/qrexec-client-vm dom0 qubes.NotifyUpdates /bin/sh -c 'if [ -e /etc/system-release ]; then yum -q check-update >/dev/null; [ $? -eq 100 ] && echo 1 || echo 0; else apt-get -q update > /dev/null; apt-get -s upgrade | awk "/^Inst/{ print $2 }" | [ $(wc -L) -eq 0 ] && echo 0 || echo 1; fi'
