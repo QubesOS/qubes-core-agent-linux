@@ -1,3 +1,18 @@
+qubes-core-agent (2.1.60) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * upgrade: package for simplify upgrade from R2 to R3.0
+  * network: restart updates proxy after network change to reload DNS
+    address
+
+  [ Jason Mehring ]
+  * whonix:  Added protected-files file used to prevent scripts from
+    modifying files that need to be protected
+  * Changed location of PROTECTED_FILE_LIST to /etc/qubes/protected-
+    files.d
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 25 Apr 2015 02:30:13 +0200
+
 qubes-core-agent (2.1.59) wheezy; urgency=medium
 
   * systemd: disable avahi-daemon and dnf-makecache
