@@ -1,3 +1,19 @@
+qubes-core-agent (3.0.7-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: install qubes-download-dom0-updates.sh
+  * prepare-dvm: fix bashism
+  * network: wait for iptables lock instead of aborting
+  * rpm: cleanup R2->R3.0 transitional package
+
+  [ Jason Mehring ]
+  * whonix:  Added protected-files file used to prevent scripts from
+    modifying files that need to be protected
+  * Changed location of PROTECTED_FILE_LIST to /etc/qubes/protected-
+    files.d
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 25 Apr 2015 02:36:55 +0200
+
 qubes-core-agent (3.0.6-1) wheezy; urgency=medium
 
   * qrexec: do not reset umask to 077 for every started process
