@@ -1,3 +1,11 @@
+qubes-core-agent (2.1.61) wheezy; urgency=medium
+
+  [ Jason Mehring ]
+  * debian: Update notification now notifies dom0 when an upgrade is
+    completed
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 28 Apr 2015 03:19:31 +0200
+
 qubes-core-agent (2.1.60) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
