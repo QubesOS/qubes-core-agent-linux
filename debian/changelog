@@ -1,3 +1,14 @@
+qubes-core-agent (3.0.8-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Use iptables --wait only when it is supported
+
+  [ Jason Mehring ]
+  * debian: Update notification now notifies dom0 when an upgrade is
+    completed
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 28 Apr 2015 12:51:48 +0200
+
 qubes-core-agent (3.0.7-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
