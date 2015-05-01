@@ -1,2 +1,1 @@
-#DPkg::Post-Invoke {"echo 'invoked' >> /tmp/apt-post-invoke; systemctl start qubes-update-check.service";};
-DPkg::Post-Invoke {"systemctl start qubes-update-check.service";};
+DPkg::Post-Invoke {"/usr/lib/qubes/qrexec-client-vm dom0 qubes.NotifyUpdates /bin/sh -c 'echo 0'";};
