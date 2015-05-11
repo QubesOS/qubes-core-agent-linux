@@ -1,2 +1,2 @@
-find /usr/share/applications/ /usr/local/share/applications/ -name '*.desktop' | \
+find /usr/share/applications/ /usr/local/share/applications/ -name '*.desktop' 2>/dev/null | \
          xargs awk '/^\[/ { if (tolower($0) != "\[desktop entry\]") nextfile } /^Exec=/ { print FILENAME ":Exec=qubes-desktop-run " FILENAME; next } /=/ {print FILENAME ":" $0 }' 2> /dev/null
