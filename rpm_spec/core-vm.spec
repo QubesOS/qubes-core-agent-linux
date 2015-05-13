@@ -371,21 +371,21 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 %config(noreplace) /etc/polkit-1/rules.d/00-qubes-allow-all.rules
 %dir /etc/qubes-rpc
-/etc/qubes-rpc/qubes.Filecopy
-/etc/qubes-rpc/qubes.OpenInVM
-/etc/qubes-rpc/qubes.GetAppmenus
-/etc/qubes-rpc/qubes.VMShell
-/etc/qubes-rpc/qubes.SyncNtpClock
-/etc/qubes-rpc/qubes.SuspendPre
-/etc/qubes-rpc/qubes.SuspendPost
-/etc/qubes-rpc/qubes.WaitForSession
-/etc/qubes-rpc/qubes.DetachPciDevice
-/etc/qubes-rpc/qubes.Backup
-/etc/qubes-rpc/qubes.Restore
-/etc/qubes-rpc/qubes.SelectFile
-/etc/qubes-rpc/qubes.SelectDirectory
-/etc/qubes-rpc/qubes.GetImageRGBA
-/etc/qubes-rpc/qubes.SetDateTime
+%config(noreplace) /etc/qubes-rpc/qubes.Filecopy
+%config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
+%config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
+%config(noreplace) /etc/qubes-rpc/qubes.VMShell
+%config(noreplace) /etc/qubes-rpc/qubes.SyncNtpClock
+%config(noreplace) /etc/qubes-rpc/qubes.SuspendPre
+%config(noreplace) /etc/qubes-rpc/qubes.SuspendPost
+%config(noreplace) /etc/qubes-rpc/qubes.WaitForSession
+%config(noreplace) /etc/qubes-rpc/qubes.DetachPciDevice
+%config(noreplace) /etc/qubes-rpc/qubes.Backup
+%config(noreplace) /etc/qubes-rpc/qubes.Restore
+%config(noreplace) /etc/qubes-rpc/qubes.SelectFile
+%config(noreplace) /etc/qubes-rpc/qubes.SelectDirectory
+%config(noreplace) /etc/qubes-rpc/qubes.GetImageRGBA
+%config(noreplace) /etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/sudoers.d/qubes
 %if %{fedora} < 21
 %config(noreplace) /etc/sysconfig/iptables
