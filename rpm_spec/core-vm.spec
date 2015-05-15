@@ -595,9 +595,13 @@ The Qubes core startup configuration for SystemD init.
 if [ $1 -eq 1 ]; then
     /bin/systemctl --no-reload preset-all
 else
-    for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-home qubes-netwatcher qubes-network qubes-qrexec-agent; do
-        /bin/systemctl --no-reload preset $srv
+    services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
+    services="$services qubes-netwatcher qubes-network qubes-sysinit"
+    services="$services qubes-update-check qubes-updates-proxy qubes-qrexec-agent"
+    for srv in $services; do
+        /bin/systemctl --no-reload preset $srv.service
     done
+    /bin/systemctl --no-reload preset qubes-update-check.timer
 fi
 
 # Set default "runlevel"
