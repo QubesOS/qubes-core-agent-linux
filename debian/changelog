@@ -1,3 +1,19 @@
+qubes-core-agent (3.0.9-1) wheezy; urgency=medium
+
+  [ Jason Mehring ]
+  * debian: Only notify dom0 on apt-get post hook; don't update package
+    index
+  * debian: Allow apt-get post hook to fail gracefully (won't work in
+    chroot)
+
+  [ Marek Marczykowski-Górecki ]
+  * appmenus: hide message about missing /usr/local/share/applications
+  * qrexec: prefer VM-local service file (if present) over default one
+  * rpm: mark service files as configuration to not override user
+    changes
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 May 2015 03:27:58 +0200
+
 qubes-core-agent (3.0.8-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
