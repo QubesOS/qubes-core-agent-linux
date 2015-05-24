@@ -179,7 +179,7 @@ int try_fork_server(int type, int connect_domain, int connect_port,
     }
     len = strlen(remote.sun_path) + sizeof(remote.sun_family);
     if (connect(s, (struct sockaddr *) &remote, len) == -1) {
-        if (errno != ECONNREFUSED)
+        if (errno != ECONNREFUSED && errno != ENOENT)
             perror("connect");
         close(s);
         return -1;
