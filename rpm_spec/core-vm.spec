@@ -58,6 +58,8 @@ Requires:   gnome-packagekit-updater
 Requires:   ImageMagick
 Requires:   fakeroot
 Requires:   desktop-notification-daemon
+Requires:   pygtk2
+Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 Provides:   qubes-core-vm
