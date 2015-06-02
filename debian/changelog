@@ -1,3 +1,12 @@
+qubes-core-agent (3.0.10-1) wheezy; urgency=medium
+
+  * rpm: ensure that all the services are enabled after upgrade
+  * qrexec: do not show message about missing fork-sever - it isn't an
+    error
+  * rpm: add missing dependencies
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 02 Jun 2015 11:20:18 +0200
+
 qubes-core-agent (3.0.9-1) wheezy; urgency=medium
 
   [ Jason Mehring ]
