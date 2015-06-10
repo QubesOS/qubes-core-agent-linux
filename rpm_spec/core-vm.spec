@@ -267,6 +267,14 @@ if [ ! -f '/etc/sysconfig/ip6tables' ]; then
   cp -p /usr/lib/qubes/init/ip6tables /etc/sysconfig/ip6tables
 fi
 
+%if %{fedora} >= 20
+# Make sure there is a default locale set so gnome-terminal will start
+if [ ! -e /etc/locale.conf ] || ! grep -q LANG /etc/locale.conf; then
+    touch /etc/locale.conf
+    echo "LANG=en_US.utf8" >> /etc/locale.conf
+fi
+%endif
+
 if [ "$1" !=  1 ] ; then
 # do the rest of %post thing only when updating for the first time...
 exit 0
