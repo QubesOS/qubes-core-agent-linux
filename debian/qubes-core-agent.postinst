@@ -182,6 +182,15 @@ case "${1}" in
         fi
         /usr/lib/qubes/qubes-fix-nm-conf.sh
 
+        # make sure locale is really generated
+        current_locale=`grep 'LANG\|LC_ALL' /etc/default/locale|head -n 1|cut -f 2 -d =`
+        if [ -n "$current_locale" ] && ! locale -a | grep -q "$current_locale"; then
+            base=`echo "$current_locale" | cut -f 1 -d .`
+            charmap=`echo "$current_locale.UTF-8" | cut -f 2 -d .`
+            [ -n "$charmap" ] && charmap="-f $charmap"
+            localedef -i $base $charmap $current_locale
+        fi
+
         # Remove old firmware updates link
         if [ -L /lib/firmware/updates ]; then
             rm -f /lib/firmware/updates
