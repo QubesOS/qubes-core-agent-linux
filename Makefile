@@ -113,7 +113,7 @@ install-common:
 	install -D misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
 	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
-	install -d $(DESTDIR)/var/lib/qubes/dom0-updates
+	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 
 	if [ -r misc/dispvm-dotfiles.$(DIST).tbz ] ; \
 	then \

@@ -57,6 +57,12 @@ fi
 mkdir -p $DOM0_UPDATES_DIR/etc
 sed -i '/^reposdir\s*=/d' $DOM0_UPDATES_DIR/etc/yum.conf
 
+if [ -e /etc/debian_version ]; then
+    # Default rpm configuration on Debian uses ~/.rpmdb for rpm database (as
+    # rpm isn't native package manager there)
+    mkdir -p "$DOM0_UPDATES_DIR$HOME"
+    ln -nsf "$DOM0_UPDATES_DIR/var/lib/rpm" "$DOM0_UPDATES_DIR$HOME/.rpmdb"
+fi
 # Rebuild rpm database in case of different rpm version
 rm -f $DOM0_UPDATES_DIR/var/lib/rpm/__*
 rpm --root=$DOM0_UPDATES_DIR --rebuilddb
@@ -91,17 +97,35 @@ if [ "$DOIT" != "1" -a "$PKGS_FROM_CMDLINE" != "1" ]; then
       --text="There are updates for dom0 available, do you want to download them now?" || exit 0
 fi
 
+YUM_COMMAND="fakeroot yum $YUM_ACTION -y --downloadonly --downloaddir=$DOM0_UPDATES_DIR/packages"
+# check for --downloadonly option - if not supported (Debian), fallback to
+# yumdownloader
+if ! yum --help | grep -q downloadonly; then
+    if [ "$YUM_ACTION" != "install" -a "$YUM_ACTION" != "upgrade" ]; then
+        echo "ERROR: yum version installed in VM $HOSTNAME does not suppport --downloadonly option" >&2
+        echo "ERROR: only 'install' and 'upgrade' actions supported ($YUM_ACTION not)" >&2
+        if [ "$GUI" = 1 ]; then
+            zenity --error --text="yum version too old for '$YUM_ACTION' action, see console for details"
+        fi
+        exit 1
+    fi
+    if [ "$YUM_ACTION" = "upgrade" ]; then
+        PKGLIST=$UPDATES
+    fi
+    YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
+fi
+
 mkdir -p "$DOM0_UPDATES_DIR/packages"
 
 set -e
 
 if [ "$GUI" = 1 ]; then
     ( echo "1"
-    fakeroot yum $YUM_ACTION -y --downloadonly --downloaddir="$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
+    $YUM_COMMAND $OPTS $PKGLIST
     echo 100 ) | zenity --progress --pulsate --auto-close --auto-kill \
          --text="Downloading updates for Dom0, please wait..." --title="Qubes Dom0 updates"
 else
-    fakeroot yum $YUM_ACTION -y --downloadonly --downloaddir="$DOM0_UPDATES_DIR/packages" $OPTS $PKGLIST
+    $YUM_COMMAND $OPTS $PKGLIST
 fi
 
 if ls $DOM0_UPDATES_DIR/packages/*.rpm > /dev/null 2>&1; then
