@@ -147,10 +147,8 @@ for f in ModemManager.service NetworkManager.service \
     cp $RPM_BUILD_ROOT/usr/lib/qubes/init/$f $RPM_BUILD_ROOT/etc/systemd/system/
 done
 
-%if %{fedora} < 21
-cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/iptables $RPM_BUILD_ROOT/etc/sysconfig/iptables
-cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/ip6tables $RPM_BUILD_ROOT/etc/sysconfig/ip6tables
-%endif
+cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/iptables $RPM_BUILD_ROOT/etc/sysconfig/iptables.qubes
+cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/ip6tables $RPM_BUILD_ROOT/etc/sysconfig/ip6tables.qubes
 
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
@@ -160,6 +158,25 @@ fi
 %triggerin -- pulseaudio-module-x11
 sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/pulseaudio.desktop
 echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/pulseaudio.desktop
+
+%triggerin -- iptables
+if ! grep -q IPTABLES_DATA /etc/sysconfig/iptables-config; then
+    cat <<EOF >>/etc/sysconfig/iptables-config
+
+### Automatically added by Qubes:
+# Override default rules location on Qubes
+IPTABLES_DATA=/etc/sysconfig/iptables.qubes
+EOF
+fi
+
+if ! grep -q IP6TABLES_DATA /etc/sysconfig/ip6tables-config; then
+    cat <<EOF >>/etc/sysconfig/ip6tables-config
+
+### Automatically added by Qubes:
+# Override default rules location on Qubes
+IP6TABLES_DATA=/etc/sysconfig/ip6tables.qubes
+EOF
+fi
 
 %post
 
@@ -266,15 +283,6 @@ if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
             echo "${ip} `hostname`" >> /etc/hosts
         fi
     done
-fi
-
-# Copy ip(|6)tables into place if they do not already exist in filesystem.
-# This prevents conflict with iptables-service
-if [ ! -f '/etc/sysconfig/iptables' -o $1 = 1 ]; then
-  cp -p /usr/lib/qubes/init/iptables /etc/sysconfig/iptables
-fi
-if [ ! -f '/etc/sysconfig/ip6tables' -o $1 = 1 ]; then
-  cp -p /usr/lib/qubes/init/ip6tables /etc/sysconfig/ip6tables
 fi
 
 %if %{fedora} >= 20
@@ -406,10 +414,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetImageRGBA
 %config(noreplace) /etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/sudoers.d/qubes
-%if %{fedora} < 21
-%config(noreplace) /etc/sysconfig/iptables
-%config(noreplace) /etc/sysconfig/ip6tables
-%endif
+%config(noreplace) /etc/sysconfig/iptables.qubes
+%config(noreplace) /etc/sysconfig/ip6tables.qubes
 /usr/lib/qubes/init/iptables
 /usr/lib/qubes/init/ip6tables
 %config(noreplace) /etc/tinyproxy/filter-updates
