@@ -1,3 +1,12 @@
+qubes-core-agent (2.1.65) wheezy; urgency=medium
+
+  * rpm: improve setting iptables rules
+  * fedora, debian: make sure that default locale is generated
+  * dom0-updates: make the tool working on Debian
+  * Do not override file pointed by /etc/localtime symlink
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 23 Jun 2015 20:12:30 +0200
+
 qubes-core-agent (2.1.64) wheezy; urgency=medium
 
   [ Jason Mehring ]
