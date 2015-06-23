@@ -82,7 +82,7 @@ fi
 if ! grep -rq "^/etc/timezone$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
     timezone=`$XS_READ qubes-timezone 2> /dev/null`
     if [ -n "$timezone" ]; then
-        cp -p /usr/share/zoneinfo/$timezone /etc/localtime
+        ln -sf ../usr/share/zoneinfo/$timezone /etc/localtime
         if [ -e /etc/debian_version ]; then
             echo "$timezone" > /etc/timezone
         else
