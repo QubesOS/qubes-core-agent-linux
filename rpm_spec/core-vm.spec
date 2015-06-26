@@ -632,7 +632,7 @@ if [ $1 -eq 1 ]; then
 else
     services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
     services="$services qubes-netwatcher qubes-network qubes-sysinit"
-    services="$services qubes-update-check qubes-updates-proxy qubes-qrexec-agent"
+    services="$services qubes-updates-proxy qubes-qrexec-agent"
     for srv in $services; do
         /bin/systemctl --no-reload preset $srv.service
     done
