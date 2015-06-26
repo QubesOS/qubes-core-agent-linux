@@ -262,6 +262,16 @@ EOF
     fi
 fi
 
+# Make sure that /etc/sysconfig/ip(|6)tables exists. Otherwise iptales.service
+# would not start (even when configured to use another configuration file.
+if [ ! -e '/etc/sysconfig/iptables' ]; then
+  ln -s iptables.qubes /etc/sysconfig/iptables
+fi
+if [ ! -e '/etc/sysconfig/ip6tables' ]; then
+  ln -s ip6tables.qubes /etc/sysconfig/ip6tables
+fi
+
+
 # ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
 # in the form expected by qubes-sysinit.sh
 if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
