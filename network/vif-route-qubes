@@ -24,6 +24,7 @@ dir=$(dirname "$0")
 . "$dir/vif-common.sh"
 
 #main_ip=$(dom0_ip)
+lockfile=/var/run/xen-hotplug/vif-lock
 
 case "$command" in
 	online)
@@ -54,7 +55,7 @@ if [ "${ip}" ] ; then
 		${cmdprefix} ip route ${ipcmd} ${addr} dev ${vif} metric $metric
 	done
 	echo -e "*raw\n$iptables_cmd -i ${vif} ! -s ${ip} -j DROP\nCOMMIT" | \
-		${cmdprefix} iptables-restore --noflush
+		${cmdprefix} flock $lockfile iptables-restore --noflush
 	back_ip=`qubesdb-read /qubes-netvm-gateway`
 	${cmdprefix} ip addr ${ipcmd} ${back_ip}/32 dev ${vif}
 fi
