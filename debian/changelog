@@ -1,3 +1,13 @@
+qubes-core-agent (3.0.13-1) wheezy; urgency=medium
+
+  * fedora: ensure that /etc/sysconfig/iptables exists (Fedora 20)
+  * fedora/systemd: fix service enabling code
+  * network: use iptables-restore instead of iptables --wait
+  * network: guard iptables call with manual lock
+  * network: disable tx csum offload on vif interfaces
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 01 Jul 2015 07:05:53 +0200
+
 qubes-core-agent (3.0.12-1) wheezy; urgency=medium
 
   * dom0-updates: make the tool working on Debian
