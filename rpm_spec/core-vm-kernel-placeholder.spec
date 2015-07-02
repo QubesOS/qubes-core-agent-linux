@@ -20,6 +20,8 @@ Provides:   xorg-x11-drv-nouveau
 #  choose the oldest Qubes-supported VM kernel
 Provides:   kernel = 3.7.4
 Provides:   kernel-modules-extra
+# for xl2tpd
+Provides: kmod(l2tp_ppp.ko)
 
 %description
 Placeholder for kernel package as it is managed by Dom0.
