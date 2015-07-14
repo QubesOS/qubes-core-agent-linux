@@ -49,7 +49,7 @@ configure_iptables() {
 	### Automatically added by Qubes:
 	# Override default rules location on Qubes
 	IPTABLES_DATA=/etc/sysconfig/iptables.qubes
-	EOF
+EOF
 	fi
 	
 	if ! grep -q IP6TABLES_DATA /etc/sysconfig/ip6tables-config; then
@@ -58,7 +58,7 @@ configure_iptables() {
 	### Automatically added by Qubes:
 	# Override default rules location on Qubes
 	IP6TABLES_DATA=/etc/sysconfig/ip6tables.qubes
-	EOF
+EOF
 	fi
 
 }
@@ -239,7 +239,7 @@ update_qubesconfig() {
 	      cat <<EOF > /etc/hosts
 	127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 `hostname`
 	::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-	EOF
+EOF
 	    fi
 	fi
 	
@@ -416,7 +416,7 @@ post_remove() {
 
     for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-home qubes-netwatcher qubes-network qubes-qrexec-agent; do
         systemctl disable $srv.service
-    do
+    done
 
 }
 
