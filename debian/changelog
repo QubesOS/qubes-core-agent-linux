@@ -1,3 +1,9 @@
+qubes-core-agent (2.1.66) wheezy; urgency=medium
+
+  * fedora: ensure that /etc/sysconfig/iptables exists (Fedora 20)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 17 Jul 2015 16:11:50 +0200
+
 qubes-core-agent (2.1.65) wheezy; urgency=medium
 
   * rpm: improve setting iptables rules
