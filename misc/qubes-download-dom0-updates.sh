@@ -80,7 +80,7 @@ else
 fi
 
 if [ -z "$PKGLIST" -a -z "$UPDATES" ]; then
-    # No new updates
+    echo "No new updates available"
     if [ "$GUI" = 1 ]; then
         zenity --info --text="No new updates available"
     fi
