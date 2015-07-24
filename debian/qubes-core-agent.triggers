@@ -1,47 +1,45 @@
-interest-noawait /usr/share/applications
-interest-noawait /lib/systemd/system/NetworkManager.service
-interest-noawait /lib/systemd/system/NetworkManager-wait-online.service
-interest-noawait /lib/systemd/system/ModemManager.service
-interest-noawait /etc/init/serial.conf
-interest-noawait /etc/selinux/config
-interest-noawait /lib/systemd/system/cups.service
-interest-noawait /lib/systemd/system/haveged.service
+interest-await /usr/share/applications
+interest-await /etc/init/serial.conf
+interest-await /etc/selinux/config
 
-# Desktop Entry Modification - Remove existing rules
-interest-noawait /etc/xdg/autostart/gpk-update-icon.desktop
-interest-noawait /etc/xdg/autostart/nm-applet.desktop
-interest-noawait /etc/xdg/autostart/abrt-applet.desktop
+# Desktop Entry Modification - Enable cups notification
+interest-await /lib/systemd/system/cups.service
+interest-await /etc/xdg/autostart/print-applet.desktop
 
 # Desktop Entry Modification - Not shown in Qubes
-interest-noawait /etc/xdg/autostart/pulseaudio.desktop
-interest-noawait /etc/xdg/autostart/deja-dup-monitor.desktop
-interest-noawait /etc/xdg/autostart/imsettings-start.desktop
-interest-noawait /etc/xdg/autostart/krb5-auth-dialog.desktop
-interest-noawait /etc/xdg/autostart/pulseaudio.desktop
-interest-noawait /etc/xdg/autostart/restorecond.desktop
-interest-noawait /etc/xdg/autostart/sealertauto.desktop
-interest-noawait /etc/xdg/autostart/gnome-power-manager.desktop
-interest-noawait /etc/xdg/autostart/gnome-sound-applet.desktop
-interest-noawait /etc/xdg/autostart/gnome-screensaver.desktop
-interest-noawait /etc/xdg/autostart/orca-autostart.desktop
+interest-await /etc/xdg/autostart/pulseaudio.desktop
+interest-await /etc/xdg/autostart/deja-dup-monitor.desktop
+interest-await /etc/xdg/autostart/imsettings-start.desktop
+interest-await /etc/xdg/autostart/krb5-auth-dialog.desktop
+interest-await /etc/xdg/autostart/restorecond.desktop
+interest-await /etc/xdg/autostart/sealertauto.desktop
+interest-await /etc/xdg/autostart/gnome-power-manager.desktop
+interest-await /etc/xdg/autostart/gnome-sound-applet.desktop
+interest-await /etc/xdg/autostart/gnome-screensaver.desktop
+interest-await /etc/xdg/autostart/orca-autostart.desktop
 
 # Desktop Entry Modification - Not shown in in DisposableVM
-interest-noawait /etc/xdg/autostart/gcm-apply.desktop
+interest-await /etc/xdg/autostart/gcm-apply.desktop
 
 # Desktop Entry Modification - Only shown in AppVM
-interest-noawait /etc/xdg/autostart/gnome-keyring-gpg.desktop
-interest-noawait /etc/xdg/autostart/gnome-keyring-pkcs11.desktop
-interest-noawait /etc/xdg/autostart/gnome-keyring-secrets.desktop
-interest-noawait /etc/xdg/autostart/gnome-keyring-ssh.desktop
-interest-noawait /etc/xdg/autostart/gnome-settings-daemon.desktop
-interest-noawait /etc/xdg/autostart/user-dirs-update-gtk.desktop
-interest-noawait /etc/xdg/autostart/gsettings-data-convert.desktop
+interest-await /etc/xdg/autostart/gnome-keyring-gpg.desktop
+interest-await /etc/xdg/autostart/gnome-keyring-pkcs11.desktop
+interest-await /etc/xdg/autostart/gnome-keyring-secrets.desktop
+interest-await /etc/xdg/autostart/gnome-keyring-ssh.desktop
+interest-await /etc/xdg/autostart/gnome-settings-daemon.desktop
+interest-await /etc/xdg/autostart/user-dirs-update-gtk.desktop
+interest-await /etc/xdg/autostart/gsettings-data-convert.desktop
+
+# Desktop Entry Modification - Remove existing rules
+#interest-await /etc/xdg/autostart/gpk-update-icon.desktop
+#interest-await /etc/xdg/autostart/nm-applet.desktop
+interest-await /etc/xdg/autostart/abrt-applet.desktop
 
 # Desktop Entry Modification - Only shown in Gnome & UpdateableVM
-interest-noawait /etc/xdg/autostart/gpk-update-icon.desktop
+interest-await /etc/xdg/autostart/gpk-update-icon.desktop
 
 # Desktop Entry Modification - Only shown in Gnome & Qubes
-interest-noawait /etc/xdg/autostart/nm-applet.desktop
+interest-await /etc/xdg/autostart/nm-applet.desktop
 
 # Desktop Entry Modification - Show in all
-interest-noawait /etc/xdg/autostart/notify-osd.desktop
+interest-await /etc/xdg/autostart/notify-osd.desktop
