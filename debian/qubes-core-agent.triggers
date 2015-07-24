@@ -2,10 +2,6 @@ interest-await /usr/share/applications
 interest-await /etc/init/serial.conf
 interest-await /etc/selinux/config
 
-# Desktop Entry Modification - Enable cups notification
-interest-await /lib/systemd/system/cups.service
-interest-await /etc/xdg/autostart/print-applet.desktop
-
 # Desktop Entry Modification - Not shown in Qubes
 interest-await /etc/xdg/autostart/pulseaudio.desktop
 interest-await /etc/xdg/autostart/deja-dup-monitor.desktop
