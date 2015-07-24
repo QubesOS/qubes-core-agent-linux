@@ -45,21 +45,40 @@ all:
 	make -C qrexec
 	make -C qubes-rpc
 
+# Dropin Directory
+DROPIN_DIR ?= "lib/systemd/system"
+
+# Fedora Dropins
+DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
+DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
+
+# Debian Dropins
+ifeq ($(shell lsb_release -is), Debian)
+    # Don't have 'ntpd' in Debian
+    DROPINS := $(filter-out ntpd.service, $(DROPINS))
+
+    # 'crond.service' is named 'cron.service in Debian
+    DROPINS := $(strip $(patsubst crond.service, cron.service, $(DROPINS)))
+
+    # Wheezy Dropins
+    # Disable sysinit 'network-manager.service' since systemd 'NetworkManager.service' is already installed
+    DROPINS += $(strip $(if $(filter wheezy, $(shell lsb_release -cs)), network-manager.service,))
+endif
+
+install-systemd-dropins:
+	@for dropin in $(DROPINS); do \
+	    install -d $(DESTDIR)/$(DROPIN_DIR)/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/$${dropin}.d/ ;\
+	done
+
 install-systemd:
 	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d
 	install -m 0755 vm-systemd/*.sh $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
-	install -m 0644 vm-systemd/ModemManager.service $(DESTDIR)$(LIBDIR)/qubes/init/
-	install -m 0644 vm-systemd/NetworkManager.service $(DESTDIR)$(LIBDIR)/qubes/init/
-	install -m 0644 vm-systemd/NetworkManager-wait-online.service $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
 	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
-	install -m 0644 vm-systemd/cups.* $(DESTDIR)$(LIBDIR)/qubes/init/
-	install -m 0644 vm-systemd/ntpd.service $(DESTDIR)$(LIBDIR)/qubes/init/
-	install -m 0644 vm-systemd/chronyd.service $(DESTDIR)$(LIBDIR)/qubes/init/
-	install -m 0644 vm-systemd/crond.service $(DESTDIR)$(LIBDIR)/qubes/init/
 
 install-sysvinit:
 	install -d $(DESTDIR)/etc/init.d
@@ -73,7 +92,7 @@ install-sysvinit:
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install -D vm-init.d/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
 
-install-rh: install-systemd install-sysvinit
+install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -D -m 0644 misc/qubes-r3.repo $(DESTDIR)/etc/yum.repos.d/qubes-r3.repo
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
@@ -186,7 +205,7 @@ install-common:
 	install -d $(DESTDIR)/home_volatile/user
 	install -d $(DESTDIR)/rw
 
-install-deb:
+install-deb: install-common install-systemd install-systemd-dropins
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
 	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r3.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r3.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
