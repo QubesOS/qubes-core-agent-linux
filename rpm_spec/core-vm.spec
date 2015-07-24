@@ -77,27 +77,6 @@ BuildRequires: qubes-libvchan-%{backend_vmm}-devel
 
 %define kde_service_dir /usr/share/kde4/services
 
-%define installOverridenServices() \
-UNITDIR=/lib/systemd/system\
-OVERRIDEDIR=/usr/lib/qubes/init\
-# Install overriden services only when original exists\
-for srv in %*; do\
-    if [ -f $UNITDIR/$srv.service ]; then\
-        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/\
-        /bin/systemctl is-enabled $srv.service >/dev/null && /bin/systemctl --no-reload reenable $srv.service 2>/dev/null\
-    fi\
-    if [ -f $UNITDIR/$srv.socket -a -f $OVERRIDEDIR/$srv.socket ]; then\
-        cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/\
-        /bin/systemctl is-enabled $srv.socket >/dev/null && /bin/systemctl --no-reload reenable $srv.socket 2>/dev/null\
-    fi\
-    if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then\
-        cp $OVERRIDEDIR/$srv.path /etc/systemd/system/\
-        /bin/systemctl is-enabled $srv.path >/dev/null && /bin/systemctl --no-reload reenable $srv.path 2>/dev/null\
-    fi\
-done\
-/bin/systemctl daemon-reload\
-%{nil}
-
 %description
 The Qubes core files for installation inside a Qubes VM.
 
@@ -138,14 +117,6 @@ usermod -L user
 
 (cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
-
-# Create ghost files to silent rpmbuild warnings, those files will NOT be
-# included in package
-mkdir -p $RPM_BUILD_ROOT/etc/systemd/system
-for f in ModemManager.service NetworkManager.service \
-        NetworkManager-wait-online.service cups.service cups.socket cups.path; do
-    cp $RPM_BUILD_ROOT/usr/lib/qubes/init/$f $RPM_BUILD_ROOT/etc/systemd/system/
-done
 
 cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/iptables $RPM_BUILD_ROOT/etc/sysconfig/iptables.qubes
 cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/ip6tables $RPM_BUILD_ROOT/etc/sysconfig/ip6tables.qubes
@@ -609,26 +580,31 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/misc-post-stop.sh
 /usr/lib/qubes/init/mount-home.sh
 /usr/lib/qubes/init/qubes-sysinit.sh
-/usr/lib/qubes/init/ModemManager.service
-/usr/lib/qubes/init/NetworkManager.service
-/usr/lib/qubes/init/NetworkManager-wait-online.service
-/usr/lib/qubes/init/cups.service
-/usr/lib/qubes/init/cups.socket
-/usr/lib/qubes/init/cups.path
-/usr/lib/qubes/init/ntpd.service
-/usr/lib/qubes/init/chronyd.service
-/usr/lib/qubes/init/crond.service
-%ghost %attr(0644,root,root) /etc/systemd/system/ModemManager.service
-%ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager.service
-%ghost %attr(0644,root,root) /etc/systemd/system/NetworkManager-wait-online.service
-%ghost %attr(0644,root,root) /etc/systemd/system/cups.service
-%ghost %attr(0644,root,root) /etc/systemd/system/cups.socket
-%ghost %attr(0644,root,root) /etc/systemd/system/cups.path
+%dir /lib/systemd/system/chronyd.service.d
+%dir /lib/systemd/system/crond.service.d
+%dir /lib/systemd/system/cups.service.d
+%dir /lib/systemd/system/cups.socket.d
+%dir /lib/systemd/system/cups.path.d
+%dir /lib/systemd/system/getty@tty.service.d
+%dir /lib/systemd/system/ModemManager.service.d
+%dir /lib/systemd/system/NetworkManager.service.d
+%dir /lib/systemd/system/NetworkManager-wait-online.service.d
+%dir /lib/systemd/system/ntpd.service.d
+/lib/systemd/system/chronyd.service.d/30_qubes.conf
+/lib/systemd/system/crond.service.d/30_qubes.conf
+/lib/systemd/system/cups.service.d/30_qubes.conf
+/lib/systemd/system/cups.socket.d/30_qubes.conf
+/lib/systemd/system/cups.path.d/30_qubes.conf
+/lib/systemd/system/getty@tty.service.d/30_qubes.conf
+/lib/systemd/system/ModemManager.service.d/30_qubes.conf
+/lib/systemd/system/NetworkManager.service.d/30_qubes.conf
+/lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
+/lib/systemd/system/ntpd.service.d/30_qubes.conf
 
 %post systemd
 
 if [ $1 -eq 1 ]; then
-    /bin/systemctl --no-reload preset-all
+    /bin/systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
 else
     services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
     services="$services qubes-netwatcher qubes-network qubes-sysinit"
@@ -653,33 +629,17 @@ grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while 
             fi
         fi
         ;;
+    *)
+        # preset-all is not available in fc20; so preset each unit file listed in 75-qubes-vm.preset
+        if [ "${PRESET_FAILED}" -eq 1 ]; then
+            systemctl --no-reload preset "${unit_name}" > /dev/null 2>&1 || true
+        fi
+        ;;
     esac
 done
 
-rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
-
 /bin/systemctl daemon-reload
 
-exit 0
-
-%triggerin systemd -- NetworkManager
-%installOverridenServices ModemManager NetworkManager NetworkManager-wait-online
-# Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
-/bin/systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
-# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
-/bin/systemctl enable NetworkManager-dispatcher.service 2> /dev/null
-exit 0
-
-%triggerin systemd -- cups
-%installOverridenServices cups
-exit 0
-
-%triggerin systemd -- cronie
-%installOverridenServices crond
-exit 0
-
-%triggerin systemd -- chrony
-%installOverridenServices chronyd
 exit 0
 
 %postun systemd
