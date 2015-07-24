@@ -14,7 +14,7 @@ override_dh_auto_build:
 	make all
 
 override_dh_auto_install:
-	make install-common install-deb install-systemd
+	make install-deb
 	make -C qrexec install
 
 override_dh_fixperms:

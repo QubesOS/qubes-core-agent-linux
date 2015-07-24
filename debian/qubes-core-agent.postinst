@@ -22,54 +22,6 @@ set -e
 # Directory that modified desktop entry config files are stored in
 XDG_CONFIG_QUBES="/usr/share/qubes/xdg"
 
-# Install overriden services only when original exists
-installOverridenServices() {
-    override_dir="${1}"
-    service="${2}"
-    retval=1
-
-    for unit in ${service}; do
-        unit="${unit%%.*}"
-        unit_name="$(basename ${unit})"
-        if [ -f ${unit}.service ]; then
-            echo "Installing override for ${unit}.service..."
-            cp ${override_dir}/${unit_name}.service /etc/systemd/system/
-            retval=0
-        fi
-        if [ -f ${unit}.socket -a -f ${override_dir}/${unit}.socket ]; then
-            echo "Installing override for ${unit}.socket..."
-            cp ${override_dir}/${unit_name}.socket /etc/systemd/system/
-            retval=0
-        fi
-        if [ -f ${unit}.path -a -f ${override_dir}/${unit}.path ]; then
-            echo "Installing override for ${unit}.path..."
-            cp ${override_dir}/${unit_name}.path /etc/systemd/system/
-            retval=0
-        fi
-    done
-
-    return ${retval}
-}
-
-reenableNetworkManager() {
-    # Disable original service to enable overriden one
-    echo "Disabling original service to enable overriden one..."
-    disableSystemdUnits ModemManager.service
-    disableSystemdUnits NetworkManager.service
-
-    # Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
-    echo "Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)"
-    systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null || echo "Could not disable D-BUS activation of NetworkManager"
-
-    echo "Re-enabling original service to enable overriden one..."
-    enableSystemdUnits ModemManager.service
-    enableSystemdUnits NetworkManager.service
-
-    # Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
-    echo "Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811"
-    enableSystemdUnits NetworkManager-dispatcher.service
-}
-
 remove_ShowIn() {
     if [ -e "${1}" ]; then
         sed -i '/^\(Not\|Only\)ShowIn/d' "${1}"
@@ -105,59 +57,44 @@ showIn() {
     fi
 }
 
-changeSystemdStatus() {
-    unit=${1}
-    disable=${2-0}
-    
-    # Check if unit file is currently active (running)
-    systemctl is-active ${unit} > /dev/null 2>&1 && active=true || unset active
+systemdPreload() {
+    # Debian systemd helper does not yet honour preset, therefore use
+    # systemctl preset on each unit file (not using preset-all either since
+    # wheezy does not support it) listed in 75-qubes-vm.preset.
 
-    case ${disable} in
-        0)
-            systemctl --quiet enable ${unit} > /dev/null 2>&1 || true
-            ;;
-        1)  
-            if [ $active ]; then
-                systemctl --quiet stop ${unit} > /dev/null 2>&1 || true
-            fi  
+    systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
 
-            if [ -f /lib/systemd/system/${unit} ]; then
-                if fgrep -q '[Install]' /lib/systemd/system/${unit}; then
-                    systemctl --quiet disable ${unit} > /dev/null 2>&1 || true
-                else
-                    # Forcibly disable
-                    ln -sf /dev/null /etc/systemd/system/${unit}
+    # Mask any static unit files that are marked to be disabled
+    grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
+        case "${action}" in
+        disable)
+            if [ -e "/lib/systemd/system/${unit_name}" ]; then
+                if ! fgrep -q '[Install]' "/lib/systemd/system/${unit_name}"; then
+                    deb-systemd-helper mask "${unit_name}" > /dev/null 2>&1 || true
                 fi
-            else
-                systemctl --quiet disable ${unit} > /dev/null 2>&1 || true
             fi
             ;;
-    esac
-}
-
-# Enable systemd units
-enableSystemdUnits() {
-    for unit in $*; do
-        changeSystemdStatus ${unit} 0 || true
+        *)
+            # preset-all is not available in wheezy; so preset each unit file listed in 75-qubes-vm.preset
+            if [ "${PRESET_FAILED}" -eq 1 ]; then
+                systemctl --no-reload preset "${unit_name}" > /dev/null 2>&1 || true
+            fi
+            ;;
+        esac
     done
-}
 
-# Disable systemd units
-disableSystemdUnits() {
-    for unit in $*; do
-        changeSystemdStatus ${unit} 1 || true
-    done
+    systemctl daemon-reload
 }
 
 # Manually trigger all triggers to automaticatly configure
 triggerTriggers() {
-        path="$(readlink -m ${0})"
-        triggers="${path/postinst/triggers}"
+    path="$(readlink -m ${0})"
+    triggers="${path/postinst/triggers}"
 
-        awk '{sub(/[ \t]*#.*/,"")} NF' ${triggers} | while read line
-        do
-            /bin/bash -c "${0} triggered ${line##* }" || true
-        done
+    awk '{sub(/[ \t]*#.*/,"")} NF' ${triggers} | while read line
+    do
+        /bin/bash -c "${0} triggered ${line##* }" || true
+    done
 }
 
 case "${1}" in
@@ -170,9 +107,7 @@ case "${1}" in
                     tty ; do
             dpkg-divert --divert /etc/init/${init}.conf.qubes-disabled --package qubes-core-agent --rename --add /etc/init/${init}.conf
         done
-
-        # Disable sysv init network-manager
-        disableSystemdUnits network-manager
+        dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
 
         # Create NetworkManager configuration if we do not have it
         if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
@@ -224,71 +159,15 @@ case "${1}" in
             dpkg-statoverride --update --add user user 775 /var/lib/qubes/dom0-updates
         fi
 
-        dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
-
-        # Enable Qubes systemd units
-        enableSystemdUnits \
-            qubes-sysinit.service \
-            qubes-misc-post.service \
-            qubes-netwatcher.service \
-            qubes-network.service \
-            qubes-firewall.service \
-            qubes-updates-proxy.service \
-            qubes-update-check.timer \
-            qubes-qrexec-agent.service
-
         # Set default "runlevel"
         rm -f /etc/systemd/system/default.target
         ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
-        # Process all triggers which will set defaults to wanted values
+        ## Systemd preload-all
+        systemdPreload
+
+        ## Process all triggers which will set defaults to wanted values
         triggerTriggers
-
-        disableSystemdUnits \
-            alsa-store.service \
-            alsa-restore.service \
-            auditd.service \
-            avahi.service \
-            avahi-daemon.service \
-            backuppc.service \
-            cpuspeed.service \
-            crond.service \
-            fedora-autorelabel.service \
-            fedora-autorelabel-mark.service \
-            ipmi.service \
-            hwclock-load.service \
-            hwclock-save.service \
-            mdmonitor.service \
-            multipathd.service \
-            openct.service \
-            rpcbind.service \
-            mcelog.service \
-            fedora-storage-init.service \
-            fedora-storage-init-late.service \
-            plymouth-start.service \
-            plymouth-read-write.service \
-            plymouth-quit.service \
-            plymouth-quit-wait.service \
-            sshd.service \
-            tcsd.service \
-            sm-client.service \
-            sendmail.service \
-            mdmonitor-takeover.service \
-            rngd smartd.service \
-            upower.service \
-            irqbalance.service \
-            colord.service 
-
-        rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
-
-        # Enable other systemd units
-        enableSystemdUnits \
-            rsyslog.service \
-            netfilter-persistent.service
-
-        # XXX: TODO: Needs to be implemented still
-        # These do not exist on debian; maybe a different package name
-        #    ntpd.service \
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -303,28 +182,9 @@ case "${1}" in
                 /usr/share/applications)
                     echo "Updating Qubes App Menus..."
                     /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
-                    ;;
 
-                # Install overriden services only when original exists
-                /lib/systemd/system/NetworkManager.service | \
-                /lib/systemd/system/NetworkManager-wait-online.service | \
-                /lib/systemd/system/ModemManager.service)
-                    UNITDIR=/lib/systemd/system
-                    OVERRIDEDIR=/usr/lib/qubes/init
-                    installOverridenServices "${OVERRIDEDIR}" "${trigger}"
-                    if [ $? -eq 0 ]; then
-                        reenableNetworkManager
-                    fi
-                    ;;
-
-                # Enable cups only when it is real Systemd service
-                /lib/systemd/system/cups.service)
-                    [ -e /lib/systemd/system/cups.service ] && enableSystemdUnits cups.service
-                    ;;
-
-                # "Enable haveged service"
-                /lib/systemd/system/haveged.service)
-                    [ -e /lib/systemd/system/haveged.service ] && enableSystemdUnits haveged.service
+                    ## Systemd preload-all
+                    #systemdPreload
                     ;;
 
                 # Install overridden serial.conf init script 
@@ -400,6 +260,7 @@ case "${1}" in
                     ;;
             esac
         done
+        exit 0
         ;;
 
     *)
