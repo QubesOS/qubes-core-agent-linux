@@ -646,7 +646,7 @@ ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
     case "$action" in
     (disable)
-        if [ -f /lib/systemd/system/$unit_name.service ]; then
+        if [ -f /lib/systemd/system/$unit_name ]; then
             if ! fgrep -q '[Install]' /lib/systemd/system/$unit_name; then
                 # forcibly disable
                 ln -sf /dev/null /etc/systemd/system/$unit_name
