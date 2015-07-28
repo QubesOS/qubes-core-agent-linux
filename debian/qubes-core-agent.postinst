@@ -220,6 +220,10 @@ case "${1}" in
 
         chown user:user /home_volatile/user
 
+        if ! dpkg-statoverride --list /var/lib/qubes/dom0-updates >/dev/null 2>&1; then
+            dpkg-statoverride --update --add user user 775 /var/lib/qubes/dom0-updates
+        fi
+
         dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
 
         # Enable Qubes systemd units
