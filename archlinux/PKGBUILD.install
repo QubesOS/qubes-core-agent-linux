@@ -350,6 +350,14 @@ post_install() {
 
 	mkdir -p /rw
 
+	configure_iptables
+	configure_notification-daemon
+	configure_selinux
+	configure_networkmanager
+	configure_cups
+	configure_cronie
+	configure_crony
+
 	systemctl --no-reload preset-all
 
 	update_systemd_finalize
@@ -367,6 +375,14 @@ post_upgrade() {
 	update_xdgstart
 
 	update_qubesconfig
+
+	configure_iptables
+	configure_notification-daemon
+	configure_selinux
+	configure_networkmanager
+	configure_cups
+	configure_cronie
+	configure_crony
 
 	services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
 	services="$services qubes-netwatcher qubes-network qubes-sysinit"
