@@ -34,12 +34,7 @@ configure_initscripts() {
 
 }
 
-configure_pulseaudio() {
 
-	sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/pulseaudio.desktop
-	echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/pulseaudio.desktop
-
-}
 
 configure_iptables() {
 	
