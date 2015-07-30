@@ -6,18 +6,17 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=2
+pkgrel=3
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
 url="http://qubes-os.org/"
 license=('GPL')
 groups=()
-depends=(ethtool ntp net-tools qubes-vm-utils gnome-packagekit imagemagick fakeroot notification-daemon pygtk zenity qubes-libvchan qubes-db-vm haveged)
+depends=(ethtool ntp net-tools qubes-vm-utils gnome-packagekit imagemagick fakeroot notification-daemon pygtk zenity qubes-libvchan qubes-db-vm haveged python2-gobject)
 makedepends=(qubes-vm-utils qubes-libvchan-xen)
 checkdepends=()
 optdepends=(gnome-keyring gnome-settings-daemon networkmanager iptables tinyproxy python2-nautilus gpk-update-viewer)
-# Unknown deps: pygobject3-base (for qubes-desktop-run)
 provides=()
 conflicts=()
 replaces=()
@@ -48,6 +47,10 @@ sed 's:/sbin/route:route:g' -i network/*
 sed 's:/sbin/ethtool:ethtool:g' -i network/*
 sed 's:/sbin/ip:ip:g' -i network/*
 sed 's:/bin/grep:grep:g' -i network/*
+
+# Fix for running with python2
+sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i misc/*
+sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i qubes-rpc/*
 
 # Fix for archlinux sbindir
 sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
