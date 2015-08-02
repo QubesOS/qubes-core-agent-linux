@@ -108,6 +108,7 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
 	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
+	install -D -m 0644 misc/qubes-trigger-desktop-file-install.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-desktop-file-install.action
 
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
@@ -166,6 +167,8 @@ install-common:
 	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
 
 	install -d $(DESTDIR)/usr/bin
+	install -m 0755 misc/qubes-desktop-file-install $(DESTDIR)/usr/bin/qubes-desktop-file-install
+	install -m 0755 misc/qubes-trigger-desktop-file-install $(DESTDIR)$(LIBDIR)/qubes/qubes-trigger-desktop-file-install
 
 	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-move-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
 	install qubes-rpc/wrap-in-html-if-url.sh $(DESTDIR)$(LIBDIR)/qubes
