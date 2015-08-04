@@ -3,29 +3,6 @@
 ## Install Hooks ##
 ###################
 
-installOverridenServices() {
-	UNITDIR=/lib/systemd/system
-	OVERRIDEDIR=/usr/lib/qubes/init
-	# Install overriden services only when original exists
-	for srv in %*; do
-	    if [ -f $UNITDIR/$srv.service ]; then
-	        cp $OVERRIDEDIR/$srv.service /etc/systemd/system/
-	        systemctl is-enabled $srv.service >/dev/null && systemctl --no-reload reenable $srv.service 2>/dev/null
-	    fi
-	    if [ -f $UNITDIR/$srv.socket -a -f $OVERRIDEDIR/$srv.socket ]; then
-	        cp $OVERRIDEDIR/$srv.socket /etc/systemd/system/
-	        systemctl is-enabled $srv.socket >/dev/null && systemctl --no-reload reenable $srv.socket 2>/dev/null
-	    fi
-	    if [ -f $UNITDIR/$srv.path -a -f $OVERRIDEDIR/$srv.path ]; then
-	        cp $OVERRIDEDIR/$srv.path /etc/systemd/system/
-	        systemctl is-enabled $srv.path >/dev/null && systemctl --no-reload reenable $srv.path 2>/dev/null
-	    fi
-	done
-	
-	systemctl daemon-reload
-
-}
-
 configure_initscripts() {
 
 	if [ -e /etc/init/serial.conf ]; then
@@ -74,26 +51,12 @@ configure_selinux() {
 }
 
 configure_networkmanager() {
-	installOverridenServices ModemManager NetworkManager NetworkManager-wait-online
 	# Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
 	systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
 
 	# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
 	systemctl enable NetworkManager-dispatcher.service 2> /dev/null
 }
-
-configure_cups() {
-	installOverridenServices cups
-}
-
-configure_cronie() {
-	installOverridenServices crond
-}
-
-configure_crony() {
-	installOverridenServices chronyd
-}
-
 
 ###########################
 ## Pre-Install functions ##
@@ -354,9 +317,6 @@ post_install() {
 	configure_notification-daemon
 	configure_selinux
 	configure_networkmanager
-	configure_cups
-	configure_cronie
-	configure_crony
 
 	systemctl --no-reload preset-all
 
@@ -380,9 +340,6 @@ post_upgrade() {
 	configure_notification-daemon
 	configure_selinux
 	configure_networkmanager
-	configure_cups
-	configure_cronie
-	configure_crony
 
 	services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
 	services="$services qubes-netwatcher qubes-network qubes-sysinit"
