@@ -62,6 +62,7 @@ FILES=(
     'gnome-sound-applet'
     'gnome-screensaver'
     'orca-autostart'
+    'notify-osd'
 ); install --remove-show-in --add-not-show-in X-QUBES
 
 # Desktop Entry Modification - NotShowIn=DisposableVM
@@ -91,7 +92,3 @@ FILES=('nm-applet')
 FILES=(
     'abrt-applet'
 ); install --remove-show-in
-
-# Desktop Entry Modification - Misc
-# notify-osd
-$INSTALL_CMD --remove-show-in --remove-key X-GNOME-Autostart-enabled "$(generatePath notify-osd)"
