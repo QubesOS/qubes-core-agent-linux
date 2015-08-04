@@ -593,6 +593,7 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
+PRESET_FAILED=0
 if [ $1 -eq 1 ]; then
     /bin/systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
 else
@@ -621,7 +622,7 @@ grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while 
         ;;
     *)
         # preset-all is not available in fc20; so preset each unit file listed in 75-qubes-vm.preset
-        if [ "${PRESET_FAILED}" -eq 1 ]; then
+        if [ $1 -eq 1 -a "${PRESET_FAILED}" -eq 1 ]; then
             systemctl --no-reload preset "${unit_name}" > /dev/null 2>&1 || true
         fi
         ;;
