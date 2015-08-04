@@ -273,7 +273,7 @@ if [ ! -e /etc/locale.conf ] || ! grep -q LANG /etc/locale.conf; then
     echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 fi
 # ... and make sure it is really generated
-current_locale=`grep LANG /etc/locale.conf|cut -f 2 -d =`
+current_locale=`grep LANG /etc/locale.conf|cut -f 2 -d = | tr -d '"'`
 if [ -n "$current_locale" ] && ! locale -a | grep -q "$current_locale"; then
     base=`echo "$current_locale" | cut -f 1 -d .`
     charmap=`echo "$current_locale.UTF-8" | cut -f 2 -d .`
