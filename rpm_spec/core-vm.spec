@@ -580,16 +580,6 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/misc-post-stop.sh
 /usr/lib/qubes/init/mount-home.sh
 /usr/lib/qubes/init/qubes-sysinit.sh
-%dir /lib/systemd/system/chronyd.service.d
-%dir /lib/systemd/system/crond.service.d
-%dir /lib/systemd/system/cups.service.d
-%dir /lib/systemd/system/cups.socket.d
-%dir /lib/systemd/system/cups.path.d
-%dir /lib/systemd/system/getty@tty.service.d
-%dir /lib/systemd/system/ModemManager.service.d
-%dir /lib/systemd/system/NetworkManager.service.d
-%dir /lib/systemd/system/NetworkManager-wait-online.service.d
-%dir /lib/systemd/system/ntpd.service.d
 /lib/systemd/system/chronyd.service.d/30_qubes.conf
 /lib/systemd/system/crond.service.d/30_qubes.conf
 /lib/systemd/system/cups.service.d/30_qubes.conf
