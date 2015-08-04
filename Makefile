@@ -79,6 +79,7 @@ install-systemd:
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
 	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
 	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
+	install -m 0755 network/qubes-iptables $(DESTDIR)$(LIBDIR)/qubes/init/
 
 install-sysvinit:
 	install -d $(DESTDIR)/etc/init.d
@@ -91,6 +92,7 @@ install-sysvinit:
 	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install -D vm-init.d/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
+	install network/qubes-iptables $(DESTDIR)/etc/init.d/
 
 install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -D -m 0644 misc/qubes-r3.repo $(DESTDIR)/etc/yum.repos.d/qubes-r3.repo
@@ -113,9 +115,6 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
-
-	install -m 0400 -D network/iptables $(DESTDIR)/usr/lib/qubes/init/iptables
-	install -m 0400 -D network/ip6tables $(DESTDIR)/usr/lib/qubes/init/ip6tables
 
 install-common:
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
@@ -162,6 +161,9 @@ install-common:
 	install -d $(DESTDIR)/etc/xdg/autostart
 	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)$(LIBDIR)/qubes/show-hide-nm-applet.sh
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
+	install -m 0400 -D network/iptables $(DESTDIR)/etc/qubes/iptables.rules
+	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
+
 
 	install -d $(DESTDIR)/$(SBINDIR)
 	install network/qubes-firewall $(DESTDIR)/$(SBINDIR)/
@@ -213,8 +215,6 @@ install-deb: install-common install-systemd install-systemd-dropins
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
 	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r3.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r3.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
-	install -D -m 644 network/iptables $(DESTDIR)/etc/iptables/rules.v4
-	install -D -m 644 network/ip6tables $(DESTDIR)/etc/iptables/rules.v6
 	install -D -m 644 network/00notify-hook $(DESTDIR)/etc/apt/apt.conf.d/00notify-hook
 	install -d $(DESTDIR)/etc/sysctl.d
 	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/

@@ -2,7 +2,7 @@
 Description=Qubes updates proxy (tinyproxy)
 ConditionPathExists=|/var/run/qubes-service/qubes-yum-proxy
 ConditionPathExists=|/var/run/qubes-service/qubes-updates-proxy
-After=iptables.service
+After=qubes-iptables.service
 
 [Service]
 ExecStartPre=/usr/bin/install -d --owner tinyproxy --group tinyproxy /var/run/tinyproxy

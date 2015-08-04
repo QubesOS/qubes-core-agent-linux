@@ -37,7 +37,6 @@ Requires:   yum-plugin-post-transaction-actions
 Requires:   NetworkManager >= 0.8.1-1
 %if %{fedora} >= 18
 # Fedora >= 18 defaults to firewalld, which isn't supported nor needed by Qubes
-Requires:   iptables-services
 Conflicts:  firewalld
 %endif
 Requires:	/usr/bin/mimeopen
@@ -120,9 +119,6 @@ usermod -L user
 (cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
 
-cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/iptables $RPM_BUILD_ROOT/etc/sysconfig/iptables.qubes
-cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/ip6tables $RPM_BUILD_ROOT/etc/sysconfig/ip6tables.qubes
-
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
 	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
@@ -130,25 +126,6 @@ fi
 
 %triggerin -- pulseaudio-module-x11
 /usr/bin/qubes-desktop-file-install --force --dir /var/lib/qubes/xdg/autostart --remove-show-in --add-not-show-in X-QUBES /etc/xdg/autostart/pulseaudio.desktop
-
-%triggerin -- iptables
-if ! grep -q IPTABLES_DATA /etc/sysconfig/iptables-config; then
-    cat <<EOF >>/etc/sysconfig/iptables-config
-
-### Automatically added by Qubes:
-# Override default rules location on Qubes
-IPTABLES_DATA=/etc/sysconfig/iptables.qubes
-EOF
-fi
-
-if ! grep -q IP6TABLES_DATA /etc/sysconfig/ip6tables-config; then
-    cat <<EOF >>/etc/sysconfig/ip6tables-config
-
-### Automatically added by Qubes:
-# Override default rules location on Qubes
-IP6TABLES_DATA=/etc/sysconfig/ip6tables.qubes
-EOF
-fi
 
 %post
 
@@ -202,16 +179,6 @@ if ! grep -rq "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
 EOF
     fi
 fi
-
-# Make sure that /etc/sysconfig/ip(|6)tables exists. Otherwise iptales.service
-# would not start (even when configured to use another configuration file.
-if [ ! -e '/etc/sysconfig/iptables' ]; then
-  ln -s iptables.qubes /etc/sysconfig/iptables
-fi
-if [ ! -e '/etc/sysconfig/ip6tables' ]; then
-  ln -s ip6tables.qubes /etc/sysconfig/ip6tables
-fi
-
 
 # ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
 # in the form expected by qubes-sysinit.sh
@@ -357,10 +324,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetImageRGBA
 %config(noreplace) /etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/sudoers.d/qubes
-%config(noreplace) /etc/sysconfig/iptables.qubes
-%config(noreplace) /etc/sysconfig/ip6tables.qubes
-/usr/lib/qubes/init/iptables
-/usr/lib/qubes/init/ip6tables
+%config(noreplace) /etc/qubes/iptables.rules
+%config(noreplace) /etc/qubes/ip6tables.rules
 %config(noreplace) /etc/tinyproxy/filter-updates
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
@@ -451,6 +416,7 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-core-netvm
 /etc/init.d/qubes-firewall
 /etc/init.d/qubes-netwatcher
+/etc/init.d/qubes-iptables
 /etc/init.d/qubes-updates-proxy
 /etc/init.d/qubes-qrexec-agent
 /etc/sysconfig/modules/qubes-core.modules
@@ -476,8 +442,6 @@ done
 chkconfig rsyslog on
 chkconfig haldaemon on
 chkconfig messagebus on
-chkconfig iptables on
-chkconfig ip6tables on
 chkconfig --add qubes-core || echo "WARNING: Cannot add service qubes-core!"
 chkconfig qubes-core on || echo "WARNING: Cannot enable service qubes-core!"
 chkconfig --add qubes-core-netvm || echo "WARNING: Cannot add service qubes-core-netvm!"
@@ -488,6 +452,8 @@ chkconfig --add qubes-firewall || echo "WARNING: Cannot add service qubes-firewa
 chkconfig qubes-firewall on || echo "WARNING: Cannot enable service qubes-firewall!"
 chkconfig --add qubes-netwatcher || echo "WARNING: Cannot add service qubes-netwatcher!"
 chkconfig qubes-netwatcher on || echo "WARNING: Cannot enable service qubes-netwatcher!"
+chkconfig --add qubes-iptables || echo "WARNING: Cannot add service qubes-iptables!"
+chkconfig qubes-iptables on || echo "WARNING: Cannot enable service qubes-iptables!"
 chkconfig --add qubes-updates-proxy || echo "WARNING: Cannot add service qubes-updates-proxy!"
 chkconfig qubes-updates-proxy on || echo "WARNING: Cannot enable service qubes-updates-proxy!"
 chkconfig --add qubes-qrexec-agent || echo "WARNING: Cannot add service qubes-qrexec-agent!"
@@ -531,6 +497,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-mount-home.service
 /lib/systemd/system/qubes-netwatcher.service
 /lib/systemd/system/qubes-network.service
+/lib/systemd/system/qubes-iptables.service
 /lib/systemd/system/qubes-sysinit.service
 /lib/systemd/system/qubes-update-check.service
 /lib/systemd/system/qubes-update-check.timer
@@ -542,6 +509,7 @@ The Qubes core startup configuration for SystemD init.
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/prepare-dvm.sh
 /usr/lib/qubes/init/network-proxy-setup.sh
+/usr/lib/qubes/init/qubes-iptables
 /usr/lib/qubes/init/misc-post.sh
 /usr/lib/qubes/init/misc-post-stop.sh
 /usr/lib/qubes/init/mount-home.sh
@@ -565,11 +533,14 @@ if [ $1 -eq 1 ]; then
 else
     services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
     services="$services qubes-netwatcher qubes-network qubes-sysinit"
-    services="$services qubes-updates-proxy qubes-qrexec-agent"
+    services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
     for srv in $services; do
         /bin/systemctl --no-reload preset $srv.service
     done
     /bin/systemctl --no-reload preset qubes-update-check.timer
+    # Upgrade path - now qubes-iptables is used instead
+    /bin/systemctl --no-reload preset iptables.service
+    /bin/systemctl --no-reload preset ip6tables.service
 fi
 
 # Set default "runlevel"
