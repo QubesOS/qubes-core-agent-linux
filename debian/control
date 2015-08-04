@@ -9,8 +9,50 @@ Vcs-Git: git://git.qubes-os.org/marmarek/core-agent-linux.git
 
 Package: qubes-core-agent
 Architecture: any
-Depends: qubes-utils (>= 2.0.17), libvchan-xen, xenstore-utils, iptables-persistent, xserver-xorg-video-dummy, xen-utils-common, ethtool, python2.7, python-gi, init-system-helpers, xdg-user-dirs, iptables, net-tools, initscripts, imagemagick, fakeroot, systemd, locales, sudo, dmsetup, psmisc, ncurses-term, xserver-xorg-core, x11-xserver-utils, xinit, ${shlibs:Depends}, ${misc:Depends}
-Recommends: tinyproxy, gnome-themes-standard, chrony, ntpdate, haveged, network-manager (>= 0.8.1-1), network-manager-gnome, xsettingsd, libnotify-bin, notify-osd, gnome-packagekit, gnome-terminal, python-nautilus, yum, yum-utils
+Depends:
+    dmsetup,
+    ethtool,
+    fakeroot,
+    imagemagick,
+    init-system-helpers,
+    initscripts,
+    iptables,
+    iptables-persistent,
+    libvchan-xen,
+    locales,
+    ncurses-term,
+    net-tools,
+    psmisc,
+    python2.7,
+    python-gi,
+    qubes-utils (>= 2.0.17),
+    sudo,
+    systemd,
+    x11-xserver-utils,
+    xdg-user-dirs,
+    xen-utils-common,
+    xenstore-utils,
+    xinit,
+    xserver-xorg-core,
+    xserver-xorg-video-dummy,
+    ${shlibs:Depends},
+    ${misc:Depends}
+Recommends:
+    chrony,
+    gnome-packagekit,
+    gnome-terminal,
+    gnome-themes-standard,
+    haveged,
+    libnotify-bin,
+    network-manager (>= 0.8.1-1),
+    network-manager-gnome,
+    notify-osd,
+    ntpdate,
+    python-nautilus,
+    tinyproxy,
+    xsettingsd,
+    yum,
+    yum-utils
 Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
