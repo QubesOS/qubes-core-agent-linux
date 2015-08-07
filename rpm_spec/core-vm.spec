@@ -421,6 +421,7 @@ rm -f %{name}-%{version}
 /usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
 /usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.override
+/usr/share/glib-2.0/schemas/org.mate.NotificationDaemon.gschema.override
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
