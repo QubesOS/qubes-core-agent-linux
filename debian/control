@@ -50,6 +50,7 @@ Recommends:
     notify-osd,
     ntpdate,
     python-nautilus,
+    python-xdg,
     system-config-printer,
     tinyproxy,
     xsettingsd,
