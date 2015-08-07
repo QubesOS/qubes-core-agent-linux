@@ -1,41 +1,4 @@
-interest-await /usr/share/applications
-interest-await /etc/init/serial.conf
-interest-await /etc/selinux/config
-
-# Desktop Entry Modification - Not shown in Qubes
-interest-await /etc/xdg/autostart/pulseaudio.desktop
-interest-await /etc/xdg/autostart/deja-dup-monitor.desktop
-interest-await /etc/xdg/autostart/imsettings-start.desktop
-interest-await /etc/xdg/autostart/krb5-auth-dialog.desktop
-interest-await /etc/xdg/autostart/restorecond.desktop
-interest-await /etc/xdg/autostart/sealertauto.desktop
-interest-await /etc/xdg/autostart/gnome-power-manager.desktop
-interest-await /etc/xdg/autostart/gnome-sound-applet.desktop
-interest-await /etc/xdg/autostart/gnome-screensaver.desktop
-interest-await /etc/xdg/autostart/orca-autostart.desktop
-
-# Desktop Entry Modification - Not shown in in DisposableVM
-interest-await /etc/xdg/autostart/gcm-apply.desktop
-
-# Desktop Entry Modification - Only shown in AppVM
-interest-await /etc/xdg/autostart/gnome-keyring-gpg.desktop
-interest-await /etc/xdg/autostart/gnome-keyring-pkcs11.desktop
-interest-await /etc/xdg/autostart/gnome-keyring-secrets.desktop
-interest-await /etc/xdg/autostart/gnome-keyring-ssh.desktop
-interest-await /etc/xdg/autostart/gnome-settings-daemon.desktop
-interest-await /etc/xdg/autostart/user-dirs-update-gtk.desktop
-interest-await /etc/xdg/autostart/gsettings-data-convert.desktop
-
-# Desktop Entry Modification - Remove existing rules
-#interest-await /etc/xdg/autostart/gpk-update-icon.desktop
-#interest-await /etc/xdg/autostart/nm-applet.desktop
-interest-await /etc/xdg/autostart/abrt-applet.desktop
-
-# Desktop Entry Modification - Only shown in Gnome & UpdateableVM
-interest-await /etc/xdg/autostart/gpk-update-icon.desktop
-
-# Desktop Entry Modification - Only shown in Gnome & Qubes
-interest-await /etc/xdg/autostart/nm-applet.desktop
-
-# Desktop Entry Modification - Show in all
-interest-await /etc/xdg/autostart/notify-osd.desktop
+interest-noawait /usr/share/applications
+interest-noawait /etc/xdg
+interest-noawait /etc/init/serial.conf
+interest-noawait /etc/selinux/config

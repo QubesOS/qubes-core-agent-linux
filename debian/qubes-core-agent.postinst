@@ -19,41 +19,10 @@ set -e
 # https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html or
 # the debian-policy package
 
-# Directory that modified desktop entry config files are stored in
-XDG_CONFIG_QUBES="/usr/share/qubes/xdg"
 
-remove_ShowIn() {
-    if [ -e "${1}" ]; then
-        sed -i '/^\(Not\|Only\)ShowIn/d' "${1}"
-    fi
-}
-
-showIn() {
-    desktop_entry="${1}"
-    shown_in="${2}"
-    message="${shown_in:-"Shown in All;"}" 
-    desktop_entry_qubes="${XDG_CONFIG_QUBES}/autostart/${desktop_entry##*/}"
-
-    # Make sure Qubes autostart directory exists
-    mkdir -p "${XDG_CONFIG_QUBES}/autostart"
-
-    # Desktop entry exists, so move to Qubes directory and modify it
-    if [ -e "${desktop_entry}" ]; then
-        echo "Desktop Entry Modification - ${message} ${desktop_entry##*/}..."
-        cp -pf "${desktop_entry}" "${desktop_entry_qubes}"
-
-        remove_ShowIn "${desktop_entry_qubes}"
-        sed -i '/^X-GNOME-Autostart-enabled.*[fF0]/d' "${desktop_entry_qubes}"
-
-        # Will only be '' if shown in all
-        if [ ! "${shown_in}x" == "x" ]; then
-            echo "${shown_in}" >> "${desktop_entry_qubes}" || true
-        fi
-
-    # Desktop entry must have been removed, so also remove from Qubes directory
-    else
-        echo "Desktop Entry Modification - Remove: ${desktop_entry##*/}..."
-        rm -f "${desktop_entry_qubes}"
+debug() {
+    if [ "${DEBDEBUG}" == "1" ]; then
+        echo -e ""$@""
     fi
 }
 
@@ -86,19 +55,76 @@ systemdPreload() {
     systemctl daemon-reload
 }
 
-# Manually trigger all triggers to automaticatly configure
-triggerTriggers() {
-    path="$(readlink -m ${0})"
-    triggers="${path/postinst/triggers}"
+installSerialConf() {
+    debug "Installing over-ridden serial.conf init script..."
+    if [ -e /etc/init/serial.conf ]; then
+        cp /usr/share/qubes/serial.conf /etc/init/serial.conf
+    fi
+}
 
-    awk '{sub(/[ \t]*#.*/,"")} NF' ${triggers} | while read line
-    do
-        /bin/bash -c "${0} triggered ${line##* }" || true
-    done
+disableSELinux() {
+    debug "Disabling SELinux..."
+    if [ -e /etc/selinux/config ]; then
+        sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+        mv /etc/selinux/config.processed /etc/selinux/config
+        setenforce 0 2>/dev/null
+    fi
 }
 
 case "${1}" in
     configure)
+        # Initial installation of package only
+        # ($2 contains version number on update; nothing on initial installation)
+        if [ -z "${2}" ]; then
+
+            debug "FIRST INSTALL..."
+            # Create NetworkManager configuration if we do not have it
+            if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
+                echo '[main]' > /etc/NetworkManager/NetworkManager.conf
+                echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
+                echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
+            fi
+            /usr/lib/qubes/qubes-fix-nm-conf.sh
+
+            # Location of files which contains list of protected files
+            PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
+
+            # ensure that hostname resolves to 127.0.1.1 resp. ::1 and that /etc/hosts is
+            # in the form expected by qubes-sysinit.sh
+            if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+                for ip in '127\.0\.1\.1' '::1'; do
+                    if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
+                        sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
+                        sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts || true
+                    else
+                        echo "${ip//\\/} `hostname`" >> /etc/hosts || true
+                    fi
+                done
+            fi
+
+            # remove hostname from 127.0.0.1 line (in debian the hostname is by default
+            # resolved to 127.0.1.1)
+            if ! grep -rq "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+                sed -i "/^127\.0\.0\.1\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
+            fi
+
+            chown user:user /home_volatile/user
+
+            # Set default "runlevel"
+            rm -f /etc/systemd/system/default.target
+            ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+
+            # Systemd preload-all
+            systemdPreload
+
+            # Maybe install overridden serial.conf init script 
+            installSerialConf
+
+            # Maybe disable SELinux
+            disableSELinux
+        fi
+
+        debug "UPDATE..."
         # disable some Upstart services
         for init in plymouth-shutdown \
                     prefdm \
@@ -108,14 +134,6 @@ case "${1}" in
             dpkg-divert --divert /etc/init/${init}.conf.qubes-disabled --package qubes-core-agent --rename --add /etc/init/${init}.conf
         done
         dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
-
-        # Create NetworkManager configuration if we do not have it
-        if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
-            echo '[main]' > /etc/NetworkManager/NetworkManager.conf
-            echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
-            echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
-        fi
-        /usr/lib/qubes/qubes-fix-nm-conf.sh
 
         # make sure locale is really generated
         current_locale=`grep 'LANG\|LC_ALL' /etc/default/locale|head -n 1|cut -f 2 -d =`
@@ -131,43 +149,16 @@ case "${1}" in
             rm -f /lib/firmware/updates
         fi
 
-        # Location of files which contains list of protected files
-        PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
-
-        # ensure that hostname resolves to 127.0.1.1 resp. ::1 and that /etc/hosts is
-        # in the form expected by qubes-sysinit.sh
-        if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
-            for ip in '127\.0\.1\.1' '::1'; do
-                if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
-                    sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
-                    sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts || true
-                else
-                    echo "${ip//\\/} `hostname`" >> /etc/hosts || true
-                fi
-            done
-        fi
-
-        # remove hostname from 127.0.0.1 line (in debian the hostname is by default
-        # resolved to 127.0.1.1)
-        if ! grep -rq "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
-            sed -i "/^127\.0\.0\.1\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
-        fi
-
-        chown user:user /home_volatile/user
-
         if ! dpkg-statoverride --list /var/lib/qubes/dom0-updates >/dev/null 2>&1; then
             dpkg-statoverride --update --add user user 775 /var/lib/qubes/dom0-updates
         fi
 
-        # Set default "runlevel"
-        rm -f /etc/systemd/system/default.target
-        ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+        # Update Qubes App Menus"
+        /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
 
-        ## Systemd preload-all
-        systemdPreload
+        ## Update all xdg autostart desktop entries
+        /usr/lib/qubes/qubes-trigger-desktop-file-install clean || true
 
-        ## Process all triggers which will set defaults to wanted values
-        triggerTriggers
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -178,85 +169,27 @@ case "${1}" in
         for trigger in ${2}; do
             case "${trigger}" in
 
-                # Update Qubes App Menus
                 /usr/share/applications)
-                    echo "Updating Qubes App Menus..."
+                    debug "Updating Qubes App Menus..."
                     /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
+            
+                    debug "Updating XDG Config..."
+                    /usr/lib/qubes/qubes-trigger-desktop-file-install || true
+                    ;;
 
-                    ## Systemd preload-all
-                    #systemdPreload
+                /etc/xdg)
+                    debug "Updating XDG Config..."
+                    /usr/lib/qubes/qubes-trigger-desktop-file-install || true
                     ;;
 
                 # Install overridden serial.conf init script 
                 /etc/init/serial.conf)
-                    echo "Installing over-ridden serial.conf init script..."
-                    if [ -e /etc/init/serial.conf ]; then
-                        cp /usr/share/qubes/serial.conf /etc/init/serial.conf
-                    fi
+                    installSerialConf
                     ;;
 
                 # Disable SELinux"
                 /etc/selinux/config)
-                    echo "Disabling SELinux..."
-                    if [ -e /etc/selinux/config ]; then
-                        sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
-                        mv /etc/selinux/config.processed /etc/selinux/config
-                        setenforce 0 2>/dev/null
-                    fi
-                    ;;
-
-                # Desktop Entry Modification - Remove existing rules
-                /etc/xdg/autostart/gpk-update-icon.desktop | \
-                /etc/xdg/autostart/nm-applet.desktop | \
-                /etc/xdg/autostart/abrt-applet.desktop | \
-                /etc/xdg/autostart/notify-osd.desktop)
-                    showIn "${trigger}"
-                    ;;
-
-                # Desktop Entry Modification - Not shown in Qubes
-                /etc/xdg/autostart/pulseaudio.desktop | \
-                /etc/xdg/autostart/deja-dup-monitor.desktop | \
-                /etc/xdg/autostart/imsettings-start.desktop | \
-                /etc/xdg/autostart/krb5-auth-dialog.desktop | \
-                /etc/xdg/autostart/pulseaudio.desktop | \
-                /etc/xdg/autostart/restorecond.desktop | \
-                /etc/xdg/autostart/sealertauto.desktop | \
-                /etc/xdg/autostart/gnome-power-manager.desktop | \
-                /etc/xdg/autostart/gnome-sound-applet.desktop | \
-                /etc/xdg/autostart/gnome-screensaver.desktop | \
-                /etc/xdg/autostart/orca-autostart.desktop)
-                    showIn "${trigger}" 'NotShowIn=QUBES;'
-                    ;;
-
-                # Desktop Entry Modification - Not shown in in DisposableVM
-                /etc/xdg/autostart/gcm-apply.desktop)
-                    showIn "${trigger}" 'NotShowIn=DisposableVM;'
-                    ;;
-
-                # Desktop Entry Modification - Only shown in AppVM
-                /etc/xdg/autostart/gnome-keyring-gpg.desktop | \
-                /etc/xdg/autostart/gnome-keyring-pkcs11.desktop | \
-                /etc/xdg/autostart/gnome-keyring-secrets.desktop | \
-                /etc/xdg/autostart/gnome-keyring-ssh.desktop | \
-                /etc/xdg/autostart/gnome-settings-daemon.desktop | \
-                /etc/xdg/autostart/user-dirs-update-gtk.desktop | \
-                /etc/xdg/autostart/gsettings-data-convert.desktop)
-                    showIn "${trigger}" 'OnlyShowIn=GNOME;AppVM;'
-                    ;;
-
-                # Desktop Entry Modification - Only shown in Gnome & UpdateableVM
-                /etc/xdg/autostart/gpk-update-icon.desktop)
-                    showIn "${trigger}" 'OnlyShowIn=GNOME;UpdateableVM;'
-                    ;;
-
-                # Desktop Entry Modification - Only shown in Gnome & Qubes
-                /etc/xdg/autostart/nm-applet.desktop)
-                    showIn "${trigger}" 'OnlyShowIn=GNOME;QUBES;'
-                    ;;
-
-                *)
-                    echo "postinst called with unknown trigger \`${2}'" >&2
-                    exit 1
+                    disableSELinux
                     ;;
             esac
         done

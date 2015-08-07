@@ -51,6 +51,8 @@ Requires:   qubes-utils
 Requires:   initscripts
 # for qubes-desktop-run
 Requires:   pygobject3-base
+# for qubes-desktop-file-install
+Requires:   pyxdg
 %if %{fedora} >= 20
 # gpk-update-viewer required by qubes-manager
 Requires:   gnome-packagekit-updater
@@ -127,8 +129,7 @@ if [ -e /etc/init/serial.conf ]; then
 fi
 
 %triggerin -- pulseaudio-module-x11
-sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/pulseaudio.desktop
-echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/pulseaudio.desktop
+/usr/bin/qubes-desktop-file-install --force --dir /usr/share/qubes/xdg/autostart --remove-show-in --add-not-show-in X-QUBES /etc/xdg/autostart/pulseaudio.desktop
 
 %triggerin -- iptables
 if ! grep -q IPTABLES_DATA /etc/sysconfig/iptables-config; then
@@ -158,50 +159,9 @@ for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
 	fi
 done
 
-remove_ShowIn () {
-	if [ -e /etc/xdg/autostart/$1.desktop ]; then
-		sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/$1.desktop
-	fi
-}
-
-# reenable if disabled by some earlier version of package
-remove_ShowIn abrt-applet.desktop imsettings-start.desktop
-
-# don't want it at all
-for F in deja-dup-monitor krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
-	if [ -e /etc/xdg/autostart/$F.desktop ]; then
-		remove_ShowIn $F
-		echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/$F.desktop
-	fi
-done
-
-# don't want it in DisposableVM
-for F in gcm-apply ; do
-	if [ -e /etc/xdg/autostart/$F.desktop ]; then
-		remove_ShowIn $F
-		echo 'NotShowIn=DisposableVM;' >> /etc/xdg/autostart/$F.desktop
-	fi
-done
-
-# want it in AppVM only
-for F in gnome-keyring-gpg gnome-keyring-pkcs11 gnome-keyring-secrets gnome-keyring-ssh gnome-settings-daemon user-dirs-update-gtk gsettings-data-convert ; do
-	if [ -e /etc/xdg/autostart/$F.desktop ]; then
-		remove_ShowIn $F
-		echo 'OnlyShowIn=GNOME;AppVM;' >> /etc/xdg/autostart/$F.desktop
-	fi
-done
-
-# remove existing rule to add own later
-for F in gpk-update-icon nm-applet ; do
-	remove_ShowIn $F
-done
-
-echo 'OnlyShowIn=GNOME;UpdateableVM;' >> /etc/xdg/autostart/gpk-update-icon.desktop || :
-%if %{fedora} >= 20
-echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
-%else
-echo 'OnlyShowIn=GNOME;NetVM;' >> /etc/xdg/autostart/nm-applet.desktop || :
-%endif
+# Update all autostart xdg desktop configuration files (modified copies are
+# placed in /usr/share/qubes/xdg/autostart)
+/usr/lib/qubes/qubes-trigger-desktop-file-install clean
 
 # Create NetworkManager configuration if we do not have it
 if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
@@ -352,6 +312,8 @@ if [ $1 -eq 0 ] ; then
     if [ -L /lib/firmware/updates ]; then
       rm /lib/firmware/updates
     fi
+
+    rm -rf /usr/share/qubes/xdg
 fi
 
 %posttrans
@@ -409,6 +371,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
+/etc/yum/post-actions/qubes-trigger-desktop-file-install.action
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
@@ -421,6 +384,7 @@ rm -f %{name}-%{version}
 /usr/bin/qubes-desktop-run
 /usr/bin/qrexec-fork-server
 /usr/bin/qrexec-client-vm
+/usr/bin/qubes-desktop-file-install
 %dir /usr/lib/qubes
 /usr/lib/qubes/vusb-ctl.py*
 /usr/lib/qubes/dispvm-prerun.sh
@@ -450,6 +414,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/wrap-in-html-if-url.sh
 /usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/close-window
+/usr/lib/qubes/qubes-trigger-desktop-file-install
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher

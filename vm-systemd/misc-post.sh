@@ -27,24 +27,24 @@ INTERFACE=eth0 /usr/lib/qubes/setup-ip
 # Start services which haven't own proper systemd unit:
 
 # Start AppVM specific services
+INSTALL_CMD='/usr/bin/qubes-desktop-file-install --force --dir /usr/share/qubes/xdg/autostart'
+
 if [ ! -f /etc/systemd/system/cups.service ]; then
     if [ -f /var/run/qubes-service/cups ]; then
         /usr/sbin/service cups start
         # Allow also notification icon
-        sed -i -e '/^NotShowIn=.*QUBES/s/;QUBES//' /etc/xdg/autostart/print-applet.desktop
+        $INSTALL_CMD --remove-not-show-in X-QUBES /etc/xdg/autostart/print-applet.desktop
     else
         # Disable notification icon
-        sed -i -e '/QUBES/!s/^NotShowIn=\(.*\)/NotShowIn=QUBES;\1/' /etc/xdg/autostart/print-applet.desktop
+        $INSTALL_CMD --add-not-show-in X-QUBES /etc/xdg/autostart/print-applet.desktop
     fi
 fi
 if [ -f /var/run/qubes-service/network-manager ]; then
     # Allow also notification icon
-    sed -i -e '/QUBES/!s/^OnlyShowIn=.*/\0QUBES;/' /etc/xdg/autostart/nm-applet.desktop
-    sed -i -e '/^NotShowIn=.*/s/QUBES;//' /etc/xdg/autostart/nm-applet.desktop
+    $INSTALL_CMD --remove-not-show-in X-QUBES --add-only-show-in X-QUBES /etc/xdg/autostart/nm-applet.desktop
 else
     # Disable notification icon
-    sed -i -e '/^OnlyShowIn=.*/s/QUBES;//' /etc/xdg/autostart/nm-applet.desktop
-    sed -i -e '/QUBES/!s/^NotShowIn=.*/\0QUBES;/' /etc/xdg/autostart/nm-applet.desktop
+    $INSTALL_CMD --remove-only-show-in X-QUBES --add-not-show-in X-QUBES /etc/xdg/autostart/nm-applet.desktop
 fi
 
 exit 0
