@@ -306,10 +306,9 @@ int process_child_io(libvchan_t *data_vchan,
         /* also if vchan is disconnected (and we processed all the data), there
          * is no sense of processing further data */
         if (!libvchan_data_ready(data_vchan) && !libvchan_is_open(data_vchan)) {
-            if (child_process_pid)
-                return remote_process_status;
-            else
-                return child_process_status;
+            if (child_process_pid == 0)
+                child_process_status = remote_process_status;
+            break;
         }
         /* child signaled desire to use single socket for both stdin and stdout */
         if (stdio_socket_requested) {
