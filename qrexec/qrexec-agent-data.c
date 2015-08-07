@@ -403,6 +403,26 @@ int process_child_io(libvchan_t *data_vchan,
             }
         }
     }
+    /* make sure that all the pipes/sockets are closed, so the child process
+     * (if any) will know that the connection is terminated */
+    if (stdout_fd != -1) {
+        if (shutdown(stdout_fd, SHUT_RD) < 0) {
+            if (errno == ENOTSOCK)
+                close(stdout_fd);
+        }
+        stdout_fd = -1;
+    }
+    if (stdin_fd != -1) {
+        if (shutdown(stdin_fd, SHUT_WR) < 0) {
+            if (errno == ENOTSOCK)
+                close(stdin_fd);
+        }
+        stdin_fd = -1;
+    }
+    if (stderr_fd != -1) {
+        close(stderr_fd);
+        stderr_fd = -1;
+    }
     return child_process_status;
 }
 
