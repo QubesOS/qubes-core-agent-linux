@@ -1,3 +1,80 @@
+qubes-core-agent (3.0.14-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * kernel-placeholder: prevent xl2tpd from pulling kernel packages
+  * qubes-core-vm-kernel-placeholder 1.0-3
+
+  [ Olivier MEDOC ]
+  * archlinux: update dependency list based on .spec file
+  * archlinux: reorganize install script to make it more easily
+    compareable with the .spec file
+  * archlinux: fix syntax errors in install file
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: fix permissions of /var/lib/qubes/dom0-updates
+
+  [ Patrick Schleizer ]
+  * also inform in cli if no new updates are available
+
+  [ Olivier MEDOC ]
+  * archlinux: pulseaudio should be configured in gui agent and will
+    break installation of pulseaudio if installed in core-agent-linux
+  * archlinux: enabled configuration of all core agent dependencies
+  * archlinux: ensure python2 is used for all scripts and fix
+    dependencies for qubes-desktop-run
+
+  [ Jason Mehring ]
+  * debian: Renamed incorrect filename:  00notiy-hook -> 00notify-hook
+  * debian: Comment out deb-src line in qubes-r3.list
+  * Use 'which' to locate fuser since fuser path is different in Fedora
+    and Debian
+  * debian: Change triggers to use `interest-await` (execute triggers
+    after all packages installed)
+  * Remove '.service' from systemd enable loop as unit_name already
+    contains .service in name
+  * debian: remove cups/print-applet triggers
+  * debian: Added cups, system-config-printer to Recommends
+  * Makefile: Add systemd drop-in support which include conditionals to
+    prevent services from starting
+  * fedora: Add systemd drop-in support which include conditionals to
+    prevent services from starting
+  * debian: Add systemd drop-in support which include conditionals to
+    prevent services from starting
+  * Re-aranged qubes-vm.preset to indicate which services are specificly
+    for Fedora only
+  * vm-systemd: Add systemd drop-in support which include conditionals
+    to prevent services from starting
+
+  [ Marek Marczykowski-Górecki ]
+  * archlinux: remove installOverridenServices as now handled by systemd
+    dropins
+  * fedora: do not own dropins directories
+  * fedora: simulate preset-all only on first install, not upgrade
+  * fedora: fix default locale generation
+  * qrexec: fix exit code from qrexec-client-vm
+  * qrexec: make sure that all the pipes/sockets are closed on cleanup
+
+  [ Jason Mehring ]
+  * qubes-desktop-file-install: Manages xdg desktop entry files
+  * debian: Reformat depends in control for better readability
+  * debian: qubes-desktop-file-install: Add misssing depend to contol
+  * debian: Switch to using org.mate.NotificationDaemon by default to
+    eliminate popups not closing
+  * fedora: Use 'slider' org.mate.NotificationDaemon theme
+  * qubes-desktop-run: Activate via DBUS when desktop file contains
+    DBusActivatable
+
+  [ Marek Marczykowski-Górecki ]
+  * Move `/usr/share/qubes/xdg` to `/var/lib/qubes/xdg`
+
+  [ Patrick Schleizer ]
+  * fixed "in place upgrade issue - base-passwd debconf interative
+    question asks 'Remove group "qubes"'"
+  * fixed "in place upgrade issue - base-passwd debconf interative
+    questi…on asks 'Remove group "qubes"'" for existing users
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 08 Aug 2015 04:16:52 +0200
+
 qubes-core-agent (3.0.13-1) wheezy; urgency=medium
 
   * fedora: ensure that /etc/sysconfig/iptables exists (Fedora 20)
