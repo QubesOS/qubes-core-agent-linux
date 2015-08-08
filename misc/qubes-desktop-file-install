@@ -31,8 +31,8 @@ Description:
 
   The original .desktop files are left untouched and left in place.
 
-  Qubes modifies the XDG_CONFIG_DIRS to first include the `/usr/share/qubes/xdg`
-  directory (XDG_CONFIG_DIRS=/usr/share/qubes/xdg:/etc/xdg).
+  Qubes modifies the XDG_CONFIG_DIRS to first include the `/var/lib/qubes/xdg`
+  directory (XDG_CONFIG_DIRS=/var/lib/qubes/xdg:/etc/xdg).
 
 Usage:
   qubes-desktop-file-install [--dir DIR] [--force]
@@ -48,7 +48,7 @@ Usage:
   qubes-desktop-file-install --version
 
 Examples:
-  qubes-desktop-file-install --dir /usr/share/qubes/xdg/autostart --add-only-show-in X-QUBES /etc/xdg/autostart/pulseaudio.desktop
+  qubes-desktop-file-install --dir /var/lib/qubes/xdg/autostart --add-only-show-in X-QUBES /etc/xdg/autostart/pulseaudio.desktop
 
 Arguments:
   FILE     Path to desktop entry file
@@ -94,7 +94,7 @@ __version__ = '1.0.0'
 locale.setlocale(locale.LC_ALL, '')
 
 # Default Qubes directory that modified desktop entry config files are stored in
-QUBES_XDG_CONFIG_DIR = '/usr/share/qubes/xdg'
+QUBES_XDG_CONFIG_DIR = '/vat/lib/qubes/xdg'
 
 
 class DesktopEntry(xdg.DesktopEntry.DesktopEntry):

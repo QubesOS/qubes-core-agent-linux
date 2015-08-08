@@ -20,7 +20,7 @@
 #   --add-not-show-in ENVIRONMENT      Add ENVIRONMENT to the list of desktop environment where the desktop files should not be displayed
 
 QUBES_DESKTOP_FILE_INSTALL='/usr/bin/qubes-desktop-file-install'
-QUBES_XDG_CONFIG_DIR=/usr/share/qubes/xdg/autostart
+QUBES_XDG_CONFIG_DIR=/var/lib/qubes/xdg/autostart
 XDG_CONFIG_DIR=/etc/xdg/autostart
 
 INSTALL_CMD=""${QUBES_DESKTOP_FILE_INSTALL}" --force --dir "${QUBES_XDG_CONFIG_DIR}""

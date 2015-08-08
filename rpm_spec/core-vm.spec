@@ -129,7 +129,7 @@ if [ -e /etc/init/serial.conf ]; then
 fi
 
 %triggerin -- pulseaudio-module-x11
-/usr/bin/qubes-desktop-file-install --force --dir /usr/share/qubes/xdg/autostart --remove-show-in --add-not-show-in X-QUBES /etc/xdg/autostart/pulseaudio.desktop
+/usr/bin/qubes-desktop-file-install --force --dir /var/lib/qubes/xdg/autostart --remove-show-in --add-not-show-in X-QUBES /etc/xdg/autostart/pulseaudio.desktop
 
 %triggerin -- iptables
 if ! grep -q IPTABLES_DATA /etc/sysconfig/iptables-config; then
@@ -160,7 +160,7 @@ for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
 done
 
 # Update all autostart xdg desktop configuration files (modified copies are
-# placed in /usr/share/qubes/xdg/autostart)
+# placed in /var/lib/qubes/xdg/autostart)
 /usr/lib/qubes/qubes-trigger-desktop-file-install clean
 
 # Create NetworkManager configuration if we do not have it
@@ -313,7 +313,7 @@ if [ $1 -eq 0 ] ; then
       rm /lib/firmware/updates
     fi
 
-    rm -rf /usr/share/qubes/xdg
+    rm -rf /var/lib/qubes/xdg
 fi
 
 %posttrans
@@ -426,7 +426,7 @@ rm -f %{name}-%{version}
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
 
-%dir /usr/share/qubes
+%dir /var/lib/qubes
 /usr/share/qubes/mime-override/globs
 %dir /home_volatile
 %attr(700,user,user) /home_volatile/user

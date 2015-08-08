@@ -27,7 +27,7 @@ INTERFACE=eth0 /usr/lib/qubes/setup-ip
 # Start services which haven't own proper systemd unit:
 
 # Start AppVM specific services
-INSTALL_CMD='/usr/bin/qubes-desktop-file-install --force --dir /usr/share/qubes/xdg/autostart'
+INSTALL_CMD='/usr/bin/qubes-desktop-file-install --force --dir /var/lib/qubes/xdg/autostart'
 
 if [ ! -f /etc/systemd/system/cups.service ]; then
     if [ -f /var/run/qubes-service/cups ]; then
