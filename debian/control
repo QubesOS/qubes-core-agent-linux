@@ -38,7 +38,6 @@ Depends:
     ${shlibs:Depends},
     ${misc:Depends}
 Recommends:
-    chrony,
     gnome-packagekit,
     gnome-terminal,
     gnome-themes-standard,
