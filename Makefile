@@ -63,6 +63,9 @@ ifeq ($(shell lsb_release -is), Debian)
     # Wheezy Dropins
     # Disable sysinit 'network-manager.service' since systemd 'NetworkManager.service' is already installed
     DROPINS += $(strip $(if $(filter wheezy, $(shell lsb_release -cs)), network-manager.service,))
+
+	# handled by qubes-iptables service now
+    DROPINS += netfilter-persistent.service
 endif
 
 install-systemd-dropins:
