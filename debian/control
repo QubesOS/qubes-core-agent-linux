@@ -17,7 +17,6 @@ Depends:
     init-system-helpers,
     initscripts,
     iptables,
-    iptables-persistent,
     libvchan-xen,
     locales,
     ncurses-term,
