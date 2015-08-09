@@ -62,15 +62,6 @@ installSerialConf() {
     fi
 }
 
-disableSELinux() {
-    debug "Disabling SELinux..."
-    if [ -e /etc/selinux/config ]; then
-        sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
-        mv /etc/selinux/config.processed /etc/selinux/config
-        setenforce 0 2>/dev/null
-    fi
-}
-
 case "${1}" in
     configure)
         # Initial installation of package only
@@ -119,9 +110,6 @@ case "${1}" in
 
             # Maybe install overridden serial.conf init script 
             installSerialConf
-
-            # Maybe disable SELinux
-            disableSELinux
         fi
 
         debug "UPDATE..."
@@ -187,10 +175,6 @@ case "${1}" in
                     installSerialConf
                     ;;
 
-                # Disable SELinux"
-                /etc/selinux/config)
-                    disableSELinux
-                    ;;
             esac
         done
         exit 0
