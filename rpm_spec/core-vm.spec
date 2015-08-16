@@ -357,6 +357,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetImageRGBA
 %config(noreplace) /etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/sudoers.d/qubes
+%config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
 %config(noreplace) /etc/sysconfig/iptables.qubes
 %config(noreplace) /etc/sysconfig/ip6tables.qubes
 /usr/lib/qubes/init/iptables
