@@ -1,36 +1,11 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-# vim: set ft=python ts=4 sw=4 sts=4 et :
-
-import sys
-import subprocess
+#!/usr/bin/python
 
 from gi.repository import Gio
+import sys
 
 def main(myname, desktop, *files):
-    info = Gio.DesktopAppInfo()
-    dbus_activate = False
-
-    try:
-        launcher = info.new_from_filename(desktop)
-    except TypeError:
-        launcher = None
-
-    if launcher:
-        try:
-            dbus_activate = launcher.get_boolean('DBusActivatable')
-        except AttributeError:
-            dbus_activate = False
-
-        if not dbus_activate:
-            launcher.launch(files, None)
-
-        else:
-            if dbus_activate:
-                cmd = ['gapplication', 'launch', launcher.get_id().replace('.desktop', '')]
-                if files:
-                    cmd.extend(files)
-                process = subprocess.Popen(cmd, close_fds=True)
+    launcher = Gio.DesktopAppInfo.new_from_filename(desktop)
+    launcher.launch(files, None)
 
 if __name__ == "__main__":
     main(*sys.argv)
