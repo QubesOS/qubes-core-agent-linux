@@ -51,7 +51,7 @@ Requires:   qubes-utils
 Requires:   initscripts
 # for qubes-desktop-run
 Requires:   pygobject3-base
-# for qubes-desktop-file-install
+# for qubes-session-autostart
 Requires:   pyxdg
 %if %{fedora} >= 20
 # gpk-update-viewer required by qubes-manager
@@ -128,9 +128,6 @@ if [ -e /etc/init/serial.conf ]; then
 	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
 fi
 
-%triggerin -- pulseaudio-module-x11
-/usr/bin/qubes-desktop-file-install --force --dir /var/lib/qubes/xdg/autostart --remove-show-in --add-not-show-in X-QUBES /etc/xdg/autostart/pulseaudio.desktop
-
 %triggerin -- iptables
 if ! grep -q IPTABLES_DATA /etc/sysconfig/iptables-config; then
     cat <<EOF >>/etc/sysconfig/iptables-config
@@ -158,10 +155,6 @@ for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
 		mv -f /etc/init/$F.conf /etc/init/$F.conf.disabled
 	fi
 done
-
-# Update all autostart xdg desktop configuration files (modified copies are
-# placed in /var/lib/qubes/xdg/autostart)
-/usr/lib/qubes/qubes-trigger-desktop-file-install clean
 
 # Create NetworkManager configuration if we do not have it
 if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
@@ -374,7 +367,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-/etc/yum/post-actions/qubes-trigger-desktop-file-install.action
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
@@ -388,7 +380,6 @@ rm -f %{name}-%{version}
 /usr/bin/qrexec-fork-server
 /usr/bin/qrexec-client-vm
 /usr/bin/qubes-session-autostart
-/usr/bin/qubes-desktop-file-install
 %dir /usr/lib/qubes
 /usr/lib/qubes/vusb-ctl.py*
 /usr/lib/qubes/dispvm-prerun.sh
@@ -418,7 +409,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/wrap-in-html-if-url.sh
 /usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/close-window
-/usr/lib/qubes/qubes-trigger-desktop-file-install
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
