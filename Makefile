@@ -8,6 +8,9 @@ SBINDIR ?= /usr/sbin
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
+PYTHON = /usr/bin/python2
+PYTHON_SITEARCH = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)'`
+
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
 
@@ -179,6 +182,13 @@ install-common:
 	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
 
 	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)/usr/bin/qubes-desktop-run
+
+	mkdir -p $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+ifeq (1,${DEBIANBUILD})
+	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+else
+	install -m 0644 misc/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+endif
 
 	install -d $(DESTDIR)/mnt/removable
 
