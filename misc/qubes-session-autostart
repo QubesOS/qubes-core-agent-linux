@@ -68,14 +68,19 @@ def process_autostart(environments):
             # make the entry as processed, even if not actually started
             processed_entries[entry_name] = True
 
-            entry_path = os.path.join(path, entry_name)
-            # files in $HOME have higher priority than dropins
-            if not path.startswith(xdg.BaseDirectory.xdg_config_home):
-                entry = open_desktop_entry_and_dropins(entry_path)
-            else:
-                entry = DesktopEntry(entry_path)
-            if entry_should_be_started(entry, environments):
-                launch(entry_path)
+            try:
+                entry_path = os.path.join(path, entry_name)
+                # files in $HOME have higher priority than dropins
+                if not path.startswith(xdg.BaseDirectory.xdg_config_home):
+                    entry = open_desktop_entry_and_dropins(entry_path)
+                else:
+                    entry = DesktopEntry(entry_path)
+                if entry_should_be_started(entry, environments):
+                    launch(entry_path)
+            except Exception as e:
+                print >>sys.stderr, "Failed to process '{}': {}".format(
+                    entry_name, str(e)
+                )
 
 def main():
     process_autostart(sys.argv[1:])
