@@ -416,6 +416,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/close-window
 /usr/lib/qubes/qubes-trigger-desktop-file-install
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
+/usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher
 /usr/share/qubes/serial.conf
