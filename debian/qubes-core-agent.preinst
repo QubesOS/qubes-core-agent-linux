@@ -68,6 +68,11 @@ if [ "$1" = "upgrade" ] ; then
             fi
         fi
     fi
+    ## Allow passwordless login for user "user" (when using 'sudo xl console').
+    ## https://github.com/QubesOS/qubes-issues/issues/1130
+    if grep -q '^user:\!:' /etc/shadow ; then
+        passwd user -d >/dev/null || true
+    fi
 fi
 
 # dh_installdeb will replace this with shell code automatically
