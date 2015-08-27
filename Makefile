@@ -121,6 +121,7 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -m 0400 -D network/ip6tables $(DESTDIR)/usr/lib/qubes/init/ip6tables
 
 install-common:
+	$(MAKE) -C autostart-dropins install
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
@@ -171,6 +172,7 @@ install-common:
 	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
 
 	install -d $(DESTDIR)/usr/bin
+	install -m 0755 misc/qubes-session-autostart $(DESTDIR)/usr/bin/qubes-session-autostart
 	install -m 0755 misc/qubes-desktop-file-install $(DESTDIR)/usr/bin/qubes-desktop-file-install
 	install -m 0755 misc/qubes-trigger-desktop-file-install $(DESTDIR)$(LIBDIR)/qubes/qubes-trigger-desktop-file-install
 

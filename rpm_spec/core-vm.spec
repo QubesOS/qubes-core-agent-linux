@@ -356,6 +356,9 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.SelectDirectory
 %config(noreplace) /etc/qubes-rpc/qubes.GetImageRGBA
 %config(noreplace) /etc/qubes-rpc/qubes.SetDateTime
+%dir /etc/qubes/autostart
+/etc/qubes/autostart/README.txt
+%config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sysconfig/iptables.qubes
 %config(noreplace) /etc/sysconfig/ip6tables.qubes
@@ -384,6 +387,7 @@ rm -f %{name}-%{version}
 /usr/bin/qubes-desktop-run
 /usr/bin/qrexec-fork-server
 /usr/bin/qrexec-client-vm
+/usr/bin/qubes-session-autostart
 /usr/bin/qubes-desktop-file-install
 %dir /usr/lib/qubes
 /usr/lib/qubes/vusb-ctl.py*
