@@ -26,7 +26,7 @@ INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
 # Start services which haven't own proper systemd unit:
 
-if [ ! -f /etc/systemd/system/cups.service ]; then
+if [ ! -f /usr/lib/systemd/system/cups.service ]; then
     if [ -f /var/run/qubes-service/cups ]; then
         /usr/sbin/service cups start
     fi
