@@ -53,11 +53,13 @@ install () {
 # Desktop Entry Modification - NotShowIn=QUBES
 FILES=(
     'pulseaudio'
+    'pulseaudio-kde'
     'deja-dup-monitor'
     'imsettings-start'
     'krb5-auth-dialog'
     'restorecond'
     'sealertauto'
+    'spice-vdagent'
     'gnome-power-manager'
     'gnome-sound-applet'
     'gnome-screensaver'
