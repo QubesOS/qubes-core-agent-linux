@@ -26,25 +26,10 @@ INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
 # Start services which haven't own proper systemd unit:
 
-# Start AppVM specific services
-INSTALL_CMD='/usr/bin/qubes-desktop-file-install --force --dir /var/lib/qubes/xdg/autostart'
-
-if [ ! -f /etc/systemd/system/cups.service ]; then
+if [ ! -f /usr/lib/systemd/system/cups.service ]; then
     if [ -f /var/run/qubes-service/cups ]; then
         /usr/sbin/service cups start
-        # Allow also notification icon
-        $INSTALL_CMD --remove-not-show-in X-QUBES /etc/xdg/autostart/print-applet.desktop
-    else
-        # Disable notification icon
-        $INSTALL_CMD --add-not-show-in X-QUBES /etc/xdg/autostart/print-applet.desktop
     fi
-fi
-if [ -f /var/run/qubes-service/network-manager ]; then
-    # Allow also notification icon
-    $INSTALL_CMD --remove-not-show-in X-QUBES --add-only-show-in X-QUBES /etc/xdg/autostart/nm-applet.desktop
-else
-    # Disable notification icon
-    $INSTALL_CMD --remove-only-show-in X-QUBES --add-not-show-in X-QUBES /etc/xdg/autostart/nm-applet.desktop
 fi
 
 exit 0

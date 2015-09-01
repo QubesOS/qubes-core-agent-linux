@@ -8,6 +8,9 @@ SBINDIR ?= /usr/sbin
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
+PYTHON = /usr/bin/python2
+PYTHON_SITEARCH = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)'`
+
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
 
@@ -109,7 +112,6 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
 	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-	install -D -m 0644 misc/qubes-trigger-desktop-file-install.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-desktop-file-install.action
 
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
@@ -118,6 +120,7 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -m 0400 -D network/ip6tables $(DESTDIR)/usr/lib/qubes/init/ip6tables
 
 install-common:
+	$(MAKE) -C autostart-dropins install
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
@@ -169,8 +172,7 @@ install-common:
 	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
 
 	install -d $(DESTDIR)/usr/bin
-	install -m 0755 misc/qubes-desktop-file-install $(DESTDIR)/usr/bin/qubes-desktop-file-install
-	install -m 0755 misc/qubes-trigger-desktop-file-install $(DESTDIR)$(LIBDIR)/qubes/qubes-trigger-desktop-file-install
+	install -m 0755 misc/qubes-session-autostart $(DESTDIR)/usr/bin/qubes-session-autostart
 
 	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-move-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
 	install qubes-rpc/wrap-in-html-if-url.sh $(DESTDIR)$(LIBDIR)/qubes
@@ -201,6 +203,13 @@ install-common:
 	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
 
 	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)/usr/bin/qubes-desktop-run
+
+	mkdir -p $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+ifeq (1,${DEBIANBUILD})
+	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+else
+	install -m 0644 misc/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+endif
 
 	install -d $(DESTDIR)/mnt/removable
 

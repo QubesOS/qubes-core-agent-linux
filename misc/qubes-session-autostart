@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# The Qubes OS Project, http://www.qubes-os.org
+#
+# Copyright (C) 2015  Marek Marczykowski-Górecki
+#                                        <marmarek@invisiblethingslab.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+#
+import subprocess
+import sys
+
+from xdg.DesktopEntry import DesktopEntry
+from qubes.xdg import launch
+import xdg.BaseDirectory
+import os
+
+QUBES_XDG_CONFIG_DROPINS = '/etc/qubes/autostart'
+
+def open_desktop_entry_and_dropins(filename):
+    desktop_entry = DesktopEntry(filename)
+    dropins_dir = os.path.join(QUBES_XDG_CONFIG_DROPINS,
+                               os.path.basename(filename) + '.d')
+    if os.path.isdir(dropins_dir):
+        for dropin in sorted(os.listdir(dropins_dir)):
+            dropin_content = DesktopEntry(os.path.join(dropins_dir, dropin))
+            desktop_entry.content.update(dropin_content.content)
+
+    return desktop_entry
+
+
+def entry_should_be_started(entry, environments):
+    """
+
+    :type entry: DesktopEntry
+    """
+    if entry.getHidden():
+        return False
+    if entry.getOnlyShowIn():
+        return bool(set(entry.getOnlyShowIn()).intersection(environments))
+    if entry.getNotShowIn():
+        return not bool(set(entry.getNotShowIn()).intersection(environments))
+    return True
+
+
+def process_autostart(environments):
+    # handle only "most important" entry
+    processed_entries = {}
+    for path in xdg.BaseDirectory.load_config_paths('autostart'):
+        for entry_name in os.listdir(path):
+            if entry_name in processed_entries:
+                continue
+
+            # make the entry as processed, even if not actually started
+            processed_entries[entry_name] = True
+
+            try:
+                entry_path = os.path.join(path, entry_name)
+                # files in $HOME have higher priority than dropins
+                if not path.startswith(xdg.BaseDirectory.xdg_config_home):
+                    entry = open_desktop_entry_and_dropins(entry_path)
+                else:
+                    entry = DesktopEntry(entry_path)
+                if entry_should_be_started(entry, environments):
+                    launch(entry_path)
+            except Exception as e:
+                print >>sys.stderr, "Failed to process '{}': {}".format(
+                    entry_name, str(e)
+                )
+
+def main():
+    process_autostart(sys.argv[1:])
+
+if __name__ == '__main__':
+    main()

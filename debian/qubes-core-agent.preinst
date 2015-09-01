@@ -64,6 +64,8 @@ if [ "$1" = "upgrade" ] ; then
     if grep -q ^qubes:x:98: /etc/group ; then
         if ! grep -q :980: /etc/group ; then
             if groupmod -g 980 qubes ; then
+                # make sure that vchan will still work until VM start
+                chmod 666 /dev/xen/* /proc/xen/privcmd
                 find / -gid 98 ! -type l -exec chgrp --verbose qubes {} \; 2>/dev/null || true
             fi
         fi
