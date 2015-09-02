@@ -5,4 +5,4 @@ Name=Hide/Show nm-applet depending on NetworkManager state
 Exec=/usr/lib/qubes/show-hide-nm-applet.sh
 Terminal=false
 Type=Application
-OnlyShowIn=QUBES;
+OnlyShowIn=X-QUBES;
