@@ -13,6 +13,7 @@ Depends:
     dmsetup,
     ethtool,
     fakeroot,
+    gawk,
     imagemagick,
     init-system-helpers,
     initscripts,
