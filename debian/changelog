@@ -1,3 +1,40 @@
+qubes-core-agent (3.0.16-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: remove SELinux disabling code
+  * Revert "qubes-desktop-run: Activate via DBUS when desktop file
+    contains DBusActivatable"
+  * qubes-desktop-run: start the Dbus service (if needed)
+
+  [ Patrick Schleizer ]
+  * added pulseaudio-kde and spice-vdagent to qubes-trigger-desktop-
+    file-install
+
+  [ Jason Mehring ]
+  * debian: Move python-xdg to depends section in debian/control
+  * sudoers.d: Stops QT from using the MIT-SHM X11 Shared Memory
+    Extension
+
+  [ Rusty Bird ]
+  * Mount /dev/xvdb with fs type "auto"
+
+  [ Marek Marczykowski-Górecki ]
+  * Move .desktop launching code to python moules so it can be reused
+  * Implement dropins for /etc/xdg/autostart (#1151)
+  * Remove dynamically generated autostart desktop files
+  * qubes-session-autostart: do not abort the whole process on invalid
+    file
+  * qubes-desktop-run: don't crash on Debian wheezy (glib < 2.36)
+  * debian: fix /dev permissions on upgrade
+  * systemd: fix starting cups
+  * debian: depend on gawk
+  * Fix show-hide-nm-applet.desktop - use OnlyShowIn=X-QUBES
+
+  [ Patrick Schleizer ]
+  * moved python-xdg from Recommends to Depends
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 03 Sep 2015 02:45:30 +0200
+
 qubes-core-agent (3.0.15-1) wheezy; urgency=medium
 
   * debian: remove `Recommends: chrony`
