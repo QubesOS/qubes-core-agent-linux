@@ -51,13 +51,14 @@ Requires:   qubes-utils
 Requires:   initscripts
 # for qubes-desktop-run
 Requires:   pygobject3-base
-# for qubes-session-autostart
+# for qubes-session-autostart, xdg-icon
 Requires:   pyxdg
 %if %{fedora} >= 20
 # gpk-update-viewer required by qubes-manager
 Requires:   gnome-packagekit-updater
 %endif
 Requires:   ImageMagick
+Requires:   librsvg2-tools
 Requires:   fakeroot
 Requires:   desktop-notification-daemon
 Requires:   pygtk2
@@ -410,6 +411,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/wrap-in-html-if-url.sh
 /usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/close-window
+/usr/lib/qubes/xdg-icon
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
