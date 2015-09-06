@@ -27,6 +27,7 @@ Depends:
     python2.7,
     python-gi,
     python-xdg,
+    python-dbus,
     qubes-utils (>= 3.0.1),
     sudo,
     systemd,
