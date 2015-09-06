@@ -21,10 +21,10 @@ elif [ "${filename}" = "-" ] || [ "${filename##*:}" = "-" ]; then
     tmpfile="$(mktemp /tmp/qimg-XXXXXXXX)"
     cat > "${tmpfile}"
     if [ "${filename##*:}" = "-" ]; then
-        tmpfile="${filename%:*}:${tmpfile}"
+        filename="${filename%:*}:${tmpfile}"
+    else
+        filename="${tmpfile}"
     fi
-    filename="${tmpfile}"
-
 elif ! [ -r "${filename}" ]; then
     exit 1
 fi
@@ -34,6 +34,6 @@ fi
 identify -format '%w %h\n' "$filename" | sed -e '/^$/d'
 convert -depth 8 "$filename" rgba:-
 
-[ -n "${tmpfile}" ] && rm -f ${tmpfile} || true
+[ -n "${tmpfile}" ] && rm -f "${tmpfile}" || true
 
 # vim: ft=sh ts=4 sw=4 et
