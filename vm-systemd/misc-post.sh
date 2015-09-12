@@ -2,7 +2,7 @@
 
 if [ -f /var/run/qubes-service/yum-proxy-setup -o -f /var/run/qubes-service/updates-proxy-setup ]; then
     if [ -d /etc/apt/apt.conf.d ]; then
-        echo 'Acquire::http::Proxy "http://10.137.255.254:8082/";' >> /etc/apt/apt.conf.d/01qubes-proxy
+        echo 'Acquire::http::Proxy "http://10.137.255.254:8082/";' > /etc/apt/apt.conf.d/01qubes-proxy
     fi
     if [ -d /etc/yum.conf.d ]; then
         echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
