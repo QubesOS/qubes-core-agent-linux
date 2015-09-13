@@ -8,7 +8,7 @@ include /usr/share/dpkg/default.mk
 export DESTDIR=$(shell pwd)/debian/qubes-core-agent
 
 %:
-	dh $@ --with systemd
+	dh $@ --with systemd --with=config-package
 
 override_dh_auto_build:
 	make all

@@ -2,7 +2,7 @@ Source: qubes-core-agent
 Section: admin
 Priority: extra
 Maintainer: Davíð Steinn Geirsson <david@dsg.is>
-Build-Depends: qubes-utils (>= 2.0.17), libvchan-xen-dev, python, debhelper, quilt, libxen-dev, dh-systemd (>= 1.5), lsb-release
+Build-Depends: qubes-utils (>= 2.0.17), libvchan-xen-dev, python, debhelper, quilt, libxen-dev, dh-systemd (>= 1.5), lsb-release, config-package-dev
 Standards-Version: 3.9.5
 Homepage: http://www.qubes-os.org
 Vcs-Git: git://git.qubes-os.org/marmarek/core-agent-linux.git
@@ -56,7 +56,8 @@ Recommends:
     xsettingsd,
     yum,
     yum-utils
-Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
+Provides: ${diverted-files}
+Conflicts: ${diverted-files}, qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec.
