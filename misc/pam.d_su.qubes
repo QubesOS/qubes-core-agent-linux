@@ -51,16 +51,16 @@ session    optional   pam_mail.so nopen
 # (Replaces the use of /etc/limits in old login)
 session    required   pam_limits.so
 
-# The standard Unix authentication modules, used with
-# NIS (man nsswitch) as well as normal /etc/passwd and
-# /etc/shadow entries.
-@include common-auth
-@include common-account
-@include common-session
-
 # {{ Qubes specific modifications being here
 #    Prevent 'su -' from asking for password in Debian [based] templates.
 #    https://github.com/QubesOS/qubes-issues/issues/1128
 #    Feel free to comment out the following line.
 auth sufficient pam_permit.so
 # }} Qubes specific modifications end here
+
+# The standard Unix authentication modules, used with
+# NIS (man nsswitch) as well as normal /etc/passwd and
+# /etc/shadow entries.
+@include common-auth
+@include common-account
+@include common-session
