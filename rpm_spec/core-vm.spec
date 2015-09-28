@@ -51,6 +51,7 @@ Requires:   qubes-utils
 Requires:   initscripts
 # for qubes-desktop-run
 Requires:   pygobject3-base
+Requires:   dbus-python
 # for qubes-session-autostart
 Requires:   pyxdg
 %if %{fedora} >= 20
