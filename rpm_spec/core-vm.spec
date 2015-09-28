@@ -51,6 +51,7 @@ Requires:   qubes-utils
 Requires:   initscripts
 # for qubes-desktop-run
 Requires:   pygobject3-base
+Requires:   dbus-python
 %if %{fedora} >= 20
 # gpk-update-viewer required by qubes-manager
 Requires:   gnome-packagekit-updater
