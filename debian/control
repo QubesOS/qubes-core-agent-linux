@@ -19,6 +19,7 @@ Depends:
     initscripts,
     iptables,
     iptables-persistent,
+    librsvg2-bin,
     libvchan-xen,
     locales,
     ncurses-term,

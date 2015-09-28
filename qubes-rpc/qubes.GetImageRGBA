@@ -1,22 +1,13 @@
 set -e
 read filename
 
+ICON_MAXSIZE=512
+
 if [ "${filename%%:*}" = xdgicon ]; then
-    # get biggest icon from hicolor theme
+    filename="$(/usr/lib/qubes/xdg-icon "${filename#*:}" "$ICON_MAXSIZE")"
+    forcesize="$ICON_MAXSIZE"
 
-    filename="${filename#*:}.png"
-    candidate=
-    for dir in /usr/share/icons/hicolor/ /usr/share/icons/; do
-        candidate=$(find -L "${dir}" -type f -name "${filename}")
-        if [ -n "${candidate}" ]; then
-            candidate=$(echo "${candidate}" | xargs ls --sort=size | head -1)
-            break
-        fi
-    done
-
-    [ -n "${candidate}" ]
-    filename="${candidate}"
-
+    [ -n "${filename}" ]
 elif [ "${filename}" = "-" ] || [ "${filename##*:}" = "-" ]; then
     tmpfile="$(mktemp /tmp/qimg-XXXXXXXX)"
     cat > "${tmpfile}"
@@ -29,11 +20,23 @@ elif ! [ -r "${filename}" ]; then
     exit 1
 fi
 
-# identify in F18 (6.7) adds implicit '\n' to format,
-# whereas identify in F20 (6.8) does not
-identify -format '%w %h\n' "$filename" | sed -e '/^$/d'
-convert -depth 8 "$filename" rgba:-
+s="$(identify -format '%w %h %m' "$filename")"
+w="$(echo "$s"|cut -d " " -f 1)"
+h="$(echo "$s"|cut -d " " -f 2)"
+m="$(echo "$s"|cut -d " " -f 3)"
+if [ "$m" = SVG ]; then
+    if [ -n "$forcesize" ]; then
+        w="$forcesize"
+        h="$forcesize"
+    fi
+    tmpfile2="$(mktemp /tmp/qimg-XXXXXXXX.png)"
+    rsvg-convert -w "$w" -h "$h" -o "$tmpfile2" "$filename"
+    filename="$tmpfile2"
+fi
+echo "$w $h"
+convert -depth 8 -size "${w}x${h}" "$filename" rgba:-
 
 [ -n "${tmpfile}" ] && rm -f "${tmpfile}" || true
+[ -n "${tmpfile2}" ] && rm -f "${tmpfile2}" || true
 
 # vim: ft=sh ts=4 sw=4 et
