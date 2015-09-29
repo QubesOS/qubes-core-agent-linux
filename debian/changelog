@@ -1,3 +1,33 @@
+qubes-core-agent (2.1.67) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * also inform in cli if no new updates are available (cherry picked
+    from commit e1e51627200cfbde50ec489145ad33495bac28ad)
+
+  [ Jason Mehring ]
+  * debian: Renamed incorrect filename:  00notiy-hook -> 00notify-hook
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes-desktop-run: start the Dbus service (if needed)
+
+  [ Jason Mehring ]
+  * debian: Reformat depends in control for better readability
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: remove `Recommends: chrony`
+  * Move .desktop launching code to python moules so it can be reused
+  * qubes-desktop-run: don't crash on Debian wheezy (glib < 2.36)
+  * debian: depend on gawk
+
+  [ Patrick Schleizer ]
+  * added missing dependency python-dbus to 'Depends:'
+  * added missing dependency xserver-xorg-dev
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: add dbus-python dependency
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 Sep 2015 12:49:05 +0200
+
 qubes-core-agent (2.1.66) wheezy; urgency=medium
 
   * fedora: ensure that /etc/sysconfig/iptables exists (Fedora 20)
