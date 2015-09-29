@@ -1,3 +1,25 @@
+qubes-core-agent (3.0.17-1) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * show error msg if qubes.ReceiveUpdates failed (cherry picked from
+    commit fc013bd480176034990a6091f8c40dbafd9364ca)
+
+  [ qubesuser ]
+  * qubes-rpc: fix broken temporary file deletion in qubes.GetImageRGBA
+
+  [ Patrick Schleizer ]
+  * added missing dependency python-dbus to 'Depends:'
+  * fixed 'Debian 8 apt.config.d misconfiguration'
+  * added missing dependency xserver-xorg-dev (cherry picked from commit
+    3f19b581cdaf342bf32864d5bbf21ed367645c0f)
+  * fix typo (cherry picked from commit
+    cf55fa54c9c293d747e438c7f3bdb60310f25d40)
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: add dbus-python dependency
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 Sep 2015 16:45:05 +0200
+
 qubes-core-agent (3.0.16-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
