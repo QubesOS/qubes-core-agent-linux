@@ -1,3 +1,39 @@
+qubes-core-agent (3.1.0-1) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * Allow passwordless login for user "user" (when using 'sudo xl
+    console').
+  * Allow passwordless login for user "user" (when using 'sudo xl
+    console') for images being upgraded.
+  * show error msg if qubes.ReceiveUpdates failed
+
+  [ qubesuser ]
+  * qubes-rpc: fix broken temporary file deletion in qubes.GetImageRGBA
+
+  [ Patrick Schleizer ]
+  * added missing dependency python-dbus to 'Depends:'
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: add dbus-python dependency
+
+  [ qubesuser ]
+  * qubes-rpc: fix broken temporary file deletion in qubes.GetImageRGBA
+  * qubes-rpc: fix icon selection using pyxdg and support SVG icons
+
+  [ Patrick Schleizer ]
+  * fixed 'Debian 8 apt.config.d misconfiguration'
+  * added missing dependency xserver-xorg-dev
+  * - Prevent 'su -' from asking for password in Debian [based]
+    templates. Thanks to @unman and @marmarek for suggesting the fix!
+    Fixes https://github.com/QubesOS/qubes-issues/issues/1128. - Changed
+    'ifeq (1,${DEBIANBUILD})' to 'ifeq ($(shell lsb_release -is),
+    Debian)' to make the build work outside of Qubes Builder as well.
+  * Fixed /etc/pam.d/su.qubes. (Moved line 'auth sufficient
+    pam_permit.so' up. May not be low '@include' lines.)
+  * fix typo
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 Sep 2015 16:39:55 +0200
+
 qubes-core-agent (3.0.16-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
