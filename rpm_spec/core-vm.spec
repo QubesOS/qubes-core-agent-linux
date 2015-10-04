@@ -553,6 +553,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/NetworkManager.service.d/30_qubes.conf
 /lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
 /lib/systemd/system/ntpd.service.d/30_qubes.conf
+/lib/systemd/system/tmp.mount.d/30_qubes.conf
 
 %post systemd
 

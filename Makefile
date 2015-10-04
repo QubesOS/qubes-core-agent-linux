@@ -54,6 +54,7 @@ DROPIN_DIR ?= "lib/systemd/system"
 # Fedora Dropins
 DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
 DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
+DROPINS += tmp.mount
 
 # Debian Dropins
 ifeq ($(shell lsb_release -is), Debian)
