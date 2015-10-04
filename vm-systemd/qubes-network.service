@@ -2,7 +2,7 @@
 Description=Qubes network forwarding setup
 ConditionPathExists=/var/run/qubes-service/qubes-network
 Before=network.target
-After=iptables.service
+After=qubes-iptables.service
 
 [Service]
 Type=oneshot

@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+# qubes-iptables	Start Qubes base iptables firewall
+#
+# chkconfig: 2345 08 92
+# description:	Loads iptables firewall
+#
+# config: /etc/qubes/iptables.rules
+# config: /etc/qubes/ip6tables.rules
+#
+### BEGIN INIT INFO
+# Provides: iptables
+# Required-Start:
+# Required-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Loads Qubes base iptables firewall
+# Description: Loads Qubes base iptables firewall
+### END INIT INFO
+
+IPTABLES=iptables
+IPTABLES_DATA_DIR=/etc/qubes
+
+if [ ! -x /sbin/$IPTABLES ]; then
+    echo $"${IPTABLES}: /sbin/$IPTABLES does not exist."
+    exit 5
+fi
+
+start() {
+    ipt=$1
+    IPTABLES_DATA=$IPTABLES_DATA_DIR/${ipt}.rules
+    CMD=$ipt
+    # Do not start if there is no config file.
+    [ ! -f "$IPTABLES_DATA" ] && return 6
+
+    echo -n $"${CMD}: Applying firewall rules: "
+
+    $CMD-restore $IPTABLES_DATA
+    if [ $? -eq 0 ]; then
+        echo OK
+    else
+        echo FAIL; return 1
+    fi
+    
+    return $ret
+}
+
+case "$1" in
+    start)
+	start iptables && start ip6tables
+	RETVAL=$?
+	;;
+    *)
+	echo $"Usage: ${IPTABLES} start"
+	RETVAL=2
+	;;
+esac
+
+exit $RETVAL

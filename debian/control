@@ -18,7 +18,6 @@ Depends:
     init-system-helpers,
     initscripts,
     iptables,
-    iptables-persistent,
     librsvg2-bin,
     libvchan-xen,
     locales,

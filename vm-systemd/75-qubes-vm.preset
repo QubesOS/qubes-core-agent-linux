@@ -42,6 +42,8 @@ disable fedora-storage-init.service
 disable fedora-storage-init-late.service
 disable hwclock-load.service
 disable ipmi.service
+disable iptables.service
+disable ip6tables.service
 disable irqbalance.service
 disable mcelog.service
 disable mdmonitor-takeover.service
@@ -68,7 +70,6 @@ enable qubes-mount-home.service
 enable qubes-firewall.service
 enable qubes-netwatcher.service
 enable qubes-meminfo-writer.service
-enable iptables.service
-enable ip6tables.service
+enable qubes-iptables.service
 enable haveged.service
 enable chronyd.service
