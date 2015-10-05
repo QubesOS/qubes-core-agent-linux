@@ -126,6 +126,11 @@ EOF
     fi
     mount /home
 
+    if [ -n "`ls -A /usr/local/lib 2>/dev/null`" -o \
+         -n "`ls -A /usr/local/lib64 2>/dev/null`" ]; then
+        ldconfig
+    fi
+
 	[ -x /rw/config/rc.local ] && /rw/config/rc.local
 
 	success

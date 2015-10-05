@@ -16,6 +16,11 @@ else
     fi
 fi
 
+if [ -n "`ls -A /usr/local/lib 2>/dev/null`" -o \
+     -n "`ls -A /usr/local/lib64 2>/dev/null`" ]; then
+    ldconfig
+fi
+
 # Set IP address again (besides action in udev rules); this is needed by
 # DispVM (to override DispVM-template IP) and in case when qubes-ip was
 # called by udev before loading evtchn kernel module - in which case
