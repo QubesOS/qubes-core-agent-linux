@@ -135,15 +135,6 @@ for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
 	fi
 done
 
-# Create NetworkManager configuration if we do not have it
-if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
-echo '[main]' > /etc/NetworkManager/NetworkManager.conf
-echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
-echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
-fi
-/usr/lib/qubes/qubes-fix-nm-conf.sh
-
-
 # Remove ip_forward setting from sysctl, so NM will not reset it
 sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 
@@ -295,6 +286,7 @@ rm -f %{name}-%{version}
 %{kde_service_dir}/qvm-dvm.desktop
 /etc/NetworkManager/dispatcher.d/30-qubes-external-ip
 /etc/NetworkManager/dispatcher.d/qubes-nmhook
+%config /etc/NetworkManager/conf.d/30-qubes.conf
 %config(noreplace) /etc/X11/xorg-preload-apps.conf
 /etc/dispvm-dotfiles.tbz
 /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
@@ -364,7 +356,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qopen-in-vm
 /usr/lib/qubes/qrun-in-vm
 /usr/lib/qubes/qubes-download-dom0-updates.sh
-/usr/lib/qubes/qubes-fix-nm-conf.sh
 /usr/lib/qubes/qubes-setup-dnat-to-ns
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
 /usr/lib/qubes/qvm-copy-to-vm.gnome

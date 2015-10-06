@@ -69,14 +69,6 @@ case "${1}" in
         if [ -z "${2}" ]; then
 
             debug "FIRST INSTALL..."
-            # Create NetworkManager configuration if we do not have it
-            if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
-                echo '[main]' > /etc/NetworkManager/NetworkManager.conf
-                echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
-                echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
-            fi
-            /usr/lib/qubes/qubes-fix-nm-conf.sh
-
             # Location of files which contains list of protected files
             PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
 
