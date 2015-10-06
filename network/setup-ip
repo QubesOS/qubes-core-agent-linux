@@ -54,9 +54,9 @@ __EOF__
             echo "dns=$gateway;$secondary_dns" >> $nm_config
         fi
         if [ "x$disablegw" != "x1" ]; then
-            echo "address1=$ip/32,$gateway" >> $nm_config
+            echo "addresses1=$ip;32;$gateway" >> $nm_config
         else
-            echo "address1=$ip/32" >> $nm_config
+            echo "addresses1=$ip;32" >> $nm_config
         fi
         chmod 600 $nm_config
     fi
