@@ -133,7 +133,7 @@ case "${1}" in
             dpkg-statoverride --update --add user user 775 /var/lib/qubes/dom0-updates
         fi
 
-        # Update Qubes App Menus"
+        # Update Qubes App Menus
         /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
         ;;
 
