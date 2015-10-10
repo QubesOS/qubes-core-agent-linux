@@ -61,6 +61,8 @@ Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   fakeroot
 Requires:   desktop-notification-daemon
+# to show/hide nm-applet
+Requires:   dconf
 Requires:   pygtk2
 Requires:   zenity
 Requires:   qubes-libvchan
