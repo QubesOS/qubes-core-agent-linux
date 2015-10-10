@@ -74,7 +74,8 @@ fi
 
 if [ "x$PKGLIST" = "x" ]; then
     echo "Checking for dom0 updates..." >&2
-    UPDATES=`yum $OPTS check-update -q | cut -f 1 -d ' ' | grep -v "^Obsoleting"`
+    UPDATES_FULL=`yum $OPTS check-update -q`
+    UPDATES=`echo "$UPDATES_FULL" | cut -f 1 -d ' ' | grep -v "^Obsoleting"`
 else
     PKGS_FROM_CMDLINE=1
 fi
@@ -88,7 +89,7 @@ if [ -z "$PKGLIST" -a -z "$UPDATES" ]; then
 fi
 
 if [ "$CHECK_ONLY" = "1" ]; then
-    echo "Available updates: $PKGLIST"
+    echo "Available updates: $UPDATES_FULL"
     exit 100
 fi
 
