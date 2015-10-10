@@ -1,3 +1,9 @@
+qubes-core-agent (2.1.68) wheezy; urgency=medium
+
+  * Move iptables symlink creation to %posttrans
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 10 Oct 2015 06:33:46 +0200
+
 qubes-core-agent (2.1.67) wheezy; urgency=medium
 
   [ Patrick Schleizer ]
