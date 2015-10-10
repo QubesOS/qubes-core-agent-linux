@@ -71,5 +71,6 @@ enable qubes-firewall.service
 enable qubes-netwatcher.service
 enable qubes-meminfo-writer.service
 enable qubes-iptables.service
+enable qubes-random-seed.service
 enable haveged.service
 enable chronyd.service
