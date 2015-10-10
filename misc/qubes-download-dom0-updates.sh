@@ -108,7 +108,7 @@ YUM_COMMAND="fakeroot yum $YUM_ACTION -y --downloadonly --downloaddir=$DOM0_UPDA
 # yumdownloader
 if ! yum --help | grep -q downloadonly; then
     if [ "$YUM_ACTION" != "install" -a "$YUM_ACTION" != "upgrade" ]; then
-        echo "ERROR: yum version installed in VM $HOSTNAME does not suppport --downloadonly option" >&2
+        echo "ERROR: yum version installed in VM `hostname` does not suppport --downloadonly option" >&2
         echo "ERROR: only 'install' and 'upgrade' actions supported ($YUM_ACTION not)" >&2
         if [ "$GUI" = 1 ]; then
             zenity --error --text="yum version too old for '$YUM_ACTION' action, see console for details"
