@@ -64,6 +64,11 @@ start()
 		# the service will start only after successful restore
 		systemctl start qubes-db.service
 		echo Back to life.
+
+        # Reload random seed
+        qubesdb-read /qubes-random-seed | base64 -d > /dev/urandom
+        qubesdb-rm /qubes-random-seed
+
 	fi
 
 	start_meminfo_writer=$(/usr/bin/qubesdb-read /qubes-service/meminfo-writer 2>/dev/null)
