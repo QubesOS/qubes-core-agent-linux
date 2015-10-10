@@ -1,6 +1,6 @@
 #!/bin/sh
 
-which nm-applet > /dev/null 2>&1 || exit 0
+type nm-applet > /dev/null 2>&1 || exit 0
 
 # Hide nm-applet when network-manager is disabled
 nm_enabled=false
