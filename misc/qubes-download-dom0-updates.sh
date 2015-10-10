@@ -75,6 +75,11 @@ fi
 if [ "x$PKGLIST" = "x" ]; then
     echo "Checking for dom0 updates..." >&2
     UPDATES_FULL=`yum $OPTS check-update -q`
+    if [ $? -eq 1 ]; then
+        # Exit here if yum have reported an error. Exit code 100 isn't an
+        # error, it's "updates available" info, so check specifically for exit code 1
+        exit 1
+    fi
     UPDATES=`echo "$UPDATES_FULL" | cut -f 1 -d ' ' | grep -v "^Obsoleting"`
 else
     PKGS_FROM_CMDLINE=1
