@@ -20,6 +20,10 @@ start()
 	chgrp qubes /var/run/qubes
 	chmod 0775 /var/run/qubes
 
+	# Load random seed from dom0
+	qubesdb-read /qubes-random-seed | base64 -d > /dev/urandom
+	qubesdb-rm /qubes-random-seed
+
 	# Location of files which contains list of protected files
 	PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
 
