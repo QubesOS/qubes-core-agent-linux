@@ -70,5 +70,6 @@ enable qubes-netwatcher.service
 enable qubes-meminfo-writer.service
 enable iptables.service
 enable ip6tables.service
+enable qubes-random-seed.service
 enable haveged.service
 enable chronyd.service

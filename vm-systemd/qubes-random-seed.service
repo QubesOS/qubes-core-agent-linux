@@ -1,10 +1,12 @@
 [Unit]
 Description=Qubes Random Seed
 DefaultDependencies=no
-RequiresMountsFor=/proc/xen/
 After=qubes-db.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/lib/qubes/init/qubes-random-seed.sh
+
+[Install]
+WantedBy=sysinit.target
