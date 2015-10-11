@@ -3,9 +3,11 @@ addrule()
 {
         if [ $FIRSTONE = yes ] ; then
                 FIRSTONE=no
-                RULE1="-A PR-QBS -d $NS1 -p udp --dport 53 -j DNAT --to $1"
+                RULE1="-A PR-QBS -d $NS1 -p udp --dport 53 -j DNAT --to $1
+-A PR-QBS -d $NS1 -p tcp --dport 53 -j DNAT --to $1"
         else
-                RULE2="-A PR-QBS -d $NS2 -p udp --dport 53 -j DNAT --to $1"
+                RULE2="-A PR-QBS -d $NS2 -p udp --dport 53 -j DNAT --to $1
+-A PR-QBS -d $NS2 -p tcp --dport 53 -j DNAT --to $1"
                 NS=$NS2
         fi
 }
@@ -19,6 +21,6 @@ grep ^nameserver /etc/resolv.conf | grep -v ":.*:" | head -2 |
         while read x y z ; do
                 addrule "$y"
         done
-        (echo "*nat"; echo $RULE1; echo $RULE2; echo COMMIT) | iptables-restore -n
+        (echo "*nat"; echo "$RULE1"; echo "$RULE2"; echo COMMIT) | iptables-restore -n
         )
 
