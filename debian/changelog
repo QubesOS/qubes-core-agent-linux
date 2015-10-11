@@ -1,3 +1,31 @@
+qubes-core-agent (3.0.18-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Enlarge /tmp and /dev/shm
+  * Adjust progress message on file move operation
+  * network: fix 'qubes-uplink-eth0' NetworkManager connection (#1280)
+
+  [ Patrick Schleizer ]
+  * minor (cherry picked from commit
+    9664c97e551056a3db913dbf63b4019081987487)
+
+  [ HW42 ]
+  * qubes-random-seed: feed kernel rng with randomness from dom0
+  * reload qubes-random-seed when restoring DispVM
+
+  [ Marek Marczykowski-Górecki ]
+  * systemd: actually enable qubes-random-seed service
+  * sysvinit: load random seed from dom0 provided data
+  * Use 'type' instead of 'which' to prevent unnecessary dependency
+  * Add missing R: dconf to hide nm-applet when not used
+  * dom0-updates: Fix showing package list when --check-only option was
+    used
+  * dom0-updates: check "yum check-update" exit code, not only its
+    output
+  * dom0-updates: fix hostname in error message
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 11 Oct 2015 03:13:55 +0200
+
 qubes-core-agent (3.0.17-1) wheezy; urgency=medium
 
   [ Patrick Schleizer ]
