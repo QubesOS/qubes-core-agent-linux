@@ -1,3 +1,43 @@
+qubes-core-agent (3.1.2-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Enlarge /tmp and /dev/shm
+  * network: use own iptables service instead of repurposing existing
+    one
+
+  [ Patrick Schleizer ]
+  * removed iptables-persistent from Depends to improve usablity (avoid
+    redundant debconf question)
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: disable netfilter-persistent.service
+  * Adjust progress message on file move operation
+  * Run 'ldconfig' to update /usr/local/lib* cache, if applicable
+  * updates-proxy: Disable 'Via: tinyproxy' header
+  * Cleanup R3.0->R3.1 transitional package
+  * network: use drop-ins for NetworkManager configuration (#1176)
+  * network: fix 'qubes-uplink-eth0' NetworkManager connection (#1280)
+
+  [ Patrick Schleizer ]
+  * minor
+
+  [ HW42 ]
+  * qubes-random-seed: feed kernel rng with randomness from dom0
+  * reload qubes-random-seed when restoring DispVM
+
+  [ Marek Marczykowski-Górecki ]
+  * systemd: actually enable qubes-random-seed service
+  * sysvinit: load random seed from dom0 provided data
+  * Use 'type' instead of 'which' to prevent unnecessary dependency
+  * Add missing R: dconf to hide nm-applet when not used
+  * dom0-updates: Fix showing package list when --check-only option was
+    used
+  * dom0-updates: check "yum check-update" exit code, not only its
+    output
+  * dom0-updates: fix hostname in error message
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 11 Oct 2015 03:00:00 +0200
+
 qubes-core-agent (3.1.1-1) wheezy; urgency=medium
 
   * Update repository definition for r3.1
