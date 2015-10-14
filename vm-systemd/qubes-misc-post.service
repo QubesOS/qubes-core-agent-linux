@@ -1,6 +1,6 @@
 [Unit]
 Description=Qubes misc post-boot actions
-After=qubes-dvm.service qubes-mount-home.service
+After=qubes-dvm.service qubes-mount-dirs.service
 
 [Service]
 Type=oneshot

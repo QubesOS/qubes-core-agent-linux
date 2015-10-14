@@ -5,7 +5,7 @@ Before=qubes-gui-agent.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/lib/qubes/init/mount-home.sh
+ExecStart=/usr/lib/qubes/init/mount-dirs.sh
 # Fedora and Debian have different paths for fuser
 ExecStop=/bin/sh -c 'fuser -kMm /home' ; /bin/umount /home
 ExecStopPost=-/bin/umount /rw
