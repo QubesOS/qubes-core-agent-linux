@@ -20,7 +20,7 @@
 #
 #
 
-if ! [ $# = 2 ] ; then 
+if ! [ $# = 2 ] ; then
 	echo "Usage: $0 vmname filename"
 	exit 1
 fi

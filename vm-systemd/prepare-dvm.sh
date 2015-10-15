@@ -16,7 +16,7 @@ if true; then
     dmesg -c >/dev/null
     qubesdb-watch /qubes-restore-complete &
     watch_pid=$!
-    free | grep Mem: | 
+    free | grep Mem: |
         (read label total used free shared buffers cached; qubesdb-write /qubes-used-mem $(( $used + $cached )) )
     # we're still running in DispVM template
     echo "Waiting for save/restore..."

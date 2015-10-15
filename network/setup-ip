@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # setup-ip is potentially invoked before qubes-sysinit.sh is done, therefore
-# we perform our qubesdb reads here instead of relying on qvm-service 
+# we perform our qubesdb reads here instead of relying on qvm-service
 # files under /var/run/qubes-service/
 disablegw=`qubesdb-read /qubes-service/disable-default-route 2> /dev/null`
 disabledns=`qubesdb-read /qubes-service/disable-dns-server 2> /dev/null`

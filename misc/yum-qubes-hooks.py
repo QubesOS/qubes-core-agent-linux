@@ -27,7 +27,7 @@ import subprocess
 
 requires_api_version = '2.4'
 plugin_type = (TYPE_CORE,)
-            
+
 def posttrans_hook(conduit):
     # Get all updates available _before_ this transaction
     pkg_list = conduit._base.doPackageLists(pkgnarrow='updates')

@@ -194,7 +194,7 @@ main()
 		case 0:
 			null_fd = open("/dev/null", O_RDONLY);
 			dup2(null_fd, 0);
-			close(null_fd);		
+			close(null_fd);
 
 			env_file = fopen("/tmp/qubes-session-env", "r");
 			while(fscanf(env_file, "%1024[^=]=%4096[^\n]\n", var, val) == 2) {

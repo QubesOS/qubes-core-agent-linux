@@ -52,10 +52,10 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
 	}
 	mkdir(INCOMING_DIR_ROOT, 0700);
 	if (asprintf(&incoming_dir, "%s/%s", INCOMING_DIR_ROOT, remote_domain) < 0)
-		gui_fatal("Error allocating memory"); 
+		gui_fatal("Error allocating memory");
 	mkdir(incoming_dir, 0700);
 	if (chdir(incoming_dir))
-		gui_fatal("Error chdir to %s", incoming_dir); 
+		gui_fatal("Error chdir to %s", incoming_dir);
 
 	if (mount(".", ".", NULL, MS_BIND | MS_NODEV | MS_NOEXEC | MS_NOSUID, NULL) < 0)
 		gui_fatal("Failed to mount a directory %s", incoming_dir);

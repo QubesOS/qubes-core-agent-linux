@@ -14,19 +14,19 @@ configure_initscripts() {
 
 
 configure_iptables() {
-	
+
 	if ! grep -q IPTABLES_DATA /etc/sysconfig/iptables-config; then
 	    cat <<EOF >>/etc/sysconfig/iptables-config
-	
+
 	### Automatically added by Qubes:
 	# Override default rules location on Qubes
 	IPTABLES_DATA=/etc/sysconfig/iptables.qubes
 EOF
 	fi
-	
+
 	if ! grep -q IP6TABLES_DATA /etc/sysconfig/ip6tables-config; then
 	    cat <<EOF >>/etc/sysconfig/ip6tables-config
-	
+
 	### Automatically added by Qubes:
 	# Override default rules location on Qubes
 	IP6TABLES_DATA=/etc/sysconfig/ip6tables.qubes
@@ -87,7 +87,7 @@ pre_install() {
 	mkdir -p /var/lib/qubes
 
 	# Backup fstab / But use archlinux defaults (cp instead of mv)
-	if [ -e /etc/fstab ] ; then 
+	if [ -e /etc/fstab ] ; then
 		cp /etc/fstab /var/lib/qubes/fstab.orig
 	fi
 
@@ -123,7 +123,7 @@ update_xdgstart () {
 
 	# reenable if disabled by some earlier version of package
 	remove_ShowIn abrt-applet.desktop imsettings-start.desktop
-	
+
 	# don't want it at all
 	for F in deja-dup-monitor krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
 		if [ -e /etc/xdg/autostart/$F.desktop ]; then
@@ -131,7 +131,7 @@ update_xdgstart () {
 			echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/$F.desktop
 		fi
 	done
-	
+
 	# don't want it in DisposableVM
 	for F in gcm-apply ; do
 		if [ -e /etc/xdg/autostart/$F.desktop ]; then
@@ -139,7 +139,7 @@ update_xdgstart () {
 			echo 'NotShowIn=DisposableVM;' >> /etc/xdg/autostart/$F.desktop
 		fi
 	done
-	
+
 	# want it in AppVM only
 	for F in gnome-keyring-gpg gnome-keyring-pkcs11 gnome-keyring-secrets gnome-keyring-ssh gnome-settings-daemon user-dirs-update-gtk gsettings-data-convert ; do
 		if [ -e /etc/xdg/autostart/$F.desktop ]; then
@@ -147,12 +147,12 @@ update_xdgstart () {
 			echo 'OnlyShowIn=GNOME;AppVM;' >> /etc/xdg/autostart/$F.desktop
 		fi
 	done
-	
+
 	# remove existing rule to add own later
 	for F in gpk-update-icon nm-applet ; do
 		remove_ShowIn $F
 	done
-	
+
 	echo 'OnlyShowIn=GNOME;UpdateableVM;' >> /etc/xdg/autostart/gpk-update-icon.desktop || :
 	echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
 
@@ -171,7 +171,7 @@ update_qubesconfig() {
 	# Remove ip_forward setting from sysctl, so NM will not reset it
 	# Archlinux now use sysctl.d/ instead of sysctl.conf
 	#sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
-	
+
 	# Remove old firmware updates link
 	if [ -L /lib/firmware/updates ]; then
 	  rm -f /lib/firmware/updates
@@ -190,7 +190,7 @@ update_qubesconfig() {
 	# Location of files which contains list of protected files
 	mkdir -p /etc/qubes/protected-files.d
 	PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
-	
+
 	# qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
 	if ! grep -rq "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
 	    if ! grep -q localhost /etc/hosts; then
@@ -200,7 +200,7 @@ update_qubesconfig() {
 EOF
 	    fi
 	fi
-	
+
 	# Make sure that /etc/sysconfig/ip(|6)tables exists. Otherwise iptales.service
 	# would not start (even when configured to use another configuration file.
 	if [ ! -e '/etc/sysconfig/iptables' ]; then
@@ -253,7 +253,7 @@ update_systemd_finalize() {
 	# Set default "runlevel"
 	rm -f /etc/systemd/system/default.target
 	ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
-	
+
 	grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
 	    case "$action" in
 	    (disable)
@@ -266,7 +266,7 @@ update_systemd_finalize() {
 	        ;;
 	    esac
 	done
-	
+
 	# Archlinux specific: ensure tty1 is enabled
 	rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 	systemctl enable getty\@tty1.service
@@ -299,15 +299,15 @@ post_install() {
 	    if [ $(basename $f) == "xen-backend.rules" ] ; then
 	        continue
 	    fi
-	
+
 	    if [ $(basename $f) == "50-qubes-misc.rules" ] ; then
 	        continue
 	    fi
-	
+
 	    if echo $f | grep -q qubes; then
 	        continue
 	    fi
-	
+
 	    mv $f /var/lib/qubes/removed-udev-scripts/
 	done
 

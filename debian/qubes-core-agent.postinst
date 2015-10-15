@@ -108,7 +108,7 @@ case "${1}" in
             # Systemd preload-all
             systemdPreload
 
-            # Maybe install overridden serial.conf init script 
+            # Maybe install overridden serial.conf init script
             installSerialConf
         fi
 
@@ -158,7 +158,7 @@ case "${1}" in
                     /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
                     ;;
 
-                # Install overridden serial.conf init script 
+                # Install overridden serial.conf init script
                 /etc/init/serial.conf)
                     installSerialConf
                     ;;
