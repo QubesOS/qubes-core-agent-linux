@@ -10,10 +10,10 @@ set -e
 #   * <new-preinst> 'install' <old-version>
 #   * <new-preinst> 'upgrade' <old-version>
 #
-#     The package will not yet be unpacked, so the preinst script cannot rely 
-# on any files included in its package. Only essential packages and 
-# pre-dependencies (Pre-Depends) may be assumed to be available. 
-# Pre-dependencies will have been configured at least once, but at the time the 
+#     The package will not yet be unpacked, so the preinst script cannot rely
+# on any files included in its package. Only essential packages and
+# pre-dependencies (Pre-Depends) may be assumed to be available.
+# Pre-dependencies will have been configured at least once, but at the time the
 # preinst is called they may only be in an "Unpacked" or "Half-Configured" state
 # if a previous version of the pre-dependency was completely configured and has
 # not been removed since then.
@@ -26,7 +26,7 @@ set -e
 # be partly from the new version or partly missing, so the script cannot rely
 # on files included in the package. Package dependencies may not be available.
 # Pre-dependencies will be at least "Unpacked" following the same rules as
-# above, except they may be only "Half-Installed" if an upgrade of the 
+# above, except they may be only "Half-Installed" if an upgrade of the
 # pre-dependency failed.[46]
 #
 #    For details, see http://www.debian.org/doc/debian-policy/ or

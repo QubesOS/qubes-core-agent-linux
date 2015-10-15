@@ -30,7 +30,7 @@ qdbus $REF org.freedesktop.DBus.Properties.Set "" maximum $SIZE
 export PROGRESS_TYPE=gui
 
 /usr/lib/qubes/qrexec-client-vm $VM qubes.Filecopy \
-	/usr/lib/qubes/qfile-agent "$@" | 
+	/usr/lib/qubes/qfile-agent "$@" |
 (while read sentsize ; do
 	CURRSIZE=$(($sentsize/1024))
 	qdbus $REF  org.freedesktop.DBus.Properties.Set "" value $CURRSIZE
@@ -38,6 +38,6 @@ done)
 
 qdbus $REF close
 # we do not want a dozen error messages, do we
-# if ! [ "x"$agentstatus = xDONE ] ; then 
+# if ! [ "x"$agentstatus = xDONE ] ; then
 # 	kdialog --sorry 'Abnormal file copy termination; see /var/log/qubes/qrexec.xid.log in dom0 for more details'
 # fi

@@ -8,7 +8,7 @@
 ^http://mirrors\..*/mirrorlist\?
 
 # Debian filters
-# 
+#
 # Whonix uses sourceforge to host its repos and url can end in:
 # '/' or '/download' or '?.*'
 # -----------------------------------------------------------------------------

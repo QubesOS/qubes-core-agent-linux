@@ -709,7 +709,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	char * last_token = strtok(dirbuf,"/");
 	char * token = strtok(NULL, "/");
 	while (token != NULL) {
-		
+
 #ifdef DEBUG
 		fprintf(stderr,"Found directory %s (last:%s)\n",token,last_token);
 #endif
@@ -727,7 +727,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 			if (path == NULL)
 				return MEMORY_ALLOC_FAILED;
 			path[pathsize] = '/';
-			
+
 			strncpy(path+pathsize+1, last_token, strlen(last_token));
 			path[pathsize+strlen(last_token)+1] = '\0';
 		}
@@ -773,7 +773,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 
 			dir_header.mode = untrusted_hdr->mode | S_IFDIR;
 			dir_header.filelen = 0;
-		
+
 #ifdef DEBUG
 			fprintf(stderr,"Sending directory headers for %s\n",path);
 #endif
@@ -785,7 +785,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 	}
 	free(path);
 	free(dirbuf);
-	
+
 #ifdef DEBUG
 	fprintf(stderr,"End of directory checks\n");
 #endif

@@ -111,7 +111,7 @@ exit 0
 fi
 
 mkdir -p /var/lib/qubes
-if [ -e /etc/fstab ] ; then 
+if [ -e /etc/fstab ] ; then
 mv /etc/fstab /var/lib/qubes/fstab.orig
 fi
 

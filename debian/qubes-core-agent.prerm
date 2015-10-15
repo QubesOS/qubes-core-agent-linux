@@ -9,14 +9,14 @@ set -e
 #   * <prerm> 'remove'
 #   * <old-prerm> 'upgrade' <new-version>
 #   * <conflictor's-prerm> 'remove' 'in-favour' <package> <new-version>
-#   * <deconfigured's-prerm> 'deconfigure' 'in-favour' <package-being-installed> 
+#   * <deconfigured's-prerm> 'deconfigure' 'in-favour' <package-being-installed>
 #     <version> [removing conflicting-package version]
 #
 #     The package whose prerm is being called will be at least "Half-Installed".
-# All package dependencies will at least be "Half-Installed" and will have 
-# previously been configured and not removed. If there was no error, all 
-# dependencies will at least be "Unpacked", but these actions may be called in 
-# various error states where dependencies are only "Half-Installed" due to a 
+# All package dependencies will at least be "Half-Installed" and will have
+# previously been configured and not removed. If there was no error, all
+# dependencies will at least be "Unpacked", but these actions may be called in
+# various error states where dependencies are only "Half-Installed" due to a
 # partial upgrade.
 #
 #   * <new-prerm> 'failed-upgrade' <old-version>

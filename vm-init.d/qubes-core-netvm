@@ -33,7 +33,7 @@ start()
 		/usr/lib/qubes/qubes-setup-dnat-to-ns
 		echo "1" > /proc/sys/net/ipv4/ip_forward
 	fi
-	
+
 	success
 	echo ""
 	return 0
