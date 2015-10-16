@@ -1,62 +1,4 @@
 
-###################
-## Install Hooks ##
-###################
-
-configure_initscripts() {
-
-	if [ -e /etc/init/serial.conf ]; then
-		cp /usr/share/qubes/serial.conf /etc/init/serial.conf
-	fi
-
-}
-
-
-
-configure_iptables() {
-	
-	if ! grep -q IPTABLES_DATA /etc/sysconfig/iptables-config; then
-	    cat <<EOF >>/etc/sysconfig/iptables-config
-	
-	### Automatically added by Qubes:
-	# Override default rules location on Qubes
-	IPTABLES_DATA=/etc/sysconfig/iptables.qubes
-EOF
-	fi
-	
-	if ! grep -q IP6TABLES_DATA /etc/sysconfig/ip6tables-config; then
-	    cat <<EOF >>/etc/sysconfig/ip6tables-config
-	
-	### Automatically added by Qubes:
-	# Override default rules location on Qubes
-	IP6TABLES_DATA=/etc/sysconfig/ip6tables.qubes
-EOF
-	fi
-
-}
-
-configure_notification-daemon() {
-	# Enable autostart of notification-daemon when installed
-	ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
-}
-
-configure_selinux() {
-
-	# SELinux is not enabled on archlinux
-	#echo "--> Disabling SELinux..."
-	sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
-	mv /etc/selinux/config.processed /etc/selinux/config
-	setenforce 0 2>/dev/null
-
-}
-
-configure_networkmanager() {
-	# Disable D-BUS activation of NetworkManager - in AppVm it causes problems (eg PackageKit timeouts)
-	systemctl mask dbus-org.freedesktop.NetworkManager.service 2> /dev/null
-
-	# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=974811
-	systemctl enable NetworkManager-dispatcher.service 2> /dev/null
-}
 
 ###########################
 ## Pre-Install functions ##
@@ -109,54 +51,32 @@ pre_upgrade() {
 
 }
 
+###################
+## Install Hooks ##
+###################
+
+
+configure_notification-daemon() {
+    # Enable autostart of notification-daemon when installed
+    if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
+        ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
+    fi
+}
+
+configure_selinux() {
+
+	# SELinux is not enabled on archlinux
+	#echo "--> Disabling SELinux..."
+	echo "SELINUX not enabled on archlinux. skipped."
+	# sed -e s/^SELINUX=.*$/SELINUX=disabled/ -i /etc/selinux/config
+	# setenforce 0 2>/dev/null
+
+
+}
+
 ############################
 ## Post-Install functions ##
 ############################
-
-remove_ShowIn () {
-	if [ -e /etc/xdg/autostart/$1.desktop ]; then
-		sed -i '/^\(Not\|Only\)ShowIn/d' /etc/xdg/autostart/$1.desktop
-	fi
-}
-
-update_xdgstart () {
-
-	# reenable if disabled by some earlier version of package
-	remove_ShowIn abrt-applet.desktop imsettings-start.desktop
-	
-	# don't want it at all
-	for F in deja-dup-monitor krb5-auth-dialog pulseaudio restorecond sealertauto gnome-power-manager gnome-sound-applet gnome-screensaver orca-autostart; do
-		if [ -e /etc/xdg/autostart/$F.desktop ]; then
-			remove_ShowIn $F
-			echo 'NotShowIn=QUBES;' >> /etc/xdg/autostart/$F.desktop
-		fi
-	done
-	
-	# don't want it in DisposableVM
-	for F in gcm-apply ; do
-		if [ -e /etc/xdg/autostart/$F.desktop ]; then
-			remove_ShowIn $F
-			echo 'NotShowIn=DisposableVM;' >> /etc/xdg/autostart/$F.desktop
-		fi
-	done
-	
-	# want it in AppVM only
-	for F in gnome-keyring-gpg gnome-keyring-pkcs11 gnome-keyring-secrets gnome-keyring-ssh gnome-settings-daemon user-dirs-update-gtk gsettings-data-convert ; do
-		if [ -e /etc/xdg/autostart/$F.desktop ]; then
-			remove_ShowIn $F
-			echo 'OnlyShowIn=GNOME;AppVM;' >> /etc/xdg/autostart/$F.desktop
-		fi
-	done
-	
-	# remove existing rule to add own later
-	for F in gpk-update-icon nm-applet ; do
-		remove_ShowIn $F
-	done
-	
-	echo 'OnlyShowIn=GNOME;UpdateableVM;' >> /etc/xdg/autostart/gpk-update-icon.desktop || :
-	echo 'OnlyShowIn=GNOME;QUBES;' >> /etc/xdg/autostart/nm-applet.desktop || :
-
-}
 
 update_qubesconfig() {
 
@@ -193,15 +113,6 @@ EOF
 	    fi
 	fi
 	
-	# Make sure that /etc/sysconfig/ip(|6)tables exists. Otherwise iptales.service
-	# would not start (even when configured to use another configuration file.
-	if [ ! -e '/etc/sysconfig/iptables' ]; then
-	  ln -s iptables.qubes /etc/sysconfig/iptables
-	fi
-	if [ ! -e '/etc/sysconfig/ip6tables' ]; then
-	  ln -s ip6tables.qubes /etc/sysconfig/ip6tables
-	fi
-
 	# ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
 	# in the form expected by qubes-sysinit.sh
 	if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
@@ -231,7 +142,54 @@ EOF
 
 }
 
-update_systemd_finalize() {
+configure_systemd() {
+
+PRESET_FAILED=0
+
+if [ $1 -eq 1 ]; then
+    systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
+else
+    services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
+    services="$services qubes-netwatcher qubes-network qubes-sysinit"
+    services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
+    services="$services qubes-random-seed"
+    for srv in $services; do
+        systemctl --no-reload preset $srv.service
+    done
+    systemctl --no-reload preset qubes-update-check.timer
+    # Upgrade path - now qubes-iptables is used instead
+    systemctl --no-reload preset iptables.service
+    systemctl --no-reload preset ip6tables.service
+fi
+
+# Set default "runlevel"
+rm -f /etc/systemd/system/default.target
+ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+
+grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
+    case "$action" in
+    (disable)
+        if [ -f /lib/systemd/system/$unit_name ]; then
+            if ! fgrep -q '[Install]' /lib/systemd/system/$unit_name; then
+                # forcibly disable
+                ln -sf /dev/null /etc/systemd/system/$unit_name
+            fi
+        fi
+        ;;
+    *)
+        # preset-all is not available in fc20; so preset each unit file listed in 75-qubes-vm.preset
+        if [ $1 -eq 1 -a "${PRESET_FAILED}" -eq 1 ]; then
+            systemctl --no-reload preset "${unit_name}" > /dev/null 2>&1 || true
+        fi
+        ;;
+    esac
+done
+
+systemctl daemon-reload
+
+}
+
+update_finalize() {
 
 	# Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
 	if [ -z "`cat /etc/pam.d/su | grep system-login`" ] ; then
@@ -241,38 +199,16 @@ update_systemd_finalize() {
 		sed '/session\t\trequired\tpam_unix.so/asession\t\tinclude\t\tsystem-login' -i /etc/pam.d/su
 		cp /etc/pam.d/su /etc/pam.d/su-l
 	fi
-
-	# Set default "runlevel"
-	rm -f /etc/systemd/system/default.target
-	ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
-	
-	grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
-	    case "$action" in
-	    (disable)
-	        if [ -f /lib/systemd/system/$unit_name.service ]; then
-	            if ! fgrep -q '[Install]' /lib/systemd/system/$unit_name; then
-	                # forcibly disable
-	                ln -sf /dev/null /etc/systemd/system/$unit_name
-	            fi
-	        fi
-	        ;;
-	    esac
-	done
 	
 	# Archlinux specific: ensure tty1 is enabled
 	rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 	systemctl enable getty\@tty1.service
 
-
 	systemctl daemon-reload
-
 }
-
 
 ## arg 1:  the new package version
 post_install() {
-
-	update_xdgstart
 
 	update_qubesconfig
 
@@ -305,17 +241,15 @@ post_install() {
 
 	mkdir -p /rw
 
-	configure_iptables
 	configure_notification-daemon
 	configure_selinux
-	configure_networkmanager
 
-	systemctl --no-reload preset-all
+	configure_systemd 0
 
-	update_systemd_finalize
+	update_finalize
 
 	glib-compile-schemas /usr/share/glib-2.0/schemas &> /dev/null || :
-
+	
 }
 
 
@@ -324,26 +258,17 @@ post_install() {
 ## arg 2:  the old package version
 post_upgrade() {
 
-	update_xdgstart
-
 	update_qubesconfig
 
-	configure_iptables
 	configure_notification-daemon
 	configure_selinux
-	configure_networkmanager
 
-	services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
-	services="$services qubes-netwatcher qubes-network qubes-sysinit"
-	services="$services qubes-updates-proxy qubes-qrexec-agent"
-	for srv in $services; do
-		systemctl --no-reload preset $srv.service
-	done
-	systemctl --no-reload preset qubes-update-check.timer
+	configure_systemd 1
 
-	update_systemd_finalize
+	update_finalize
 
 	/usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas &> /dev/null || :
+
 
 }
 
@@ -374,9 +299,12 @@ post_remove() {
       rm /lib/firmware/updates
     fi
 
+    rm -rf /var/lib/qubes/xdg
+    
     for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-home qubes-netwatcher qubes-network qubes-qrexec-agent; do
         systemctl disable $srv.service
     done
 
+    
 }
 

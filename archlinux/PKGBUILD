@@ -6,15 +6,15 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=3
+pkgrel=4
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
 url="http://qubes-os.org/"
 license=('GPL')
 groups=()
-depends=(ethtool ntp net-tools qubes-vm-utils gnome-packagekit imagemagick fakeroot notification-daemon pygtk zenity qubes-libvchan qubes-db-vm haveged python2-gobject)
-makedepends=(qubes-vm-utils qubes-libvchan-xen)
+depends=(python2-xdg ethtool ntp net-tools qubes-vm-utils gnome-packagekit imagemagick fakeroot notification-daemon dconf pygtk zenity qubes-libvchan qubes-db-vm haveged python2-gobject python2-dbus xdg-utils)
+makedepends=(qubes-vm-utils qubes-libvchan qubes-db-vm qubes-vm-xen libx11)
 checkdepends=()
 optdepends=(gnome-keyring gnome-settings-daemon networkmanager iptables tinyproxy python2-nautilus gpk-update-viewer)
 provides=()
@@ -33,7 +33,7 @@ md5sums=('88f4b3d5b156888a9d38f5bc28702ab8') #generate with 'makepkg -g'
 
 build() {
 
-for source in qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network ; do
+for source in autostart-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network ; do
   (ln -s $srcdir/../$source $srcdir/$source)
 done
 
@@ -68,12 +68,7 @@ package() {
   
   (cd qrexec; make install DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib)
 
-  make install-vm DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib DIST=archlinux
-
-  # Change the place for iptable rules to match archlinux standard
-  mkdir -p $pkgdir/etc/iptables
-  mv $pkgdir/usr/lib/qubes/init/iptables $pkgdir/etc/iptables/iptables.rules
-  mv $pkgdir/usr/lib/qubes/init/ip6tables $pkgdir/etc/iptables/ip6tables.rules
+  make install-vm DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib DROPIN_DIR=usr/lib/systemd/system DIST=archlinux
 
   # Remove things non wanted in archlinux
   rm -r $pkgdir/etc/yum*
