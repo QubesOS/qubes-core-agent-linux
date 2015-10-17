@@ -6,14 +6,14 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=4
+pkgrel=5
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
 url="http://qubes-os.org/"
 license=('GPL')
 groups=()
-depends=(python2-xdg ethtool ntp net-tools qubes-vm-utils gnome-packagekit imagemagick fakeroot notification-daemon dconf pygtk zenity qubes-libvchan qubes-db-vm haveged python2-gobject python2-dbus xdg-utils)
+depends=(python2-xdg ethtool ntp net-tools qubes-vm-utils gnome-packagekit imagemagick fakeroot notification-daemon dconf pygtk zenity qubes-libvchan qubes-db-vm haveged python2-gobject python2-dbus xdg-utils notification-daemon)
 makedepends=(qubes-vm-utils qubes-libvchan qubes-db-vm qubes-vm-xen libx11)
 checkdepends=()
 optdepends=(gnome-keyring gnome-settings-daemon networkmanager iptables tinyproxy python2-nautilus gpk-update-viewer)
