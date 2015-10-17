@@ -48,9 +48,12 @@ sed 's:/sbin/ethtool:ethtool:g' -i network/*
 sed 's:/sbin/ip:ip:g' -i network/*
 sed 's:/bin/grep:grep:g' -i network/*
 
-# Fix for running with python2
+# Force running all scripts with python2
 sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i misc/*
+sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i misc/*
 sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i qubes-rpc/*
+sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i qubes-rpc/*
+
 
 # Fix for archlinux sbindir
 sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
