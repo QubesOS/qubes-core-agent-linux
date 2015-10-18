@@ -259,6 +259,8 @@ post_upgrade() {
 	configure_notification-daemon
 	configure_selinux
 
+	configure_systemd 1
+
 	update_finalize
 
 	/usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas &> /dev/null || :
@@ -291,6 +293,8 @@ post_remove() {
     if [ -L /lib/firmware/updates ] ; then
       rm /lib/firmware/updates
     fi
+
+    rm -rf /var/lib/qubes/xdg
 
     for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-netwatcher qubes-network qubes-qrexec-agent; do
         systemctl disable $srv.service
