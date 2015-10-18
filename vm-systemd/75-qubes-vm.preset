@@ -66,7 +66,7 @@ enable qubes-updates-proxy.service
 enable qubes-dvm.service
 enable qubes-network.service
 enable qubes-qrexec-agent.service
-enable qubes-mount-home.service
+enable qubes-mount-dirs.service
 enable qubes-firewall.service
 enable qubes-netwatcher.service
 enable qubes-meminfo-writer.service

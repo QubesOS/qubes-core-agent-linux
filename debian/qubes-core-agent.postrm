@@ -22,7 +22,7 @@ set -e
 #
 #     Called when the old postrm upgrade action fails. The new package will be
 # unpacked, but only essential packages and pre-dependencies can be relied on.
-# Pre-dependencies will either be configured or will be "Unpacked" or 
+# Pre-dependencies will either be configured or will be "Unpacked" or
 # "Half-Configured" but previously had been configured and was never removed.
 #
 #   * <new-postrm> 'abort-install'

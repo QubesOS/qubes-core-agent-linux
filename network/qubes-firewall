@@ -45,7 +45,7 @@ while true; do
 			echo "Failed applying rules for $i: $ERRS" >&2
 			OUT="$OUT$ERRS"
 		fi
-	done		
+	done
 	qubesdb-write $XENSTORE_ERROR "$OUT"
 	if [ -n "$OUT" ]; then
 		DISPLAY=:0 /usr/bin/notify-send -t 3000 "Firewall loading error ($(hostname))" "$OUT" || :

@@ -1,24 +1,24 @@
-#!/bin/bash                              
+#!/bin/bash
 #============================================================================
-# /etc/xen/vif-route-qubes                                                   
-#                                                                            
-# Script for configuring a vif in routed mode.                               
-# The hotplugging system will call this script if it is specified either in  
-# the device configuration given to Xend, or the default Xend configuration  
+# /etc/xen/vif-route-qubes
+#
+# Script for configuring a vif in routed mode.
+# The hotplugging system will call this script if it is specified either in
+# the device configuration given to Xend, or the default Xend configuration
 # in /etc/xen/xend-config.sxp.  If the script is specified in neither of those
-# places, then vif-bridge is the default.                                     
-#                                                                             
-# Usage:                                                                      
-# vif-route (add|remove|online|offline)                                       
-#                                                                             
-# Environment vars:                                                           
-# vif         vif interface name (required).                                  
-# XENBUS_PATH path to this device's details in the XenStore (required).       
-#                                                                             
-# Read from the store:                                                        
-# ip      list of IP networks for the vif, space-separated (default given in  
-#         this script).                                                       
-#============================================================================ 
+# places, then vif-bridge is the default.
+#
+# Usage:
+# vif-route (add|remove|online|offline)
+#
+# Environment vars:
+# vif         vif interface name (required).
+# XENBUS_PATH path to this device's details in the XenStore (required).
+#
+# Read from the store:
+# ip      list of IP networks for the vif, space-separated (default given in
+#         this script).
+#============================================================================
 
 dir=$(dirname "$0")
 . "$dir/vif-common.sh"

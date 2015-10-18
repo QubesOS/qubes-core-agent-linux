@@ -20,7 +20,7 @@
 #
 #
 
-if [ $# -lt 2 ] ; then 
+if [ $# -lt 2 ] ; then
 	cat <<USAGE
 Usage: $0 vmname command arguments
 Executes a command in another VM using the qubes.VMShell RPC service.  The

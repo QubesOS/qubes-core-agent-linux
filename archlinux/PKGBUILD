@@ -68,7 +68,7 @@ done
 
 package() {
   # Note: Archlinux removed use of directory such as /sbin /bin /usr/sbin (https://mailman.archlinux.org/pipermail/arch-dev-public/2012-March/022625.html)
-  
+
   (cd qrexec; make install DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib)
 
   make install-vm DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib DROPIN_DIR=usr/lib/systemd/system DIST=archlinux

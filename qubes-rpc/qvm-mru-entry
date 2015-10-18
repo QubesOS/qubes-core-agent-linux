@@ -42,7 +42,7 @@ class QubesMruDialog(gtk.Dialog):
         # does not work as advertised
         # using key-press-event instead
         #self.set_default_response(gtk.RESPONSE_OK)
-        
+
         self.connect("destroy", lambda *w: gtk.main_quit())
         self.connect("response", self.response_callback)
         self.connect("key-press-event", self.key_press_callback)

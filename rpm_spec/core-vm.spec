@@ -111,7 +111,7 @@ exit 0
 fi
 
 mkdir -p /var/lib/qubes
-if [ -e /etc/fstab ] ; then 
+if [ -e /etc/fstab ] ; then
 mv /etc/fstab /var/lib/qubes/fstab.orig
 fi
 
@@ -486,7 +486,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-dvm.service
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-firewall.service
-/lib/systemd/system/qubes-mount-home.service
+/lib/systemd/system/qubes-mount-dirs.service
 /lib/systemd/system/qubes-netwatcher.service
 /lib/systemd/system/qubes-network.service
 /lib/systemd/system/qubes-iptables.service
@@ -505,7 +505,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/qubes-iptables
 /usr/lib/qubes/init/misc-post.sh
 /usr/lib/qubes/init/misc-post-stop.sh
-/usr/lib/qubes/init/mount-home.sh
+/usr/lib/qubes/init/mount-dirs.sh
 /usr/lib/qubes/init/qubes-random-seed.sh
 /usr/lib/qubes/init/qubes-sysinit.sh
 /lib/systemd/system/chronyd.service.d/30_qubes.conf
@@ -526,7 +526,7 @@ PRESET_FAILED=0
 if [ $1 -eq 1 ]; then
     /bin/systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
 else
-    services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-home"
+    services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-dirs"
     services="$services qubes-netwatcher qubes-network qubes-sysinit"
     services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
     services="$services qubes-random-seed"
@@ -573,6 +573,6 @@ if [ "$1" != 0 ] ; then
     exit 0
 fi
 
-for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-home qubes-netwatcher qubes-network qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-netwatcher qubes-network qubes-qrexec-agent; do
     /bin/systemctl disable $srv.service
 do

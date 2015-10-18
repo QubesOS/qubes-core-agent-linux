@@ -51,7 +51,7 @@ start()
 		possibly_run_save_script
 		umount /rw
 		dmesg -c >/dev/null
-		free | grep Mem: | 
+		free | grep Mem: |
 			(read a b c d ; qubesdb-write /qubes-used-mem $c)
 		# give dom0 time to read some entries, when done it will shutdown qubesdb,
 		# so wait for it

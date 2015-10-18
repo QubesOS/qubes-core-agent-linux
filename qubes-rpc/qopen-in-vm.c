@@ -100,8 +100,8 @@ void talk_to_daemon(const char *fname)
 int main(int argc, char ** argv)
 {
 	signal(SIGPIPE, SIG_IGN);
-	if (argc!=2) 
+	if (argc!=2)
 		gui_fatal("OpenInVM - no file given?");
 	talk_to_daemon(argv[1]);
 	return 0;
-}	
+}
