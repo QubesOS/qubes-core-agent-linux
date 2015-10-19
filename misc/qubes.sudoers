@@ -28,7 +28,7 @@ user ALL=(ALL) NOPASSWD: ALL
 # hypervisor -- so far there has been only one (!) publicly disclosed
 # exploitable bug in the Xen hypervisor from a VM, found in 2008,
 # incidentally by one of the Qubes developers (RW) -- then it would be
-# highly unlikely that they couldn't also find a user-to-root
+# highly unlikely that that person couldn't also find a user-to-root
 # escalation in the VM (which as we know from history of UNIX/Linux
 # happens all the time).
 #
