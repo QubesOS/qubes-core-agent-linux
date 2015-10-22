@@ -1,0 +1,1 @@
+rm_conffile /etc/apt/apt.conf.d/00notiy-hook
