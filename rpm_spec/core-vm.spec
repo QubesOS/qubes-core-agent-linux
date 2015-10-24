@@ -384,7 +384,6 @@ rm -f %{name}-%{version}
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
 
-%dir /var/lib/qubes
 /usr/share/qubes/mime-override/globs
 %dir /home_volatile
 %attr(700,user,user) /home_volatile/user
