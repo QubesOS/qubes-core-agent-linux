@@ -168,6 +168,8 @@ int handle_input(libvchan_t *vchan, int fd, int msg_type)
             return -1;
 
         if (len == 0) {
+            /* restore flags */
+            set_block(fd);
             if (shutdown(fd, SHUT_RD) < 0) {
                 if (errno == ENOTSOCK)
                     close(fd);
@@ -184,16 +186,27 @@ int handle_input(libvchan_t *vchan, int fd, int msg_type)
  *       in this case "status" will be set
  *  -1 - vchan error occurred
  *  0 - EOF received, do not attempt to access this FD again
- *  1 - some data processed, call it again when buffer space and more data
+ *  1 - maybe some data processed, call it again when buffer space and more data
  *      available
  */
 
-int handle_remote_data(libvchan_t *data_vchan, int stdin_fd, int *status)
+int handle_remote_data(libvchan_t *data_vchan, int stdin_fd, int *status,
+        struct buffer *stdin_buf)
 {
 	struct msg_header hdr;
     char buf[MAX_DATA_CHUNK];
 
-    /* TODO: set stdin_fd to non-blocking mode and handle its buffering */
+    /* do not receive any data if we have something already buffered */
+    switch (flush_client_data(stdin_fd, stdin_buf)) {
+        case WRITE_STDIN_OK:
+            break;
+        case WRITE_STDIN_BUFFERED:
+            return 1;
+        case WRITE_STDIN_ERROR:
+            perror("write");
+            return 0;
+    }
+
     while (libvchan_data_ready(data_vchan) > 0) {
         if (libvchan_recv(data_vchan, &hdr, sizeof(hdr)) < 0)
             return -1;
@@ -214,6 +227,8 @@ int handle_remote_data(libvchan_t *data_vchan, int stdin_fd, int *status)
                     /* discard the data */
                     continue;
                 if (hdr.len == 0) {
+                    /* restore flags */
+                    set_block(stdin_fd);
                     if (shutdown(stdin_fd, SHUT_WR) < 0) {
                         if (errno == ENOTSOCK)
                             close(stdin_fd);
@@ -221,18 +236,22 @@ int handle_remote_data(libvchan_t *data_vchan, int stdin_fd, int *status)
                     stdin_fd = -1;
                     return 0;
                 } else {
-                    /* FIXME: use buffered write here to prevent deadlock */
-                    if (!write_all(stdin_fd, buf, hdr.len)) {
-                        if (errno == EPIPE || errno == ECONNRESET) {
-                            if (shutdown(stdin_fd, SHUT_WR) < 0) {
-                                if (errno == ENOTSOCK)
-                                    close(stdin_fd);
+                    switch (write_stdin(stdin_fd, buf, hdr.len, stdin_buf)) {
+                        case WRITE_STDIN_OK:
+                            break;
+                        case WRITE_STDIN_BUFFERED:
+                            return 1;
+                        case WRITE_STDIN_ERROR:
+                            if (errno == EPIPE || errno == ECONNRESET) {
+                                if (shutdown(stdin_fd, SHUT_WR) < 0) {
+                                    if (errno == ENOTSOCK)
+                                        close(stdin_fd);
+                                }
+                                stdin_fd = -1;
+                            } else {
+                                perror("write");
                             }
-                            stdin_fd = -1;
-                        } else {
-                            perror("write");
-                        }
-                        return 0;
+                            return 0;
                     }
                 }
                 break;
@@ -266,15 +285,18 @@ int process_child_io(libvchan_t *data_vchan,
     int remote_process_status = -1;
     int ret, max_fd;
     struct timespec zero_timeout = { 0, 0 };
+    struct buffer stdin_buf;
 
     sigemptyset(&selectmask);
     sigaddset(&selectmask, SIGCHLD);
     sigprocmask(SIG_BLOCK, &selectmask, NULL);
     sigemptyset(&selectmask);
 
+    set_nonblock(stdin_fd);
     set_nonblock(stdout_fd);
     set_nonblock(stderr_fd);
 
+    buffer_init(&stdin_buf);
     while (1) {
         if (child_exited) {
             pid_t pid;
@@ -283,6 +305,8 @@ int process_child_io(libvchan_t *data_vchan,
                 if (pid == child_process_pid) {
                     child_process_status = WEXITSTATUS(status);
                     if (stdin_fd >= 0) {
+                        /* restore flags */
+                        set_block(stdin_fd);
                         if (shutdown(stdin_fd, SHUT_WR) < 0) {
                             if (errno == ENOTSOCK)
                                 close(stdin_fd);
@@ -305,7 +329,9 @@ int process_child_io(libvchan_t *data_vchan,
         }
         /* also if vchan is disconnected (and we processed all the data), there
          * is no sense of processing further data */
-        if (!libvchan_data_ready(data_vchan) && !libvchan_is_open(data_vchan)) {
+        if (!libvchan_data_ready(data_vchan) &&
+                !libvchan_is_open(data_vchan) &&
+                !buffer_len(&stdin_buf)) {
             if (child_process_pid == 0)
                 child_process_status = remote_process_status;
             break;
@@ -338,8 +364,15 @@ int process_child_io(libvchan_t *data_vchan,
         FD_SET(vchan_fd, &rdset);
         if (vchan_fd > max_fd)
             max_fd = vchan_fd;
+        /* if we have something buffered for the child process, wake also on
+         * writable stdin */
+        if (stdin_fd > -1 && buffer_len(&stdin_buf)) {
+            FD_SET(stdin_fd, &wrset);
+            if (stdin_fd > max_fd)
+                max_fd = stdin_fd;
+        }
 
-        if (libvchan_data_ready(data_vchan) > 0) {
+        if (!buffer_len(&stdin_buf) && libvchan_data_ready(data_vchan) > 0) {
             /* check for other FDs, but exit immediately */
             ret = pselect(max_fd + 1, &rdset, &wrset, NULL, &zero_timeout, &selectmask);
         } else
@@ -361,7 +394,7 @@ int process_child_io(libvchan_t *data_vchan,
         }
 
         /* handle_remote_data will check if any data is available */
-        switch (handle_remote_data(data_vchan, stdin_fd, &remote_process_status)) {
+        switch (handle_remote_data(data_vchan, stdin_fd, &remote_process_status, &stdin_buf)) {
             case -1:
                 handle_vchan_error("read");
                 break;
@@ -406,6 +439,8 @@ int process_child_io(libvchan_t *data_vchan,
     /* make sure that all the pipes/sockets are closed, so the child process
      * (if any) will know that the connection is terminated */
     if (stdout_fd != -1) {
+        /* restore flags */
+        set_block(stdout_fd);
         if (shutdown(stdout_fd, SHUT_RD) < 0) {
             if (errno == ENOTSOCK)
                 close(stdout_fd);
@@ -413,6 +448,8 @@ int process_child_io(libvchan_t *data_vchan,
         stdout_fd = -1;
     }
     if (stdin_fd != -1) {
+        /* restore flags */
+        set_block(stdin_fd);
         if (shutdown(stdin_fd, SHUT_WR) < 0) {
             if (errno == ENOTSOCK)
                 close(stdin_fd);
@@ -420,6 +457,8 @@ int process_child_io(libvchan_t *data_vchan,
         stdin_fd = -1;
     }
     if (stderr_fd != -1) {
+        /* restore flags */
+        set_block(stderr_fd);
         close(stderr_fd);
         stderr_fd = -1;
     }
