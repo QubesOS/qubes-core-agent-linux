@@ -25,11 +25,11 @@ user ALL=(ALL) NOPASSWD: ALL
 # and for sure, root/user isolation is not a mitigating factor.
 #
 # Because, really, if somebody could find and exploit a bug in the Xen
-# hypervisor -- so far there have been only one (!) publicly disclosed
+# hypervisor -- so far there has been only one (!) publicly disclosed
 # exploitable bug in the Xen hypervisor from a VM, found in 2008,
 # incidentally by one of the Qubes developers (RW) -- then it would be
-# highly unlikely if that person couldn't also found a user-to-root
-# escalation in VM (which as we know from history of UNIX/Linux
+# highly unlikely that that person couldn't also find a user-to-root
+# escalation in the VM (which as we know from history of UNIX/Linux
 # happens all the time).
 #
 # At the same time allowing for easy user-to-root escalation in a VM
