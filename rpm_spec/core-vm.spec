@@ -46,7 +46,7 @@ Requires:   ntpdate
 Requires:   net-tools
 Requires:   nautilus-python
 Requires:   qubes-core-vm-kernel-placeholder
-Requires:   qubes-utils
+Requires:   qubes-utils >= 3.1.2
 Requires:   initscripts
 # for qubes-desktop-run
 Requires:   pygobject3-base
@@ -75,7 +75,7 @@ Obsoletes:  qubes-core-proxyvm
 Obsoletes:  qubes-upgrade-vm < 3.1
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
-BuildRequires: qubes-utils-devel >= 3.0.1
+BuildRequires: qubes-utils-devel >= 3.1.2
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
 
 %define _builddir %(pwd)
