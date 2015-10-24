@@ -317,6 +317,7 @@ rm -f %{name}-%{version}
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
+%config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
 %config(noreplace) /etc/qubes/iptables.rules
 %config(noreplace) /etc/qubes/ip6tables.rules
 %config(noreplace) /etc/tinyproxy/filter-updates
