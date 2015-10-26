@@ -21,6 +21,7 @@ Depends:
     librsvg2-bin,
     libvchan-xen,
     locales,
+    locales-all,
     ncurses-term,
     net-tools,
     psmisc,
