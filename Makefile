@@ -17,10 +17,6 @@ SHELL = /bin/bash
 help:
 	@echo "make rpms                  -- generate binary rpm packages"
 	@echo "make rpms-vm               -- generate binary rpm packages for VM"
-	@echo "make update-repo-current   -- copy newly generated rpms to qubes yum repo"
-	@echo "make update-repo-current-testing  -- same, but to -current-testing repo"
-	@echo "make update-repo-unstable  -- same, but to -testing repo"
-	@echo "make update-repo-installer -- copy dom0 rpms to installer repo"
 	@echo "make clean                 -- cleanup"
 	@echo "make install-vm            -- install VM related files"
 
