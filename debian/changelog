@@ -1,3 +1,30 @@
+qubes-core-agent (3.0.19-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * network: forward TCP DNS queries
+
+  [ Patrick Schleizer ]
+  * removed trailing spaces
+
+  [ erihe251 ]
+  * Small language fixes (cherry picked from commit
+    0f410ed2de0c4c36997d607135b8f8a80ae86bfd)
+  * Update qubes.sudoers (cherry picked from commit
+    de293f12d59464ef7a53dd70a733a1a4e9b40965)
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: implement buffered write to a child stdin
+  * rpm: remove duplicated entry
+
+  [ Patrick Schleizer ]
+  * cleanup /etc/apt/apt.conf.d/00notiy-hook on existing systems
+
+  [ Marek Marczykowski-Górecki ]
+  * Require new enough qubes-utils package for updated libqrexec-utils
+  * debian: install locales-all instead of custom locales generation
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 30 Oct 2015 15:40:09 +0100
+
 qubes-core-agent (3.0.18-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
