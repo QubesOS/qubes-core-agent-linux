@@ -167,6 +167,7 @@ install-common:
 	install -d $(DESTDIR)/etc/xdg/autostart
 	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)$(LIBDIR)/qubes/show-hide-nm-applet.sh
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
+	install -m 0755 network/update-proxy-configs $(DESTDIR)$(LIBDIR)/qubes/
 
 	install -d $(DESTDIR)/$(SBINDIR)
 	install network/qubes-firewall $(DESTDIR)/$(SBINDIR)/

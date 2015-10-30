@@ -49,13 +49,7 @@ start()
 		fi
 	fi
 
-	yum_proxy_setup=$(/usr/bin/qubesdb-read /qubes-service/yum-proxy-setup 2> /dev/null || /usr/bin/qubesdb-read /qubes-service/updates-proxy-setup 2> /dev/null)
-	type=$(/usr/bin/qubesdb-read /qubes-vm-type)
-	if [ "$yum_proxy_setup" != "0" ] || [ -z "$yum_proxy_setup" -a "$type" == "TemplateVM" ]; then
-		echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
-	else
-		echo > /etc/yum.conf.d/qubes-proxy.conf
-	fi
+	/usr/lib/qubes/update-proxy-configs
 
 	# Set IP address again (besides action in udev rules); this is needed by
 	# DispVM (to override DispVM-template IP) and in case when qubes-ip was

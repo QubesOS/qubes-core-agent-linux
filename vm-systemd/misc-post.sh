@@ -1,20 +1,6 @@
 #!/bin/sh
 
-if [ -f /var/run/qubes-service/yum-proxy-setup -o -f /var/run/qubes-service/updates-proxy-setup ]; then
-    if [ -d /etc/apt/apt.conf.d ]; then
-        echo 'Acquire::http::Proxy "http://10.137.255.254:8082/";' > /etc/apt/apt.conf.d/01qubes-proxy
-    fi
-    if [ -d /etc/yum.conf.d ]; then
-        echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
-    fi
-else
-    if [ -d /etc/apt/apt.conf.d ]; then
-        rm -f /etc/apt/apt.conf.d/01qubes-proxy
-    fi
-    if [ -d /etc/yum.conf.d ]; then
-        echo > /etc/yum.conf.d/qubes-proxy.conf
-    fi
-fi
+/usr/lib/qubes/update-proxy-configs
 
 # Set IP address again (besides action in udev rules); this is needed by
 # DispVM (to override DispVM-template IP) and in case when qubes-ip was
