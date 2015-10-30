@@ -169,6 +169,7 @@ install-common:
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
 	install -m 0400 -D network/iptables $(DESTDIR)/etc/qubes/iptables.rules
 	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
+	install -m 0755 network/update-proxy-configs $(DESTDIR)$(LIBDIR)/qubes/
 
 
 	install -d $(DESTDIR)/$(SBINDIR)

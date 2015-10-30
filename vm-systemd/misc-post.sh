@@ -1,20 +1,6 @@
 #!/bin/sh
 
-if [ -f /var/run/qubes-service/yum-proxy-setup -o -f /var/run/qubes-service/updates-proxy-setup ]; then
-    if [ -d /etc/apt/apt.conf.d ]; then
-        echo 'Acquire::http::Proxy "http://10.137.255.254:8082/";' > /etc/apt/apt.conf.d/01qubes-proxy
-    fi
-    if [ -d /etc/yum.conf.d ]; then
-        echo proxy=http://10.137.255.254:8082/ > /etc/yum.conf.d/qubes-proxy.conf
-    fi
-else
-    if [ -d /etc/apt/apt.conf.d ]; then
-        rm -f /etc/apt/apt.conf.d/01qubes-proxy
-    fi
-    if [ -d /etc/yum.conf.d ]; then
-        echo > /etc/yum.conf.d/qubes-proxy.conf
-    fi
-fi
+/usr/lib/qubes/update-proxy-configs
 
 if [ -n "`ls -A /usr/local/lib 2>/dev/null`" -o \
      -n "`ls -A /usr/local/lib64 2>/dev/null`" ]; then

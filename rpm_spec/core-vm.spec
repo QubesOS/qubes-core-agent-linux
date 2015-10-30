@@ -151,6 +151,9 @@ if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
   echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
 fi
 
+# And actually setup the proxy usage in package managers
+/usr/lib/qubes/update-proxy-configs
+
 # Revert 'Prevent unnecessary updates in VMs':
 sed -i -e '/^exclude = kernel/d' /etc/yum.conf
 
@@ -372,6 +375,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/close-window
 /usr/lib/qubes/xdg-icon
+/usr/lib/qubes/update-proxy-configs
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
