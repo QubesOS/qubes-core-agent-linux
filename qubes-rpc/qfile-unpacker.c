@@ -90,5 +90,8 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
 	}
 	if (umount2(".", MNT_DETACH) < 0)
 		gui_fatal("Cannot umount incoming directory");
-	return ret;
+	if (!WIFEXITED(ret)) {
+		gui_fatal("Child process exited abnormally");
+	}
+	return WEXITSTATUS(ret);
 }
