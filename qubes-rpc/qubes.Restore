@@ -20,9 +20,14 @@ else
     eval "set -- $args"
     # Use named pipe to pass original stdin to tar2file
     $@ > $tmpdir/backup-data < /dev/null &
-    retcode=$?
     /usr/lib/qubes/tar2qfile $tmpdir/backup-data $paths
-    wait
+    # Restoration may be terminated earlier because of selected files. This
+    # will be seen as EPIPE to the retrieving process, which may cause retcode
+    # other than 0 in some cases - which would be incorrectly treated as backup
+    # restore error. So instead of that, use tar2qfile exit code (and have dom0
+    # detect if anything wrong with actual data)
+    retcode=$?
+    wait -n
     rm $tmpdir/backup-data
     rmdir $tmpdir
     exit $retcode
