@@ -46,7 +46,7 @@
 #include <stdio.h>
 #include <libqubes-rpc-filecopy.h>
 #include <string.h>
-#include <qfile-utils.h>
+#include <gui-fatal.h>
 
 // #define DEBUG
 
@@ -800,7 +800,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 #ifdef DEBUG
 	fprintf(stderr,"Writing file content\n");
 #endif
-	ret = copy_file(1, fd, untrusted_hdr->filelen, &crc32_sum);
+	ret = copy_file_with_crc(1, fd, untrusted_hdr->filelen);
 
 #ifdef DEBUG
 	fprintf(stderr,"Copyfile returned with error %d\n",ret);
@@ -960,23 +960,13 @@ int main(int argc, char **argv)
 	int use_stdin = 1;
 	struct filters filters;
 
-	signal(SIGPIPE, SIG_IGN);
-	// this will allow checking for possible feedback packet in the middle of transfer
-	// if disabled, the copy_file process could hang
-	register_notify_progress(&notify_progress);
-	notify_progress(0, PROGRESS_FLAG_INIT);
-	//set_size_limit(1500000000, 2048);
-
-	crc32_sum = 0;
+	qfile_pack_init();
 	/* when extracting backup header, dom0 will terminate the transfer with
 	 * EDQUOT just after getting qubes.xml */
-	ignore_quota_error = 1;
+	set_ignore_quota_error(1);
 	for (i = 1; i < argc; i++) {
 		set_nonblock(0);
-		if (strcmp(argv[i], "--ignore-symlinks")==0) {
-			ignore_symlinks = 1;
-			continue;
-		} else if (strcmp(argv[i], "-")==0) {
+		if (strcmp(argv[i], "-")==0) {
 			use_stdin = 1;
 			i++;
 			break;
@@ -1021,7 +1011,6 @@ int main(int argc, char **argv)
 
 
 	notify_end_and_wait_for_result();
-	notify_progress(0, PROGRESS_FLAG_DONE);
 	return 0;
 }
 

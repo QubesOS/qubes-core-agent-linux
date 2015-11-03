@@ -53,6 +53,11 @@ void gui_fatal(const char *fmt, ...)
 	exit(1);
 }
 
+void qfile_gui_fatal(const char *fmt, va_list args) {
+	produce_message("Fatal error", fmt, args);
+    exit(1);
+}
+
 void gui_nonfatal(const char *fmt, ...)
 {
 	va_list args;

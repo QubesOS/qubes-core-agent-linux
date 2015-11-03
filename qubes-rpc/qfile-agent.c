@@ -1,4 +1,67 @@
-#include "qfile-utils.h"
+#define _GNU_SOURCE
+#include <dirent.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <malloc.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <gui-fatal.h>
+#include <libqubes-rpc-filecopy.h>
+
+enum {
+	PROGRESS_FLAG_NORMAL,
+	PROGRESS_FLAG_INIT,
+	PROGRESS_FLAG_DONE
+};
+
+void do_notify_progress(long long total, int flag)
+{
+	const char *du_size_env = getenv("FILECOPY_TOTAL_SIZE");
+	const char *progress_type_env = getenv("PROGRESS_TYPE");
+	const char *saved_stdout_env = getenv("SAVED_FD_1");
+	int ignore;
+	if (!progress_type_env)
+		return;
+	if (!strcmp(progress_type_env, "console") && du_size_env) {
+		char msg[256];
+		snprintf(msg, sizeof(msg), "sent %lld/%lld KB\r",
+			 total / 1024, strtoull(du_size_env, NULL, 0));
+		ignore = write(2, msg, strlen(msg));
+		if (flag == PROGRESS_FLAG_DONE)
+			ignore = write(2, "\n", 1);
+	}
+	if (!strcmp(progress_type_env, "gui") && saved_stdout_env) {
+		char msg[256];
+		snprintf(msg, sizeof(msg), "%lld\n", total);
+		ignore = write(strtoul(saved_stdout_env, NULL, 0), msg,
+				strlen(msg));
+	}
+	if (ignore < 0) {
+		/* silence gcc warning */
+	}
+}
+
+void notify_progress(int size, int flag)
+{
+	static long long total = 0;
+	static long long prev_total = 0;
+	total += size;
+	if (total > prev_total + PROGRESS_NOTIFY_DELTA
+	    || (flag != PROGRESS_FLAG_NORMAL)) {
+		// check for possible error from qfile-unpacker; if error occured,
+		// exit() will be called, so don't bother with current state
+		// (notify_progress can be called as callback from copy_file())
+		if (flag == PROGRESS_FLAG_NORMAL)
+			wait_for_result();
+		do_notify_progress(total, flag);
+		prev_total = total;
+	}
+}
+
 
 char *get_abs_path(const char *cwd, const char *pathname)
 {
@@ -11,53 +74,18 @@ char *get_abs_path(const char *cwd, const char *pathname)
 		return ret;
 }
 
-int do_fs_walk(const char *file)
-{
-	char *newfile;
-	struct stat st;
-	struct dirent *ent;
-	DIR *dir;
-
-	if (lstat(file, &st))
-		gui_fatal("stat %s", file);
-	single_file_processor(file, &st);
-	if (!S_ISDIR(st.st_mode))
-		return 0;
-	dir = opendir(file);
-	if (!dir)
-		gui_fatal("opendir %s", file);
-	while ((ent = readdir(dir))) {
-		char *fname = ent->d_name;
-		if (!strcmp(fname, ".") || !strcmp(fname, ".."))
-			continue;
-		if (asprintf(&newfile, "%s/%s", file, fname) >= 0) {
-			do_fs_walk(newfile);
-			free(newfile);
-		} else {
-			fprintf(stderr, "asprintf failed\n");
-			exit(1);
-		}
-	}
-	closedir(dir);
-	// directory metadata is resent; this makes the code simple,
-	// and the atime/mtime is set correctly at the second time
-	single_file_processor(file, &st);
-	return 0;
-}
-
 int main(int argc, char **argv)
 {
 	int i;
 	char *entry;
 	char *cwd;
 	char *sep;
+	int ignore_symlinks = 0;
 
-	signal(SIGPIPE, SIG_IGN);
-	// this will allow checking for possible feedback packet in the middle of transfer
-	set_nonblock(0);
+	qfile_pack_init();
+	register_error_handler(qfile_gui_fatal);
 	register_notify_progress(&notify_progress);
 	notify_progress(0, PROGRESS_FLAG_INIT);
-	crc32_sum = 0;
 	cwd = getcwd(NULL, 0);
 	for (i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "--ignore-symlinks")==0) {
@@ -80,7 +108,7 @@ int main(int argc, char **argv)
 			}
 		} else if (chdir(entry))
 			gui_fatal("chdir to %s", entry);
-		do_fs_walk(sep + 1);
+		do_fs_walk(sep + 1, ignore_symlinks);
 		free(entry);
 	}
 	notify_end_and_wait_for_result();

@@ -5,11 +5,11 @@ vm-file-editor: vm-file-editor.o
 	$(CC) -pie -g -o $@ $^ -lqubes-rpc-filecopy
 qopen-in-vm: qopen-in-vm.o gui-fatal.o
 	$(CC) -pie -g -o $@ $^ -lqubes-rpc-filecopy
-qfile-agent: qfile-agent.o gui-fatal.o qfile-utils.o
+qfile-agent: qfile-agent.o gui-fatal.o
 	$(CC) -pie -g -o $@ $^ -lqubes-rpc-filecopy
 qfile-unpacker: qfile-unpacker.o gui-fatal.o
 	$(CC) -pie -g -o $@ $^ -lqubes-rpc-filecopy
-tar2qfile: qfile-utils.o tar2qfile.o gui-fatal.o
+tar2qfile: tar2qfile.o gui-fatal.o
 	$(CC) -pie -g -o $@ $^ -lqubes-rpc-filecopy
 
 clean:
