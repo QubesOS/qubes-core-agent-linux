@@ -18,7 +18,6 @@
 
 disable alsa-store.service
 disable alsa-restore.service
-disable auditd.service
 disable avahi.service
 disable avahi-daemon.service
 disable avahi-daemon.socket
