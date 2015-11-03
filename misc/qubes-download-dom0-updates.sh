@@ -104,9 +104,12 @@ if [ "$DOIT" != "1" -a "$PKGS_FROM_CMDLINE" != "1" ]; then
 fi
 
 YUM_COMMAND="fakeroot yum $YUM_ACTION -y --downloadonly --downloaddir=$DOM0_UPDATES_DIR/packages"
+# prefer yum-deprecated over dnf, because of still missing features in dnf (at least --downloaddir)
+if type dnf >/dev/null 2>&1 && type yum-deprecated >/dev/null 2>&1; then
+    YUM_COMMAND="fakeroot yum-deprecated $YUM_ACTION -y --downloadonly --downloaddir=$DOM0_UPDATES_DIR/packages"
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
-if ! yum --help | grep -q downloadonly; then
+elif ! yum --help | grep -q downloadonly; then
     if [ "$YUM_ACTION" != "install" -a "$YUM_ACTION" != "upgrade" ]; then
         echo "ERROR: yum version installed in VM `hostname` does not suppport --downloadonly option" >&2
         echo "ERROR: only 'install' and 'upgrade' actions supported ($YUM_ACTION not)" >&2
