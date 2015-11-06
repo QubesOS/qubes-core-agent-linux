@@ -2,6 +2,7 @@
 name = Qubes OS Repository for VM (updates)
 baseurl = http://yum.qubes-os.org/r3.0/current/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
+skip_if_unavailable=False
 gpgcheck = 1
 enabled=1
 
@@ -9,6 +10,7 @@ enabled=1
 name = Qubes OS Repository for VM (updates-testing)
 baseurl = http://yum.qubes-os.org/r3.0/current-testing/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
+skip_if_unavailable=False
 gpgcheck = 1
 enabled=0
 
@@ -16,6 +18,7 @@ enabled=0
 name = Qubes OS Repository for VM (updates-testing)
 baseurl = http://yum.qubes-os.org/r3.0/security-testing/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
+skip_if_unavailable=False
 gpgcheck = 1
 enabled=0
 
