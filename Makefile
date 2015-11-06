@@ -51,6 +51,7 @@ DROPIN_DIR ?= "lib/systemd/system"
 DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
 DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
 DROPINS += tmp.mount
+DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket 
 
 # Debian Dropins
 ifeq ($(shell lsb_release -is), Debian)
