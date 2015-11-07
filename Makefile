@@ -45,33 +45,44 @@ all:
 	make -C qubes-rpc
 
 # Dropin Directory
-DROPIN_DIR ?= "lib/systemd/system"
+DROPIN_DIR ?= "lib/systemd"
 
-# Fedora Dropins
-DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
-DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
-DROPINS += tmp.mount
+# Fedora System Dropins
+SYSTEM_DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
+SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
+SYSTEM_DROPINS += tmp.mount
+SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket 
+
+# Fedora User Dropins
+USER_DROPINS := pulseaudio.service pulseaudio.socket
 
 # Debian Dropins
 ifeq ($(shell lsb_release -is), Debian)
     # Don't have 'ntpd' in Debian
-    DROPINS := $(filter-out ntpd.service, $(DROPINS))
+    SYSTEM_DROPINS := $(filter-out ntpd.service, $(SYSTEM_DROPINS))
 
     # 'crond.service' is named 'cron.service in Debian
-    DROPINS := $(strip $(patsubst crond.service, cron.service, $(DROPINS)))
+    SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
 
-    # Wheezy Dropins
+    # Wheezy System Dropins
     # Disable sysinit 'network-manager.service' since systemd 'NetworkManager.service' is already installed
-    DROPINS += $(strip $(if $(filter wheezy, $(shell lsb_release -cs)), network-manager.service,))
+    SYSTEM_DROPINS += $(strip $(if $(filter wheezy, $(shell lsb_release -cs)), network-manager.service,))
 
 	# handled by qubes-iptables service now
-    DROPINS += netfilter-persistent.service
+    SYSTEM_DROPINS += netfilter-persistent.service
 endif
 
 install-systemd-dropins:
-	@for dropin in $(DROPINS); do \
-	    install -d $(DESTDIR)/$(DROPIN_DIR)/$${dropin}.d ;\
-	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/$${dropin}.d/ ;\
+	# Install system dropins
+	@for dropin in $(SYSTEM_DROPINS); do \
+	    install -d $(DESTDIR)/$(DROPIN_DIR)/system/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/system/$${dropin}.d/ ;\
+	done
+	
+	# Install user dropins
+	@for dropin in $(USER_DROPINS); do \
+	    install -d $(DESTDIR)/$(DROPIN_DIR)/user/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/user/$${dropin}.d/ ;\
 	done
 
 install-systemd:
