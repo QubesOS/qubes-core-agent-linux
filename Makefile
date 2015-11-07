@@ -53,6 +53,9 @@ SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket 
 
+# Fedora User Dropins
+USER_DROPINS := pulseaudio.service pulseaudio.socket
+
 # Debian Dropins
 ifeq ($(shell lsb_release -is), Debian)
     # Don't have 'ntpd' in Debian
@@ -74,6 +77,12 @@ install-systemd-dropins:
 	@for dropin in $(SYSTEM_DROPINS); do \
 	    install -d $(DESTDIR)/$(DROPIN_DIR)/system/$${dropin}.d ;\
 	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/system/$${dropin}.d/ ;\
+	done
+	
+	# Install user dropins
+	@for dropin in $(USER_DROPINS); do \
+	    install -d $(DESTDIR)/$(DROPIN_DIR)/user/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/user/$${dropin}.d/ ;\
 	done
 
 install-systemd:
