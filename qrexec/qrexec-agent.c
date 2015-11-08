@@ -65,6 +65,23 @@ void no_colon_in_cmd()
     exit(1);
 }
 
+/* Start program requested by dom0 in already prepared process
+ * (stdin/stdout/stderr already set, etc)
+ * Called in two cases:
+ *  MSG_JUST_EXEC - from qrexec-agent-data.c:handle_new_process_common->handle_just_exec
+ *  MSG_EXEC_CMDLINE - from
+ *  qrexec-agent-data.c:handle_new_process_common->do_fork_exec (callback
+ *  registerd with register_exec_func in init() here)
+ *
+ * cmd parameter came from dom0 (MSG_JUST_EXEC or MSG_EXEC_CMDLINE messages), so
+ * is trusted. Even in VM-VM service request, the command here is controlled by
+ * dom0 - it will be in form:
+ * RPC_REQUEST_COMMAND " " service_name " " source_vm_name
+ * where service_name is already validated against Qrexec RPC policy
+ *
+ * If dom0 sends overly long cmd, it will probably crash qrexec-agent (unless
+ * process can allocate up to 4GB on both stack and heap), sorry.
+ */
 void do_exec(const char *cmd)
 {
     char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - strlen(RPC_REQUEST_COMMAND) + 1];
@@ -75,8 +92,8 @@ void do_exec(const char *cmd)
     *realcmd = 0;
     realcmd++;
     /* ignore "nogui:" prefix in linux agent */
-    if (strncmp(realcmd, "nogui:", 6) == 0)
-        realcmd+=6;
+    if (strncmp(realcmd, "nogui:", strlen("nogui:")) == 0)
+        realcmd += strlen("nogui:");
     /* replace magic RPC cmd with RPC multiplexer path */
     if (strncmp(realcmd, RPC_REQUEST_COMMAND " ", strlen(RPC_REQUEST_COMMAND)+1)==0) {
         strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
@@ -221,6 +238,7 @@ void register_vchan_connection(pid_t pid, int fd, int domain, int port)
     fprintf(stderr, "No free slot for child %d (connection to %d:%d)\n", pid, domain, port);
 }
 
+/* hdr parameter is received from dom0, so it is trusted */
 void handle_server_exec_request(struct msg_header *hdr)
 {
     struct exec_params params;
