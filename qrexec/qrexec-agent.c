@@ -84,7 +84,7 @@ void no_colon_in_cmd()
  */
 void do_exec(const char *cmd)
 {
-    char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - strlen(RPC_REQUEST_COMMAND) + 1];
+    char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - RPC_REQUEST_COMMAND_LEN + 1];
     char *realcmd = index(cmd, ':');
     if (!realcmd)
         no_colon_in_cmd();
@@ -92,12 +92,12 @@ void do_exec(const char *cmd)
     *realcmd = 0;
     realcmd++;
     /* ignore "nogui:" prefix in linux agent */
-    if (strncmp(realcmd, "nogui:", strlen("nogui:")) == 0)
-        realcmd += strlen("nogui:");
+    if (strncmp(realcmd, NOGUI_CMD_PREFIX, NOGUI_CMD_PREFIX_LEN) == 0)
+        realcmd += NOGUI_CMD_PREFIX_LEN;
     /* replace magic RPC cmd with RPC multiplexer path */
-    if (strncmp(realcmd, RPC_REQUEST_COMMAND " ", strlen(RPC_REQUEST_COMMAND)+1)==0) {
+    if (strncmp(realcmd, RPC_REQUEST_COMMAND " ", RPC_REQUEST_COMMAND_LEN+1)==0) {
         strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
-        strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + strlen(RPC_REQUEST_COMMAND));
+        strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + RPC_REQUEST_COMMAND_LEN);
         realcmd = buf;
     }
     signal(SIGCHLD, SIG_DFL);
