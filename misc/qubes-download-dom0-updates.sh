@@ -49,6 +49,12 @@ if [ -z "$YUM_ACTION" ]; then
     YUM_ACTION=upgrade
 fi
 
+YUM="yum"
+# prefer yum-deprecated over dnf, because of still missing features in dnf (at least --downloaddir)
+if type dnf >/dev/null 2>&1 && type yum-deprecated >/dev/null 2>&1; then
+    YUM="yum-deprecated"
+fi
+
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
     echo "Dom0 updates dir does not exists: $DOM0_UPDATES_DIR" >&2
     exit 1
@@ -68,19 +74,25 @@ rm -f $DOM0_UPDATES_DIR/var/lib/rpm/__*
 rpm --root=$DOM0_UPDATES_DIR --rebuilddb
 
 if [ "$CLEAN" = "1" ]; then
-    yum $OPTS clean all
+    $YUM $OPTS clean all
     rm -f $DOM0_UPDATES_DIR/packages/*
 fi
 
 if [ "x$PKGLIST" = "x" ]; then
     echo "Checking for dom0 updates..." >&2
-    UPDATES_FULL=`yum $OPTS check-update -q`
-    if [ $? -eq 1 ]; then
+    UPDATES_FULL=`$YUM $OPTS check-update -q`
+    check_update_retcode=$?
+    if [ $check_update_retcode -eq 1 ]; then
         # Exit here if yum have reported an error. Exit code 100 isn't an
         # error, it's "updates available" info, so check specifically for exit code 1
         exit 1
     fi
     UPDATES=`echo "$UPDATES_FULL" | cut -f 1 -d ' ' | grep -v "^Obsoleting"`
+    if [ -z "$UPDATES" -a $check_update_retcode -eq 100 ]; then
+        # save not empty string for below condition (-z "$UPDATES"), but blank
+        # to not confuse the user wwith magic strings in messages
+        UPDATES=" "
+    fi
 else
     PKGS_FROM_CMDLINE=1
 fi
@@ -103,13 +115,10 @@ if [ "$DOIT" != "1" -a "$PKGS_FROM_CMDLINE" != "1" ]; then
       --text="There are updates for dom0 available, do you want to download them now?" || exit 0
 fi
 
-YUM_COMMAND="fakeroot yum $YUM_ACTION -y --downloadonly --downloaddir=$DOM0_UPDATES_DIR/packages"
-# prefer yum-deprecated over dnf, because of still missing features in dnf (at least --downloaddir)
-if type dnf >/dev/null 2>&1 && type yum-deprecated >/dev/null 2>&1; then
-    YUM_COMMAND="fakeroot yum-deprecated $YUM_ACTION -y --downloadonly --downloaddir=$DOM0_UPDATES_DIR/packages"
+YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y --downloadonly --downloaddir=$DOM0_UPDATES_DIR/packages"
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
-elif ! yum --help | grep -q downloadonly; then
+if ! $YUM --help | grep -q downloadonly; then
     if [ "$YUM_ACTION" != "install" -a "$YUM_ACTION" != "upgrade" ]; then
         echo "ERROR: yum version installed in VM `hostname` does not suppport --downloadonly option" >&2
         echo "ERROR: only 'install' and 'upgrade' actions supported ($YUM_ACTION not)" >&2
