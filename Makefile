@@ -131,6 +131,15 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -D -m 0644 misc/dracut-qubes.conf \
 		$(DESTDIR)/usr/lib/dracut/dracut.conf.d/30-qubes.conf
 
+	install -D -m 0644 misc/dnf-qubes-hooks.py \
+		$(DESTDIR)/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.py
+	install -D -m 0644 misc/dnf-qubes-hooks.pyc \
+		$(DESTDIR)/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.pyc
+	install -D -m 0644 misc/dnf-qubes-hooks.pyo \
+		$(DESTDIR)/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.pyo
+	install -D -m 0644 misc/dnf-qubes-hooks.conf $(DESTDIR)/etc/dnf/plugins/qubes-hooks.conf
+
+
 install-common:
 	$(MAKE) -C autostart-dropins install
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab

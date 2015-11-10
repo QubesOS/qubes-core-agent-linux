@@ -332,6 +332,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
+%config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
@@ -377,6 +378,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/xdg-icon
 /usr/lib/qubes/update-proxy-configs
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
+/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
