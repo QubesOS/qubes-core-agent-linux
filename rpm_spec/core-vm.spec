@@ -33,7 +33,9 @@ Vendor:		Invisible Things Lab
 License:	GPL
 URL:		http://www.qubes-os.org
 Requires:   fedora-release
+%if %{fedora} < 22
 Requires:   yum-plugin-post-transaction-actions
+%endif
 Requires:   NetworkManager >= 0.8.1-1
 %if %{fedora} >= 18
 # Fedora >= 18 defaults to firewalld, which isn't supported nor needed by Qubes
@@ -125,6 +127,9 @@ make install-vm DESTDIR=$RPM_BUILD_ROOT
 
 cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/iptables $RPM_BUILD_ROOT/etc/sysconfig/iptables.qubes
 cp -p $RPM_BUILD_ROOT/usr/lib/qubes/init/ip6tables $RPM_BUILD_ROOT/etc/sysconfig/ip6tables.qubes
+%if %{fedora} >= 22
+rm -f $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
+%endif
 
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
@@ -374,7 +379,9 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
+%if %{fedora} < 22
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
+%endif
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
