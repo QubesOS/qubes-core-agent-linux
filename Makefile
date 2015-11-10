@@ -128,6 +128,8 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
+	install -D -m 0644 misc/dracut-qubes.conf \
+		$(DESTDIR)/usr/lib/dracut/dracut.conf.d/30-qubes.conf
 
 install-common:
 	$(MAKE) -C autostart-dropins install
