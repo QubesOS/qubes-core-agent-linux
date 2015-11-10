@@ -94,9 +94,6 @@ update_qubesconfig() {
 	#  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
 	#fi
 
-	# Revert 'Prevent unnecessary updates in VMs':
-	#sed -i -e '/^exclude = kernel/d' /etc/yum.conf
-
 	# Location of files which contains list of protected files
 	mkdir -p /etc/qubes/protected-files.d
 	PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'

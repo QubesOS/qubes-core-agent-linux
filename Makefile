@@ -25,11 +25,9 @@ rpms: rpms-vm
 rpms-vm:
 	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm.spec
 	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm-doc.spec
-	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm-kernel-placeholder.spec
 	rpm --addsign \
 		$(RPMS_DIR)/x86_64/qubes-core-vm-*$(VERSION)*.rpm \
-		$(RPMS_DIR)/x86_64/qubes-core-vm-doc-*$(VERSION)*.rpm \
-		$(RPMS_DIR)/x86_64/qubes-core-vm-kernel-placeholder-*.rpm
+		$(RPMS_DIR)/x86_64/qubes-core-vm-doc-*$(VERSION)*.rpm
 
 rpms-dom0:
 	@true

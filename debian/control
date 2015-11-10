@@ -63,6 +63,3 @@ Conflicts: ${diverted-files}, qubes-core-agent-linux, firewalld, qubes-core-vm-s
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec.
-
-# Unresolved depends that exist in rpm_spec
-#qubes-core-vm-kernel-placeholder, qubes-core-vm,

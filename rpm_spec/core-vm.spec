@@ -47,7 +47,6 @@ Requires:   tinyproxy
 Requires:   ntpdate
 Requires:   net-tools
 Requires:   nautilus-python
-Requires:   qubes-core-vm-kernel-placeholder
 Requires:   qubes-utils >= 3.1.2
 Requires:   initscripts
 # for qubes-desktop-run
@@ -74,6 +73,7 @@ Obsoletes:  qubes-core-commonvm
 Obsoletes:  qubes-core-appvm
 Obsoletes:  qubes-core-netvm
 Obsoletes:  qubes-core-proxyvm
+Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.1
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
@@ -159,9 +159,6 @@ fi
 
 # And actually setup the proxy usage in package managers
 /usr/lib/qubes/update-proxy-configs
-
-# Revert 'Prevent unnecessary updates in VMs':
-sed -i -e '/^exclude = kernel/d' /etc/yum.conf
 
 # Location of files which contains list of protected files
 mkdir -p /etc/qubes/protected-files.d
