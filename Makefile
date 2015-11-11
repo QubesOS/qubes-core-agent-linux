@@ -45,13 +45,11 @@ all:
 # Dropin Directory
 DROPIN_DIR ?= "lib/systemd"
 
-# Fedora System Dropins
 SYSTEM_DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
 SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket 
 
-# Fedora User Dropins
 USER_DROPINS := pulseaudio.service pulseaudio.socket
 
 # Debian Dropins
