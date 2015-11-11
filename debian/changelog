@@ -1,3 +1,90 @@
+qubes-core-agent (3.1.3-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * network: forward TCP DNS queries
+
+  [ Patrick Schleizer ]
+  * removed trailing spaces
+  * Renamed qubes-mount-home to qubes-mount-dirs.
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: implement buffered write to a child stdin
+
+  [ Olivier MEDOC ]
+  * archlinux: update packaging and install script to use systemd
+    DROPINs
+  * archlinux: force running scripts with python2 even when /usr/bin/env
+    is used
+  * archlinux: readd notification-daemon as a dependency
+  * archlinux: readd lines removed by error during merge
+
+  [ Patrick Schleizer ]
+  * disable leaking TCP timestamps by default
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: add /etc/sysctl.d/20_tcp_timestamps.conf
+  * rpm: remove duplicated entry
+
+  [ Patrick Schleizer ]
+  * cleanup /etc/apt/apt.conf.d/00notiy-hook on existing systems
+
+  [ erihe251 ]
+  * Small language fixes
+  * Update qubes.sudoers
+
+  [ Marek Marczykowski-Górecki ]
+  * Require new enough qubes-utils package for updated libqrexec-utils
+  * debian: install locales-all instead of custom locales generation
+  * makefile: cleanup help message
+  * Setup updates proxy in dnf and PackageKit
+  * backup: fix handling backup filename with spaces
+  * backup: improve exit code reporting
+
+  [ Rusty Bird ]
+  * qfile-unpacker: Avoid data loss by checking for child errors
+
+  [ Marek Marczykowski-Górecki ]
+  * appmenus: ignore entries with NoDisplay=true
+  * qfile-agent: move data handling code to libqubes-rpc-filecopy
+
+  [ yaqu ]
+  * Replacing "sleep 365d" with "sleep inf"
+
+  [ Marek Marczykowski-Górecki ]
+  * No longer disable auditd
+  * dom0-updates: prefer yum-deprecated over dnf
+  * fedora: Add skip_if_unavailable=False to Qubes repositories
+
+  [ Olivier MEDOC ]
+  * add DROPINS for org.cups.cupsd systemd files.
+  * dropins: make current systemd dropins specific to systemd-system in
+    order to introduce dropins for systemd-user
+  * dropins: implement dropins for systemd user starting with pulseaudio
+    systemd service and socket masking
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: add some comments, minor improvement in readability
+  * qrexec: use #define for protocol-specified strings
+  * dracut: disable hostonly mode
+  * dom0-updates: use yum-deprecated instead of dnf in all calls
+  * updates-proxy-setup: use temporary file for config snippet
+  * Implement dnf hooks for post-update actions
+  * fedora: do not require/use yum-plugin-post-transaction-actions in
+    F>=22
+  * Get rid of qubes-core-vm-kernel-placeholder
+  * systemd: make sure that update check is started only after qrexec-
+    agent
+  * dom0-updates: do not use 'yum check-update -q'
+  * Bump qubes-utils version requirement
+
+  [ Patrick Schleizer ]
+  * preset disable tinyproxy by default
+
+  [ Marek Marczykowski-Górecki ]
+  * updates-proxy: use separate directory for PID file
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 11 Nov 2015 06:29:21 +0100
+
 qubes-core-agent (3.1.2-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
