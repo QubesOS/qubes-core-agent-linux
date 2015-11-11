@@ -92,6 +92,8 @@ install-systemd:
 	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
 	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
 	install -m 0755 network/qubes-iptables $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -D -m 0644 vm-systemd/qubes-core-agent-linux.tmpfiles \
+		$(DESTDIR)/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
 
 install-sysvinit:
 	install -d $(DESTDIR)/etc/init.d
