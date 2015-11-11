@@ -25,7 +25,7 @@
 exec="/usr/sbin/tinyproxy"
 prog=$(basename $exec)
 config="/etc/tinyproxy/tinyproxy-updates.conf"
-pidfile="/var/run/tinyproxy/tinyproxy-updates.pid"
+pidfile="/var/run/tinyproxy-updates/tinyproxy.pid"
 
 [ -e /etc/sysconfig/tinyproxy-updates ] && . /etc/sysconfig/tinyproxy-updates
 

@@ -84,6 +84,8 @@ install-systemd:
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
 	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
 	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
+	install -D -m 0644 vm-systemd/qubes-core-agent-linux.tmpfiles \
+		$(DESTDIR)/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
 
 install-sysvinit:
 	install -d $(DESTDIR)/etc/init.d
