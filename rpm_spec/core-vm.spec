@@ -47,7 +47,7 @@ Requires:   tinyproxy
 Requires:   ntpdate
 Requires:   net-tools
 Requires:   nautilus-python
-Requires:   qubes-utils >= 3.1.2
+Requires:   qubes-utils >= 3.1.3
 Requires:   initscripts
 # for qubes-desktop-run
 Requires:   pygobject3-base
@@ -77,7 +77,7 @@ Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.1
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
-BuildRequires: qubes-utils-devel >= 3.1.2
+BuildRequires: qubes-utils-devel >= 3.1.3
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
 
 %define _builddir %(pwd)
