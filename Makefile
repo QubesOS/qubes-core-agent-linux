@@ -171,6 +171,9 @@ install-common:
 	install misc/dispvm-prerun.sh $(DESTDIR)$(LIBDIR)/qubes/dispvm-prerun.sh
 	install misc/close-window $(DESTDIR)$(LIBDIR)/qubes/close-window
 
+	install misc/upgrades-installed-check $(DESTDIR)$(LIBDIR)/qubes/upgrades-installed-check
+	install misc/upgrades-status-notify $(DESTDIR)$(LIBDIR)/qubes/upgrades-status-notify
+
 	install -m 0644 network/udev-qubes-network.rules $(DESTDIR)/etc/udev/rules.d/99-qubes-network.rules
 	install network/qubes-setup-dnat-to-ns $(DESTDIR)$(LIBDIR)/qubes
 	install network/setup-ip $(DESTDIR)$(LIBDIR)/qubes/

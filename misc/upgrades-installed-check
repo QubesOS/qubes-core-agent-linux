@@ -1,0 +1,25 @@
+#!/bin/bash
+
+## `echo`s:
+## * 'true' - if all upgrades have been installed
+## * 'false' - if there are pending upgrades
+## * nothing - if apt-get is currently locked
+##
+## Forwards the exit code of the package manager.
+
+if [ -e /etc/system-release ]; then
+   ## Fedora
+   yum_output="$(yum -q check-update 2>&1)"
+   exit_code="$?"
+   [ "$exit_code" -eq 100 ] && echo "false" && exit 0
+   [ "$exit_code" -eq 0 ] && echo "true"
+else
+   ## Debian
+   set -e
+   set -o pipefail
+   apt_get_output="$(LANG="C" apt-get -s upgrade 2>&1)"
+   exit_code="$?"
+   echo "$apt_get_output" | awk "/^Inst/{ print $2 }" | [ "$(wc -L)" -eq 0 ] && echo "true" || echo "false"
+fi
+
+exit "$exit_code"
