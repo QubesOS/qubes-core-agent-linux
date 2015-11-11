@@ -80,14 +80,14 @@ fi
 
 if [ "x$PKGLIST" = "x" ]; then
     echo "Checking for dom0 updates..." >&2
-    UPDATES_FULL=`$YUM $OPTS check-update -q`
+    UPDATES_FULL=`$YUM $OPTS check-update | grep -v "^Loaded plugins:\|^$"`
     check_update_retcode=$?
     if [ $check_update_retcode -eq 1 ]; then
         # Exit here if yum have reported an error. Exit code 100 isn't an
         # error, it's "updates available" info, so check specifically for exit code 1
         exit 1
     fi
-    UPDATES=`echo "$UPDATES_FULL" | cut -f 1 -d ' ' | grep -v "^Obsoleting"`
+    UPDATES=`echo "$UPDATES_FULL" | grep -v "^Obsoleting\|Could not" | cut -f 1 -d ' '`
     if [ -z "$UPDATES" -a $check_update_retcode -eq 100 ]; then
         # save not empty string for below condition (-z "$UPDATES"), but blank
         # to not confuse the user wwith magic strings in messages
@@ -106,7 +106,8 @@ if [ -z "$PKGLIST" -a -z "$UPDATES" ]; then
 fi
 
 if [ "$CHECK_ONLY" = "1" ]; then
-    echo "Available updates: $UPDATES_FULL"
+    echo "Available updates: "
+    echo "$UPDATES_FULL"
     exit 100
 fi
 
