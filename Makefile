@@ -146,7 +146,7 @@ install-common:
 
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
-	install -D -m 0440 misc/20_tcp_timestamps.conf $(DESTDIR)/etc/sysctl.d/20_tcp_timestamps.conf
+	install -D -m 0644 misc/20_tcp_timestamps.conf $(DESTDIR)/etc/sysctl.d/20_tcp_timestamps.conf
 
 	install -d $(DESTDIR)/var/lib/qubes
 
@@ -156,8 +156,8 @@ install-common:
 	install -d $(DESTDIR)$(LIBDIR)/qubes/
 	install misc/vusb-ctl.py $(DESTDIR)$(LIBDIR)/qubes/
 	install misc/qubes-trigger-sync-appmenus.sh $(DESTDIR)$(LIBDIR)/qubes/
-	install -D misc/polkit-1-qubes-allow-all.pkla $(DESTDIR)/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
-	install -D misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
+	install -D -m 0644 misc/polkit-1-qubes-allow-all.pkla $(DESTDIR)/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
+	install -D -m 0644 misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
 	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
 	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates

@@ -68,11 +68,6 @@ Requires:   pygtk2
 Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
-Provides:   qubes-core-vm
-Obsoletes:  qubes-core-commonvm
-Obsoletes:  qubes-core-appvm
-Obsoletes:  qubes-core-netvm
-Obsoletes:  qubes-core-proxyvm
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.1
 BuildRequires: xen-devel
@@ -108,7 +103,7 @@ id -u 'user' >/dev/null 2>&1 || {
 usermod -a --groups qubes user
 
 if [ "$1" !=  1 ] ; then
-# do this whole %pre thing only when updating for the first time...
+# do this whole %%pre thing only when updating for the first time...
 exit 0
 fi
 
@@ -204,7 +199,7 @@ fi
 %endif
 
 if [ "$1" !=  1 ] ; then
-# do the rest of %post thing only when updating for the first time...
+# do the rest of %%post thing only when updating for the first time...
 exit 0
 fi
 

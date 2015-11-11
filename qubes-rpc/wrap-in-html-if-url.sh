@@ -1,3 +1,5 @@
+#!/bin/sh
+
 wrap_in_html_if_url()
 {
 	case "$1" in
