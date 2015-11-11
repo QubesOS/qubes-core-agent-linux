@@ -11,7 +11,8 @@ if [ -e /etc/system-release ]; then
    ## Fedora
    yum_output="$(yum -q check-update 2>&1)"
    exit_code="$?"
-   [ "$exit_code" -eq 100 ] && echo "true" || echo "false"
+   [ "$exit_code" -eq 100 ] && echo "false" && exit 0
+   [ "$exit_code" -eq 0 ] && echo "true"
 else
    ## Debian
    apt_get_output="$(LANG="C" apt-get -s upgrade 2>&1)"
