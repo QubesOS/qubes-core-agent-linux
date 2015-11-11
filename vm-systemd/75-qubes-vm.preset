@@ -30,8 +30,6 @@ disable plymouth-quit-wait.service
 disable smartd.service
 disable upower.service
 disable colord.service
-## conflicts with qubes-updates-proxy.service
-disable tinyproxy.service
 
 # Fedora only services
 disable backuppc.service
