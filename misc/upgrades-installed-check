@@ -13,13 +13,16 @@ if [ -e /etc/system-release ]; then
    exit_code="$?"
    [ "$exit_code" -eq 100 ] && echo "false" && exit 0
    [ "$exit_code" -eq 0 ] && echo "true"
-else
+elif [ -e /etc/debian_version ]; then
    ## Debian
    set -e
    set -o pipefail
    apt_get_output="$(LANG="C" apt-get -s upgrade 2>&1)"
    exit_code="$?"
    echo "$apt_get_output" | awk "/^Inst/{ print $2 }" | [ "$(wc -L)" -eq 0 ] && echo "true" || echo "false"
+else
+   echo "Check not implemented for this distribution" >&2
+   exit 1
 fi
 
 exit "$exit_code"
