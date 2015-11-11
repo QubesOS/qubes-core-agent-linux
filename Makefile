@@ -66,7 +66,7 @@ ifeq ($(shell lsb_release -is), Debian)
     # Disable sysinit 'network-manager.service' since systemd 'NetworkManager.service' is already installed
     SYSTEM_DROPINS += $(strip $(if $(filter wheezy, $(shell lsb_release -cs)), network-manager.service,))
 
-	# handled by qubes-iptables service now
+    # handled by qubes-iptables service now
     SYSTEM_DROPINS += netfilter-persistent.service
 endif
 
