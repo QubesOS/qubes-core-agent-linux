@@ -1,3 +1,32 @@
+qubes-core-agent (3.0.20-1) wheezy; urgency=medium
+
+  [ Rusty Bird ]
+  * qfile-unpacker: Avoid data loss by checking for child errors
+
+  [ Marek Marczykowski-Górecki ]
+  * Setup updates proxy in dnf and PackageKit
+  * updates-proxy-setup: use temporary file for config snippet
+  * backup: fix handling backup filename with spaces
+  * backup: improve exit code reporting
+  * appmenus: ignore entries with NoDisplay=true
+  * No longer disable auditd
+  * dom0-updates: prefer yum-deprecated over dnf
+
+  [ Olivier MEDOC ]
+  * add DROPINS for org.cups.cupsd systemd files.
+
+  [ Marek Marczykowski-Górecki ]
+  * fedora: Add skip_if_unavailable=False to Qubes repositories
+  * dom0-updates: use yum-deprecated instead of dnf in all calls
+  * Implement dnf hooks for post-update actions
+  * fedora: do not require/use yum-plugin-post-transaction-actions in
+    F>=22
+  * systemd: make sure that update check is started only after qrexec-
+    agent
+  * dom0-updates: do not use 'yum check-update -q'
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 13 Nov 2015 23:22:37 +0100
+
 qubes-core-agent (3.0.19-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
