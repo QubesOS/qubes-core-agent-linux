@@ -13,7 +13,7 @@
 # '/' or '/download' or '?.*'
 # -----------------------------------------------------------------------------
 \.deb\(\|\/\|\/download\|\?.*\)$
-/dists/[a-z-]*/\(InRelease\|Release\|Release.gpg\)\(\|\|/\|\/download\|\?.*\)$
+/dists/[a-z/-]*/\(InRelease\|Release\|Release.gpg\)\(\|\|/\|\/download\|\?.*\)$
 /dists/[a-z/-]*/.*/\(Packages\|Sources\|Release\)\(\|\.gz\|\.bz2\|\.xz\|\.lzma\|\.gpg\)\(\|\|/\|\/download\|\?.*\)$
 /dists/[a-z/-]*/.*/\(Contents\|Translation\)-.*\(\|\.gz\|\.xz\|\.bz2\|\.lzma\)\(\|\|/\|\/download\|\?.*\)$
 /dists/[a-z/-]*/.*/\(Contents-.*\|Translation-.*\|Packages\)\.diff/\(Index\|[0-9.-]*\)\(\|\.gz\|\.xz\|\.bz2\|\.lzma\)\(\|\|/\|\/download\|\?.*\)$
