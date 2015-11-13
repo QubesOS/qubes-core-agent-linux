@@ -377,6 +377,8 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/close-window
 /usr/lib/qubes/xdg-icon
 /usr/lib/qubes/update-proxy-configs
+/usr/lib/qubes/upgrades-installed-check
+/usr/lib/qubes/upgrades-status-notify
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
