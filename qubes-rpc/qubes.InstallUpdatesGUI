@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# This script should open some GUI to install updates.
+# If you are creating package for other distribution, feel free to replace it
+# with distribution-specific script.
+
+if [ -e /etc/redhat-release ]; then
+    xterm -title update -e su -l -c 'yum update; echo Done. Press Enter to exit.; read x'
+elif [ -e /etc/debian_version ]; then
+    xterm -title update -e su -l -c 'apt-get update && apt-get -V dist-upgrade; echo Done. Press Enter to exit.; read x'
+else
+    xterm -title update -e su -l -c 'echo Unsupported distribution, install updates manually; bash -i'
+fi
+# Notify dom0 about installed updates
+su -c 'service qubes-update-check start'
