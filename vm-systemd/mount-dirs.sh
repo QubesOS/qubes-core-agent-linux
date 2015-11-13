@@ -79,10 +79,12 @@ if [ -e /var/run/qubes-service/qubes-dvm ]; then
     touch /etc/this-is-dvm
 
     #If user have customized DispVM settings, use its home instead of default dotfiles
-    if [ -e /rw/home/user/.qubes-dispvm-customized ]; then
-        cp -af /rw/home/user /home/
-    else
-        cat /etc/dispvm-dotfiles.tbz | tar -xjf- --overwrite -C /home/user --owner user 2>&1 >/tmp/dispvm-dotfiles-errors.log
+    if [ ! -e /home/user/.qubes-dispvm-customized ]; then
+        if [ -e /rw/home/user/.qubes-dispvm-customized ]; then
+            cp -af /rw/home/user /home/
+        else
+            cat /etc/dispvm-dotfiles.tbz | tar -xjf- --overwrite -C /home/user --owner user 2>&1 >/tmp/dispvm-dotfiles-errors.log
+        fi
     fi
 else
     mount /home
