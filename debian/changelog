@@ -1,3 +1,38 @@
+qubes-core-agent (3.1.4-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Minor improvements to packaging (based on rpmlint)
+
+  [ Patrick Schleizer ]
+  * removed confusing comments
+  * minor indent
+  * No longer start /etc/init.d/tinyproxy by default anymore.
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "preset disable tinyproxy by default"
+
+  [ Patrick Schleizer ]
+  * minor, removed trailing space
+  * Improved upgrade notifications sent to QVMM.
+  * fixed inverted logic issue in upgrades-installed-check
+  * misc/upgrades-installed-check: handle apt-get errors
+
+  [ Marek Marczykowski-Górecki ]
+  * Explicitly fail upgrades-installed-check on other distributions
+
+  [ qubesuser ]
+  * Allow to provide customized DispVM home directly in the template VM
+
+  [ Marek Marczykowski-Górecki ]
+  * network: let NetworkManager configure VM uplink, if enabled
+  * Use improved update-notify script also in Fedora
+  * Implement qubes.InstallUpdatesGUI qrexec service
+  * Really fix update-proxy rules for debian security fixes repo
+  * updates-proxy: disable filtering at all
+  * network: disable proxy_arp
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 15 Nov 2015 04:29:29 +0100
+
 qubes-core-agent (3.1.3-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
