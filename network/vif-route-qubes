@@ -29,7 +29,6 @@ lockfile=/var/run/xen-hotplug/vif-lock
 case "$command" in
 	online)
 		ifconfig ${vif} up
-		echo 1 >/proc/sys/net/ipv4/conf/${vif}/proxy_arp
 		ipcmd='add'
 		iptables_cmd='-I PREROUTING 1'
 		cmdprefix=''
