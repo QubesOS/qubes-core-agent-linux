@@ -1,3 +1,10 @@
+qubes-core-agent (3.0.21-1) wheezy; urgency=medium
+
+  * updates-proxy: use separate directory for PID file
+  * Really fix update-proxy rules for debian security fixes repo
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 15 Nov 2015 04:34:38 +0100
+
 qubes-core-agent (3.0.20-1) wheezy; urgency=medium
 
   [ Rusty Bird ]
