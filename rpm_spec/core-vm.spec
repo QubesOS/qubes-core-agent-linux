@@ -321,7 +321,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
 %config(noreplace) /etc/qubes/iptables.rules
 %config(noreplace) /etc/qubes/ip6tables.rules
-%config(noreplace) /etc/tinyproxy/filter-updates
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
