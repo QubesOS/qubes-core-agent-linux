@@ -41,7 +41,7 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
 	pid_t pid;
 	const char *remote_domain;
 	char *procdir_path;
-	int procfs_fd;
+	int procfs_fd, incoming_dir_fd;
 
 	uid = prepare_creds_return_uid("user");
 
@@ -88,6 +88,11 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
 	if (waitpid(pid, &ret, 0) < 0) {
 		gui_fatal("Failed to wait for child process");
 	}
+	incoming_dir_fd = open(".", O_RDONLY);
+	if (incoming_dir_fd < 0 ||
+	    syncfs(incoming_dir_fd) != 0 ||
+	     close(incoming_dir_fd) != 0)
+		gui_fatal("Failed to sync filesystem");
 	if (umount2(".", MNT_DETACH) < 0)
 		gui_fatal("Cannot umount incoming directory");
 	if (!WIFEXITED(ret)) {
