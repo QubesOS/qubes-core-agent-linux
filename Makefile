@@ -147,6 +147,9 @@ install-common:
 	install -D -m 0440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
 	install -D -m 0644 misc/20_tcp_timestamps.conf $(DESTDIR)/etc/sysctl.d/20_tcp_timestamps.conf
 
+	install -d $(DESTDIR)/etc/needrestart/conf.d
+	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
+
 	install -d $(DESTDIR)/var/lib/qubes
 
 	install -D misc/xenstore-watch $(DESTDIR)/usr/bin/xenstore-watch-qubes
