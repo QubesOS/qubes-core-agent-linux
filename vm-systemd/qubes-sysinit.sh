@@ -49,10 +49,10 @@ chmod 666 /proc/u2mfn
 
 # Set default services depending on VM type
 TYPE=`$QDB_READ /qubes-vm-type 2> /dev/null`
-[ "$TYPE" = "AppVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM
-[ "$TYPE" = "NetVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM
-[ "$TYPE" = "ProxyVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_PROXYVM
-[ "$TYPE" = "TemplateVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_TEMPLATEVM
+[ "$TYPE" = "AppVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM && touch /var/run/qubes/this-is-appvm
+[ "$TYPE" = "NetVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM && touch /var/run/qubes/this-is-netvm
+[ "$TYPE" = "ProxyVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_PROXYVM && touch /var/run/qubes/this-is-proxyvm
+[ "$TYPE" = "TemplateVM" ] && DEFAULT_ENABLED=$DEFAULT_ENABLED_TEMPLATEVM && touch /var/run/qubes/this-is-templatevm
 
 # Enable default services
 for srv in $DEFAULT_ENABLED; do
