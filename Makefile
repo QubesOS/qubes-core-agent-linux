@@ -139,9 +139,6 @@ install-common:
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
 
-	install -d $(DESTDIR)/etc/needrestart/conf.d
-	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
-
 	install -d $(DESTDIR)/var/lib/qubes
 
 	install -D misc/xenstore-watch $(DESTDIR)/usr/bin/xenstore-watch-qubes
@@ -247,5 +244,7 @@ install-deb: install-common install-systemd install-systemd-dropins
 	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/
 	install -D -m 644 misc/profile.d_qt_x11_no_mitshm.sh $(DESTDIR)/etc/profile.d/qt_x11_no_mitshm.sh
 	install -D -m 440 misc/sudoers.d_umask $(DESTDIR)/etc/sudoers.d/umask
+	install -d $(DESTDIR)/etc/needrestart/conf.d
+	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
 
 install-vm: install-rh install-common
