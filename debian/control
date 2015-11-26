@@ -3,7 +3,8 @@ Section: admin
 Priority: extra
 Maintainer: Davíð Steinn Geirsson <david@dsg.is>
 Build-Depends:
-    qubes-utils (>= 3.1.3),
+    libqrexec-utils-dev,
+    libqubes-rpc-filecopy-dev (>= 3.1.3),
     libvchan-xen-dev,
     python,
     debhelper,
