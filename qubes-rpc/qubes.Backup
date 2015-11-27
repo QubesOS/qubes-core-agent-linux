@@ -9,7 +9,7 @@ if [ -d "$args" ] ; then
 else
   echo "Checking if arguments is matching a command"
   COMMAND=`echo $args | cut -d ' ' -f 1`
-  if which "$COMMAND"; then
+  if type "$COMMAND"; then
     echo "Redirecting STDIN to $args"
     # Parsing args to handle quotes correctly
     # Dangerous method if args are uncontrolled
