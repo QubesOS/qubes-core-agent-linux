@@ -11,7 +11,7 @@ if [ -f "$args" ] ; then
 else
   echo "Checking if arguments is matching a command" >&2
   COMMAND=`echo $args | cut -d ' ' -f 1`
-  if which "$COMMAND" >/dev/null; then
+  if type "$COMMAND" >/dev/null; then
     tmpdir=`mktemp -d`
     mkfifo $tmpdir/backup-data
     echo "Redirecting $args to STDOUT" >&2
