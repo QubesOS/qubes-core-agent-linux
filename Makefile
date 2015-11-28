@@ -176,14 +176,13 @@ install-common:
 
 	install -m 0644 network/udev-qubes-network.rules $(DESTDIR)/etc/udev/rules.d/99-qubes-network.rules
 	install network/qubes-setup-dnat-to-ns $(DESTDIR)$(LIBDIR)/qubes
+	install network/qubes-fix-nm-conf.sh $(DESTDIR)$(LIBDIR)/qubes
 	install network/setup-ip $(DESTDIR)$(LIBDIR)/qubes/
 	install network/network-manager-prepare-conf-dir $(DESTDIR)$(LIBDIR)/qubes/
 	install -d $(DESTDIR)/etc/dhclient.d
 	ln -s /usr/lib/qubes/qubes-setup-dnat-to-ns $(DESTDIR)/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 	install -d $(DESTDIR)/etc/NetworkManager/dispatcher.d/
 	install network/{qubes-nmhook,30-qubes-external-ip} $(DESTDIR)/etc/NetworkManager/dispatcher.d/
-	install -m 0644 -D network/NetworkManager-qubes.conf \
-		$(DESTDIR)/etc/NetworkManager/conf.d/30-qubes.conf
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
 	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
 	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)$(LIBDIR)/qubes/iptables-updates-proxy
