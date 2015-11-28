@@ -1,3 +1,10 @@
+qubes-core-agent (3.1.6-1) wheezy; urgency=medium
+
+  * Revert "network: use drop-ins for NetworkManager configuration
+    (#1176)"
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 29 Nov 2015 00:34:34 +0100
+
 qubes-core-agent (3.1.5-1) wheezy; urgency=medium
 
   [ Patrick Schleizer ]
