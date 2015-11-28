@@ -1,3 +1,27 @@
+qubes-core-agent (3.1.5-1) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * clean up /etc/tinyproxy/filter-updates
+
+  [ Olivier MEDOC ]
+  * updates-proxy: remove remaining traces of proxy filtering file from
+    Makefile
+  * rpm_spec: declare InstallUpdateGUI qrexec_service
+  * archlinux: enforce minimum versionning of qubes-utils
+
+  [ Patrick Schleizer ]
+  * Prevent services from being accidentally restarted by `needrestart`.
+  * Have qubes-sysinit create /var/run/qubes VM type files.
+
+  [ Marek Marczykowski-Górecki ]
+  * Package needrestart config only for Debian
+  * debian: reformat Build-Depends:
+  * debian: update build-depends for split qubes-utils package
+  * backup: Use 'type' instead of 'which' to prevent unnecessary
+    dependency
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 28 Nov 2015 14:48:33 +0100
+
 qubes-core-agent (3.1.4-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
