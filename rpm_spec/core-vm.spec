@@ -331,6 +331,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/iptables.rules
 %config(noreplace) /etc/qubes/ip6tables.rules
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
+%config(noreplace) /etc/tinyproxy/updates-blacklist
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
 /etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
