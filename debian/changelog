@@ -1,3 +1,10 @@
+qubes-core-agent (3.1.7-1) wheezy; urgency=medium
+
+  * updates-proxy: explicitly block connection looping back to the proxy
+    IP
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 04 Dec 2015 15:32:14 +0100
+
 qubes-core-agent (3.1.6-1) wheezy; urgency=medium
 
   * Revert "network: use drop-ins for NetworkManager configuration
