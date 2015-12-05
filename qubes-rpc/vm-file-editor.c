@@ -11,7 +11,7 @@
 #include "dvm2.h"
 
 #define USER_HOME "/home/user"
-#define MIMEINFO_DATABASES "/usr/share/mime:/usr/local/share:" USER_HOME "/.local/share:/usr/share/qubes/mime-override"
+#define MIMEINFO_DATABASES "/usr/share/mime:/usr/local/share/mime:" USER_HOME "/.local/share/mime:/usr/share/qubes/mime-override"
 #define TMP_LOC "/tmp/qopen/"
 
 static const char *cleanup_filename = NULL;
