@@ -48,32 +48,52 @@ legacy() {
 }
 
 bind_dirs() {
+   ## legend
    ## fso: file system object
    ## ro: read-only
    ## rw: read-write
+
    for fso_ro in ${binds[@]}; do
       fso_rw="${rw_dest_dir}${fso_ro}"
 
-      # Make sure ro directory is not mounted
+      # Make sure fso_ro is not mounted.
       umount "$fso_ro" 2> /dev/null || true
 
       if [ -n "$1" ]; then
-         echo "Umounting $1 only..."
+         true "Umounting $1 only..."
          continue
       fi
 
-      # Initially copy over data directories to /rw if rw directory does not exist
+      ## If $fso_ro is a symlink, see where it links to, then replace that
+      ## symlink with the file it linked to. This is because mount does not
+      ## following symlinks.
+      ## For more discussion and symlink and other special files, see:
+      ## https://phabricator.whonix.org/T414
+      if [ -h "$fso_ro" ]; then
+         fso_real_location="$(realpath "$fso_ro")"
+         unlink "$fso_ro"
+         if [ -f "$fso_real_location" ]; then
+            cp --archive --recursive "$fso_real_location" "$fso_ro"
+         else
+            true "$fso_real_location is not a file, skipping."
+         fi
+      fi
+
+      # Initially copy over data directories to /rw if rw directory does not exist.
       if [ -d "$fso_ro" ]; then
          if [ ! -d "$fso_rw" ]; then
-            cp --archive --parents --recursive "$fso_ro" "$rw_dest_dir"
+            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
          fi
       elif [ -f "$fso_ro" ]; then
          if [ ! -f "$fso_rw" ]; then
             cp --archive --recursive "$fso_ro" "$fso_rw"
          fi
+      else
+         true "$fso_ro does not exist, skipping."
+         continue
       fi
 
-      # Bind the directory
+      # Bind the fso.
       mount --bind "$fso_rw" "$fso_ro"
    done
 }
@@ -85,11 +105,12 @@ main() {
    bind_dirs ${1+"$@"}
 }
 
-for folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do
-   if [ ! -d "$folder" ]; then
+for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do
+   true "source_folder: $source_folder"
+   if [ ! -d "$source_folder" ]; then
       continue
    fi
-   for file_name in "$folder/"*".conf" ; do
+   for file_name in "$source_folder/"*".conf" ; do
       bash -n "$file_name"
       source "$file_name"
    done
