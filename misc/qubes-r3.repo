@@ -15,7 +15,7 @@ gpgcheck = 1
 enabled=0
 
 [qubes-vm-r3.1-security-testing]
-name = Qubes OS Repository for VM (updates-testing)
+name = Qubes OS Repository for VM (security-testing)
 baseurl = http://yum.qubes-os.org/r3.1/security-testing/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
 skip_if_unavailable=False
