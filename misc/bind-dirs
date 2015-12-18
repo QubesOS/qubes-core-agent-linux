@@ -35,6 +35,7 @@ prerequisite() {
 
 init() {
    [ -n "$rw_dest_dir" ] || rw_dest_dir="/rw/bind-dirs"
+   [ -n "$symlink_level_max" ] || symlink_level_max="10"
    mkdir --parents "$rw_dest_dir"
 }
 
@@ -54,6 +55,27 @@ bind_dirs() {
    ## rw: read-write
 
    for fso_ro in ${binds[@]}; do
+      local symlink_level_counter
+      symlink_level_counter="0"
+
+      ## For more discussion and symlink and other special files, see:
+      ## https://phabricator.whonix.org/T414
+      while true; do
+         if [ -h "$fso_ro" ]; then
+            symlink_level_counter="$(( symlink_level_counter + 1 ))"
+            true "$fso_ro is a symlink"
+            fso_real_location="$(realpath "$fso_ro")"
+            fso_ro="$fso_real_location"
+         else
+            true "$fso_ro is not a symlink"
+            break
+         fi
+         if [ "$symlink_level_counter" -ge "10" ]; then
+            break
+         fi
+      done
+
+      true "fso_ro: $fso_ro"
       fso_rw="${rw_dest_dir}${fso_ro}"
 
       # Make sure fso_ro is not mounted.
@@ -62,21 +84,6 @@ bind_dirs() {
       if [ -n "$1" ]; then
          true "Umounting $1 only..."
          continue
-      fi
-
-      ## If $fso_ro is a symlink, see where it links to, then replace that
-      ## symlink with the file it linked to. This is because mount does not
-      ## following symlinks.
-      ## For more discussion and symlink and other special files, see:
-      ## https://phabricator.whonix.org/T414
-      if [ -h "$fso_ro" ]; then
-         fso_real_location="$(realpath "$fso_ro")"
-         unlink "$fso_ro"
-         if [ -f "$fso_real_location" ]; then
-            cp --archive --recursive "$fso_real_location" "$fso_ro"
-         else
-            true "$fso_real_location is not a file, skipping."
-         fi
       fi
 
       # Initially copy over data directories to /rw if rw directory does not exist.
@@ -89,7 +96,7 @@ bind_dirs() {
             cp --archive --recursive "$fso_ro" "$fso_rw"
          fi
       else
-         true "$fso_ro does not exist, skipping."
+         true "$fso_ro is neither a directory nor a file or does not exist, skipping."
          continue
       fi
 
@@ -99,10 +106,10 @@ bind_dirs() {
 }
 
 main() {
-   prerequisite ${1+"$@"}
-   init ${1+"$@"}
-   legacy ${1+"$@"}
-   bind_dirs ${1+"$@"}
+   prerequisite "$@"
+   init "$@"
+   legacy "$@"
+   bind_dirs "$@"
 }
 
 for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do
@@ -116,4 +123,4 @@ for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/confi
    done
 done
 
-main ${1+"$@"}
+main "$@"
