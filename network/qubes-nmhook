@@ -1,2 +1,9 @@
 #!/bin/sh
 /usr/lib/qubes/qubes-setup-dnat-to-ns
+
+# Tinyproxy does not reload DNS servers 
+if [ -x /bin/systemctl ]; then
+    /bin/systemctl --no-block try-restart qubes-updates-proxy.service
+else
+    /usr/sbin/service qubes-updates-proxy try-restart
+fi
