@@ -151,13 +151,18 @@ configure_systemd() {
 PRESET_FAILED=0
 
 if [ $1 -eq 1 ]; then
-    systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
+    # Needs to be started two times to deal  with services name changes (systemctl bug?)
+    echo "Resetting systemd services to defaults presets (PASS 1)"
+    systemctl --no-reload preset-all 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
+    echo "Resetting systemd services to defaults presets (PASS 2)"
+    systemctl --no-reload preset-all 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
 else
     services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-dirs"
     services="$services qubes-netwatcher qubes-network qubes-sysinit"
     services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
     services="$services qubes-random-seed"
     for srv in $services; do
+        echo "Enable service defaults for $service"
         systemctl --no-reload preset $srv.service
     done
     systemctl --no-reload preset qubes-update-check.timer
