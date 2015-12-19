@@ -6,6 +6,10 @@ deb [arch=amd64] http://deb.qubes-os.org/r3.1/vm @DIST@ main
 #deb [arch=amd64] http://deb.qubes-os.org/r3.1/vm @DIST@-testing main
 #deb-src http://deb.qubes-os.org/r3.1/vm @DIST@-testing main
 
+# Qubes security updates testing repository
+#deb [arch=amd64] http://deb.qubes-os.org/r3.1/vm @DIST@-securitytesting main
+#deb-src http://deb.qubes-os.org/r3.1/vm @DIST@-securitytesting main
+
 # Qubes experimental/unstable repository
 #deb [arch=amd64] http://deb.qubes-os.org/r3.1/vm @DIST@-unstable main
 #deb-src http://deb.qubes-os.org/r3.1/vm @DIST@-unstable main
