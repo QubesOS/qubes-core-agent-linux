@@ -1,3 +1,23 @@
+qubes-core-agent (3.0.23-1) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * Prevent services from being accidentally restarted by `needrestart`.
+
+  [ Marek Marczykowski-Górecki ]
+  * Package needrestart config only for Debian
+  * backup: Use 'type' instead of 'which' to prevent unnecessary
+    dependency
+  * open-in-vm: Fix path to mimeinfo database
+
+  [ Rusty Bird ]
+  * repo description: updates-testing -> security-testing (cherry picked
+    from commit 3238eab85f1dd2366ca280ddf1b5fbd4d92630fa)
+
+  [ Marek Marczykowski-Górecki ]
+  * updates-proxy: restart on network configuration change to reload DNS
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 20 Dec 2015 04:15:56 +0100
+
 qubes-core-agent (3.0.22-1) wheezy; urgency=medium
 
   * upgrade: package for simplify upgrade from R3.0 to R3.1
