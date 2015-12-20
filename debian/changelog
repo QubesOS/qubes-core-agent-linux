@@ -1,3 +1,31 @@
+qubes-core-agent (3.1.8-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * open-in-vm: Fix path to mimeinfo database
+
+  [ Olivier MEDOC ]
+  * archlinux: fix invalid systemd path in make install directive
+  * archlinux: remove quotes when checking system locales (in case it
+    has been user defined)
+
+  [ MB ]
+  * [network-proxy-setup] Permit !CONFIG_MODuLES
+
+  [ Rusty Bird ]
+  * repo description: updates-testing -> security-testing
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: add security-testing repository
+
+  [ Olivier MEDOC ]
+  * archlinux: ensure systemctl reset preset correctly (need to be
+    started twice)
+
+  [ Marek Marczykowski-Górecki ]
+  * updates-proxy: restart on network configuration change to reload DNS
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 20 Dec 2015 03:12:39 +0100
+
 qubes-core-agent (3.1.7-1) wheezy; urgency=medium
 
   * updates-proxy: explicitly block connection looping back to the proxy
