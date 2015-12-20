@@ -1,3 +1,10 @@
+qubes-core-agent (3.0.22-1) wheezy; urgency=medium
+
+  * upgrade: package for simplify upgrade from R3.0 to R3.1
+  * debian: add security-testing repository
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 20 Dec 2015 03:39:14 +0100
+
 qubes-core-agent (3.0.21-1) wheezy; urgency=medium
 
   * updates-proxy: use separate directory for PID file
