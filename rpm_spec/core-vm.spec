@@ -68,12 +68,37 @@ Requires:   pygtk2
 Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
+%if 0%{fedora} >= 23
+Requires:   python3-dnf-plugins-qubes-hooks
+%else
+Requires:   python2-dnf-plugins-qubes-hooks
+%endif
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.1
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
+
+%package -n python2-dnf-plugins-qubes-hooks
+Summary:	DNF plugin for Qubes specific post-installation actions
+BuildRequires: python2-devel
+%{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
+
+%description -n python2-dnf-plugins-qubes-hooks
+DNF plugin for Qubes specific post-installation actions:
+ * notify dom0 that updates were installed
+ * refresh applications shortcut list
+
+%package -n python3-dnf-plugins-qubes-hooks
+Summary:	DNF plugin for Qubes specific post-installation actions
+BuildRequires: python3-devel
+%{?python_provide:%python_provide python3-dnf-plugins-qubes-hooks}
+
+%description -n python3-dnf-plugins-qubes-hooks
+DNF plugin for Qubes specific post-installation actions:
+ * notify dom0 that updates were installed
+ * refresh applications shortcut list
 
 %define _builddir %(pwd)
 
@@ -390,7 +415,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/upgrades-installed-check
 /usr/lib/qubes/upgrades-status-notify
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
-/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
@@ -408,6 +432,12 @@ rm -f %{name}-%{version}
 %attr(700,user,user) /home_volatile/user
 %dir /mnt/removable
 %dir /rw
+
+%files -n python2-dnf-plugins-qubes-hooks
+%{python2_sitelib}/dnf-plugins/*
+
+%files -n python3-dnf-plugins-qubes-hooks
+%{python3_sitelib}/dnf-plugins/*
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
