@@ -75,10 +75,35 @@ Obsoletes:  qubes-core-appvm
 Obsoletes:  qubes-core-netvm
 Obsoletes:  qubes-core-proxyvm
 Obsoletes:  qubes-upgrade-vm < 3.0
+%if 0%{fedora} >= 23
+Requires:   python3-dnf-plugins-qubes-hooks
+%else
+Requires:   python2-dnf-plugins-qubes-hooks
+%endif
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.0.12
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
+
+%package -n python2-dnf-plugins-qubes-hooks
+Summary:	DNF plugin for Qubes specific post-installation actions
+BuildRequires: python2-devel
+%{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
+
+%description -n python2-dnf-plugins-qubes-hooks
+DNF plugin for Qubes specific post-installation actions:
+ * notify dom0 that updates were installed
+ * refresh applications shortcut list
+
+%package -n python3-dnf-plugins-qubes-hooks
+Summary:	DNF plugin for Qubes specific post-installation actions
+BuildRequires: python3-devel
+%{?python_provide:%python_provide python3-dnf-plugins-qubes-hooks}
+
+%description -n python3-dnf-plugins-qubes-hooks
+DNF plugin for Qubes specific post-installation actions:
+ * notify dom0 that updates were installed
+ * refresh applications shortcut list
 
 %define _builddir %(pwd)
 
@@ -426,7 +451,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/close-window
 /usr/lib/qubes/update-proxy-configs
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
-/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.py*
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher
@@ -443,6 +467,12 @@ rm -f %{name}-%{version}
 %attr(700,user,user) /home_volatile/user
 %dir /mnt/removable
 %dir /rw
+
+%files -n python2-dnf-plugins-qubes-hooks
+%{python2_sitelib}/dnf-plugins/*
+
+%files -n python3-dnf-plugins-qubes-hooks
+%{python3_sitelib}/dnf-plugins/*
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart

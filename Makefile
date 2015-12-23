@@ -10,6 +10,8 @@ SYSLIBDIR ?= /lib
 
 PYTHON = /usr/bin/python2
 PYTHON_SITEARCH = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)'`
+PYTHON2_SITELIB = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()'`
+PYTHON3_SITELIB = `python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())'`
 
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
@@ -124,11 +126,9 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -m 0400 -D network/ip6tables $(DESTDIR)/usr/lib/qubes/init/ip6tables
 
 	install -D -m 0644 misc/dnf-qubes-hooks.py \
-		$(DESTDIR)/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.py
-	install -D -m 0644 misc/dnf-qubes-hooks.pyc \
-		$(DESTDIR)/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.pyc
-	install -D -m 0644 misc/dnf-qubes-hooks.pyo \
-		$(DESTDIR)/usr/lib/python2.7/site-packages/dnf-plugins/qubes-hooks.pyo
+		$(DESTDIR)$(PYTHON2_SITELIB)/dnf-plugins/qubes-hooks.py
+	install -D -m 0644 misc/dnf-qubes-hooks.py \
+		$(DESTDIR)$(PYTHON3_SITELIB)/dnf-plugins/qubes-hooks.py
 	install -D -m 0644 misc/dnf-qubes-hooks.conf $(DESTDIR)/etc/dnf/plugins/qubes-hooks.conf
 
 
@@ -222,7 +222,7 @@ install-common:
 ifeq (1,${DEBIANBUILD})
 	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 else
-	install -m 0644 misc/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+	install -m 0644 misc/py2/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 endif
 
 	install -d $(DESTDIR)/mnt/removable
