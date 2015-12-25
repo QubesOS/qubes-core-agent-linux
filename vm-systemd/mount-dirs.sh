@@ -89,3 +89,5 @@ if [ -e /var/run/qubes-service/qubes-dvm ]; then
 else
     mount /home
 fi
+
+/usr/lib/qubes/bind-dirs.sh
