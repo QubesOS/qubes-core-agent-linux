@@ -1,3 +1,11 @@
+qubes-core-agent (3.1.9-1) wheezy; urgency=medium
+
+  * dnf: drop shebang, it isn't standalone script
+  * Package DNF plugin for both python2 and python3
+  * dom0-updates: fix reporting when no updates are available
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 26 Dec 2015 14:24:00 +0100
+
 qubes-core-agent (3.1.8-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
