@@ -80,8 +80,9 @@ fi
 
 if [ "x$PKGLIST" = "x" ]; then
     echo "Checking for dom0 updates..." >&2
-    UPDATES_FULL=`$YUM $OPTS check-update | grep -v "^Loaded plugins:\|^$"`
+    UPDATES_FULL=`$YUM $OPTS check-update`
     check_update_retcode=$?
+    UPDATES_FULL=`echo "$UPDATES_FULL" | grep -v "^Loaded plugins:\|^$"`
     if [ $check_update_retcode -eq 1 ]; then
         # Exit here if yum have reported an error. Exit code 100 isn't an
         # error, it's "updates available" info, so check specifically for exit code 1
