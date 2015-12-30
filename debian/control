@@ -29,6 +29,7 @@ Depends:
     python-gi,
     python-xdg,
     python-dbus,
+    python-gtk2,
     qubes-utils (>= 3.0.12),
     sudo,
     systemd,
