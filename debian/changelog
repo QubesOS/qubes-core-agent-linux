@@ -1,3 +1,10 @@
+qubes-core-agent (3.1.10-1) wheezy; urgency=medium
+
+  * network: use more strict policy about incoming traffic
+  * debian: add missing python-gtk2 dependency
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 31 Dec 2015 02:58:29 +0100
+
 qubes-core-agent (3.1.9-1) wheezy; urgency=medium
 
   * dnf: drop shebang, it isn't standalone script
