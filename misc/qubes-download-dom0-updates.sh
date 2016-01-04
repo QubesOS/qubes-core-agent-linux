@@ -52,6 +52,8 @@ fi
 YUM="yum"
 # prefer yum-deprecated over dnf, because of still missing features in dnf (at least --downloaddir)
 if type dnf >/dev/null 2>&1 && type yum-deprecated >/dev/null 2>&1; then
+    echo "(Note: dnf will complain that the yum command has been deprecated." >&2
+    echo "This message is safe to ignore.)" >&2
     YUM="yum-deprecated"
 fi
 
