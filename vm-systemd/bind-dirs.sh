@@ -31,6 +31,13 @@ prerequisite() {
       true "No TemplateBasedVM detected. Exiting."
       exit 0
    fi
+   if [ -f "/var/run/qubes-service/qubes-dvm" ]; then
+      # https://github.com/QubesOS/qubes-issues/issues/1328#issuecomment-169483029
+      # Do none of the following in a DispVM.
+      # During DispVM savefile generation, 'qubesdb-read /qubes-vm-persistence'
+      # outputs 'rw'.
+      exit 0
+   fi
 }
 
 init() {
