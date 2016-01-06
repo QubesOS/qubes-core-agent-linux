@@ -58,10 +58,10 @@ bind_dirs() {
       local symlink_level_counter
       symlink_level_counter="0"
 
-      ## For more discussion and symlink and other special files, see:
-      ## https://phabricator.whonix.org/T414
       while true; do
          if [ -h "$fso_ro" ]; then
+            ## Resolving where there symlink points to, and using the result
+            ## for bind mount instead.
             symlink_level_counter="$(( symlink_level_counter + 1 ))"
             true "$fso_ro is a symlink"
             fso_real_location="$(realpath "$fso_ro")"
@@ -70,7 +70,7 @@ bind_dirs() {
             true "$fso_ro is not a symlink"
             break
          fi
-         if [ "$symlink_level_counter" -ge "10" ]; then
+         if [ "$symlink_level_counter" -ge "$symlink_level_max" ]; then
             break
          fi
       done
