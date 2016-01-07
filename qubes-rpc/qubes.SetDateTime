@@ -8,4 +8,4 @@ if [ $timediff -le 2 -a $timediff -ge -2 ]; then
     # don't bother
     exit 0
 fi
-date -u -s "$timestamp"
+date -u -s "$timestamp" >/dev/null
