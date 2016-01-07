@@ -1,3 +1,16 @@
+qubes-core-agent (3.1.11-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: add a message explaining yum deprecated warning
+
+  [ noname ]
+  * archlinux: Added python{2,3} as dependency. Solved python22 bug.
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix time sync service
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 07 Jan 2016 05:52:35 +0100
+
 qubes-core-agent (3.1.10-1) wheezy; urgency=medium
 
   * network: use more strict policy about incoming traffic
