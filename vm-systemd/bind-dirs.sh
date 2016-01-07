@@ -100,7 +100,7 @@ bind_dirs() {
          fi
       elif [ -f "$fso_ro" ]; then
          if [ ! -f "$fso_rw" ]; then
-            cp --archive --recursive "$fso_ro" "$fso_rw"
+            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
          fi
       else
          true "$fso_ro is neither a directory nor a file or does not exist, skipping."
