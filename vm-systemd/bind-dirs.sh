@@ -94,14 +94,8 @@ bind_dirs() {
       fi
 
       # Initially copy over data directories to /rw if rw directory does not exist.
-      if [ -d "$fso_ro" ]; then
-         if [ ! -d "$fso_rw" ]; then
-            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
-         fi
-      elif [ -f "$fso_ro" ]; then
-         if [ ! -f "$fso_rw" ]; then
-            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
-         fi
+      if [ -d "$fso_ro" ] || [ -f "$fso_ro" ]; then
+         cp --verbose --no-clobber --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
       else
          true "$fso_ro is neither a directory nor a file or does not exist, skipping."
          continue
