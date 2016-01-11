@@ -1,3 +1,11 @@
+qubes-core-agent (3.1.12-1) wheezy; urgency=medium
+
+  * Unload USB controllers drivers in USB VM before going to sleep
+  * Do not try to signal NetworkManager before suspend if it isn't
+    running
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 11 Jan 2016 21:59:34 +0100
+
 qubes-core-agent (3.1.11-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
