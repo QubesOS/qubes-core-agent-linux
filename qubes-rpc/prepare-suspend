@@ -12,11 +12,13 @@ if [ -r /rw/config/suspend-module-blacklist ]; then
 fi
 
 if [ x"$action" = x"suspend" ]; then
-    dbus-send --system --print-reply          \
-        --dest=org.freedesktop.NetworkManager \
-        /org/freedesktop/NetworkManager       \
-        org.freedesktop.NetworkManager.Sleep boolean:true ||  \
-        service NetworkManager stop
+    if [ -f /var/run/qubes-service/network-manager ]; then
+        dbus-send --system --print-reply          \
+            --dest=org.freedesktop.NetworkManager \
+            /org/freedesktop/NetworkManager       \
+            org.freedesktop.NetworkManager.Sleep boolean:true ||  \
+            service NetworkManager stop
+    fi
     # Force interfaces down, just in case when NM didn't done it
     for if in `ls /sys/class/net|grep -v "lo\|vif"`; do
         if [ "`cat /sys/class/net/$if/device/devtype 2>/dev/null`" = "vif" ]; then
@@ -36,9 +38,11 @@ else
     for mod in `cat /var/run/qubes/suspend-modules-loaded`; do
         modprobe $mod
     done
-    dbus-send --system --print-reply          \
-        --dest=org.freedesktop.NetworkManager \
-        /org/freedesktop/NetworkManager       \
-        org.freedesktop.NetworkManager.Sleep boolean:false ||  \
-        { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes-core-netvm start
+    if [ -f /var/run/qubes-service/network-manager ]; then
+        dbus-send --system --print-reply          \
+            --dest=org.freedesktop.NetworkManager \
+            /org/freedesktop/NetworkManager       \
+            org.freedesktop.NetworkManager.Sleep boolean:false ||  \
+            { [ -x /bin/systemctl ] && systemctl start NetworkManager.service; } || service qubes-core-netvm start
+    fi
 fi
