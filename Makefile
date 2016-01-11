@@ -216,6 +216,7 @@ install-common:
 	install qubes-rpc/qrun-in-vm $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/sync-ntp-clock $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/prepare-suspend $(DESTDIR)$(LIBDIR)/qubes
+	install -m 0644 misc/qubes-suspend-module-blacklist $(DESTDIR)/etc/qubes-suspend-module-blacklist
 	install -d $(DESTDIR)/$(KDESERVICEDIR)
 	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-move.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDESERVICEDIR)
 	install -d $(DESTDIR)/etc/qubes-rpc

@@ -1,0 +1,6 @@
+# You can list here modules you want to be unloaded before going to sleep. This
+# file is used only if the VM has any PCI device assigned. Modules will be
+# automatically loaded after resume.
+
+ehci_pci
+xhci_pci
