@@ -398,6 +398,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
+%config(noreplace) /etc/qubes-suspend-module-blacklist
 /etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
 /etc/xen/scripts/vif-route-qubes
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
