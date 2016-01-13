@@ -23,8 +23,8 @@ if ! dmesg | grep -q "$systemd_pkg_version running in system mode."; then
     systemctl daemon-reexec
 fi
 
-# Wait for evtchn initialization
-while [ ! -e /dev/xen/xenbus ]; do
+# Wait for xenbus initialization
+while [ ! -e /dev/xen/xenbus -a ! -e /proc/xen/xenbus ]; do
   sleep 0.1
 done
 
