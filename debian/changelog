@@ -1,3 +1,17 @@
+qubes-core-agent (3.0.24-1) wheezy; urgency=medium
+
+  * dnf: drop shebang, it isn't standalone script
+  * Package DNF plugin for both python2 and python3
+  * debian: add missing python-gtk2 dependency
+  * dom0-updates: add a message explaining yum deprecated warning
+  * Fix time sync service
+  * Unload USB controllers drivers in USB VM before going to sleep
+  * Do not try to signal NetworkManager before suspend if it isn't
+    running
+  * sysinit: Accept also old xenbus kernel interface
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 Jan 2016 12:35:13 +0100
+
 qubes-core-agent (3.0.23-1) wheezy; urgency=medium
 
   [ Patrick Schleizer ]
