@@ -8,6 +8,8 @@ if [ -e /etc/redhat-release ]; then
     xterm -title update -e su -l -c 'yum update; echo Done. Press Enter to exit.; read x'
 elif [ -e /etc/debian_version ]; then
     xterm -title update -e su -l -c 'apt-get update && apt-get -V dist-upgrade; echo Done. Press Enter to exit.; read x'
+elif [ -e /etc/arch-release ]; then
+    xterm -title update -e su -l -c 'pacman -Suy; echo Done. Press Enter to exit.; read x'
 else
     xterm -title update -e su -l -c 'echo Unsupported distribution, install updates manually; bash -i'
 fi
