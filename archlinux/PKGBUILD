@@ -14,7 +14,7 @@ url="http://qubes-os.org/"
 license=('GPL')
 groups=()
 depends=("qubes-vm-utils>=3.1.3" python2 python3 python2-xdg ethtool ntp net-tools gnome-packagekit imagemagick fakeroot notification-daemon dconf pygtk zenity qubes-libvchan qubes-db-vm haveged python2-gobject python2-dbus xdg-utils notification-daemon)
-makedepends=("qubes-vm-utils>=3.1.3" qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python2 python3)
+makedepends=(gcc make pkg-config "qubes-vm-utils>=3.1.3" qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python2 python3)
 checkdepends=()
 optdepends=(gnome-keyring gnome-settings-daemon networkmanager iptables tinyproxy python2-nautilus gpk-update-viewer)
 provides=()
