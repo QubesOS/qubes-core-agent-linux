@@ -6,7 +6,7 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=2
+pkgrel=4
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
