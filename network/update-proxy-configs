@@ -120,5 +120,5 @@ fi
 
 # Pacman (archlinux) also
 if [ -e /etc/pacman.conf ]; then
-    update_conf /etc/pacman.conf "XferCommand = http_proxy=$PROXY_ADDR /usr/bin/wget --passive-ftp -c -O %o %u"
+    update_conf /etc/pacman.conf "XferCommand = http_proxy=$PROXY_ADDR /usr/bin/curl -C - -f %u > %o"
 fi
