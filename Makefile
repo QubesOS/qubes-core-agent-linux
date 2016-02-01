@@ -210,6 +210,7 @@ install-common:
 	install qubes-rpc/qvm-move-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/xdg-icon $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/qubes-open $(DESTDIR)/usr/bin
 	install qubes-rpc/tar2qfile $(DESTDIR)$(LIBDIR)/qubes
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
 	install -m 4755  qubes-rpc/qfile-unpacker $(DESTDIR)$(LIBDIR)/qubes

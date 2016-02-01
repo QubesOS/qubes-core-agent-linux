@@ -379,6 +379,7 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-mru-entry
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
+/usr/bin/qubes-open
 /usr/bin/qrexec-fork-server
 /usr/bin/qrexec-client-vm
 /usr/bin/qubes-session-autostart

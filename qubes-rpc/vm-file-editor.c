@@ -11,7 +11,6 @@
 #include "dvm2.h"
 
 #define USER_HOME "/home/user"
-#define MIMEINFO_DATABASES "/usr/share/mime:/usr/local/share/mime:" USER_HOME "/.local/share/mime:/usr/share/qubes/mime-override"
 #define TMP_LOC "/tmp/qopen/"
 
 static const char *cleanup_filename = NULL;
@@ -148,8 +147,6 @@ main()
 	struct stat stat_pre, stat_post, session_stat;
 	char *filename = get_filename();
 	int child, status, log_fd, null_fd;
-	char var[1024], val[4096];
-	FILE *env_file;
 	FILE *waiter_pidfile;
 
 	copy_file_by_name(filename);
@@ -196,12 +193,6 @@ main()
 			dup2(null_fd, 0);
 			close(null_fd);
 
-			env_file = fopen("/tmp/qubes-session-env", "r");
-			while(fscanf(env_file, "%1024[^=]=%4096[^\n]\n", var, val) == 2) {
-				setenv(var, val, 1);
-			}
-			fclose(env_file);
-
 			log_fd = open("/tmp/mimeopen.log", O_CREAT | O_APPEND, 0666);
 			if (log_fd == -1) {
 				perror("open /tmp/mimeopen.log");
@@ -212,8 +203,7 @@ main()
 
 			setenv("HOME", USER_HOME, 1);
 			setenv("DISPLAY", ":0", 1);
-			execl("/usr/bin/mimeopen", "mimeopen", "-n",
-					"--database", MIMEINFO_DATABASES, filename, (char*)NULL);
+			execl("/usr/bin/qubes-open", "qubes-open", filename, (char*)NULL);
 			perror("execl");
 			exit(1);
 		default:

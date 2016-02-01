@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ -r /etc/profile.d/qubes-session.sh ]; then
+    . /etc/profile.d/qubes-session.sh
+fi
+
+MIMEINFO_DATABASES="/usr/share/mime:/usr/local/share/mime:$HOME/.local/share/mime:/usr/share/qubes/mime-override"
+
+exec mimeopen -n --database "$MIMEINFO_DATABASES" "$@"
