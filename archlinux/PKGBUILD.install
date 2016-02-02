@@ -198,6 +198,20 @@ systemctl daemon-reload
 
 }
 
+config_prependtomark() {
+FILE=$1
+APPENDBEFORELINE=$2
+APPENDLINE=$3
+grep -q "$APPENDLINE" "$FILE" || sed "/$APPENDBEFORELINE/i$APPENDLINE" -i "$FILE"
+}
+
+config_appendtomark() {
+FILE=$1
+APPENDAFTERLINE=$2
+APPENDLINE=$3
+grep -q "$APPENDLINE" "$FILE" || sed "/$APPENDAFTERLINE/a$APPENDLINE" -i "$FILE"
+}
+
 update_finalize() {
 
 	# Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
@@ -213,6 +227,14 @@ update_finalize() {
 	rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 	systemctl enable getty\@tty1.service
 
+	# Archlinux specific: Prepare pacman.conf to add qubes specific config
+	QUBES_MARKER="### QUBES CONFIG MARKER ###"
+	config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "$QUBES_MARKER"
+	
+	# Add Qubes setup script markers at the right place (this won't work at the end of pacman.conf)"
+	config_appendtomark "/etc/pacman.conf" "$QUBES_MARKER" "### QUBES END ###"
+	config_appendtomark "/etc/pacman.conf" "$QUBES_MARKER" "### QUBES BEGIN ###"
+	
 	systemctl daemon-reload
 }
 
