@@ -41,7 +41,7 @@ Requires:   NetworkManager >= 0.8.1-1
 # Fedora >= 18 defaults to firewalld, which isn't supported nor needed by Qubes
 Conflicts:  firewalld
 %endif
-Requires:	/usr/bin/mimeopen
+Requires:	xdg-utils
 Requires:   ethtool
 Requires:   tinyproxy
 Requires:   ntpdate

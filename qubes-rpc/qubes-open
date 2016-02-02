@@ -4,6 +4,8 @@ if [ -r /etc/profile.d/qubes-session.sh ]; then
     . /etc/profile.d/qubes-session.sh
 fi
 
-MIMEINFO_DATABASES="/usr/share/mime:/usr/local/share/mime:$HOME/.local/share/mime:/usr/share/qubes/mime-override"
-
-exec mimeopen -n --database "$MIMEINFO_DATABASES" "$@"
+# gvfs-open, kde-open, and possibly others don't wait for editor to be
+# closed, which is critical behaviour for DisposableVM (which gets destroyed
+# after this process exits)
+export DE=generic
+exec xdg-open "$@"

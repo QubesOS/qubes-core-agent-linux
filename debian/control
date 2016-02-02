@@ -46,6 +46,7 @@ Depends:
     systemd,
     x11-xserver-utils,
     xdg-user-dirs,
+    xdg-utils,
     xen-utils-common,
     xenstore-utils,
     xinit,
