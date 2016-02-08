@@ -1,3 +1,27 @@
+qubes-core-agent (3.1.13-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * sysinit: Accept also old xenbus kernel interface
+
+  [ adrianx64 ]
+  * Proposed solution for issue #1657
+
+  [ Marek Marczykowski-Górecki ]
+  * Move opening file viewer/editor into separate shell script
+  * qubes-open: switch from mimeopen to xdg-open
+
+  [ Olivier MEDOC ]
+  * update qubes.InstallUpdateGUI to support archlinux
+  * archlinux: add gcc and make as make dependencies
+  * implement update proxy support for archlinux
+  * archlinux: add Qubes Markers in pacman.conf so that changes done by
+    qubes scripts are not inserted at the end of pacman.conf
+  * archlinux: properly add qubes markers in pacman.conf
+  * update-proxy: use curl instead of wget in archlinux in order to
+    limit additional dependencies
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 08 Feb 2016 05:07:39 +0100
+
 qubes-core-agent (3.1.12-1) wheezy; urgency=medium
 
   * Unload USB controllers drivers in USB VM before going to sleep
