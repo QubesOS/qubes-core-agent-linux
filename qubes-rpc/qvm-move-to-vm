@@ -22,4 +22,4 @@
 
 set -e
 . qvm-copy-to-vm "$@"
-rm -rf "$@"
+rm -rf -- "$@"
