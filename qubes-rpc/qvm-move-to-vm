@@ -20,6 +20,5 @@
 #
 #
 
-set -e
-. qvm-copy-to-vm "$@"
+. qvm-copy-to-vm "$@" &&
 rm -rf -- "$@"
