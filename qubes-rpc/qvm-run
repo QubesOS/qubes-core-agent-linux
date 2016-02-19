@@ -21,7 +21,7 @@
 #
 
 if [ $# -lt 2 ] ; then
-	cat <<USAGE
+    cat <<USAGE
 Usage: $0 vmname command arguments
 Executes a command in another VM using the qubes.VMShell RPC service.  The
 arguments are joined with spaces and passed to "bash -c".
@@ -33,11 +33,11 @@ is your terminal.
 
 You can use \$dispvm or --dispvm instead of vmname to start a new DisposableVM.
 USAGE
-	exit 1
+    exit 1
 fi
 VMNAME=$1
 shift
 if [ $VMNAME = "--dispvm" ] ; then
-	VMNAME='$dispvm'
+    VMNAME='$dispvm'
 fi
 exec /usr/lib/qubes/qrexec-client-vm $VMNAME qubes.VMShell "/usr/lib/qubes/qrun-in-vm" "$@"
