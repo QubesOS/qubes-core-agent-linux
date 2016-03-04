@@ -1,9 +1,18 @@
 #!/bin/sh
 
-mkfifo /tmp/qrexec-rpc-stderr.$$
-logger -t "$1-$2" -f /tmp/qrexec-rpc-stderr.$$ >/dev/null 2>&1 </dev/null &
-exec 2>/tmp/qrexec-rpc-stderr.$$
-rm -f /tmp/qrexec-rpc-stderr.$$
+# write stderr to both calling party and local log; be very careful about
+# closing file descriptors here - if either stdout or stderr will not be closed
+# when service process does the same - service call will hang (waiting for EOF
+# on stdout/stderr)
+stderr_pipe=/tmp/qrexec-rpc-stderr.$$
+mkfifo $stderr_pipe
+# tee can't write to file descriptor, nor /proc/self/fd/2 (EXIO on open)
+return_stderr_pipe=/tmp/qrexec-rpc-stderr-return.$$
+mkfifo $return_stderr_pipe
+{ cat <$return_stderr_pipe >&2 2>/dev/null; rm -f $return_stderr_pipe; } &
+{ tee $return_stderr_pipe 2>/dev/null <$stderr_pipe |\
+       logger -t "$1-$2" >/dev/null 2>&1; rm -f $stderr_pipe; } &
+exec 2>$stderr_pipe
 
 QUBES_RPC=/etc/qubes-rpc
 LOCAL_QUBES_RPC=/usr/local/etc/qubes-rpc
