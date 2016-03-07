@@ -26,9 +26,10 @@ start()
 	if [ "x$network" != "x" ]; then
 		gateway=$(/usr/bin/qubesdb-read /qubes-netvm-gateway)
 		netmask=$(/usr/bin/qubesdb-read /qubes-netvm-netmask)
+		primary_dns=$(/usr/bin/qubesdb-read /qubes-netvm-primary-dns || echo $gateway)
 		secondary_dns=$(/usr/bin/qubesdb-read /qubes-netvm-secondary-dns)
 		modprobe netbk 2> /dev/null || modprobe xen-netback
-		echo "NS1=$gateway" > /var/run/qubes/qubes-ns
+		echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
 		echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
 		/usr/lib/qubes/qubes-setup-dnat-to-ns
 		echo "1" > /proc/sys/net/ipv4/ip_forward
