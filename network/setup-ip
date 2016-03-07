@@ -13,6 +13,7 @@ ip=`/usr/bin/qubesdb-read /qubes-ip 2> /dev/null`
 if [ x$ip != x ]; then
     netmask=`/usr/bin/qubesdb-read /qubes-netmask`
     gateway=`/usr/bin/qubesdb-read /qubes-gateway`
+    primary_dns=`/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null || echo $gateway`
     secondary_dns=`/usr/bin/qubesdb-read /qubes-secondary-dns`
     /sbin/ifconfig $INTERFACE $ip netmask 255.255.255.255
     /sbin/ifconfig $INTERFACE up
@@ -25,7 +26,7 @@ if [ x$ip != x ]; then
     if ! grep -rq "^/etc/resolv[.]conf$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
    	echo > /etc/resolv.conf
         if [ "x$disabledns" != "x1" ]; then
-            echo "nameserver $gateway" > /etc/resolv.conf
+            echo "nameserver $primary_dns" > /etc/resolv.conf
             echo "nameserver $secondary_dns" >> /etc/resolv.conf
         fi
     fi
@@ -51,7 +52,7 @@ method=manual
 may-fail=false
 __EOF__
         if [ "x$disabledns" != "x1" ]; then
-            echo "dns=$gateway;$secondary_dns" >> $nm_config
+            echo "dns=$primary_dns;$secondary_dns" >> $nm_config
         fi
         if [ "x$disablegw" != "x1" ]; then
             echo "addresses1=$ip;32;$gateway" >> $nm_config
@@ -64,8 +65,9 @@ __EOF__
     if [ "x$network" != "x" ] && [ "x$disabledns" != "x1" ]; then
         gateway=$(qubesdb-read /qubes-netvm-gateway)
         netmask=$(qubesdb-read /qubes-netvm-netmask)
+        primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo $gateway)
         secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
-        echo "NS1=$gateway" > /var/run/qubes/qubes-ns
+        echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
         echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
         /usr/lib/qubes/qubes-setup-dnat-to-ns
     fi
