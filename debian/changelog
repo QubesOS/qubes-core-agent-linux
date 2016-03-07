@@ -1,3 +1,9 @@
+qubes-core-agent (3.1.14-1) wheezy; urgency=medium
+
+  * network: use `qubes-primary-dns` QubesDB entry if present
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 07 Mar 2016 13:47:01 +0100
+
 qubes-core-agent (3.1.13-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
