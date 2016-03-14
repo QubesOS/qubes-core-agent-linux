@@ -20,25 +20,5 @@
 #
 #
 
-if [ $# -lt 2 ] ; then
-	echo usage: $0 '[--without-progress] dest_vmname file [file]+'
-	exit 1
-fi
-
-if [ x"$1" = "x--without-progress" ] ; then
-	export PROGRESS_TYPE=none
-	shift
-else
-	export PROGRESS_TYPE=console
-fi
-
-
-VM="$1"
-shift
-
-if [ $PROGRESS_TYPE = console ] ; then
-	export FILECOPY_TOTAL_SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
-fi
-set -e
-/usr/lib/qubes/qrexec-client-vm $VM qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
-rm -rf "$@"
+. qvm-copy-to-vm "$@" &&
+rm -rf -- "$@"
