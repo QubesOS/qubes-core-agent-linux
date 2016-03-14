@@ -249,9 +249,9 @@ install-common:
 	mkdir -p $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 
 ifeq ($(shell lsb_release -is), Debian)
-	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+	install -m 0644 misc/qubesxdg.py $(DESTDIR)/$(PYTHON2_SITELIB)/
 else
-	install -m 0644 misc/py2/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+	install -m 0644 misc/py2/qubesxdg.py* $(DESTDIR)/$(PYTHON2_SITELIB)/
 endif
 
 	install -d $(DESTDIR)/mnt/removable
