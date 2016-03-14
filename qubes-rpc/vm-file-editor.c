@@ -12,6 +12,7 @@
 
 #define USER_HOME "/home/user"
 #define TMP_LOC "/tmp/qopen/"
+// #define DEBUG
 
 static const char *cleanup_filename = NULL;
 
@@ -154,7 +155,9 @@ main()
 		perror("stat pre");
 		exit(1);
 	}
+#ifdef DEBUG
 	fprintf(stderr, "time=%s, waiting for qubes-session\n", gettime());
+#endif
 	// wait for X server to starts (especially in DispVM)
 	if (stat("/tmp/qubes-session-env", &session_stat)) {
 		switch (child = fork()) {
@@ -183,7 +186,9 @@ main()
 				}
 		}
 	}
+#ifdef DEBUG
 	fprintf(stderr, "time=%s, starting editor\n", gettime());
+#endif
 	switch (child = fork()) {
 		case -1:
 			perror("fork");
