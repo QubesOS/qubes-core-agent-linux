@@ -559,6 +559,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/qubes/init/mount-dirs.sh
 /usr/lib/qubes/init/qubes-random-seed.sh
 /usr/lib/qubes/init/qubes-sysinit.sh
+/usr/lib/qubes/init/bind-dirs.sh
 /lib/systemd/system/chronyd.service.d/30_qubes.conf
 /lib/systemd/system/crond.service.d/30_qubes.conf
 /lib/systemd/system/cups.service.d/30_qubes.conf
