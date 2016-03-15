@@ -1,3 +1,25 @@
+qubes-core-agent (3.1.15-1) wheezy; urgency=medium
+
+  [ Rusty Bird ]
+  * qvm-move-to-vm: Remove duplicated code
+  * qvm-move-to-vm: Use '--' before file arguments
+  * Use && in qvm-move-to-vm
+
+  [ Patrick Schleizer ]
+  * disable systemd-timesyncd
+
+  [ Andrew ]
+  * Use proper space-expanded tabs, as per the coding guidelines.
+  * Move usage information printing to separate function, and print
+    usage to stderr; also added some spacing.
+  * Use proper quoting around variables.
+  * Properly handle case of empty domain name.
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes.SuspendPreAll and qubes.SuspendPostAll services
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 15 Mar 2016 23:54:12 +0100
+
 qubes-core-agent (3.1.14-1) wheezy; urgency=medium
 
   * network: use `qubes-primary-dns` QubesDB entry if present
