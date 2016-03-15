@@ -1,0 +1,2 @@
+All executable files with `.sh` suffix in this directory will be executed as
+root just before host suspend.
