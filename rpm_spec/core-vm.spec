@@ -337,7 +337,9 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.VMShell
 %config(noreplace) /etc/qubes-rpc/qubes.SyncNtpClock
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPre
+%config(noreplace) /etc/qubes-rpc/qubes.SuspendPreAll
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPost
+%config(noreplace) /etc/qubes-rpc/qubes.SuspendPostAll
 %config(noreplace) /etc/qubes-rpc/qubes.WaitForSession
 %config(noreplace) /etc/qubes-rpc/qubes.DetachPciDevice
 %config(noreplace) /etc/qubes-rpc/qubes.Backup
@@ -350,6 +352,10 @@ rm -f %{name}-%{version}
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
+%dir /etc/qubes/suspend-pre.d
+/etc/qubes/suspend-pre.d/README
+%dir /etc/qubes/suspend-post.d
+/etc/qubes/suspend-post.d/README
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
