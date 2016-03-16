@@ -5,7 +5,7 @@ ICON_MAXSIZE=512
 
 if [ "${filename%%:*}" = xdgicon ]; then
     filename="$(/usr/lib/qubes/xdg-icon "${filename#*:}" "$ICON_MAXSIZE")"
-    forcesize="$ICON_MAXSIZE"
+    #forcesize="$ICON_MAXSIZE"
 
     [ -n "${filename}" ]
 elif [ "${filename}" = "-" ] || [ "${filename##*:}" = "-" ]; then
