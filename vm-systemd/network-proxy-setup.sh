@@ -5,9 +5,9 @@ network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
 if [ "x$network" != "x" ]; then
 
     if [ -e /proc/sys/kernel ] && ! [ -e /proc/sys/kernel/modules_disabled ]; then
-      readonly modprobe_fail_cmd='true'
+        readonly modprobe_fail_cmd='true'
     else
-      readonly modprobe_fail_cmd='false'
+        readonly modprobe_fail_cmd='false'
     fi
 
     gateway=$(qubesdb-read /qubes-netvm-gateway)
