@@ -82,7 +82,6 @@ int main(int argc, char **argv)
     char *abs_exec_path;
     pid_t child_pid = 0;
     int inpipe[2], outpipe[2];
-    char pid_s[10];
 
     if (argc < 3) {
         fprintf(stderr,
@@ -123,8 +122,7 @@ int main(int argc, char **argv)
             perror("socketpair");
             exit(1);
         }
-        snprintf(pid_s, sizeof(pid_s), "%d", getpid());
-        setenv("QREXEC_AGENT_PID", pid_s, 1);
+        prepare_child_env();
 
         switch (child_pid = fork()) {
             case -1:

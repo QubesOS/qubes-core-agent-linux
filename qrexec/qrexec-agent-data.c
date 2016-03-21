@@ -57,6 +57,15 @@ static void sigusr1_handler(int __attribute__((__unused__))x)
     signal(SIGUSR1, SIG_IGN);
 }
 
+void prepare_child_env() {
+    char pid_s[10];
+
+    signal(SIGCHLD, sigchld_handler);
+    signal(SIGUSR1, sigusr1_handler);
+    snprintf(pid_s, sizeof(pid_s), "%d", getpid());
+    setenv("QREXEC_AGENT_PID", pid_s, 1);
+}
+
 int handle_handshake(libvchan_t *ctrl)
 {
     struct msg_header hdr;
@@ -482,7 +491,6 @@ int handle_new_process_common(int type, int connect_domain, int connect_port,
     libvchan_t *data_vchan;
     int exit_code = 0;
     pid_t pid;
-    char pid_s[10];
 
     if (type != MSG_SERVICE_CONNECT) {
         assert(cmdline != NULL);
@@ -503,10 +511,7 @@ int handle_new_process_common(int type, int connect_domain, int connect_port,
     }
     handle_handshake(data_vchan);
 
-    signal(SIGCHLD, sigchld_handler);
-    signal(SIGUSR1, sigusr1_handler);
-    snprintf(pid_s, sizeof(pid_s), "%d", getpid());
-    setenv("QREXEC_AGENT_PID", pid_s, 1);
+    prepare_child_env();
     /* TODO: use setresuid to allow child process to actually send the signal? */
 
     switch (type) {
