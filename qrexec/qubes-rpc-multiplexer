@@ -22,19 +22,26 @@ if ! [ $# = 2 ] ; then
 	exit 1
 fi
 export QREXEC_REMOTE_DOMAIN="$2"
+export QREXEC_SERVICE_FULL_NAME="$1"
+SERVICE_WITHOUT_ARGUMENT="${1%%+*}"
+if [ "${QREXEC_SERVICE_FULL_NAME}" != "${SERVICE_WITHOUT_ARGUMENT}" ]; then
+    export QREXEC_SERVICE_ARGUMENT="${QREXEC_SERVICE_FULL_NAME#*+}"
+fi
 
-for CFG_FILE in $LOCAL_QUBES_RPC/"$1" $QUBES_RPC/"$1"; do
+for CFG_FILE in $LOCAL_QUBES_RPC/"$1" $QUBES_RPC/"$1" \
+        $LOCAL_QUBES_RPC/"${SERVICE_WITHOUT_ARGUMENT}" \
+        $QUBES_RPC/"${SERVICE_WITHOUT_ARGUMENT}"; do
 	if [ -s "$CFG_FILE" ]; then
         break
 	fi
 done
 
 if [ -x "$CFG_FILE" ] ; then
-	exec "$CFG_FILE"
+	exec "$CFG_FILE" ${QREXEC_SERVICE_ARGUMENT}
 	echo "$0: failed to execute handler for" "$1" >&2
 	exit 1
 else
-	exec /bin/sh "$CFG_FILE"
+	exec /bin/sh -- "$CFG_FILE" ${QREXEC_SERVICE_ARGUMENT}
 	echo "$0: failed to execute handler for" "$1" >&2
 	exit 1
 fi
