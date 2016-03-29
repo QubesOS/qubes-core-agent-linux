@@ -1,3 +1,20 @@
+qubes-core-agent (3.1.16-1) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * use 'true' rather than ':' for consistency (cherry picked from
+    commit 77d51a69ea294b76c9d5d2d79554c4607b1c0288)
+  * minor indent (cherry picked from commit
+    5a1ea4f5e5961503263b8b91f8eaddb2adb16b38)
+
+  [ Rusty Bird ]
+  * Remove exec in last line of qvm-copy-to-vm
+
+  [ Marek Marczykowski-Górecki ]
+  * network: run setup-ip only on xen frontend interfaces
+  * qubes-rpc: fix SVG icon scaling
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 Mar 2016 17:27:21 +0200
+
 qubes-core-agent (3.1.15-1) wheezy; urgency=medium
 
   [ Rusty Bird ]
