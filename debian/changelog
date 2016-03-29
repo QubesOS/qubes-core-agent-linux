@@ -1,3 +1,56 @@
+qubes-core-agent (3.2.0-1) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * disable systemd-timesyncd
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: write service stderr to both syslog and caller
+  * qrexec: hide timing debug messages in vm-file-editor
+
+  [ Patrick Schleizer ]
+  * do not start the Tor service inside Qubes TemplateVMs
+  * work on bind-dirs https://phabricator.whonix.org/T414
+  * work on bind-dirs
+  * work on bind-dirs
+  * renamed:    misc/bind-dirs -> vm-systemd/bind-dirs
+  * renamed:    bind-dirs -> bind-dirs.sh
+  * run /usr/lib/qubes/bind-dirs.sh from mount-dirs.sh
+  * use symlink_level_max rather than hardcoding 10; comment
+  * also exit from bind-directories if file /var/run/qubes-service/qubes-
+    dvm exists
+  * fixed broken file copy for files in multi level directories
+  * refactoring / code simplification
+
+  [ Rusty Bird ]
+  * qvm-move-to-vm: Remove duplicated code
+  * qvm-move-to-vm: Use '--' before file arguments
+  * Use && in qvm-move-to-vm
+
+  [ Andrew ]
+  * Use proper space-expanded tabs, as per the coding guidelines.
+  * Move usage information printing to separate function, and print
+    usage to stderr; also added some spacing.
+  * Use proper quoting around variables.
+  * Properly handle case of empty domain name.
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: Add bind-dirs.sh to spec file
+  * qubes.SuspendPreAll and qubes.SuspendPostAll services
+  * qrexec: unify service environment preparation
+
+  [ Patrick Schleizer ]
+  * use 'true' rather than ':' for consistency
+  * minor indent
+
+  [ Rusty Bird ]
+  * Remove exec in last line of qvm-copy-to-vm
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: add service argument support
+  * network: run setup-ip only on xen frontend interfaces
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 Mar 2016 14:41:34 +0200
+
 qubes-core-agent (3.1.14-1) wheezy; urgency=medium
 
   * network: use `qubes-primary-dns` QubesDB entry if present
