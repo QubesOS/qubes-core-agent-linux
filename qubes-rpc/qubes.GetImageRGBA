@@ -5,7 +5,7 @@ ICON_MAXSIZE=512
 
 if [ "${filename%%:*}" = xdgicon ]; then
     filename="$(/usr/lib/qubes/xdg-icon "${filename#*:}" "$ICON_MAXSIZE")"
-    forcesize="$ICON_MAXSIZE"
+    forcemaxsize="$ICON_MAXSIZE"
 
     [ -n "${filename}" ]
 elif [ "${filename}" = "-" ] || [ "${filename##*:}" = "-" ]; then
@@ -25,12 +25,17 @@ w="$(echo "$s"|cut -d " " -f 1)"
 h="$(echo "$s"|cut -d " " -f 2)"
 m="$(echo "$s"|cut -d " " -f 3)"
 if [ "$m" = SVG ]; then
-    if [ -n "$forcesize" ]; then
-        w="$forcesize"
-        h="$forcesize"
-    fi
     tmpfile2="$(mktemp /tmp/qimg-XXXXXXXX.png)"
-    rsvg-convert -w "$w" -h "$h" -o "$tmpfile2" "$filename"
+    rsvg-convert -o "$tmpfile2" "$filename"
+    # downscale the image if necessary
+    if [ -n "$forcemaxsize" -a 
+            ( "$w" -gt "$forcemaxsize" -o "$h" -gt "$forcemaxsize" ) ]; then
+        convert "$tmpfile2" -scale "${forcemaxsize}x${forcemaxsize}" "$tmpfile2"
+        # read the size again, because icon may not be a square
+        s="$(identify -format '%w %h' "$tmpfile2")"
+        w="$(echo "$s"|cut -d " " -f 1)"
+        h="$(echo "$s"|cut -d " " -f 2)"
+    fi
     filename="$tmpfile2"
 fi
 echo "$w $h"
