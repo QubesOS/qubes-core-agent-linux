@@ -90,4 +90,4 @@ else
     mount /home
 fi
 
-/usr/lib/qubes/bind-dirs.sh
+/usr/lib/qubes/init/bind-dirs.sh
