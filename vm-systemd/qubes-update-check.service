@@ -5,5 +5,4 @@ After=qubes-qrexec-agent.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c 'if [ -e /etc/debian_version ]; then apt-get -q update; fi'
 ExecStart=/usr/lib/qubes/upgrades-status-notify
