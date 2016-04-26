@@ -214,22 +214,38 @@ grep -q "$APPENDLINE" "$FILE" || sed "/$APPENDAFTERLINE/a$APPENDLINE" -i "$FILE"
 
 update_finalize() {
 
+	# Archlinux specific: Prepare pacman.conf to add qubes specific config
+	QUBES_MARKER="### QUBES CONFIG MARKER ###"
+	config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "$QUBES_MARKER"
+
 	# Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
-	if [ -z "`cat /etc/pam.d/su | grep system-login`" ] ; then
+	# Also remove pam_unix.so from su configuration
+	# as system-login (which include system-auth) already gives pam_unix.so
+	# with more appropriate parameters (fix the missing nullok parameter)
+
+	if [ -n "`cat /etc/pam.d/su | grep pam_unix.so`" ] ; then
 		echo "Fixing pam.d"
-		sed '/auth\t\trequired\tpam_unix.so/aauth\t\tinclude\t\tsystem-login' -i /etc/pam.d/su
-		sed '/account\t\trequired\tpam_unix.so/aaccount\t\tinclude\t\tsystem-login' -i /etc/pam.d/su
-		sed '/session\t\trequired\tpam_unix.so/asession\t\tinclude\t\tsystem-login' -i /etc/pam.d/su
+		cat <<EOF > /etc/pam.d/su
+#%PAM-1.0
+auth		sufficient	pam_rootok.so
+# Uncomment the following line to implicitly trust users in the "wheel" group.
+#auth		sufficient	pam_wheel.so trust use_uid
+# Uncomment the following line to require a user to be in the "wheel" group.
+#auth		required	pam_wheel.so use_uid
+auth		include		system-login
+account		include         system-login
+session		include		system-login
+EOF
 		cp /etc/pam.d/su /etc/pam.d/su-l
+		
+		echo "Ensure pam.d will not be modified by archlinux package updates"
+		config_appendtomark '/etc/pacman.conf' "$QUBES_MARKER" 'NoUpgrade = etc/pam.d/su'
+		config_appendtomark '/etc/pacman.conf' "$QUBES_MARKER" 'NoUpgrade = etc/pam.d/su-l'		
 	fi
 
 	# Archlinux specific: ensure tty1 is enabled
 	rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
 	systemctl enable getty\@tty1.service
-
-	# Archlinux specific: Prepare pacman.conf to add qubes specific config
-	QUBES_MARKER="### QUBES CONFIG MARKER ###"
-	config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "$QUBES_MARKER"
 	
 	# Add Qubes setup script markers at the right place (this won't work at the end of pacman.conf)"
 	config_appendtomark "/etc/pacman.conf" "$QUBES_MARKER" "### QUBES END ###"
