@@ -44,15 +44,20 @@ init() {
    [ -n "$rw_dest_dir" ] || rw_dest_dir="/rw/bind-dirs"
    [ -n "$symlink_level_max" ] || symlink_level_max="10"
    mkdir --parents "$rw_dest_dir"
+   shopt -s nullglob
+   shopt -s dotglob
 }
 
 legacy() {
-   if [ -d /rw/srv/qubes-whonix ]; then
-      mv /rw/srv/qubes-whonix /rw/bind-dirs || true
-   fi
-   if [ -d /rw/srv/whonix ]; then
-      mv /rw/srv/whonix /rw/bind-dirs || true
-   fi
+   local item
+   for item in /rw/srv/qubes-whonix/* /rw/srv/whonix/*; do
+      mv "$item" /rw/bind-dirs/ || true
+   done
+   for item in /rw/srv/qubes-whonix /rw/srv/whonix; do
+      if [ -d "$item" ]; then
+         rmdir "$item" || true
+      fi
+   done
 }
 
 bind_dirs() {
