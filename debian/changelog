@@ -1,3 +1,11 @@
+qubes-core-agent (3.0.26-1) wheezy; urgency=medium
+
+  * network: use `qubes-primary-dns` QubesDB entry if present
+  * qubes.SuspendPreAll and qubes.SuspendPostAll services
+  * network: run setup-ip only on xen frontend interfaces
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 01 May 2016 22:36:43 +0200
+
 qubes-core-agent (3.0.25-1) wheezy; urgency=medium
 
   [ adrianx64 ]
