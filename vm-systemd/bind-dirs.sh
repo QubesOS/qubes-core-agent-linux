@@ -130,3 +130,5 @@ for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/confi
 done
 
 main "$@"
+
+true "OK: END."
