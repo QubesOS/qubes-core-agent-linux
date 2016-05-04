@@ -1,3 +1,23 @@
+qubes-core-agent (3.2.1-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes-rpc: fix SVG icon scaling
+  * Fix bind-dirs.sh path
+
+  [ Olivier MEDOC ]
+  * archlinux: fix remaining loginctl privilege issues with invalid
+    pam.d configuration
+
+  [ Marek Marczykowski-Górecki ]
+  * Remove obsolete policy files
+
+  [ Patrick Schleizer ]
+  * fixed bind-dirs legacy import function
+  * fixed sh syntax error
+  * minor debug xtrace output
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 05 May 2016 00:05:13 +0200
+
 qubes-core-agent (3.2.0-1) wheezy; urgency=medium
 
   [ Patrick Schleizer ]
