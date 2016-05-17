@@ -1,0 +1,16 @@
+#!/bin/sh
+
+read url
+
+case "$url" in
+    http://*|\
+    https://*|\
+    ftp://*)
+        exec qubes-open "$url"
+        ;;
+    *)
+        echo "Invalid URL" >&2
+        exit 1
+        ;;
+esac
+

@@ -333,6 +333,7 @@ rm -f %{name}-%{version}
 %dir /etc/qubes-rpc
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
 %config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
+%config(noreplace) /etc/qubes-rpc/qubes.OpenURL
 %config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
 %config(noreplace) /etc/qubes-rpc/qubes.VMShell
 %config(noreplace) /etc/qubes-rpc/qubes.SyncNtpClock
@@ -415,7 +416,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/setup-ip
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
-/usr/lib/qubes/wrap-in-html-if-url.sh
 /usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/close-window
 /usr/lib/qubes/xdg-icon

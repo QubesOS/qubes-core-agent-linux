@@ -24,6 +24,12 @@ if ! [ $# = 2 ] ; then
 	echo "Usage: $0 vmname filename"
 	exit 1
 fi
-. /usr/lib/qubes/wrap-in-html-if-url.sh
-wrap_in_html_if_url "$2"
-exec /usr/lib/qubes/qrexec-client-vm "$1" qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" "$FILE_ARGUMENT"
+
+case "$2" in
+	*://*)
+        exec /usr/lib/qubes/qrexec-client-vm "$1" qubes.OpenURL /bin/echo "$2"
+        ;;
+    *)
+        exec /usr/lib/qubes/qrexec-client-vm "$1" qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" "$2"
+        ;;
+esac
