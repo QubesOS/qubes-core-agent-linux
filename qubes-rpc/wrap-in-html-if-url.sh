@@ -6,9 +6,10 @@ wrap_in_html_if_url()
 	*://*)
 		FILE_ARGUMENT=$(mktemp)
 
-		echo -n '<html><meta HTTP-EQUIV="REFRESH" content="0; url=' > $FILE_ARGUMENT
-		echo -n "$1" >> $FILE_ARGUMENT
-		echo '"></html>' >> $FILE_ARGUMENT
+		echo -n '<html><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>'
+        echo -n '<meta HTTP-EQUIV="REFRESH" content="0; url=' > $FILE_ARGUMENT
+		echo -n "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g' >> $FILE_ARGUMENT
+		echo '"/></html>' >> $FILE_ARGUMENT
 		;;
 	*)
 		FILE_ARGUMENT="$1"
