@@ -1,3 +1,11 @@
+qubes-core-agent (3.2.2-1) wheezy; urgency=medium
+
+  * systemd: order units checking for qubes-service after qubes-sysinit
+  * qvm-open-in-vm: escape URL when wrapping it in HTML
+  * Implement qubes.OpenURL service instead of wrapping URLs in HTML
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 18 May 2016 03:00:12 +0200
+
 qubes-core-agent (3.2.1-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
