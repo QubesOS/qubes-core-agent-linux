@@ -1,0 +1,81 @@
+#!/usr/bin/env python2
+# vim: fileencoding=utf-8
+
+#
+# The Qubes OS Project, https://www.qubes-os.org/
+#
+# Copyright (C) 2010-2016  Joanna Rutkowska <joanna@invisiblethingslab.com>
+# Copyright (C)      2016  Wojtek Porczyk <woju@invisiblethingslab.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+import argparse
+import os
+import subprocess
+import sys
+
+import qubesdb
+
+class FeatureRequestAction(argparse.Action):
+    '''Action for argument parser that stores a property.'''
+    # pylint: disable=redefined-builtin,too-few-public-methods
+    def __init__(self,
+            option_strings,
+            dest='features',
+            metavar='NAME=VALUE',
+            required=False,
+            help='request a feature with the value'):
+        super(FeatureRequestAction, self).__init__(option_strings, dest=dest,
+            metavar=metavar, nargs='*', required=required, default={},
+            help=help)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        for request in values:
+            try:
+                feature, value = request.split('=', 1)
+            except ValueError:
+                parser.error(
+                    'invalid feature request token: {!r}'.format(request))
+
+            getattr(namespace, self.dest)[feature] = value
+
+
+parser = argparse.ArgumentParser(
+    description='submit a feature request to the dom0')
+
+parser.add_argument('--commit',
+    action='store_true', default=False,
+    help='actually send the request (without it, only make entries in qubesdb)')
+
+parser.add_argument('features',
+    action=FeatureRequestAction)
+
+
+def main(args=None):
+    args = parser.parse_args(args)
+
+    qdb = qubesdb.QubesDB()
+    for feature, value in args.features.items():
+        qdb.write('/features-request/' + feature, value)
+
+    if args.commit:
+        devnull = os.open(os.devnull, os.O_RDWR)
+        subprocess.check_call(
+            ['qrexec-client-vm', 'dom0', 'qubes.FeaturesRequest'],
+            stdin=devnull, stdout=devnull)
+
+if __name__ == '__main__':
+    sys.exit(main())
