@@ -468,6 +468,7 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-open-in-vm
 /usr/bin/qvm-run
 /usr/bin/qvm-mru-entry
+/usr/bin/qvm-features-request
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
 /usr/bin/qubes-open
