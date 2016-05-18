@@ -1,30 +1,30 @@
-[qubes-vm-r3.1-current]
+[qubes-vm-r3.2-current]
 name = Qubes OS Repository for VM (updates)
-baseurl = http://yum.qubes-os.org/r3.1/current/vm/fc$releasever
+baseurl = http://yum.qubes-os.org/r3.2/current/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
 skip_if_unavailable=False
 gpgcheck = 1
 enabled=1
 
-[qubes-vm-r3.1-current-testing]
+[qubes-vm-r3.2-current-testing]
 name = Qubes OS Repository for VM (updates-testing)
-baseurl = http://yum.qubes-os.org/r3.1/current-testing/vm/fc$releasever
+baseurl = http://yum.qubes-os.org/r3.2/current-testing/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
 skip_if_unavailable=False
 gpgcheck = 1
 enabled=0
 
-[qubes-vm-r3.1-security-testing]
+[qubes-vm-r3.2-security-testing]
 name = Qubes OS Repository for VM (security-testing)
-baseurl = http://yum.qubes-os.org/r3.1/security-testing/vm/fc$releasever
+baseurl = http://yum.qubes-os.org/r3.2/security-testing/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-primary
 skip_if_unavailable=False
 gpgcheck = 1
 enabled=0
 
-[qubes-vm-r3.1-unstable]
+[qubes-vm-r3.2-unstable]
 name = Qubes OS Repository for VM (unstable)
-baseurl = http://yum.qubes-os.org/r3.1/unstable/vm/fc$releasever
+baseurl = http://yum.qubes-os.org/r3.2/unstable/vm/fc$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-3-unstable
 gpgcheck = 1
 enabled=0
