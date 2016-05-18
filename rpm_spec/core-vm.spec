@@ -74,7 +74,7 @@ Requires:   python3-dnf-plugins-qubes-hooks
 Requires:   python2-dnf-plugins-qubes-hooks
 %endif
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
-Obsoletes:  qubes-upgrade-vm < 3.1
+Obsoletes:  qubes-upgrade-vm < 3.2
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
