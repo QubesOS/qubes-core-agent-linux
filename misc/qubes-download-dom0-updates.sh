@@ -7,6 +7,8 @@ GUI=1
 CLEAN=0
 CHECK_ONLY=0
 OPTS="--installroot $DOM0_UPDATES_DIR --config=$DOM0_UPDATES_DIR/etc/yum.conf"
+# DNF uses /etc/yum.repos.d, even when --installroot is specified
+OPTS="$OPTS --setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d"
 PKGLIST=
 YUM_ACTION=
 
@@ -50,11 +52,8 @@ if [ -z "$YUM_ACTION" ]; then
 fi
 
 YUM="yum"
-# prefer yum-deprecated over dnf, because of still missing features in dnf (at least --downloaddir)
-if type dnf >/dev/null 2>&1 && type yum-deprecated >/dev/null 2>&1; then
-    echo "(Note: dnf will complain that the yum command has been deprecated." >&2
-    echo "This message is safe to ignore.)" >&2
-    YUM="yum-deprecated"
+if type dnf >/dev/null 2>&1; then
+    YUM="dnf"
 fi
 
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
@@ -78,6 +77,7 @@ rpm --root=$DOM0_UPDATES_DIR --rebuilddb
 if [ "$CLEAN" = "1" ]; then
     $YUM $OPTS clean all
     rm -f $DOM0_UPDATES_DIR/packages/*
+    rm -f $DOM0_UPDATES_DIR/var/cache/yum/*
 fi
 
 if [ "x$PKGLIST" = "x" ]; then
@@ -119,7 +119,7 @@ if [ "$DOIT" != "1" -a "$PKGS_FROM_CMDLINE" != "1" ]; then
       --text="There are updates for dom0 available, do you want to download them now?" || exit 0
 fi
 
-YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y --downloadonly --downloaddir=$DOM0_UPDATES_DIR/packages"
+YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y --downloadonly"
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
 if ! $YUM --help | grep -q downloadonly; then
@@ -149,6 +149,9 @@ if [ "$GUI" = 1 ]; then
 else
     $YUM_COMMAND $OPTS $PKGLIST
 fi
+
+find $DOM0_UPDATES_DIR/var/cache/yum -name '*.rpm' -print0 |\
+    xargs -0 -r ln -f -t $DOM0_UPDATES_DIR/packages/
 
 if ls $DOM0_UPDATES_DIR/packages/*.rpm > /dev/null 2>&1; then
     cmd="/usr/lib/qubes/qrexec-client-vm dom0 qubes.ReceiveUpdates /usr/lib/qubes/qfile-agent"
