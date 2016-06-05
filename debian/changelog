@@ -1,3 +1,20 @@
+qubes-core-agent (3.2.4-1) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * fix indent
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: use dnf when available
+  * Prefer 'dnf' over 'yum' for template update
+
+  [ unman ]
+  * Fall back to gnome utilities if kdialog not present
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: initial version
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 05 Jun 2016 22:10:58 +0200
+
 qubes-core-agent (3.2.3-1) wheezy; urgency=medium
 
   * Cleanup R3.1->R3.2 transitional package
