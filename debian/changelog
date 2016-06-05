@@ -1,3 +1,10 @@
+qubes-core-agent (3.2.5-1) wheezy; urgency=medium
+
+  * travis: add fc24 build
+  * debian: add missing pkg-config build depends
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 06 Jun 2016 00:18:54 +0200
+
 qubes-core-agent (3.2.4-1) wheezy; urgency=medium
 
   [ Patrick Schleizer ]
