@@ -53,7 +53,7 @@ fi
 
 YUM="yum"
 if type dnf >/dev/null 2>&1; then
-    YUM="dnf"
+    YUM="dnf --best --allowerasing"
 fi
 
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
