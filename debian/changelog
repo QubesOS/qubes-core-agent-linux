@@ -1,3 +1,36 @@
+qubes-core-agent (3.1.17-1) wheezy; urgency=medium
+
+  [ Olivier MEDOC ]
+  * archlinux: fix remaining loginctl privilege issues with invalid
+    pam.d configuration
+
+  [ Marek Marczykowski-Górecki ]
+  * Remove obsolete policy files
+
+  [ Patrick Schleizer ]
+  * fixed sh syntax error
+  * do not start the Tor service inside Qubes TemplateVMs
+
+  [ Marek Marczykowski-Górecki ]
+  * systemd: order units checking for qubes-service after qubes-sysinit
+  * qvm-open-in-vm: escape URL when wrapping it in HTML
+
+  [ Patrick Schleizer ]
+  * fix indent (cherry picked from commit
+    3db93cdc87e75474429207871543491f18ac9afc)
+
+  [ unman ]
+  * Fall back to gnome utilities if kdialog not present
+
+  [ Marek Marczykowski-Górecki ]
+  * Prefer 'dnf' over 'yum' for template update
+  * debian: add missing pkg-config build depends
+
+  [ Patrick Schleizer ]
+  * Do not start tor@default service in TemplateVM.
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 25 Jun 2016 15:48:12 +0200
+
 qubes-core-agent (3.1.16-1) wheezy; urgency=medium
 
   [ Patrick Schleizer ]
