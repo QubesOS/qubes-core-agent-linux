@@ -1,6 +1,6 @@
 [Unit]
 Description=Qubes remote exec agent
-After=qubes-dvm.service
+After=qubes-dvm.service xendriverdomain.service
 
 [Service]
 ExecStartPre=/bin/sh -c '[ -e /dev/xen/evtchn ] || modprobe xen_evtchn'
