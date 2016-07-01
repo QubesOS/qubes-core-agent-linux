@@ -22,6 +22,6 @@ if true; then
     echo "Waiting for save/restore..."
     qubesdb-read /qubes-restore-complete || wait $watch_pid
     echo Back to life.
-    systemctl --no-block restart qubes-random-seed.service
+    systemctl restart qubes-random-seed.service
 fi
 
