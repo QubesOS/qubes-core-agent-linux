@@ -115,6 +115,7 @@ if [ -e /etc/dnf/dnf.conf ]; then
 fi
 
 # The same goes for PackageKit...
+# https://bugs.freedesktop.org/show_bug.cgi?id=96788
 if [ -e /etc/PackageKit/PackageKit.conf ]; then
     update_conf /etc/PackageKit/PackageKit.conf "ProxyHTTP=$PROXY_ADDR"
 fi
