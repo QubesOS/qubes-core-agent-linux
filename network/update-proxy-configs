@@ -109,6 +109,7 @@ EOF
 fi
 
 # DNF configuration doesn't support including other files
+# https://bugzilla.redhat.com/show_bug.cgi?id=1352234
 if [ -e /etc/dnf/dnf.conf ]; then
     update_conf /etc/dnf/dnf.conf "$PROXY_CONF_ENTRY"
 fi
