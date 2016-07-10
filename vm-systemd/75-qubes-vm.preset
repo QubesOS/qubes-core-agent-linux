@@ -74,3 +74,4 @@ enable qubes-iptables.service
 enable qubes-random-seed.service
 enable haveged.service
 enable chronyd.service
+enable xendriverdomain.service
