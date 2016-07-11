@@ -1,0 +1,11 @@
+[Trigger]
+Type = File
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Target = usr/share/applications/*.desktop
+
+[Action]
+Description = Updating the Qubes desktop file App Icons...
+When = PostTransaction
+Exec = /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
