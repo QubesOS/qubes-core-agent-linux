@@ -91,7 +91,7 @@ package() {
 
   # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
   mkdir -p ${pkgdir}/etc/pacman.d
-  install -m 644 $srcdir/PKGBUILD-qubes-noupgrade.conf ${pkgdir}/etc/pacman.d/qubes-noupgrade.conf
+  install -m 644 $srcdir/PKGBUILD-qubes-noupgrade.conf ${pkgdir}/etc/pacman.d/10-qubes-noupgrade.conf
 
   # Install pacman repository
   release=`echo $pkgver | cut -d '.' -f 1,2`
