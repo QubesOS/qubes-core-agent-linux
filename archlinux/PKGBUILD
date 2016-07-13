@@ -6,7 +6,7 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=7
+pkgrel=9
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
@@ -25,11 +25,18 @@ options=()
 install=PKGBUILD.install
 changelog=
 
-source=(PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook)
+source=(	PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook
+		PKGBUILD-qubes-noupgrade.conf
+		PKGBUILD-qubes-repo-3.1.conf
+		PKGBUILD-qubes-repo-3.2.conf
+		)
 
 noextract=()
-md5sums=('88f4b3d5b156888a9d38f5bc28702ab8' 'bbfb946d6d2787e5abf8e2236502a3d4')
-
+md5sums=( '88f4b3d5b156888a9d38f5bc28702ab8' 'bbfb946d6d2787e5abf8e2236502a3d4'
+          'c1c1b86eed48cc0f943f21b9a1df8b8e'
+	  '36bf82df048e81250e7ba80b3224bddc'
+	  'd5898def7bad7fd92ea60f0bf48174e3'
+          )
 
 build() {
 
@@ -81,6 +88,15 @@ package() {
   # Install pacman hook to update desktop icons
   mkdir -p ${pkgdir}/usr/share/libalpm/hooks/
   install -m 644 $srcdir/PKGBUILD.qubes-update-desktop-icons.hook ${pkgdir}/usr/share/libalpm/hooks/qubes-update-desktop-icons.hook
+
+  # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
+  mkdir -p ${pkgdir}/etc/pacman.d
+  install -m 644 $srcdir/PKGBUILD-qubes-noupgrade.conf ${pkgdir}/etc/pacman.d/10-qubes-noupgrade.conf
+
+  # Install pacman repository
+  release=`echo $pkgver | cut -d '.' -f 1,2`
+  echo "Installing repository for release ${release}"
+  install -m 644 $srcdir/PKGBUILD-qubes-repo-${release}.conf ${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf
 
   # Archlinux specific: enable autologin on tty1
   mkdir -p $pkgdir/etc/systemd/system/getty@tty1.service.d/
