@@ -1,3 +1,31 @@
+qubes-core-agent (3.2.6-1) wheezy; urgency=medium
+
+  [ Patrick Schleizer ]
+  * Do not start tor@default service in TemplateVM.
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: use dnf --best --allowerasing
+
+  [ Rusty Bird ]
+  * Order network management units after network-pre.target
+  * dvm, then xendriverdomain, then qrexec-agent
+  * *Do* block until good random is available again
+  * Remove 'if true' wrapper from
+    06a0d30d50ce4ea266532c06ef24880bf5363c1b
+  * Enable xendriverdomain.service in 75-qubes-vm.preset
+
+  [ Patrick Schleizer ]
+  * add comment
+  * add comment
+
+  [ Olivier MEDOC ]
+  * archlinux: update installer script in prevision of pacman.d drop-ins
+  * archlinux: provide automatic qubes-trigger-sync-appmenus through
+    pacman hooks
+  * archlinux: remove unnecessary glib-compile-scheme
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 13 Jul 2016 04:38:17 +0200
+
 qubes-core-agent (3.2.5-1) wheezy; urgency=medium
 
   * travis: add fc24 build
