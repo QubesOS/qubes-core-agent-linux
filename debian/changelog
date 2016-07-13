@@ -1,3 +1,20 @@
+qubes-core-agent (3.2.7-1) wheezy; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * systemd: preset xendriverdomain on update
+  * rpm: fix misleading systemd warnings during upgrade
+
+  [ Olivier MEDOC ]
+  * archlinux: switch to usage of pacman.d drop-ins
+  * archlinux: Setup default package repository
+  * archlinux: ensure repositories are the last pacman.d files included
+  * archlinux: fix update-proxy-configs to use pacman.d drop-ins
+
+  [ Patrick Schleizer ]
+  * fixed qubes-core-agent upgrading double package manager lock
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 13 Jul 2016 22:43:06 +0200
+
 qubes-core-agent (3.2.6-1) wheezy; urgency=medium
 
   [ Patrick Schleizer ]
