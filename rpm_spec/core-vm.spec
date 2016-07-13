@@ -600,8 +600,12 @@ else
     done
     /bin/systemctl --no-reload preset qubes-update-check.timer
     # Upgrade path - now qubes-iptables is used instead
-    /bin/systemctl --no-reload preset iptables.service
-    /bin/systemctl --no-reload preset ip6tables.service
+    if [ -f /lib/systemd/system/iptables.service ]; then
+        /bin/systemctl --no-reload preset iptables.service
+    fi
+    if [ -f /lib/systemd/system/ip6tables.service ]; then
+        /bin/systemctl --no-reload preset ip6tables.service
+    fi
 fi
 
 # Set default "runlevel"
