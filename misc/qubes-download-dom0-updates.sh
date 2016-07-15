@@ -77,7 +77,7 @@ rpm --root=$DOM0_UPDATES_DIR --rebuilddb
 if [ "$CLEAN" = "1" ]; then
     $YUM $OPTS clean all
     rm -f $DOM0_UPDATES_DIR/packages/*
-    rm -f $DOM0_UPDATES_DIR/var/cache/yum/*
+    rm -rf $DOM0_UPDATES_DIR/var/cache/yum/*
 fi
 
 if [ "x$PKGLIST" = "x" ]; then
