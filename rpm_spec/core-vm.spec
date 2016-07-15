@@ -593,7 +593,7 @@ else
     services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-dirs"
     services="$services qubes-netwatcher qubes-network qubes-sysinit"
     services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
-    services="$services qubes-random-seed xendriverdomain"
+    services="$services qubes-random-seed"
     for srv in $services; do
         /bin/systemctl --no-reload preset $srv.service
     done
