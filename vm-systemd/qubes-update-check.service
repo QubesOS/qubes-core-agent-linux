@@ -5,4 +5,4 @@ After=qubes-qrexec-agent.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/lib/qubes/upgrades-status-notify
+ExecStart=-/usr/lib/qubes/upgrades-status-notify
