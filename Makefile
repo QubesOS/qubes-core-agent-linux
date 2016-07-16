@@ -52,6 +52,7 @@ SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd
 SYSTEM_DROPINS += tinyproxy.service
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket
+SYSTEM_DROPINS += systemd-random-seed.service
 
 USER_DROPINS := pulseaudio.service pulseaudio.socket
 

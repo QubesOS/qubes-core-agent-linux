@@ -552,7 +552,6 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-update-check.timer
 /lib/systemd/system/qubes-updates-proxy.service
 /lib/systemd/system/qubes-qrexec-agent.service
-/lib/systemd/system/qubes-random-seed.service
 /lib/systemd/system-preset/75-qubes-vm.preset
 /lib/modules-load.d/qubes-core.conf
 /lib/modules-load.d/qubes-misc.conf
@@ -579,6 +578,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/NetworkManager.service.d/30_qubes.conf
 /lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
 /lib/systemd/system/ntpd.service.d/30_qubes.conf
+/lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
 /lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
 /lib/systemd/system/tmp.mount.d/30_qubes.conf
 /lib/systemd/user/pulseaudio.service.d/30_qubes.conf
@@ -594,7 +594,6 @@ else
     services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-dirs"
     services="$services qubes-netwatcher qubes-network qubes-sysinit"
     services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
-    services="$services qubes-random-seed"
     for srv in $services; do
         /bin/systemctl --no-reload preset $srv.service
     done

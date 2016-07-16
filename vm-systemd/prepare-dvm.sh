@@ -21,4 +21,4 @@ free | grep Mem: |
 echo "Waiting for save/restore..."
 qubesdb-read /qubes-restore-complete || wait $watch_pid
 echo Back to life.
-systemctl restart qubes-random-seed.service
+systemctl restart systemd-random-seed.service
