@@ -161,6 +161,7 @@ install-common:
 	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
 	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
 	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
+	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc
 
 	if [ -r misc/dispvm-dotfiles.$(DIST).tbz ] ; \
 	then \

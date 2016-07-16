@@ -436,6 +436,7 @@ rm -f %{name}-%{version}
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
 
 /usr/share/qubes/mime-override/globs
+/usr/share/qubes/qubes-master-key.asc
 %dir /home_volatile
 %attr(700,user,user) /home_volatile/user
 %dir /mnt/removable
