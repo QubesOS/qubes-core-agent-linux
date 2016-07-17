@@ -1,3 +1,13 @@
+qubes-core-agent (3.2.8-1) wheezy; urgency=medium
+
+  * dom0-updates: fix cleaning downloaded packages
+  * Revert "systemd: preset xendriverdomain on update"
+  * systemd: don't mark updates check service failed
+  * systemd: plug random seed loading into systemd-random-seed
+  * Include Qubes Master Key in the VM template
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 17 Jul 2016 04:27:04 +0200
+
 qubes-core-agent (3.2.7-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
