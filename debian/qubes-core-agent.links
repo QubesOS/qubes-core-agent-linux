@@ -1,0 +1,3 @@
+## compatibility symlink
+## https://github.com/QubesOS/qubes-issues/issues/2191
+/usr/lib/qubes/init/bind-dirs.sh /usr/lib/qubes/bind-dirs.sh
