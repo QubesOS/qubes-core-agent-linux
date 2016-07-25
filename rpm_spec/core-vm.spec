@@ -631,6 +631,14 @@ grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while 
     esac
 done
 
+# remove old symlinks
+if [ -L /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service ]; then
+    systemctl --no-reload disable qubes-random-seed.service >/dev/null
+fi
+if [ -L /etc/systemd/system/sysinit.target.wants/qubes-mount-home.service ]; then
+    systemctl --no-reload disable qubes-mount-home.service >/dev/null
+fi
+
 /bin/systemctl daemon-reload
 
 exit 0
