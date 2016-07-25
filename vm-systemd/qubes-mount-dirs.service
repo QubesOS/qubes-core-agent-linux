@@ -1,6 +1,8 @@
 [Unit]
 Description=Initialize and mount /rw and /home
-Before=qubes-gui-agent.service
+After=qubes-sysinit.service
+DefaultDependencies=no
+Before=local-fs.target qubes-gui-agent.service
 
 [Service]
 Type=oneshot
