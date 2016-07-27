@@ -53,6 +53,7 @@ SYSTEM_DROPINS += tinyproxy.service
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket
 SYSTEM_DROPINS += systemd-random-seed.service
+SYSTEM_DROPINS += tor.service tor@default.service
 
 USER_DROPINS := pulseaudio.service pulseaudio.socket
 
