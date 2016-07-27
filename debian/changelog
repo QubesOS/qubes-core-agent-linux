@@ -1,3 +1,10 @@
+qubes-core-agent (3.1.18-1) wheezy; urgency=medium
+
+  * upgrade: package for simplify upgrade from R3.1 to R3.2
+  * qvm-open-in-vm: fix wrapping URL in HTML file
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 28 Jul 2016 00:17:22 +0200
+
 qubes-core-agent (3.1.17-1) wheezy; urgency=medium
 
   [ Olivier MEDOC ]
