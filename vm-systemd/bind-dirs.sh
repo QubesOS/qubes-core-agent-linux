@@ -49,15 +49,7 @@ init() {
 }
 
 legacy() {
-   local item
-   for item in /rw/srv/qubes-whonix/* /rw/srv/whonix/*; do
-      mv "$item" /rw/bind-dirs/ || true
-   done
-   for item in /rw/srv/qubes-whonix /rw/srv/whonix; do
-      if [ -d "$item" ]; then
-         rmdir "$item" || true
-      fi
-   done
+   true
 }
 
 bind_dirs() {
