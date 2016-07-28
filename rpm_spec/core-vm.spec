@@ -635,10 +635,10 @@ done
 
 # remove old symlinks
 if [ -L /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service ]; then
-    systemctl --no-reload disable qubes-random-seed.service >/dev/null
+    rm /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service
 fi
 if [ -L /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service ]; then
-    systemctl --no-reload disable qubes-mount-home.service >/dev/null
+    rm /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service
 fi
 
 /bin/systemctl daemon-reload
