@@ -48,6 +48,8 @@ __EOF__
             echo "addresses1=$ip;32" >> $nm_config
         fi
         chmod 600 $nm_config
+        # reload connection
+        nmcli connection load $nm_config || :
     else
         # No NetworkManager enabled, configure the network manually
         /sbin/ifconfig $INTERFACE $ip netmask 255.255.255.255
