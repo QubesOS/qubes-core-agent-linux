@@ -49,6 +49,9 @@ init() {
 }
 
 legacy() {
+   ## The legacy function gets overwritten by Whonix:
+   ## https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-bind-dirs.d/41_qubes-whonix-legacy.conf
+   ## Please do not remove this legacy function without coordination with Whonix.
    true
 }
 
