@@ -1,3 +1,18 @@
+qubes-core-agent (3.2.10-1) wheezy; urgency=medium
+
+  [ HW42 ]
+  * systemd: fix qubes-mount-home path in cleanup script
+  * systemd: remove obsolete symlinks with rm instead of systemctl
+
+  [ Marek Marczykowski-Górecki ]
+  * network: reload NM connection after setting it up
+  * systemd: fix syntax error in preset file
+
+  [ Patrick Schleizer ]
+  * comment legacy function
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 08 Aug 2016 05:23:02 +0200
+
 qubes-core-agent (3.2.9-1) wheezy; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
