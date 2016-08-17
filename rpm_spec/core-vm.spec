@@ -350,6 +350,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetImageRGBA
 %config(noreplace) /etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/qubes-rpc/qubes.InstallUpdatesGUI
+%config(noreplace) /etc/qubes-rpc/qubes.ResizeDisk
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
