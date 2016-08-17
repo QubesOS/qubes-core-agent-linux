@@ -5,6 +5,7 @@ VERSION := $(shell cat version)
 DIST ?= fc18
 KDESERVICEDIR ?= /usr/share/kde4/services
 SBINDIR ?= /usr/sbin
+BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
@@ -151,7 +152,7 @@ install-common:
 
 	install -d $(DESTDIR)/var/lib/qubes
 
-	install -D misc/xenstore-watch $(DESTDIR)/usr/bin/xenstore-watch-qubes
+	install -D misc/xenstore-watch $(DESTDIR)$(BINDIR)/xenstore-watch-qubes
 	install -d $(DESTDIR)/etc/udev/rules.d
 	install -m 0644 misc/udev-qubes-misc.rules $(DESTDIR)/etc/udev/rules.d/50-qubes-misc.rules
 	install -d $(DESTDIR)$(LIBDIR)/qubes/
@@ -202,17 +203,18 @@ install-common:
 	install network/qubes-firewall $(DESTDIR)/$(SBINDIR)/
 	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
 
-	install -d $(DESTDIR)/usr/bin
-	install -m 0755 misc/qubes-session-autostart $(DESTDIR)/usr/bin/qubes-session-autostart
+	install -d $(DESTDIR)$(BINDIR)
+	install -m 0755 misc/qubes-session-autostart $(DESTDIR)$(BINDIR)/qubes-session-autostart
+	install -m 0755 misc/qvm-features-request $(DESTDIR)$(BINDIR)/qvm-features-request
+	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-move-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)$(BINDIR)
 
-	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-move-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
 	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-move-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-move-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/xdg-icon $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/qubes-open $(DESTDIR)/usr/bin
+	install qubes-rpc/qubes-open $(DESTDIR)$(BINDIR)
 	install qubes-rpc/tar2qfile $(DESTDIR)$(LIBDIR)/qubes
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
 	install -m 4755  qubes-rpc/qfile-unpacker $(DESTDIR)$(LIBDIR)/qubes
@@ -244,7 +246,7 @@ install-common:
 	install -d $(DESTDIR)/usr/share/nautilus-python/extensions
 	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
 
-	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)/usr/bin/qubes-desktop-run
+	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)$(BINDIR)/qubes-desktop-run
 
 	mkdir -p $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 
