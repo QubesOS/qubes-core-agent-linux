@@ -146,6 +146,11 @@ install-common:
 	$(MAKE) -C autostart-dropins install
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
+	# force /usr/bin before /bin to have /usr/bin/python instead of /bin/python
+	PATH="/usr/bin:$(PATH)" python setup.py install -O1 --root $(DESTDIR)
+	mkdir -p $(DESTDIR)$(SBINDIR)
+	mv $(DESTDIR)/usr/bin/qubes-firewall $(DESTDIR)$(SBINDIR)/qubes-firewall
+
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
 	install -D -m 0644 misc/20_tcp_timestamps.conf $(DESTDIR)/etc/sysctl.d/20_tcp_timestamps.conf
@@ -200,7 +205,6 @@ install-common:
 
 
 	install -d $(DESTDIR)/$(SBINDIR)
-	install network/qubes-firewall $(DESTDIR)/$(SBINDIR)/
 	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
 
 	install -d $(DESTDIR)$(BINDIR)

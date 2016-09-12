@@ -54,6 +54,8 @@ Requires:   pygobject3-base
 Requires:   dbus-python
 # for qubes-session-autostart, xdg-icon
 Requires:   pyxdg
+Requires:   python-daemon
+Requires:   nftables
 %if %{fedora} >= 20
 # gpk-update-viewer required by qubes-manager
 Requires:   gnome-packagekit-updater
@@ -436,6 +438,13 @@ rm -f %{name}-%{version}
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
+
+%dir %{python_sitelib}/qubesagent-*-py2.7.egg-info
+%{python_sitelib}/qubesagent-*-py2.7.egg-info/*
+%dir %{python_sitelib}/qubesagent
+%{python_sitelib}/qubesagent/__init__.py*
+%{python_sitelib}/qubesagent/firewall.py*
+%{python_sitelib}/qubesagent/test_firewall.py*
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc

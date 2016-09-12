@@ -38,6 +38,7 @@ Depends:
     net-tools,
     psmisc,
     python2.7,
+    python-daemon,
     python-gi,
     python-xdg,
     python-dbus,

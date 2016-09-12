@@ -17,6 +17,7 @@ COMMIT
 :INPUT ACCEPT [168:11399]
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [128:12536]
+:QBS-FORWARD - [0:0]
 -A INPUT -i vif+ -p udp -m udp --dport 68 -j DROP
 -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -i vif+ -p icmp -j ACCEPT
@@ -24,6 +25,7 @@ COMMIT
 -A INPUT -i vif+ -j REJECT --reject-with icmp-host-prohibited
 -A INPUT -j DROP
 -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -j QBS-FORWARD
 -A FORWARD -i vif+ -o vif+ -j DROP
 -A FORWARD -i vif+ -j ACCEPT
 -A FORWARD -j DROP
