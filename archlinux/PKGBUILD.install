@@ -158,7 +158,7 @@ if [ $1 -eq 1 ]; then
     systemctl --no-reload preset-all 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
 else
     services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-dirs"
-    services="$services qubes-netwatcher qubes-network qubes-sysinit"
+    services="$services qubes-network qubes-sysinit"
     services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
     services="$services qubes-random-seed"
     for srv in $services; do
@@ -357,7 +357,7 @@ post_remove() {
 
     rm -rf /var/lib/qubes/xdg
 
-    for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-netwatcher qubes-network qubes-qrexec-agent; do
+    for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-network qubes-qrexec-agent; do
         systemctl disable $srv.service
     done
     

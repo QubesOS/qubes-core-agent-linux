@@ -105,7 +105,6 @@ install-sysvinit:
 	install vm-init.d/qubes-core-appvm $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-core-netvm $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-firewall $(DESTDIR)/etc/init.d/
-	install vm-init.d/qubes-netwatcher $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-qrexec-agent $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
@@ -202,10 +201,6 @@ install-common:
 	install -m 0400 -D network/iptables $(DESTDIR)/etc/qubes/iptables.rules
 	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
 	install -m 0755 network/update-proxy-configs $(DESTDIR)$(LIBDIR)/qubes/
-
-
-	install -d $(DESTDIR)/$(SBINDIR)
-	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
 
 	install -d $(DESTDIR)$(BINDIR)
 	install -m 0755 misc/qubes-session-autostart $(DESTDIR)$(BINDIR)/qubes-session-autostart

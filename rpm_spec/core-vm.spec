@@ -430,7 +430,6 @@ rm -f %{name}-%{version}
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 /usr/lib/python2.7/site-packages/qubesxdg.py*
 /usr/sbin/qubes-firewall
-/usr/sbin/qubes-netwatcher
 /usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
 /usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.override
@@ -476,7 +475,6 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-core-appvm
 /etc/init.d/qubes-core-netvm
 /etc/init.d/qubes-firewall
-/etc/init.d/qubes-netwatcher
 /etc/init.d/qubes-iptables
 /etc/init.d/qubes-updates-proxy
 /etc/init.d/qubes-qrexec-agent
@@ -511,14 +509,15 @@ chkconfig --add qubes-core-appvm || echo "WARNING: Cannot add service qubes-core
 chkconfig qubes-core-appvm on || echo "WARNING: Cannot enable service qubes-core-appvm!"
 chkconfig --add qubes-firewall || echo "WARNING: Cannot add service qubes-firewall!"
 chkconfig qubes-firewall on || echo "WARNING: Cannot enable service qubes-firewall!"
-chkconfig --add qubes-netwatcher || echo "WARNING: Cannot add service qubes-netwatcher!"
-chkconfig qubes-netwatcher on || echo "WARNING: Cannot enable service qubes-netwatcher!"
 chkconfig --add qubes-iptables || echo "WARNING: Cannot add service qubes-iptables!"
 chkconfig qubes-iptables on || echo "WARNING: Cannot enable service qubes-iptables!"
 chkconfig --add qubes-updates-proxy || echo "WARNING: Cannot add service qubes-updates-proxy!"
 chkconfig qubes-updates-proxy on || echo "WARNING: Cannot enable service qubes-updates-proxy!"
 chkconfig --add qubes-qrexec-agent || echo "WARNING: Cannot add service qubes-qrexec-agent!"
 chkconfig qubes-qrexec-agent on || echo "WARNING: Cannot enable service qubes-qrexec-agent!"
+
+# dropped services
+chkconfig qubes-netwatcher off || :
 
 # TODO: make this not display the silly message about security context...
 sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
@@ -530,7 +529,6 @@ if [ "$1" = 0 ] ; then
     chkconfig qubes-core-netvm off
     chkconfig qubes-core-appvm off
     chkconfig qubes-firewall off
-    chkconfig qubes-netwatcher off
     chkconfig qubes-updates-proxy off
     chkconfig qubes-qrexec-agent off
 fi
@@ -556,7 +554,6 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-firewall.service
 /lib/systemd/system/qubes-mount-dirs.service
-/lib/systemd/system/qubes-netwatcher.service
 /lib/systemd/system/qubes-network.service
 /lib/systemd/system/qubes-iptables.service
 /lib/systemd/system/qubes-sysinit.service
@@ -606,7 +603,7 @@ if [ $1 -eq 1 ]; then
     /bin/systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
 else
     services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-dirs"
-    services="$services qubes-netwatcher qubes-network qubes-sysinit"
+    services="$services qubes-network qubes-sysinit"
     services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
     for srv in $services; do
         /bin/systemctl --no-reload preset $srv.service
@@ -620,6 +617,9 @@ else
         /bin/systemctl --no-reload preset ip6tables.service
     fi
 fi
+
+# dropped services
+/bin/systemctl disable qubes-netwatcher.service >/dev/null 2>&1 || :
 
 # Set default "runlevel"
 rm -f /etc/systemd/system/default.target
@@ -663,6 +663,6 @@ if [ "$1" != 0 ] ; then
     exit 0
 fi
 
-for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-netwatcher qubes-network qubes-qrexec-agent; do
+for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-network qubes-qrexec-agent; do
     /bin/systemctl disable $srv.service
 do
