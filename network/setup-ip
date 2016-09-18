@@ -77,8 +77,12 @@ __EOF__
         /usr/lib/qubes/qubes-setup-dnat-to-ns
     fi
     if [ "x$network" != "x" ]; then
-        [ -x /rw/config/qubes-ip-change-hook ] && /rw/config/qubes-ip-change-hook
+        if [ -x /rw/config/qubes-ip-change-hook ]; then
+            /rw/config/qubes-ip-change-hook
+        fi
         # XXX: Backward compatibility
-        [ -x /rw/config/qubes_ip_change_hook ] && /rw/config/qubes_ip_change_hook
+        if [ -x /rw/config/qubes_ip_change_hook ]; then
+            /rw/config/qubes_ip_change_hook
+        fi
     fi
 fi
