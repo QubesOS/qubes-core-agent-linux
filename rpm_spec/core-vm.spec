@@ -424,6 +424,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/upgrades-status-notify
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
+/usr/lib/NetworkManager/conf.d/30-qubes.conf
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher
