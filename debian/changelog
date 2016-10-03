@@ -1,3 +1,14 @@
+qubes-core-agent (3.2.11-1) wheezy; urgency=medium
+
+  [ HW42 ]
+  * bind-dirs: copy from ro only if bind target doesn't exists
+
+  [ Marek Marczykowski-Górecki ]
+  * network: minor setup-ip fix
+  * Configure NetworkManager to keep /etc/resolv.conf as plain file
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 03 Oct 2016 11:32:40 +0200
+
 qubes-core-agent (3.2.10-1) wheezy; urgency=medium
 
   [ HW42 ]
