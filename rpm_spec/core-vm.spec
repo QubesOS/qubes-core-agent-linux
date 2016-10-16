@@ -425,6 +425,8 @@ rm -f %{name}-%{version}
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 /usr/lib/NetworkManager/conf.d/30-qubes.conf
+%dir /usr/lib/qubes-bind-dirs.d
+/usr/lib/qubes-bind-dirs.d/30_cron.conf
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
 /usr/sbin/qubes-firewall
 /usr/sbin/qubes-netwatcher

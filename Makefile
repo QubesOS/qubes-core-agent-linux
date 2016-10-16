@@ -260,6 +260,10 @@ endif
 
 	install -D -m 0644 misc/xorg-preload-apps.conf $(DESTDIR)/etc/X11/xorg-preload-apps.conf
 
+	install -d $(DESTDIR)/usr/lib/qubes-bind-dirs.d
+	install -D -m 0644 misc/30_cron.conf $(DESTDIR)/usr/lib/qubes-bind-dirs.d/30_cron.conf
+
+
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/home_volatile/user
 	install -d $(DESTDIR)/rw

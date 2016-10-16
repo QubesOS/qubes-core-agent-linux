@@ -1,3 +1,10 @@
+qubes-core-agent (3.2.12-1) wheezy; urgency=medium
+
+  [ Unman ]
+  * cron: set up bind-dirs for /var/spool/cron
+
+ -- unman <unman@thirdeyesecurity.org>  Sat, 16 Oct 2016 21:53:40 +0000
+
 qubes-core-agent (3.2.11-1) wheezy; urgency=medium
 
   [ HW42 ]
