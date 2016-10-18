@@ -1,3 +1,16 @@
+qubes-core-agent (3.2.12-1) wheezy; urgency=medium
+
+  [ unman ]
+  * Remove custom mount when starting cron, in favour of bind-dirs
+  * use bind-dirs to handle crontab persistence
+  * Revert version and correct unit files
+  * Remove entry in changelog as version not bumped
+
+  [ Rudd-O ]
+  * Eliminate race condition with qubes-setup-dnat-to-ns
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 18 Oct 2016 15:55:40 +0200
+
 qubes-core-agent (3.2.11-1) wheezy; urgency=medium
 
   [ HW42 ]
