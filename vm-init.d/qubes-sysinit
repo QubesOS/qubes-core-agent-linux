@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# chkconfig: 345 80 80
+# description: Executes Qubes system initialization scripts at VM boot
+#
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+start()
+{
+	echo -n $"Executing Qubes system initialization scripts:"
+	/usr/lib/qubes/init/qubes-sysinit.sh && success || failure ; echo
+}
+
+stop()
+{
+	return 0
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  *)
+	echo $"Usage: $0 {start|stop}"
+	exit 3
+	;;
+esac
+
+exit $RETVAL

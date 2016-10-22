@@ -5,7 +5,6 @@ After=qubes-network.service
 
 [Service]
 ExecStart=/usr/sbin/qubes-firewall
-StandardOutput=syslog
 
 [Install]
 WantedBy=multi-user.target

@@ -23,19 +23,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-set -x
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
 
 prerequisite() {
-   qubes_vm_persistence="$(qubesdb-read /qubes-vm-persistence)"
-   if [ ! "$qubes_vm_persistence" = "rw-only" ]; then
+   if ! is_rwonly_persistent ; then
       true "No TemplateBasedVM detected. Exiting."
-      exit 0
-   fi
-   if [ -f "/var/run/qubes-service/qubes-dvm" ]; then
-      # https://github.com/QubesOS/qubes-issues/issues/1328#issuecomment-169483029
-      # Do none of the following in a DispVM.
-      # During DispVM savefile generation, 'qubesdb-read /qubes-vm-persistence'
-      # outputs 'rw'.
       exit 0
    fi
 }
@@ -96,7 +89,8 @@ bind_dirs() {
       # Initially copy over data directories to /rw if rw directory does not exist.
       if [ -d "$fso_ro" ] || [ -f "$fso_ro" ]; then
          if ! [ -d "$fso_rw" -o -f "$fso_rw" ]; then
-            cp --verbose --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
+            echo "Initializing $rw_dest_dir with files from $fso_ro" >&2
+            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
          fi
       else
          true "$fso_ro is neither a directory nor a file or does not exist, skipping."
@@ -104,6 +98,7 @@ bind_dirs() {
       fi
 
       # Bind the fso.
+      echo "Bind mounting $fso_rw onto $fso_ro" >&2
       mount --bind "$fso_rw" "$fso_ro"
    done
 }

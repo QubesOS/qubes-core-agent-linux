@@ -1,24 +1,30 @@
 #!/bin/bash
 
-possibly_run_save_script()
-{
-	ENCODED_SCRIPT=$(qubesdb-read /qubes-save-script)
-	if [ -z "$ENCODED_SCRIPT" ] ; then return ; fi
-	echo $ENCODED_SCRIPT|perl -e 'use MIME::Base64 qw(decode_base64); local($/) = undef;print decode_base64(<STDIN>)' >/tmp/qubes-save-script
-	chmod 755 /tmp/qubes-save-script
-	DISPLAY=:0 su - user -c /tmp/qubes-save-script
-}
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
 
-echo user | /bin/sh /etc/qubes-rpc/qubes.WaitForSession
+set -e
+
+echo "Waiting for user session to quiesce." >&2
+echo user | /bin/sh /etc/qubes-rpc/qubes.WaitForSession || :
+
+echo "Possibly running save script." >&2
 possibly_run_save_script
-umount /rw
-dmesg -c >/dev/null
+
+echo "Unmounting /rw filesystem." >&2
+umount_retry /rw || echo "Giving up and proceeding.  Warning: this may not work." >&2
+
+dmesg -C
 qubesdb-watch /qubes-restore-complete &
 watch_pid=$!
 free | grep Mem: |
     (read label total used free shared buffers cached; qubesdb-write /qubes-used-mem $(( $used + $cached )) )
+
 # we're still running in DispVM template
-echo "Waiting for save/restore..."
-qubesdb-read /qubes-restore-complete || wait $watch_pid
-echo Back to life.
-systemctl restart systemd-random-seed.service
+echo "Waiting for restore signal." >&2
+qubesdb-read /qubes-restore-complete >/dev/null || wait $watch_pid
+echo "Restore complete." >&2
+
+# Reload random seed
+echo "Reloading random seed." >&2
+reload_random_seed

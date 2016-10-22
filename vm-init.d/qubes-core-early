@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# chkconfig: 345 84 84
+# description: Executes early necessary Qubes core scripts at VM boot
+#
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
+
+start()
+{
+	have_qubesdb || return
+
+	echo -n $"Setting up Qubes persistent file systems:"
+	/usr/lib/qubes/init/mount-dirs.sh && success || failure
+	echo
+
+	echo -n $"Executing Qubes random seed scripts:"
+	/usr/lib/qubes/init/qubes-random-seed.sh && success || failure
+	echo
+
+}
+
+stop()
+{
+	return 0
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  *)
+	echo $"Usage: $0 {start|stop}"
+	exit 3
+	;;
+esac
+
+exit $RETVAL

@@ -2,7 +2,9 @@
 
 type nm-applet > /dev/null 2>&1 || exit 0
 
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
+
 # Hide nm-applet when network-manager is disabled
-nm_enabled=false
-[ -f /var/run/qubes-service/network-manager ] && nm_enabled=true
+qsvc network-manager && nm_enabled=true || nm_enabled=false
 gsettings set org.gnome.nm-applet show-applet $nm_enabled

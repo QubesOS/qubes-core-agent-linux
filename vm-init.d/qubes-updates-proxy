@@ -2,7 +2,7 @@
 #
 # tinyproxy     Startup script for the tinyproxy server as Qubes updates proxy
 #
-# chkconfig:   - 85 15
+# chkconfig: 345 85 15
 # description: small, efficient HTTP/SSL proxy daemon
 #
 # processname: tinyproxy
@@ -15,6 +15,9 @@
 
 # Source function library.
 . /etc/rc.d/init.d/functions
+
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
 
 # Source networking configuration.
 .  /etc/sysconfig/network
@@ -32,9 +35,9 @@ pidfile="/var/run/tinyproxy-updates/tinyproxy.pid"
 lockfile=/var/lock/subsys/tinyproxy-updates
 
 start() {
-    type=`/usr/bin/qubesdb-read /qubes-vm-type`
-    start_updates_proxy=`/usr/bin/qubesdb-read /qubes-service/qubes-updates-proxy 2>/dev/null`
-    if [ -z "$start_updates_proxy" ] && [ "$type" != "NetVM" ] || [ "$start_updates_proxy" != "1" ]; then
+    have_qubesdb || return
+
+    if qsvc qubes-updates-proxy ; then
         # Yum proxy disabled
         exit 0
     fi

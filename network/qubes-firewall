@@ -23,8 +23,8 @@ while true; do
 		TRIGGER=reload
 	else
 		# Wait for changes in qubesdb file
-		/usr/bin/qubesdb-watch $XENSTORE_IPTABLES
-		TRIGGER=$(/usr/bin/qubesdb-read $XENSTORE_IPTABLES)
+		qubesdb-watch $XENSTORE_IPTABLES
+		TRIGGER=$(qubesdb-read $XENSTORE_IPTABLES)
 	fi
 
 	if ! [ "$TRIGGER" = "reload" ]; then continue ; fi

@@ -1,32 +1,34 @@
 #!/bin/bash
 #
-# chkconfig: 345 91 91
+# chkconfig: 345 92 92
 # description: Starts Qubes Firewall monitor
 #
 # Source function library.
 . /etc/rc.d/init.d/functions
 
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
+
 PIDFILE=/var/run/qubes/qubes-firewall.pid
 
 start()
 {
-    type=$(/usr/bin/qubesdb-read /qubes-vm-type)
-    start_firewall=$(/usr/bin/qubesdb-read /qubes-service/qubes-firewall 2> /dev/null)
-    if [ -z "$start_firewall" ] && [ "$type" == "ProxyVM" ] || [ "$start_firewall" == "1" ]; then
+    have_qubesdb || return
+
+    if qsvc qubes-firewall ; then
         echo -n $"Starting Qubes Firewall monitor:"
         /sbin/ethtool -K eth0 sg off
         /usr/sbin/qubes-firewall &
         success
         echo ""
     fi
-	return 0
 }
 
 stop()
 {
     if [ -r $PIDFILE ]; then
         echo -n "Stopping Qubes Firewall monitor:"
-        kill -9 $(cat $PIDFILE) 2>/dev/null  && success || failure
+        kill -9 $(cat $PIDFILE) 2>/dev/null && success || failure
         echo ""
     fi
 	return 0

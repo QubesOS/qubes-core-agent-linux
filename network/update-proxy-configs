@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # The Qubes OS Project, http://www.qubes-os.org
 #
@@ -20,6 +20,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 #
+
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
 
 BEGIN_MARKER="### QUBES BEGIN ###"
 END_MARKER="### QUBES END ###"
@@ -71,7 +74,7 @@ EOF
 ### helper functions end
 
 # Determine whether the proxy should be used
-if [ -f /var/run/qubes-service/yum-proxy-setup -o -f /var/run/qubes-service/updates-proxy-setup ]; then
+if qsvc yum-proxy-setup || qsvc updates-proxy-setup ; then
     PROXY_ADDR="http://10.137.255.254:8082/"
     PROXY_CONF_ENTRY="proxy=$PROXY_ADDR"
 else

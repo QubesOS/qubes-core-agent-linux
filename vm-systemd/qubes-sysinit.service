@@ -8,7 +8,6 @@ After=proc-xen.mount systemd-modules-load.service qubes-db.service
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/lib/qubes/init/qubes-sysinit.sh
-StandardOutput=syslog
 
 [Install]
 WantedBy=sysinit.target

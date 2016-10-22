@@ -1,9 +1,13 @@
 #!/bin/sh
+
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
+
 /usr/lib/qubes/qubes-setup-dnat-to-ns
 
-# Tinyproxy does not reload DNS servers 
-if [ -x /bin/systemctl ]; then
-    /bin/systemctl --no-block try-restart qubes-updates-proxy.service
+# FIXME: Tinyproxy does not reload DNS servers.
+if under_systemd ; then
+    systemctl --no-block try-restart qubes-updates-proxy.service
 else
-    /usr/sbin/service qubes-updates-proxy try-restart
+    service qubes-updates-proxy try-restart
 fi

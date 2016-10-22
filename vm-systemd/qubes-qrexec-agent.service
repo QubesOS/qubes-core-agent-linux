@@ -5,7 +5,6 @@ After=qubes-dvm.service xendriverdomain.service
 [Service]
 ExecStartPre=/bin/sh -c '[ -e /dev/xen/evtchn ] || modprobe xen_evtchn'
 ExecStart=/usr/lib/qubes/qrexec-agent
-StandardOutput=syslog
 
 [Install]
 WantedBy=multi-user.target

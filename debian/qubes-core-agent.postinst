@@ -78,11 +78,11 @@ case "${1}" in
             /usr/lib/qubes/qubes-fix-nm-conf.sh
 
             # Location of files which contains list of protected files
-            PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
+            . /usr/lib/qubes/init/functions
 
             # ensure that hostname resolves to 127.0.1.1 resp. ::1 and that /etc/hosts is
             # in the form expected by qubes-sysinit.sh
-            if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+            if ! is_protected_file /etc/hostname ; then
                 for ip in '127\.0\.1\.1' '::1'; do
                     if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
                         sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
@@ -95,7 +95,7 @@ case "${1}" in
 
             # remove hostname from 127.0.0.1 line (in debian the hostname is by default
             # resolved to 127.0.1.1)
-            if ! grep -rq "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+            if ! is_protected_file /etc/hosts ; then
                 sed -i "/^127\.0\.0\.1\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
             fi
 

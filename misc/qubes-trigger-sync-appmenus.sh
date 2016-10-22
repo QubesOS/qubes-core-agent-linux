@@ -1,7 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-UPDATEABLE=`qubesdb-read /qubes-vm-updateable`
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
 
-if [ "$UPDATEABLE" = "True" ]; then
+if is_updateable ; then
     /usr/lib/qubes/qrexec-client-vm dom0 qubes.SyncAppMenus /bin/sh /etc/qubes-rpc/qubes.GetAppmenus
 fi

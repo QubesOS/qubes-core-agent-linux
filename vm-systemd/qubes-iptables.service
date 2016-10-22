@@ -5,8 +5,6 @@ Description=Qubes base firewall settings
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/lib/qubes/init/qubes-iptables start
-StandardOutput=syslog
-StandardError=syslog
 
 [Install]
 WantedBy=basic.target
