@@ -21,13 +21,19 @@ help:
 	@echo "make rpms-vm               -- generate binary rpm packages for VM"
 	@echo "make clean                 -- cleanup"
 	@echo "make install-vm            -- install VM related files"
+	@echo ""
+	@echo "You must have lsb_release, rpm-sign and pandoc installed."
 
 rpms: rpms-vm
 
 rpms-vm:
+	[ "$$BACKEND_VMM" != "" ] || { echo "error: you must define variable BACKEND_VMM" >&2 ; exit 1 ; }
+	lsb_release >/dev/null 2>&1 || { echo "error: you need lsb_release installed" >&2 ; exit 1 ; }
+	type pandoc >/dev/null 2>&1 || { echo "error: you need pandoc installed" >&2 ; exit 1 ; }
+	type rpmsign >/dev/null 2>&1 || { echo "error: you need rpm-sign installed" >&2 ; exit 1 ; }
 	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm.spec
 	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm-doc.spec
-	rpm --addsign \
+	[ "$$SKIP_SIGNING" = "" ] || rpm --addsign \
 		$(RPMS_DIR)/x86_64/qubes-core-vm-*$(VERSION)*.rpm \
 		$(RPMS_DIR)/x86_64/qubes-core-vm-doc-*$(VERSION)*.rpm
 
