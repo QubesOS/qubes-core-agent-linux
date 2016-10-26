@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Location of files which contains list of protected files
+PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
+
+qsvc() {
+    # Returns whether a service is enabled.
+    # Usage: qsvc <nameofservice>
+    #
+    # Must only be used after qubes-sysinit has started.
+    # See qsvc_early for more information.
+    local count=100
+    while [ ! -e /var/run/qubes-service-environment ] ; do
+        if [ "$count" = "0" ] ; then
+            echo "qsvc: Warning: qubes-sysinit has not finished executing yet" >&2
+            break
+        fi
+        sleep 0.1
+        count=$(( count - 1 ))
+    done
+    [ -e /var/run/qubes-service/"$1" ]
+}
+
+under_systemd() {
+    pidof systemd >/dev/null 2>&1
+}
+
+systemd_version_changed() {
+    under_systemd || return
+    systemd_pkg_version=`systemctl --version|head -n 1`
+    if dmesg | grep -q "$systemd_pkg_version running in system mode."; then
+        return 0
+    fi
+    return 1
+}
+
+possibly_run_save_script() {
+    ENCODED_SCRIPT=$(qubesdb-read /qubes-save-script)
+    if [ -z "$ENCODED_SCRIPT" ] ; then return ; fi
+    tmpfile=$(mktemp /tmp/qubes-save-script.XXXXXXXXX)
+    echo $ENCODED_SCRIPT|perl -e 'use MIME::Base64 qw(decode_base64); local($/) = undef;print decode_base64(<STDIN>)' >"$tmpfile"
+    chmod 755 "$tmpfile"
+    DISPLAY=:0 su - user -c "$tmpfile"
+    ret=$?
+    rm -f "$tmpfile"
+    return $ret
+}
+
+have_qubesdb() {
+    # Tests whether qubesdb-read exists and can be executed.
+    type qubesdb-read >/dev/null 2>&1
+}
+
+have_qrexec_agent() {
+    # Tests whether qrexec-agent exists and can be executed.
+    PATH=/usr/lib/qubes type qrexec-agent >/dev/null 2>&1
+}
+
+qubes_vm_type() {
+    qubesdb-read /qubes-vm-type
+}
+
+is_netvm() {
+    [ "$(qubes_vm_type)" = "NetVM" ]
+}
+
+is_appvm() {
+    [ "$(qubes_vm_type)" = "AppVM" ]
+}
+
+is_proxyvm() {
+    [ "$(qubes_vm_type)" = "ProxyVM" ]
+}
+
+is_templatevm() {
+    [ "$(qubes_vm_type)" = "TemplateVM" ]
+}
+
+is_dispvm() {
+    [ "$(qubes_vm_type)" = "DisposableVM" ]
+}
+
+is_fully_persistent() {
+    [ "$(qubesdb-read /qubes-vm-persistence)" = "full" ]
+}
+
+is_rwonly_persistent() {
+    [ "$(qubesdb-read /qubes-vm-persistence)" = "rw-only" ]
+}
+
+is_updateable() {
+    [ "$(qubesdb-read /qubes-vm-updateable)" = "True" ]
+}
+
+reload_random_seed() {
+    qubesdb-read /qubes-random-seed | base64 -d > /dev/urandom
+    qubesdb-rm /qubes-random-seed
+}
+
+is_protected_file() {
+    grep -Fxrq --exclude='*.rpmsave' --exclude='*~' --exclude='*.rpmnew' --exclude='*.rpmold' -- "${1}" "$PROTECTED_FILE_LIST" 2>/dev/null
+}
+
+umount_retry() {
+    local count=5
+    while mountpoint -q "$1" ; do
+        if umount "$1" ; then break ; fi
+        echo "Something prevents unmounting $1:" >&2
+        fuser -vmM "$1" >&2
+        if [ "$count" = "0" ] ; then
+            return 1
+        fi
+        sleep 5
+        count=$(( count - 1 ))
+    done
+    return 0
+}

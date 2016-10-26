@@ -37,6 +37,8 @@ Depends:
     ncurses-term,
     net-tools,
     psmisc,
+    procps,
+    util-linux,
     python2.7,
     python-gi,
     python-xdg,

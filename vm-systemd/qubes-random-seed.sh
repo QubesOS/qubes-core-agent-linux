@@ -1,7 +1,9 @@
 #!/bin/bash
 
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
+
 set -e
 set -o pipefail
 
-qubesdb-read /qubes-random-seed | base64 -d > /dev/urandom
-qubesdb-rm /qubes-random-seed
+reload_random_seed

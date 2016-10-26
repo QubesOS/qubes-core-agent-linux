@@ -20,6 +20,8 @@
 #
 #
 
+%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-netwatcher qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-dvm
+
 %{!?version: %define version %(cat version)}
 %{!?backend_vmm: %define backend_vmm %(echo $BACKEND_VMM)}
 
@@ -49,6 +51,10 @@ Requires:   net-tools
 Requires:   nautilus-python
 Requires:   qubes-utils >= 3.1.3
 Requires:   initscripts
+Requires:   gawk
+# for dispvm-prerun.sh
+Requires:   procps-ng
+Requires:   util-linux
 # for qubes-desktop-run
 Requires:   pygobject3-base
 Requires:   dbus-python
@@ -191,10 +197,10 @@ fi
 
 # Location of files which contains list of protected files
 mkdir -p /etc/qubes/protected-files.d
-PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
+. /usr/lib/qubes/init/functions
 
 # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
-if ! grep -rq "^/etc/hosts$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+if ! is_protected_file /etc/hosts ; then
     if ! grep -q localhost /etc/hosts; then
       cat <<EOF > /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 `hostname`
@@ -205,7 +211,7 @@ fi
 
 # ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
 # in the form expected by qubes-sysinit.sh
-if ! grep -rq "^/etc/hostname$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+if ! is_protected_file /etc/hostname ; then
     for ip in '127\.0\.0\.1' '::1'; do
         if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
             sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
@@ -324,7 +330,6 @@ rm -f %{name}-%{version}
 /etc/NetworkManager/dispatcher.d/30-qubes-external-ip
 /etc/NetworkManager/dispatcher.d/qubes-nmhook
 %config(noreplace) /etc/X11/xorg-preload-apps.conf
-/etc/dispvm-dotfiles.tbz
 /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
@@ -425,6 +430,9 @@ rm -f %{name}-%{version}
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 /usr/lib/NetworkManager/conf.d/30-qubes.conf
+%dir /usr/lib/qubes/init
+/usr/lib/qubes/init/*.sh
+/usr/lib/qubes/init/functions
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
 /usr/lib64/python2.7/site-packages/qubes/xdg.py*
@@ -464,8 +472,10 @@ Conflicts:      qubes-core-vm-systemd
 The Qubes core startup configuration for SysV init (or upstart).
 
 %files sysvinit
+/etc/init.d/qubes-sysinit
+/etc/init.d/qubes-core-early
 /etc/init.d/qubes-core
-/etc/init.d/qubes-core-appvm
+/etc/init.d/qubes-dvm
 /etc/init.d/qubes-core-netvm
 /etc/init.d/qubes-firewall
 /etc/init.d/qubes-netwatcher
@@ -495,22 +505,13 @@ done
 chkconfig rsyslog on
 chkconfig haldaemon on
 chkconfig messagebus on
-chkconfig --add qubes-core || echo "WARNING: Cannot add service qubes-core!"
-chkconfig qubes-core on || echo "WARNING: Cannot enable service qubes-core!"
-chkconfig --add qubes-core-netvm || echo "WARNING: Cannot add service qubes-core-netvm!"
-chkconfig qubes-core-netvm on || echo "WARNING: Cannot enable service qubes-core-netvm!"
-chkconfig --add qubes-core-appvm || echo "WARNING: Cannot add service qubes-core-appvm!"
-chkconfig qubes-core-appvm on || echo "WARNING: Cannot enable service qubes-core-appvm!"
-chkconfig --add qubes-firewall || echo "WARNING: Cannot add service qubes-firewall!"
-chkconfig qubes-firewall on || echo "WARNING: Cannot enable service qubes-firewall!"
-chkconfig --add qubes-netwatcher || echo "WARNING: Cannot add service qubes-netwatcher!"
-chkconfig qubes-netwatcher on || echo "WARNING: Cannot enable service qubes-netwatcher!"
-chkconfig --add qubes-iptables || echo "WARNING: Cannot add service qubes-iptables!"
-chkconfig qubes-iptables on || echo "WARNING: Cannot enable service qubes-iptables!"
-chkconfig --add qubes-updates-proxy || echo "WARNING: Cannot add service qubes-updates-proxy!"
-chkconfig qubes-updates-proxy on || echo "WARNING: Cannot enable service qubes-updates-proxy!"
-chkconfig --add qubes-qrexec-agent || echo "WARNING: Cannot add service qubes-qrexec-agent!"
-chkconfig qubes-qrexec-agent on || echo "WARNING: Cannot enable service qubes-qrexec-agent!"
+for svc in %qubes_services ; do
+    if [ "$1" = 1 ] ; then
+        chkconfig --add $svc || echo "WARNING: Cannot add service $svc!"
+    else
+        chkconfig $svc resetpriorities || echo "WARNING: Cannot reset priorities of service $svc!"
+    fi
+done
 
 # TODO: make this not display the silly message about security context...
 sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
@@ -518,13 +519,9 @@ sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
 %preun sysvinit
 if [ "$1" = 0 ] ; then
     # no more packages left
-    chkconfig qubes-core off
-    chkconfig qubes-core-netvm off
-    chkconfig qubes-core-appvm off
-    chkconfig qubes-firewall off
-    chkconfig qubes-netwatcher off
-    chkconfig qubes-updates-proxy off
-    chkconfig qubes-qrexec-agent off
+    for svc in %qubes_services ; do
+        chkconfig --del $svc
+    done
 fi
 
 %package systemd
@@ -559,16 +556,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system-preset/75-qubes-vm.preset
 /lib/modules-load.d/qubes-core.conf
 /lib/modules-load.d/qubes-misc.conf
-%dir /usr/lib/qubes/init
-/usr/lib/qubes/init/prepare-dvm.sh
-/usr/lib/qubes/init/network-proxy-setup.sh
 /usr/lib/qubes/init/qubes-iptables
-/usr/lib/qubes/init/misc-post.sh
-/usr/lib/qubes/init/misc-post-stop.sh
-/usr/lib/qubes/init/mount-dirs.sh
-/usr/lib/qubes/init/qubes-random-seed.sh
-/usr/lib/qubes/init/qubes-sysinit.sh
-/usr/lib/qubes/init/bind-dirs.sh
 /lib/systemd/system/chronyd.service.d/30_qubes.conf
 /lib/systemd/system/crond.service.d/30_qubes.conf
 /lib/systemd/system/cups.service.d/30_qubes.conf

@@ -1,13 +1,9 @@
 #!/bin/sh
 
-# setup-ip is potentially invoked before qubes-sysinit.sh is done, therefore
-# we perform our qubesdb reads here instead of relying on qvm-service
-# files under /var/run/qubes-service/
-disablegw=`qubesdb-read /qubes-service/disable-default-route 2> /dev/null`
-disabledns=`qubesdb-read /qubes-service/disable-dns-server 2> /dev/null`
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
 
-# Location of files which contains list of protected files
-PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
+have_qubesdb || exit 0
 
 ip=`/usr/bin/qubesdb-read /qubes-ip 2> /dev/null`
 if [ x$ip != x ]; then
@@ -18,7 +14,7 @@ if [ x$ip != x ]; then
     /sbin/ethtool -K $INTERFACE sg off
     /sbin/ethtool -K $INTERFACE tx off
     # If NetworkManager is enabled, let it configure the network
-    if [ -f /var/run/qubes-service/network-manager ]; then
+    if qsvc network-manager ; then
         nm_config=/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE
         cat > $nm_config <<__EOF__
 [802-3-ethernet]
@@ -39,10 +35,10 @@ method=ignore
 method=manual
 may-fail=false
 __EOF__
-        if [ "x$disabledns" != "x1" ]; then
+        if ! qsvc disable-dns-server ; then
             echo "dns=$primary_dns;$secondary_dns" >> $nm_config
         fi
-        if [ "x$disablegw" != "x1" ]; then
+        if ! qsvc disable-default-route ; then
             echo "addresses1=$ip;32;$gateway" >> $nm_config
         else
             echo "addresses1=$ip;32" >> $nm_config
@@ -58,7 +54,7 @@ __EOF__
         if [ "x$disablegw" != "x1" ]; then
             /sbin/route add default gw $gateway
         fi
-        if ! grep -rq "^/etc/resolv[.]conf$" "${PROTECTED_FILE_LIST}" 2>/dev/null; then
+        if ! is_protected_file /etc/resolv.conf ; then
             echo > /etc/resolv.conf
             if [ "x$disabledns" != "x1" ]; then
                 echo "nameserver $primary_dns" > /etc/resolv.conf

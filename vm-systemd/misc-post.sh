@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
+
 /usr/lib/qubes/update-proxy-configs
 
 if [ -n "`ls -A /usr/local/lib 2>/dev/null`" -o \
@@ -13,14 +16,6 @@ fi
 # qubesdb-read fails
 INTERFACE=eth0 /usr/lib/qubes/setup-ip
 
-[ -x /rw/config/rc.local ] && /rw/config/rc.local
-
-# Start services which haven't own proper systemd unit:
-
-if [ ! -f /usr/lib/systemd/system/cups.service ]; then
-    if [ -f /var/run/qubes-service/cups ]; then
-        /usr/sbin/service cups start
-    fi
+if [ -x /rw/config/rc.local ] ; then
+    /rw/config/rc.local
 fi
-
-exit 0

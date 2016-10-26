@@ -6,21 +6,23 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
+
 start()
 {
+	have_qrexec_agent || return
 	echo -n $"Starting Qubes RPC agent:"
-
 	/usr/lib/qubes/qrexec-agent 2>/var/log/qubes/qrexec-agent.log &
-
 	success
 	echo ""
-
 	return 0
 }
 
 stop()
 {
-    killproc qrexec-agent
+	have_qrexec_agent || return
+	killproc qrexec-agent
 }
 
 case "$1" in

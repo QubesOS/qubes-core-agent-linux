@@ -92,9 +92,15 @@ install-systemd-dropins:
 	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/user/$${dropin}.d/ ;\
 	done
 
-install-systemd:
+install-init:
+	install -d $(DESTDIR)$(LIBDIR)/qubes/init
+	# FIXME: do a source code move vm-systemd/*.sh to init/
+	# since those scripts are shared between sysvinit and systemd.
+	install -m 0755 init/*.sh vm-systemd/*.sh $(DESTDIR)$(LIBDIR)/qubes/init/
+	install -m 0644 init/functions $(DESTDIR)$(LIBDIR)/qubes/init/
+
+install-systemd: install-init
 	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d
-	install -m 0755 vm-systemd/*.sh $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
@@ -104,15 +110,17 @@ install-systemd:
 	install -D -m 0644 vm-systemd/qubes-core-agent-linux.tmpfiles \
 		$(DESTDIR)/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
 
-install-sysvinit:
+install-sysvinit: install-init
 	install -d $(DESTDIR)/etc/init.d
+	install vm-init.d/qubes-sysinit $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-core-early $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-core $(DESTDIR)/etc/init.d/
-	install vm-init.d/qubes-core-appvm $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-core-netvm $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-firewall $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-netwatcher $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-qrexec-agent $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-dvm $(DESTDIR)/etc/init.d/
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install -D vm-init.d/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
@@ -169,13 +177,6 @@ install-common:
 	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
 	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc
-
-	if [ -r misc/dispvm-dotfiles.$(DIST).tbz ] ; \
-	then \
-		install misc/dispvm-dotfiles.$(DIST).tbz $(DESTDIR)/etc/dispvm-dotfiles.tbz ; \
-	else \
-		install misc/dispvm-dotfiles.tbz $(DESTDIR)/etc/dispvm-dotfiles.tbz ; \
-	fi;
 
 	install misc/dispvm-prerun.sh $(DESTDIR)$(LIBDIR)/qubes/dispvm-prerun.sh
 	install misc/close-window $(DESTDIR)$(LIBDIR)/qubes/close-window

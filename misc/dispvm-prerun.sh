@@ -1,22 +1,24 @@
 #!/bin/sh
 
+# This script must be run as the `user` user.
+# It is customarily launched from prepare-dvm.sh.
+
+# At this point, the DispVM home directory customizations
+# undertaken by mount-dirs.sh have taken place.
+# We know this because dispvm-prerun.sh executes after
+# local-fs.target, and mount-dirs.sh runs before it.
+
+me=$( basename "$0" )
 apps="/usr/libexec/evinced"
 
-#If user have customized DispVM settings, use its home instead of default dotfiles
-if [ ! -e /home/user/.qubes-dispvm-customized ]; then
-	if [ -e /rw/home/user/.qubes-dispvm-customized ]; then
-		cp -af /rw/home/user /home/
-	else
-		cat /etc/dispvm-dotfiles.tbz | tar -xjf- --overwrite -C /home/user --owner user 2>&1 >/tmp/dispvm-dotfiles-errors.log
-	fi
-fi
+echo "$me started." >&2
 
 for app in $apps ; do
-    echo "Launching: $app..."
-    $app >>/tmp/dispvm_prerun_errors.log 2>&1 &
+    echo "Launching $app" >&2
+    $app &
 done
 
-echo "Sleeping..."
+echo "Waiting for I/O to quiesce" >&2
 PREV_IO=0
 while true; do
 	IO=`vmstat -D | awk '/read|write/ {IOs+=$1} END {print IOs}'`
@@ -27,11 +29,9 @@ while true; do
 	sleep 2
 done
 
-ps aufwwx > /tmp/dispvm-prerun-proclist.log
-
-echo "Closing windows..."
+echo "Closing windows" >&2
 /usr/lib/qubes/close-window `xwininfo -root -children|tail -n +7 |awk '{print $1}'`
 sleep 1
 fuser -vkm /rw
 
-echo done.
+echo "$me finished." >&2
