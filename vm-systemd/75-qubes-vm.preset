@@ -14,13 +14,38 @@
 # Qubes currently does not provide a way to permanently prevent such units from
 # being masked.
 #
+# Maintainer information:
+#
+# * All units listed here are preset during first install of the *-systemd RPM.
+#   For those units which are disabled here, but don't have an install section
+#   (static units), we mask them during that install.
+# * All units listed here that find themselves below the comment titled
+#   "# Units below this line will be re-preset on package upgrade"
+#   are preset both during install and during upgrade.  This allows you to add
+#   new units here and have them become active when the user's machine upgrades
+#   their *-systemd RPM built by this project.
+#
+# Hi, Matt!  I see you did great with this conversion to systemd presets!
+# Thank you!  Skyler sends you her regards from Europe!
+#   - Rudd-O
+#
 # https://groups.google.com/d/topic/qubes-users/dpM_GHfmEOk/discussion
 
-disable alsa-store.service
-disable alsa-restore.service
 disable avahi.service
 disable avahi-daemon.service
 disable avahi-daemon.socket
+
+# Fedora only services
+disable rpcbind.service
+disable sendmail.service
+disable sm-client.service
+disable sshd.service
+disable backuppc.service
+
+# Units below this line will be re-preset on package upgrade
+
+disable alsa-store.service
+disable alsa-restore.service
 disable hwclock-save.service
 disable mdmonitor.service
 disable plymouth-start.service
@@ -33,7 +58,6 @@ disable colord.service
 disable systemd-timesyncd.service
 
 # Fedora only services
-disable backuppc.service
 disable cpuspeed.service
 disable dnf-makecache.timer
 disable fedora-autorelabel.service
@@ -50,17 +74,12 @@ disable mdmonitor-takeover.service
 disable multipathd.service
 disable openct.service
 disable rngd.service
-disable rpcbind.service
-disable sendmail.service
-disable sm-client.service
-disable sshd.service
 disable tcsd.service
 
 enable qubes-sysinit.service
 enable qubes-early-vm-config.service
 enable qubes-db.service
 enable qubes-gui-agent.service
-enable qubes-update-check.timer
 enable qubes-update-check.timer
 enable qubes-misc-post.service
 enable qubes-updates-proxy.service

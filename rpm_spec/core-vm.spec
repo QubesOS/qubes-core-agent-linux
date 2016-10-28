@@ -21,9 +21,87 @@
 #
 
 %define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-netwatcher qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-dvm
+%define qubes_preset_file 75-qubes-vm.preset
 
 %{!?version: %define version %(cat version)}
 %{!?backend_vmm: %define backend_vmm %(echo $BACKEND_VMM)}
+
+%define scriptletfuns is_static() { \
+    [ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
+} \
+ \
+is_masked() { \
+    if [ ! -L %{_sysconfdir}/systemd/system/"$1" ] \
+    then \
+       return 1 \
+    fi \
+    target=`readlink %{_sysconfdir}/systemd/system/"$1" 2>/dev/null` || : \
+    if [ "$target" = "/dev/null" ] \
+    then \
+       return 0 \
+    fi \
+    return 1 \
+} \
+\
+mask() { \
+    ln -sf /dev/null %{_sysconfdir}/systemd/system/"$1" \
+} \
+\
+unmask() { \
+    if ! is_masked "$1" \
+    then \
+        return 0 \
+    fi \
+    rm -f %{_sysconfdir}/systemd/system/"$1" \
+} \
+\
+preset_units() { \
+    local represet= \
+    cat "$1" | while read action unit_name \
+    do \
+        if [ "$action" = "#" -a "$unit_name" = "Units below this line will be re-preset on package upgrade" ] \
+        then \
+            represet=1 \
+            continue \
+        fi \
+        echo "$action $unit_name" | grep -q '^[[:space:]]*[^#;]' || continue \
+        [ -n "$action" -a -n "$unit_name" ] || continue \
+        if [ "$2" = "initial" -o "$represet" = "1" ] \
+        then \
+            if [ "$action" = "disable" ] && is_static "$unit_name" \
+            then \
+                if ! is_masked "$unit_name" \
+                then \
+                    # We must effectively mask these units, even if they are static. \
+                    mask "$unit_name" \
+                fi \
+            elif [ "$action" = "enable" ] && is_static "$unit_name" \
+            then \
+                if is_masked "$unit_name" \
+                then \
+                    # We masked this static unit before, now we unmask it. \
+                    unmask "$unit_name" \
+                fi \
+                 systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+            else \
+                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+            fi \
+        fi \
+    done \
+} \
+\
+restore_units() { \
+    grep '^[[:space:]]*[^#;]' "$1" | while read action unit_name \
+    do \
+        if is_static "$unit_name" && is_masked "$unit_name" \
+        then \
+            # If the unit had been masked by us, we must unmask it here. \
+            # Otherwise systemctl preset will fail badly. \
+            unmask "$unit_name" \
+        fi \
+        systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+    done \
+} \
 
 Name:		qubes-core-vm
 Version:	%{version}
@@ -554,7 +632,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-update-check.timer
 /lib/systemd/system/qubes-updates-proxy.service
 /lib/systemd/system/qubes-qrexec-agent.service
-/lib/systemd/system-preset/75-qubes-vm.preset
+/lib/systemd/system-preset/%qubes_preset_file
 /lib/modules-load.d/qubes-core.conf
 /lib/modules-load.d/qubes-misc.conf
 /usr/lib/qubes/init/qubes-iptables
@@ -582,68 +660,83 @@ The Qubes core startup configuration for SystemD init.
 
 %post systemd
 
-PRESET_FAILED=0
-if [ $1 -eq 1 ]; then
-    /bin/systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
+changed=
+
+%scriptletfuns
+
+if [ $1 -eq 1 ]
+then
+    preset_units %{_presetdir}/%qubes_preset_file initial
+    changed=true
 else
-    services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-dirs"
-    services="$services qubes-netwatcher qubes-network qubes-sysinit"
-    services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
-    for srv in $services; do
-        /bin/systemctl --no-reload preset $srv.service
-    done
-    /bin/systemctl --no-reload preset qubes-update-check.timer
+    preset_units %{_presetdir}/%qubes_preset_file upgrade
+    changed=true
     # Upgrade path - now qubes-iptables is used instead
-    if [ -f /lib/systemd/system/iptables.service ]; then
-        /bin/systemctl --no-reload preset iptables.service
-    fi
-    if [ -f /lib/systemd/system/ip6tables.service ]; then
-        /bin/systemctl --no-reload preset ip6tables.service
-    fi
+    for svc in iptables ip6tables
+    do
+        if [ -f "$svc".service ]
+        then
+            systemctl --no-reload preset "$svc".service
+            changed=true
+        fi
+    done
 fi
 
-# Set default "runlevel"
-rm -f /etc/systemd/system/default.target
-ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
-
-grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
-    case "$action" in
-    (disable)
-        if [ -f /lib/systemd/system/$unit_name ]; then
-            if ! fgrep -q '[Install]' /lib/systemd/system/$unit_name; then
-                # forcibly disable
-                ln -sf /dev/null /etc/systemd/system/$unit_name
-            fi
-        fi
-        ;;
-    *)
-        # preset-all is not available in fc20; so preset each unit file listed in 75-qubes-vm.preset
-        if [ $1 -eq 1 -a "${PRESET_FAILED}" -eq 1 ]; then
-            systemctl --no-reload preset "${unit_name}" > /dev/null 2>&1 || true
-        fi
-        ;;
-    esac
-done
+if [ $1 -eq 1 ]
+then
+    # First install.
+    # Set default "runlevel".
+    # FIXME: this ought to be done via kernel command line.
+    # The fewer deviations of the template from the seed
+    # image, the better.
+    rm -f %{_sysconfdir}/systemd/system/default.target
+    ln -s %{_unitdir}/multi-user.target %{_sysconfdir}/systemd/system/default.target
+    changed=true
+fi
 
 # remove old symlinks
-if [ -L /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service ]; then
-    rm /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service
+if [ -L %{_sysconfdir}/systemd/system/sysinit.target.wants/qubes-random-seed.service ]
+then
+    rm -f %{_sysconfdir}/systemd/system/sysinit.target.wants/qubes-random-seed.service
+    changed=true
 fi
-if [ -L /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service ]; then
-    rm /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service
+if [ -L %{_sysconfdir}/systemd/system/multi-user.target.wants/qubes-mount-home.service ]
+then
+    rm -f %{_sysconfdir}/systemd/system/multi-user.target.wants/qubes-mount-home.service
+    changed=true
 fi
 
-/bin/systemctl daemon-reload
+if [ "x$changed" != "x" ]
+then
+    systemctl daemon-reload
+fi
 
-exit 0
+%preun systemd
+
+if [ $1 -eq 0 ] ; then
+    # Run this only during uninstall.
+    # Save the preset file to later use it to re-preset services there
+    # once the Qubes OS preset file is removed.
+    mkdir -p %{_rundir}/qubes-uninstall
+    cp -f %{_presetdir}/%qubes_preset_file %{_rundir}/qubes-uninstall/
+fi
 
 %postun systemd
 
-#Do not run this part on upgrades
-if [ "$1" != 0 ] ; then
-    exit 0
+changed=
+
+%scriptletfuns
+
+if [ -d %{_rundir}/qubes-uninstall ]
+then
+    # We have a saved preset file (or more).
+    # Re-preset the units mentioned there.
+    restore_units %{_rundir}/qubes-uninstall/%qubes_preset_file
+    rm -rf %{_rundir}/qubes-uninstall
+    changed=true
 fi
 
-for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-netwatcher qubes-network qubes-qrexec-agent; do
-    /bin/systemctl disable $srv.service
-do
+if [ "x$changed" != "x" ]
+then
+    systemctl daemon-reload
+fi
