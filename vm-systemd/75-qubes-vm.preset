@@ -57,6 +57,7 @@ disable sshd.service
 disable tcsd.service
 
 enable qubes-sysinit.service
+enable qubes-early-vm-config.service
 enable qubes-db.service
 enable qubes-gui-agent.service
 enable qubes-update-check.timer

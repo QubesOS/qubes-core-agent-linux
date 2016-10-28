@@ -1,0 +1,13 @@
+[Unit]
+Description=Early Qubes VM settings
+DefaultDependencies=no
+Before=sysinit.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/qubes/init/qubes-early-vm-config.sh
+
+[Install]
+WantedBy=sysinit.target

@@ -549,6 +549,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-network.service
 /lib/systemd/system/qubes-iptables.service
 /lib/systemd/system/qubes-sysinit.service
+/lib/systemd/system/qubes-early-vm-config.service
 /lib/systemd/system/qubes-update-check.service
 /lib/systemd/system/qubes-update-check.timer
 /lib/systemd/system/qubes-updates-proxy.service
