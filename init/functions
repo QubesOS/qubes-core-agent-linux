@@ -29,9 +29,9 @@ systemd_version_changed() {
     under_systemd || return
     systemd_pkg_version=`systemctl --version|head -n 1`
     if dmesg | grep -q "$systemd_pkg_version running in system mode."; then
-        return 0
+        return 1
     fi
-    return 1
+    return 0
 }
 
 possibly_run_save_script() {
