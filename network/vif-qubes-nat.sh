@@ -9,6 +9,24 @@ netvm_if="${vif}"
 netns_netvm_if="${vif}-p"
 netns_appvm_if="${vif}"
 
+#
+#               .----------------------------------.
+#               |          NetVM/ProxyVM           |
+# .------------.|.------------------.              |
+# |   AppVM    ||| $netns namespace |              |
+# |            |||                  |              |
+# |  eth0<--------->$netns_appvm_if |              |
+# |$appvm_ip   |||   $appvm_gw_ip   |              |
+# |$appvm_gw_ip|||         ^        |              |
+# '------------'||         |NAT     |              |
+#               ||         v        |              |
+#               ||  $netns_netvm_if<--->$netvm_if  |
+#               ||     $netvm_ip    |  $netvm_gw_ip|
+#               |'------------------'              |
+#               '----------------------------------'
+#
+
+
 function run
 {
     #echo "$@" >> /var/log/qubes-nat.log
@@ -20,8 +38,6 @@ function netns
     run ip netns exec "$netns" "$@"
 }
 
-
-
 run ip addr flush dev "$netns_appvm_if"
 run ip netns delete "$netns" || :
 
@@ -31,7 +47,6 @@ if test "$command" == online; then
 
     run ip link add "$netns_netvm_if" type veth peer name "$netvm_if"
     run ip link set "$netns_netvm_if" netns "$netns"
-
 
     netns ip6tables -t raw -I PREROUTING -j DROP
     netns ip6tables -P INPUT DROP
