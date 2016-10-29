@@ -1,24 +1,24 @@
-#!/bin/bash                              
+#!/bin/bash
 #============================================================================
-# /etc/xen/vif-route-qubes-nat                                               
-#                                                                            
-# Script for configuring a vif in routed mode.                               
-# The hotplugging system will call this script if it is specified either in  
-# the device configuration given to Xend, or the default Xend configuration  
+# /etc/xen/vif-route-qubes-nat
+#
+# Script for configuring a vif in routed mode.
+# The hotplugging system will call this script if it is specified either in
+# the device configuration given to Xend, or the default Xend configuration
 # in /etc/xen/xend-config.sxp.  If the script is specified in neither of those
-# places, then vif-bridge is the default.                                     
-#                                                                             
-# Usage:                                                                      
-# vif-route (add|remove|online|offline)                                       
-#                                                                             
-# Environment vars:                                                           
-# vif         vif interface name (required).                                  
-# XENBUS_PATH path to this device's details in the XenStore (required).       
-#                                                                             
-# Read from the store:                                                        
-# ip      list of IP networks for the vif, space-separated (default given in  
-#         this script).                                                       
-#============================================================================ 
+# places, then vif-bridge is the default.
+#
+# Usage:
+# vif-route (add|remove|online|offline)
+#
+# Environment vars:
+# vif         vif interface name (required).
+# XENBUS_PATH path to this device's details in the XenStore (required).
+#
+# Read from the store:
+# ip      list of IP networks for the vif, space-separated (default given in
+#         this script).
+#============================================================================
 
 appvm_gw_ip="$1"
 netvm_ip="$2"
@@ -28,12 +28,12 @@ dir=$(dirname "$0")
 . "$dir/vif-common.sh"
 
 if [ "${ip}" ]; then
-	appvm_ip="$ip"
-	netvm_gw_ip=`qubesdb-read /qubes-netvm-gateway`
-	netvm_dns2_ip=`qubesdb-read /qubes-netvm-secondary-dns`
+    appvm_ip="$ip"
+    netvm_gw_ip=`qubesdb-read /qubes-netvm-gateway`
+    netvm_dns2_ip=`qubesdb-read /qubes-netvm-secondary-dns`
 
-        ip="$netvm_ip"
-        back_ip="$netvm_gw_ip"
+    ip="$netvm_ip"
+    back_ip="$netvm_gw_ip"
 fi
 
 #echo "$appvm_ip $appvm_gw_ip $netvm_ip $netvm_gw_ip" >> /var/log/qubes-nat.log
@@ -42,27 +42,27 @@ fi
 lockfile=/var/run/xen-hotplug/vif-lock
 
 if [ "${ip}" ]; then
-	if test "$command" == online; then
-		echo 1 >/proc/sys/net/ipv4/conf/${vif}/proxy_arp
-	fi
+    if test "$command" == online; then
+        echo 1 >/proc/sys/net/ipv4/conf/${vif}/proxy_arp
+    fi
 
-	. "$dir/vif-qubes-nat.sh"
+    . "$dir/vif-qubes-nat.sh"
 fi
 
 case "$command" in
-	online)
-		ifconfig ${vif} up
-		echo 1 >/proc/sys/net/ipv4/conf/${vif}/proxy_arp
-		ipcmd='add'
-		iptables_cmd='-I PREROUTING 1'
-		cmdprefix=''
-		;;
-	offline)
-		do_without_error ifdown ${vif}
-		ipcmd='del'
-		iptables_cmd='-D PREROUTING'
-		cmdprefix='do_without_error'
-		;;
+    online)
+        ifconfig ${vif} up
+        echo 1 >/proc/sys/net/ipv4/conf/${vif}/proxy_arp
+        ipcmd='add'
+        iptables_cmd='-I PREROUTING 1'
+        cmdprefix=''
+        ;;
+    offline)
+        do_without_error ifdown ${vif}
+        ipcmd='del'
+        iptables_cmd='-D PREROUTING'
+        cmdprefix='do_without_error'
+        ;;
 esac
 
 domid=${vif/vif/}
@@ -72,20 +72,20 @@ domid=${domid/.*/}
 metric=$[ 32752 - $domid ]
 
 if [ "${ip}" ] ; then
-	# If we've been given a list of IP addresses, then add routes from dom0 to
-	# the guest using those addresses.
-	for addr in ${ip} ; do
-		${cmdprefix} ip route ${ipcmd} ${addr} dev ${vif} metric $metric
-	done
-	echo -e "*raw\n$iptables_cmd -i ${vif} ! -s ${ip} -j DROP\nCOMMIT" | \
-		${cmdprefix} flock $lockfile iptables-restore --noflush
-	${cmdprefix} ip addr ${ipcmd} ${back_ip}/32 dev ${vif}
+    # If we've been given a list of IP addresses, then add routes from dom0 to
+    # the guest using those addresses.
+    for addr in ${ip} ; do
+        ${cmdprefix} ip route ${ipcmd} ${addr} dev ${vif} metric $metric
+    done
+    echo -e "*raw\n$iptables_cmd -i ${vif} ! -s ${ip} -j DROP\nCOMMIT" | \
+        ${cmdprefix} flock $lockfile iptables-restore --noflush
+    ${cmdprefix} ip addr ${ipcmd} ${back_ip}/32 dev ${vif}
 fi
 
 log debug "Successful vif-route-qubes-nat $command for $vif."
 if [ "$command" = "online" ]
 then
-  # disable tx checksumming offload, apparently it doesn't work with our ancient qemu in stubdom
-  do_without_error ethtool -K $vif tx off
-  success
+    # disable tx checksumming offload, apparently it doesn't work with our ancient qemu in stubdom
+    do_without_error ethtool -K $vif tx off
+    success
 fi
