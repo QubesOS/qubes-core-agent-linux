@@ -192,6 +192,8 @@ install-common:
 	install -d $(DESTDIR)/etc/NetworkManager/dispatcher.d/
 	install network/{qubes-nmhook,30-qubes-external-ip} $(DESTDIR)/etc/NetworkManager/dispatcher.d/
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
+	install -D network/vif-route-qubes-nat $(DESTDIR)/etc/xen/scripts/vif-route-qubes-nat
+	install -D network/vif-qubes-nat.sh $(DESTDIR)/etc/xen/scripts/vif-qubes-nat.sh
 	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
 	install -m 0644 -D network/updates-blacklist $(DESTDIR)/etc/tinyproxy/updates-blacklist
 	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)$(LIBDIR)/qubes/iptables-updates-proxy
