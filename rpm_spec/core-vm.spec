@@ -372,7 +372,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-suspend-module-blacklist
 /etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
 /etc/xen/scripts/vif-route-qubes
-/etc/xen/scripts/vif-route-qubes-nat
 /etc/xen/scripts/vif-qubes-nat.sh
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo

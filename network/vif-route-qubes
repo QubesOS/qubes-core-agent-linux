@@ -26,6 +26,30 @@ dir=$(dirname "$0")
 #main_ip=$(dom0_ip)
 lockfile=/var/run/xen-hotplug/vif-lock
 
+if [ "${ip}" ]; then
+    # IPs as seen by this VM
+    netvm_ip="$ip"
+    netvm_gw_ip=`qubesdb-read /qubes-netvm-gateway`
+    netvm_dns2_ip=`qubesdb-read /qubes-netvm-secondary-dns`
+
+    back_ip="$netvm_gw_ip"
+
+    # IPs as seen by the VM - if other than $netvm_ip
+    appvm_gw_ip="`qubesdb-read /mapped-ip/$ip/visible-gateway 2>/dev/null || :`"
+    appvm_ip="`qubesdb-read /mapped-ip/$ip/visible-ip 2>/dev/null || :`"
+fi
+
+# Apply NAT if IP visible from the VM is different than the "real" one
+# See vif-qubes-nat.sh for details
+if [ -n "$appvm_ip" -a -n "$appvm_gw_ip" -a "$appvm_ip" != "$netvm_ip" ]; then
+    if test "$command" == online; then
+        echo 1 >/proc/sys/net/ipv4/conf/${vif}/proxy_arp
+    fi
+
+    . "$dir/vif-qubes-nat.sh"
+fi
+
+
 case "$command" in
 	online)
 		ifconfig ${vif} up
@@ -55,7 +79,6 @@ if [ "${ip}" ] ; then
 	done
 	echo -e "*raw\n$iptables_cmd -i ${vif} ! -s ${ip} -j DROP\nCOMMIT" | \
 		${cmdprefix} flock $lockfile iptables-restore --noflush
-	back_ip=`qubesdb-read /qubes-netvm-gateway`
 	${cmdprefix} ip addr ${ipcmd} ${back_ip}/32 dev ${vif}
 fi
 
