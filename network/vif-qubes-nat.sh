@@ -45,7 +45,9 @@ if test "$command" == online; then
     run ip netns add "$netns"
     run ip link set "$netns_appvm_if" netns "$netns"
 
-    run ip link add "$netns_netvm_if" type veth peer name "$netvm_if"
+    # keep the same MAC as the real vif interface, so NetworkManager will still
+    # ignore it
+    run ip link add "$netns_netvm_if" type veth peer name "$netvm_if" address fe:ff:ff:ff:ff:ff
     run ip link set "$netns_netvm_if" netns "$netns"
 
     netns ip6tables -t raw -I PREROUTING -j DROP
