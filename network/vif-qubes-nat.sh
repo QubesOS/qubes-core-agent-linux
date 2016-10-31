@@ -1,7 +1,6 @@
 #!/bin/bash
 #set -x
 
-netvm_subnet=/24
 undetectable_netvm_ips=
 
 netns="${vif}-nat"
@@ -85,13 +84,14 @@ if test "$command" == online; then
         netns iptables -t nat -I POSTROUTING -o "$netns_appvm_if" -s "$netvm_dns2_ip" -j SNAT --to-source "$appvm_dns2_ip"
     fi
 
-    netns ip addr add "$netvm_ip$netvm_subnet" dev "$netns_netvm_if"
+    netns ip addr add "$netvm_ip" dev "$netns_netvm_if"
     netns ip addr add "$appvm_gw_ip" dev "$netns_appvm_if"
 
     netns ip link set "$netns_netvm_if" up
     netns ip link set "$netns_appvm_if" up
 
     netns ip route add "$appvm_ip" dev "$netns_appvm_if" src "$appvm_gw_ip"
+    netns ip route add "$netvm_gw_ip" dev "$netns_netvm_if" src "$netvm_ip"
     netns ip route add default via "$netvm_gw_ip" dev "$netns_netvm_if" src "$netvm_ip"
 
 
