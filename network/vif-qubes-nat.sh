@@ -2,7 +2,7 @@
 #set -x
 
 netvm_subnet=/24
-undetectable_netvm_ips=1
+undetectable_netvm_ips=
 
 netns="${vif}-nat"
 netvm_if="${vif}"
@@ -65,6 +65,7 @@ if test "$command" == online; then
 
         # same for the gateway/DNS IPs
         netns iptables -t raw -I PREROUTING -i "$netns_appvm_if" -d "$netvm_gw_ip" -j DROP
+        netns iptables -t raw -I PREROUTING -i "$netns_appvm_if" -d "$netvm_dns1_ip" -j DROP
         netns iptables -t raw -I PREROUTING -i "$netns_appvm_if" -d "$netvm_dns2_ip" -j DROP
     fi
 
@@ -73,6 +74,11 @@ if test "$command" == online; then
 
     netns iptables -t nat -I PREROUTING -i "$netns_appvm_if" -d "$appvm_gw_ip" -j DNAT --to-destination "$netvm_gw_ip"
     netns iptables -t nat -I POSTROUTING -o "$netns_appvm_if" -s "$netvm_gw_ip" -j SNAT --to-source "$appvm_gw_ip"
+
+    if test -n "$appvm_dns1_ip"; then
+        netns iptables -t nat -I PREROUTING -i "$netns_appvm_if" -d "$appvm_dns1_ip" -j DNAT --to-destination "$netvm_dns1_ip"
+        netns iptables -t nat -I POSTROUTING -o "$netns_appvm_if" -s "$netvm_dns1_ip" -j SNAT --to-source "$appvm_dns1_ip"
+    fi
 
     if test -n "$appvm_dns2_ip"; then
         netns iptables -t nat -I PREROUTING -i "$netns_appvm_if" -d "$appvm_dns2_ip" -j DNAT --to-destination "$netvm_dns2_ip"

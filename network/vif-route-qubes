@@ -30,6 +30,7 @@ if [ "${ip}" ]; then
     # IPs as seen by this VM
     netvm_ip="$ip"
     netvm_gw_ip=`qubesdb-read /qubes-netvm-gateway`
+    netvm_dns1_ip=`qubesdb-read /qubes-netvm-primary-dns`
     netvm_dns2_ip=`qubesdb-read /qubes-netvm-secondary-dns`
 
     back_ip="$netvm_gw_ip"
