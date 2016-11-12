@@ -5,15 +5,17 @@
 # with distribution-specific script.
 
 if [ -e /etc/redhat-release -a -x /usr/bin/dnf ]; then
-    xterm -title update -e su -l -c 'dnf update --best; echo Done. Press Enter to exit.; read x'
+    update_cmd='dnf update --best'
 elif [ -e /etc/redhat-release -a -x /usr/bin/yum ]; then
-    xterm -title update -e su -l -c 'yum update; echo Done. Press Enter to exit.; read x'
+    update_cmd='yum update'
 elif [ -e /etc/debian_version ]; then
-    xterm -title update -e su -l -c 'apt-get update && apt-get -V dist-upgrade; echo Done. Press Enter to exit.; read x'
+    update_cmd='apt-get update && apt-get -V dist-upgrade'
 elif [ -e /etc/arch-release ]; then
-    xterm -title update -e su -l -c 'pacman -Suy; echo Done. Press Enter to exit.; read x'
+    update_cmd='pacman -Suy'
 else
-    xterm -title update -e su -l -c 'echo Unsupported distribution, install updates manually; bash -i'
+    update_cmd='echo Unsupported distribution, install updates manually; bash -i'
 fi
+xterm -title update -e su -l -c "$update_cmd; echo Done. Press Enter to exit.; read x"
+
 # Notify dom0 about installed updates
 su -c 'service qubes-update-check start'
