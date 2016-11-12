@@ -10,6 +10,8 @@ elif [ -e /etc/redhat-release -a -x /usr/bin/yum ]; then
     update_cmd='yum update'
 elif [ -e /etc/debian_version ]; then
     update_cmd='apt-get update && apt-get -V dist-upgrade'
+elif [ -e /etc/arch-release -a -x /usr/bin/powerpill ]; then
+    update_cmd='powerpill -Suy'
 elif [ -e /etc/arch-release ]; then
     update_cmd='pacman -Suy'
 else
