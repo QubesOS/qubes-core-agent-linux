@@ -93,7 +93,11 @@ is_updateable() {
 }
 
 reload_random_seed() {
-    qubesdb-read /qubes-random-seed | base64 -d > /dev/urandom
+    local seed
+    local decoded
+    seed=$(qubesdb-read /qubes-random-seed)
+    decoded=$(echo "$seed" | base64 -d)
+    echo "$decoded" > /dev/urandom
     qubesdb-rm /qubes-random-seed
 }
 
