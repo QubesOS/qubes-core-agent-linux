@@ -55,42 +55,6 @@ EOF
         fi
     fi
 
-    if ! [ -d /rw/home ] ; then
-        echo "Virgin boot of the VM: populating /rw/home" >&2
-        mkdir -p /rw/home
-    fi
-
-    # Chown home if users' UIDs have changed - can be the case on template switch.
-    for pair in $(getent passwd | awk -F : '/\/home/ { print $1":"$3":"$4":"$6 } ') ; do
-        user=$(echo "$pair" | awk -F : ' { print $1 } ')
-        uid=$(echo "$pair" | awk -F : ' { print $2 } ')
-        gid=$(echo "$pair" | awk -F : ' { print $3 } ')
-        homedir=$(echo "$pair" | awk -F : ' { print $4 } ')
-        if ! test -d /rw"$homedir" ; then
-            if [ "$homedir" == "/home/user" -a -d /home.orig/"$user" ] ; then
-                echo "Virgin boot of the VM: populating /rw$homedir from /home.orig/$user" >&2
-                cp -af /home.orig/"$user" /rw"$homedir"
-            else
-                echo "Virgin boot of the VM: populating /rw$homedir from /etc/skel" >&2
-                cp -af /etc/skel /rw"$homedir"
-            fi
-            chown -R "$uid"  /rw"$homedir" &
-            chgrp -R "$gid"  /rw"$homedir" &
-            chmod 700 /rw"$homedir" &
-            wait
-        fi
-        homedir_uid=$(ls -dn /rw"$homedir" | awk '{print $3}')
-        homedir_gid=$(ls -dn /rw"$homedir" | awk '{print $4}')
-        if [ "$uid" -ne "$homedir_uid" ]; then
-            echo "Virgin boot of the VM: adjusting ownership on /rw$homedir to $uid" >&2
-            find /rw/"$homedir" -uid "$homedir_uid" -print0 | xargs -0 echo chown "$uid"
-        fi
-        if [ "$gid" -ne "$homedir_gid" ]; then
-            echo "Virgin boot of the VM: adjusting groupship on /rw$homedir to $gid" >&2
-            find /rw/"$homedir" -gid "$homedir_gid" -print0 | xargs -0 echo chgrp "$gid"
-        fi
-    done
-
     echo "Finished checking /rw" >&2
 fi
 
