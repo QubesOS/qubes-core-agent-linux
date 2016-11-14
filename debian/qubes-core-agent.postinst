@@ -111,6 +111,7 @@ case "${1}" in
             # Maybe install overridden serial.conf init script
             installSerialConf
         fi
+        systemctl reenable haveged
 
         debug "UPDATE..."
         # disable some Upstart services
