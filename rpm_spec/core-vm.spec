@@ -130,6 +130,7 @@ Requires:   nautilus-python
 Requires:   qubes-utils >= 3.1.3
 Requires:   initscripts
 Requires:   gawk
+Requires:   sed
 # for dispvm-prerun.sh
 Requires:   procps-ng
 Requires:   util-linux

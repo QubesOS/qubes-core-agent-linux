@@ -14,7 +14,8 @@ if qsvc qubes-dvm; then
     echo "Mounting /home_volatile onto /home" >&2
     mount --bind /home_volatile /home
 else
-    echo "Mounting /home" >&2
+    initialize_home "/rw/home" ifneeded
+    echo "Mounting /rw/home onto /home" >&2
     mount /home
     # https://github.com/QubesOS/qubes-issues/issues/1328#issuecomment-169483029
     # Do none of the following in a DispVM.
