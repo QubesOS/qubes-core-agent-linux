@@ -96,8 +96,7 @@ reload_random_seed() {
     local seed
     local decoded
     seed=$(qubesdb-read /qubes-random-seed)
-    decoded=$(echo "$seed" | base64 -d)
-    echo "$decoded" > /dev/urandom
+    echo "$seed" | base64 -d > /dev/urandom
     qubesdb-rm /qubes-random-seed
 }
 
