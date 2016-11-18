@@ -1,3 +1,36 @@
+qubes-core-agent (3.2.13-1) wheezy; urgency=medium
+
+  [ Manuel Amador (Rudd-O) ]
+  * Make signing optional for testing, and add program checks.
+  * Clean up early initialization and setup of /rw
+  * Better private.img size management.
+  * Invert logic of systemd_version_changed.
+  * Fix VM settings running while / is readonly.
+  * Clean up specfile unit activation aspect.
+  * Invert logic of SKIP_SIGNING.
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "network: disable proxy_arp"
+
+  [ Jean-Philippe Ouellet ]
+  * Keep Makefile DRY
+
+  [ Marek Marczykowski-Górecki ]
+  * Refactor qubes.InstallUpdatesGUI to reduce code duplication
+  * Ask to shutdown the template after performing update
+  * Prefer powerpill to update Archlinux VM
+
+  [ Patrick Schleizer ]
+  * fix reload_random_seed error handling
+
+  [ Marek Marczykowski-Górecki ]
+  * Write random seed directly to /dev/urandom
+
+  [ Manuel Amador (Rudd-O) ]
+  * Initialize home_volatile for disposable VMs.
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 18 Nov 2016 01:59:25 +0100
+
 qubes-core-agent (3.2.12-1) wheezy; urgency=medium
 
   [ unman ]
