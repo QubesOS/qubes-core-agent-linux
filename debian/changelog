@@ -1,3 +1,48 @@
+qubes-core-agent (3.1.19-1) wheezy; urgency=medium
+
+  [ Rusty Bird ]
+  * Order network management units after network-pre.target
+  * dvm, then xendriverdomain, then qrexec-agent
+  * *Do* block until good random is available again
+  * Remove 'if true' wrapper from
+    06a0d30d50ce4ea266532c06ef24880bf5363c1b
+
+  [ Patrick Schleizer ]
+  * add comment
+  * add comment
+
+  [ Rusty Bird ]
+  * Enable xendriverdomain.service in 75-qubes-vm.preset
+
+  [ Olivier MEDOC ]
+  * archlinux: update installer script in prevision of pacman.d drop-ins
+  * archlinux: provide automatic qubes-trigger-sync-appmenus through
+    pacman hooks
+  * archlinux: remove unnecessary glib-compile-scheme
+  * archlinux: switch to usage of pacman.d drop-ins
+  * archlinux: Setup default package repository
+  * archlinux: ensure repositories are the last pacman.d files included
+  * archlinux: fix update-proxy-configs to use pacman.d drop-ins
+
+  [ Marek Marczykowski-Górecki ]
+  * systemd: preset xendriverdomain on update
+  * Revert "systemd: preset xendriverdomain on update"
+  * systemd: order qubes-mount-dirs.service before local-fs.target
+  * systemd: load xen-privcmd module
+  * systemd: include tor-disabling drop-ins in the package
+  * systemd: improve ordering of systemd units
+  * network: reload NM connection after setting it up
+  * systemd: fix syntax error in preset file
+  * network: minor setup-ip fix
+
+  [ Rudd-O ]
+  * Eliminate race condition with qubes-setup-dnat-to-ns
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "network: disable proxy_arp"
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 20 Nov 2016 17:06:30 +0100
+
 qubes-core-agent (3.1.18-1) wheezy; urgency=medium
 
   * upgrade: package for simplify upgrade from R3.1 to R3.2
