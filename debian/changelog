@@ -1,3 +1,13 @@
+qubes-core-agent (3.1.20-1) wheezy; urgency=medium
+
+  [ Jean-Philippe Ouellet ]
+  * Keep Makefile DRY
+
+  [ Rusty Bird ]
+  * v2: (vm) qvm-move-to-vm: don't "rm -rf" vm name argument
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 04 Dec 2016 22:03:11 +0100
+
 qubes-core-agent (3.1.19-1) wheezy; urgency=medium
 
   [ Rusty Bird ]
