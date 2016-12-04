@@ -21,4 +21,5 @@
 #
 
 . qvm-copy-to-vm "$@" &&
+shift &&
 rm -rf -- "$@"
