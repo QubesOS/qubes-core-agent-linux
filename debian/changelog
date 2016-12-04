@@ -1,3 +1,17 @@
+qubes-core-agent (3.2.14-1) wheezy; urgency=medium
+
+  [ unman ]
+  * Add systemd override for haveged in xenial and stretch. (#2161)
+    Reenable haveged.service after debian package installation
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: drop debootstrap workaround
+
+  [ Rusty Bird ]
+  * v2: (vm) qvm-move-to-vm: don't "rm -rf" vm name argument
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 04 Dec 2016 21:57:10 +0100
+
 qubes-core-agent (3.2.13-1) wheezy; urgency=medium
 
   [ Manuel Amador (Rudd-O) ]
