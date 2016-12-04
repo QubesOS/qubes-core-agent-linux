@@ -203,7 +203,8 @@ install-common:
 	install -d $(DESTDIR)/usr/bin
 	install -m 0755 misc/qubes-session-autostart $(DESTDIR)/usr/bin/qubes-session-autostart
 
-	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-move-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
+	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
+	ln -s qvm-copy-to-vm $(DESTDIR)/usr/bin/qvm-move-to-vm
 	install qubes-rpc/wrap-in-html-if-url.sh $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
