@@ -84,7 +84,7 @@ if [ "x$PKGLIST" = "x" ]; then
     echo "Checking for dom0 updates..." >&2
     UPDATES_FULL=`$YUM $OPTS check-update`
     check_update_retcode=$?
-    UPDATES_FULL=`echo "$UPDATES_FULL" | grep -v "^Loaded plugins:\|^$"`
+    UPDATES_FULL=`echo "$UPDATES_FULL" | grep -v "^Loaded plugins:\|^Last metadata\|^$"`
     if [ $check_update_retcode -eq 1 ]; then
         # Exit here if yum have reported an error. Exit code 100 isn't an
         # error, it's "updates available" info, so check specifically for exit code 1
@@ -95,6 +95,9 @@ if [ "x$PKGLIST" = "x" ]; then
         # save not empty string for below condition (-z "$UPDATES"), but blank
         # to not confuse the user wwith magic strings in messages
         UPDATES=" "
+    elif [ $check_update_retcode -eq 0 ]; then
+        # exit code 0 means no updates available - regardless of stdout messages
+        UPDATES=""
     fi
 else
     PKGS_FROM_CMDLINE=1
