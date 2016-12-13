@@ -25,7 +25,7 @@ int handle_handshake(libvchan_t *ctrl);
 void handle_vchan_error(const char *op);
 void do_exec(const char *cmd);
 /* call before fork() for service handling process (either end) */
-void prepare_child_env(int remote_domid);
+void prepare_child_env(int remote_domid, char *remote_dom);
 
 pid_t handle_new_process(int type,
         int connect_domain, int connect_port,

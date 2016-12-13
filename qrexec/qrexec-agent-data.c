@@ -57,7 +57,7 @@ static void sigusr1_handler(int __attribute__((__unused__))x)
     signal(SIGUSR1, SIG_IGN);
 }
 
-void prepare_child_env(int remote_domid) {
+void prepare_child_env(int remote_domid, char *remote_dom) {
     char pid_s[10];
     char remote_domid_s[16];
 
@@ -67,6 +67,8 @@ void prepare_child_env(int remote_domid) {
     setenv("QREXEC_AGENT_PID", pid_s, 1);
     snprintf(remote_domid_s, sizeof(remote_domid_s), "%d", remote_domid);
     setenv("QREXEC_REMOTE_DOMAIN_ID", remote_domid_s, 1);
+    if (remote_dom) /* otherwise, multiplexer handles this later */
+        setenv("QREXEC_REMOTE_DOMAIN", remote_dom, 1);
 }
 
 int handle_handshake(libvchan_t *ctrl)
@@ -514,7 +516,7 @@ int handle_new_process_common(int type, int connect_domain, int connect_port,
     }
     handle_handshake(data_vchan);
 
-    prepare_child_env(connect_domain);
+    prepare_child_env(connect_domain, NULL);
     /* TODO: use setresuid to allow child process to actually send the signal? */
 
     switch (type) {
