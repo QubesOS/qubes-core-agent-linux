@@ -40,7 +40,7 @@ md5sums=( '88f4b3d5b156888a9d38f5bc28702ab8' 'bbfb946d6d2787e5abf8e2236502a3d4'
 
 build() {
 
-for source in autostart-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network ; do
+for source in autostart-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network init; do
   (ln -s $srcdir/../$source $srcdir/$source)
 done
 
