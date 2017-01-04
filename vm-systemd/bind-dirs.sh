@@ -3,6 +3,7 @@
 #
 # bind-dirs
 # Binds directories which allows changes in TemplateBasedVM to persist.
+# https://www.qubes-os.org/doc/bind-dirs/
 #
 # To umount all bind-dirs, just pass any arg in $1, like umount
 #
