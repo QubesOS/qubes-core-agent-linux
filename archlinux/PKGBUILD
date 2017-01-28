@@ -6,7 +6,7 @@
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 pkgname=qubes-vm-core
 pkgver=`cat version`
-pkgrel=9
+pkgrel=10
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
@@ -14,7 +14,7 @@ url="http://qubes-os.org/"
 license=('GPL')
 groups=()
 depends=("qubes-vm-utils>=3.1.3" python2 python3 python2-xdg ethtool ntp net-tools gnome-packagekit imagemagick fakeroot notification-daemon dconf pygtk zenity qubes-libvchan qubes-db-vm haveged python2-gobject python2-dbus xdg-utils notification-daemon)
-makedepends=(gcc make pkg-config "qubes-vm-utils>=3.1.3" qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python2 python3)
+makedepends=(gcc make pkg-config "qubes-vm-utils>=3.1.3" qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python2 python3 lsb-release)
 checkdepends=()
 optdepends=(gnome-keyring gnome-settings-daemon networkmanager iptables tinyproxy python2-nautilus gpk-update-viewer)
 provides=()
@@ -40,7 +40,7 @@ md5sums=( '88f4b3d5b156888a9d38f5bc28702ab8' 'bbfb946d6d2787e5abf8e2236502a3d4'
 
 build() {
 
-for source in autostart-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network init; do
+for source in autostart-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network init version; do
   (ln -s $srcdir/../$source $srcdir/$source)
 done
 
