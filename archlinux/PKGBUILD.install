@@ -319,11 +319,15 @@ fi
 
 update_finalize() {
 
-	# Archlinux specific: Cleanup pre pacman.d qubes marker
+	# Archlinux specific: If marker exists, cleanup text between begin and end marker
 	QUBES_MARKER="### QUBES CONFIG MARKER ###"
 	if grep -F -q "$QUBES_MARKER" /etc/pacman.conf; then
 		config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "### QUBES CONFIG END MARKER ###"
 		config_cleanupmark "/etc/pacman.conf" "$QUBES_MARKER" "### QUBES CONFIG END MARKER ###"
+	# Else, add qubes config block marker
+	else
+		config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "$QUBES_MARKER"
+		config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "### QUBES CONFIG END MARKER ###"
 	fi
 
 	# Include /etc/pacman.d drop-in directory
