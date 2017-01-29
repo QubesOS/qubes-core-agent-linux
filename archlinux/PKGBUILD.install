@@ -58,7 +58,7 @@ pre_upgrade() {
 
 configure_notification-daemon() {
     # Enable autostart of notification-daemon when installed
-    if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
+    if [ ! -L /etc/xdg/autostart/notification-daemon.desktop ]; then
         ln -s /usr/share/applications/notification-daemon.desktop /etc/xdg/autostart/
     fi
 }
@@ -152,6 +152,10 @@ EOF
 ############################
 ## Service Management Functions ##
 ############################
+is_static() {
+    [ -f "/usr/lib/systemd/system/$1" ] && ! grep -q '^[[].nstall]' "/usr/lib/systemd/system/$1"
+}
+
 is_masked() {
     if [ ! -L /etc/systemd/system/"$1" ]
     then
@@ -227,7 +231,8 @@ restore_units() {
 
 configure_systemd() {
 
-if [ $1 -eq 1 ]; then
+if [ $1 -eq 1 ]
+then
     preset_units /usr/lib/systemd/system-preset/$qubes_preset_file initial
     changed=true
 else
@@ -244,7 +249,7 @@ else
     done
 fi
 
-if [ $1 -eq 1 ]; then
+if [ $1 -eq 1 ]
 then
     # First install.
     # Set default "runlevel".
@@ -408,6 +413,7 @@ post_upgrade() {
 
 	configure_systemd 1
 
+
 	update_finalize
 
 }
@@ -427,7 +433,7 @@ pre_remove() {
     if [ -e /var/lib/qubes/serial.orig ] ; then
     mv /var/lib/qubes/serial.orig /etc/init/serial.conf
     fi
-    
+
     if [ $1 -eq 0 ] ; then
         # Run this only during uninstall.
         # Save the preset file to later use it to re-preset services there
