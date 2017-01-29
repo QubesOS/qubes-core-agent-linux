@@ -1,3 +1,4 @@
+qubes_preset_file="75-qubes-vm.preset"
 
 ###########################
 ## Pre-Install functions ##
@@ -101,6 +102,8 @@ update_qubesconfig() {
 	#  echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
 	#  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
 	#fi
+	#/usr/lib/qubes/update-proxy-configs
+	# Archlinux pacman configuration is handled in update_finalize
 
 	# Location of files which contains list of protected files
 	mkdir -p /etc/qubes/protected-files.d
@@ -146,58 +149,135 @@ EOF
 
 }
 
-configure_systemd() {
+############################
+## Service Management Functions ##
+############################
+is_masked() {
+    if [ ! -L /etc/systemd/system/"$1" ]
+    then
+       return 1
+    fi
+    target=`readlink /etc/systemd/system/"$1" 2>/dev/null` || :
+    if [ "$target" = "/dev/null" ]
+    then
+       return 0
+    fi
+    return 1
+}
 
-PRESET_FAILED=0
+mask() {
+    ln -sf /dev/null /etc/systemd/system/"$1"
+}
 
-if [ $1 -eq 1 ]; then
-    # Needs to be started two times to deal  with services name changes (systemctl bug?)
-    echo "Resetting systemd services to defaults presets (PASS 1)"
-    systemctl --no-reload preset-all 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
-    echo "Resetting systemd services to defaults presets (PASS 2)"
-    systemctl --no-reload preset-all 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
-else
-    services="qubes-dvm qubes-misc-post qubes-firewall qubes-mount-dirs"
-    services="$services qubes-netwatcher qubes-network qubes-sysinit"
-    services="$services qubes-iptables qubes-updates-proxy qubes-qrexec-agent"
-    services="$services qubes-random-seed"
-    for srv in $services; do
-        echo "Enable service defaults for $service"
-        systemctl --no-reload preset $srv.service
-    done
-    systemctl --no-reload preset qubes-update-check.timer
-    # Upgrade path - now qubes-iptables is used instead
-    systemctl --no-reload preset iptables.service
-    systemctl --no-reload preset ip6tables.service
-fi
+unmask() {
+    if ! is_masked "$1"
+    then
+        return 0
+    fi
+    rm -f /etc/systemd/system/"$1"
+}
 
-# Set default "runlevel"
-rm -f /etc/systemd/system/default.target
-ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
-
-grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
-    case "$action" in
-    (disable)
-        if [ -f /lib/systemd/system/$unit_name ]; then
-            if ! fgrep -q '[Install]' /lib/systemd/system/$unit_name; then
-                # forcibly disable
-                ln -sf /dev/null /etc/systemd/system/$unit_name
+preset_units() {
+    local represet=
+    cat "$1" | while read action unit_name
+    do
+        if [ "$action" = "#" -a "$unit_name" = "Units below this line will be re-preset on package upgrade" ]
+        then
+            represet=1
+            continue
+        fi
+        echo "$action $unit_name" | grep -q '^[[:space:]]*[^#;]' || continue
+        [ -n "$action" -a -n "$unit_name" ] || continue
+        if [ "$2" = "initial" -o "$represet" = "1" ]
+        then
+            if [ "$action" = "disable" ] && is_static "$unit_name"
+            then
+                if ! is_masked "$unit_name"
+                then
+                    # We must effectively mask these units, even if they are static.
+                    mask "$unit_name"
+                fi
+            elif [ "$action" = "enable" ] && is_static "$unit_name"
+            then
+                if is_masked "$unit_name"
+                then
+                    # We masked this static unit before, now we unmask it.
+                    unmask "$unit_name"
+                fi
+                 systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
+            else
+                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
             fi
         fi
-        ;;
-    *)
-        # preset-all is not available in fc20; so preset each unit file listed in 75-qubes-vm.preset
-        if [ $1 -eq 1 -a "${PRESET_FAILED}" -eq 1 ]; then
-            systemctl --no-reload preset "${unit_name}" > /dev/null 2>&1 || true
-        fi
-        ;;
-    esac
-done
+    done
+}
 
-systemctl daemon-reload
+restore_units() {
+    grep '^[[:space:]]*[^#;]' "$1" | while read action unit_name
+    do
+        if is_static "$unit_name" && is_masked "$unit_name"
+        then
+            # If the unit had been masked by us, we must unmask it here.
+            # Otherwise systemctl preset will fail badly.
+            unmask "$unit_name"
+        fi
+        systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
+    done
+}
+
+configure_systemd() {
+
+if [ $1 -eq 1 ]; then
+    preset_units /usr/lib/systemd/system-preset/$qubes_preset_file initial
+    changed=true
+else
+    preset_units /usr/lib/systemd/system-preset/$qubes_preset_file upgrade
+    changed=true
+    # Upgrade path - now qubes-iptables is used instead
+    for svc in iptables ip6tables
+    do
+      if [ -f "$svc".service ]
+      then
+        systemctl --no-reload preset "$svc".service
+	changed=true
+      fi
+    done
+fi
+
+if [ $1 -eq 1 ]; then
+then
+    # First install.
+    # Set default "runlevel".
+    # FIXME: this ought to be done via kernel command line.
+    # The fewer deviations of the template from the seed
+    # image, the better.
+    rm -f /etc/systemd/system/default.target
+    ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+    changed=true
+fi
+
+# remove old symlinks
+if [ -L /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service ]
+then
+    rm -f /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service
+    changed=true
+fi
+if [ -L /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service ]
+then
+    rm -f /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service
+    changed=true
+fi
+
+if [ "x$changed" != "x" ]
+then
+    systemctl daemon-reload
+fi
 
 }
 
+######################
+## Archlinux Specific Functions ##
+######################
 config_prependtomark() {
 FILE=$1
 APPENDBEFORELINE=$2
@@ -243,6 +323,8 @@ update_finalize() {
 
 	# Include /etc/pacman.d drop-in directory
 	config_appendtomark "/etc/pacman.conf" "$QUBES_MARKER" "Include = /etc/pacman.d/*.conf"
+
+	/usr/lib/qubes/update-proxy-configs
 
 	# Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
 	# Also remove pam_unix.so from su configuration
@@ -345,11 +427,37 @@ pre_remove() {
     if [ -e /var/lib/qubes/serial.orig ] ; then
     mv /var/lib/qubes/serial.orig /etc/init/serial.conf
     fi
+    
+    if [ $1 -eq 0 ] ; then
+        # Run this only during uninstall.
+        # Save the preset file to later use it to re-preset services there
+        # once the Qubes OS preset file is removed.
+        mkdir -p /run/qubes-uninstall
+        cp -f /usr/lib/systemd/system-preset/$qubes_preset_file /run/qubes-uninstall/
+        cp -f /usr/lib/systemd/system-preset/$qubes_preset_file /run/qubes-uninstall/
+    fi
 
 }
 
 ## arg 1:  the old package version
 post_remove() {
+
+    changed=
+
+    if [ -d /run/qubes-uninstall ]
+    then
+        # We have a saved preset file (or more).
+        # Re-preset the units mentioned there.
+        restore_units /run/qubes-uninstall/$qubes_preset_file
+        rm -rf /run/qubes-uninstall
+        changed=true
+    fi
+
+    if [ "x$changed" != "x" ]
+    then
+        systemctl daemon-reload
+    fi
+
 
     if [ -L /lib/firmware/updates ] ; then
       rm /lib/firmware/updates
