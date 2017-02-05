@@ -1,0 +1,8 @@
+Index: core-agent-linux/misc/30_cron.conf
+===================================================================
+--- core-agent-linux.orig/misc/30_cron.conf    2017-01-06 22:47:57.855061937 +0000
++++ core-agent-linux/misc/30_cron.conf 2017-01-07 01:31:16.382061937 +0000
+@@ -1 +1,2 @@
+ binds+=( '/var/spool/cron' )
++binds+=( '/var/spool/anacron' )
+

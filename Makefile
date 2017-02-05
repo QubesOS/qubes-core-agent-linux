@@ -77,6 +77,9 @@ ifeq ($(shell lsb_release -is), Debian)
 
     # handled by qubes-iptables service now
     SYSTEM_DROPINS += netfilter-persistent.service
+
+    SYSTEM_DROPINS += anacron.service
+    SYSTEM_DROPINS += anacron-resume.service
 endif
 
 install-systemd-dropins:
