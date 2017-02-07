@@ -10,6 +10,10 @@ ifeq ($(PACKAGE_SET),vm)
   ARCH_BUILD_DIRS := archlinux
 endif
 
+ifeq ($(DIST),trusty)
+  $(shell sed -i /locales-all,/d  $(CHROOT_DIR)/$(DIST_SRC)/debian/control)
+endif
+
 source-debian-quilt-copy-in: VERSION = $(shell cat $(ORIG_SRC)/version)
 source-debian-quilt-copy-in: ORIG_FILE = "$(CHROOT_DIR)/$(DIST_SRC)/../qubes-core-agent_$(VERSION).orig.tar.gz"
 source-debian-quilt-copy-in:
