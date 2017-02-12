@@ -51,6 +51,10 @@ while true; do
 		DISPLAY=:0 /usr/bin/notify-send -t 3000 "Firewall loading error ($(hostname))" "$OUT" || :
 	fi
 
+	if [ `systemctl is-active qubes-updates-proxy` = "active" ]; then
+		iptables -I INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
+	fi
+
 	# Check if user didn't define some custom rules to be applied as well...
 	[ -x /rw/config/qubes-firewall-user-script ] && /rw/config/qubes-firewall-user-script
 	# XXX: Backward compatibility
