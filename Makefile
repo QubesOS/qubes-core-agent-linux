@@ -63,6 +63,15 @@ SYSTEM_DROPINS += tor.service tor@default.service
 
 USER_DROPINS := pulseaudio.service pulseaudio.socket
 
+# Ubuntu Dropins
+ifeq ($(shell lsb_release -is), Ubuntu)
+
+    # 'crond.service' is named 'cron.service in Debian
+    SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
+    SYSTEM_DROPINS += anacron.service
+    SYSTEM_DROPINS += anacron-resume.service
+endif
+
 # Debian Dropins
 ifeq ($(shell lsb_release -is), Debian)
     # Don't have 'ntpd' in Debian
@@ -77,6 +86,9 @@ ifeq ($(shell lsb_release -is), Debian)
 
     # handled by qubes-iptables service now
     SYSTEM_DROPINS += netfilter-persistent.service
+
+    SYSTEM_DROPINS += anacron.service
+    SYSTEM_DROPINS += anacron-resume.service
 endif
 
 install-systemd-dropins:
