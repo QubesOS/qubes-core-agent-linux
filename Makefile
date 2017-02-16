@@ -308,6 +308,8 @@ install-deb: install-common install-systemd install-systemd-dropins
 	install -m 0644 misc/pam.d_su.qubes $(DESTDIR)/etc/pam.d/su.qubes
 	install -d $(DESTDIR)/etc/needrestart/conf.d
 	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
+	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
+	install -m 0644 misc/org.gnome.nautilus.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 
 
 install-vm: install-rh install-common
