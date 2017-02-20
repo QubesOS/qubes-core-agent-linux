@@ -124,6 +124,10 @@ case "${1}" in
         done
         dpkg-divert --divert /etc/init/serial.conf.qubes-orig --package qubes-core-agent --rename --add /etc/init/serial.conf
 
+        if [ ! -L /etc/systemd/system/rpcbind.service ]; then
+            ln -s /dev/null /etc/systemd/system/rpcbind.service
+        fi
+
         # Remove old firmware updates link
         if [ -L /lib/firmware/updates ]; then
             rm -f /lib/firmware/updates

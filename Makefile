@@ -89,6 +89,8 @@ ifeq ($(shell lsb_release -is), Debian)
 
     SYSTEM_DROPINS += anacron.service
     SYSTEM_DROPINS += anacron-resume.service
+    SYSTEM_DROPINS += exim4.service
+    SYSTEM_DROPINS += avahi-daemon.service
 endif
 
 install-systemd-dropins:
