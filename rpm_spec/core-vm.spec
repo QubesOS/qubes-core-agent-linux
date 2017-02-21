@@ -655,8 +655,8 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/tor.service.d/30_qubes.conf
 /lib/systemd/system/tor@default.service.d/30_qubes.conf
 /lib/systemd/system/tmp.mount.d/30_qubes.conf
-/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
-/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
+/usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
+/usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
 /usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
 
 %post systemd

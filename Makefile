@@ -51,7 +51,8 @@ all:
 	make -C qubes-rpc
 
 # Dropin Directory
-DROPIN_DIR ?= "lib/systemd"
+SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
+USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
 SYSTEM_DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
 SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
@@ -96,14 +97,14 @@ endif
 install-systemd-dropins:
 	# Install system dropins
 	@for dropin in $(SYSTEM_DROPINS); do \
-	    install -d $(DESTDIR)/$(DROPIN_DIR)/system/$${dropin}.d ;\
-	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/system/$${dropin}.d/ ;\
+	    install -d $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
 
 	# Install user dropins
 	@for dropin in $(USER_DROPINS); do \
-	    install -d $(DESTDIR)/$(DROPIN_DIR)/user/$${dropin}.d ;\
-	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)/$(DROPIN_DIR)/user/$${dropin}.d/ ;\
+	    install -d $(DESTDIR)/$(USER_DROPIN_DIR)/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)/$(USER_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
 
 install-init:
