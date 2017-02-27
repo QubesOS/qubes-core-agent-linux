@@ -1,8 +1,18 @@
 #!/bin/sh
 
+dev=/dev/xvdb
+
 if mountpoint -q /rw ; then
     # This means /rw is mounted now.
     echo "Checking /rw" >&2
+
+    echo "Private device size management: enlarging $dev" >&2
+    if content=$(resize2fs "$dev" 2>&1) ; then
+        echo "Private device size management: resize2fs of $dev succeeded" >&2
+    else
+        echo "Private device size management: resize2fs $dev failed:" >&2
+        echo "$content" >&2
+    fi
 
     if ! [ -d /rw/config ] ; then
         echo "Virgin boot of the VM: populating /rw/config" >&2

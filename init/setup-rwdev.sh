@@ -26,27 +26,11 @@ if [ -e "$dev" ] ; then
         fi
     fi
 
-    echo "Private device size management: enlarging $dev" >&2
-    if content=$(resize2fs "$dev" 2>&1) ; then
-        echo "Private device size management: resize2fs of $dev succeeded" >&2
+    echo "Private device management: checking $dev" >&2
+    if content=$(fsck.ext4 -p "$dev" 2>&1) ; then
+        echo "Private device management: fsck.ext4 of $dev succeeded" >&2
     else
-        echo "Private device size management: resize2fs $dev failed:" >&2
+        echo "Private device management: fsck.ext4 $dev failed:" >&2
         echo "$content" >&2
-        echo "Private device size management: attempting to mark $dev clean" >&2
-        if content=$(fsck.ext4 -fp "$dev" 2>&1) ; then
-            echo "Private device size management: $dev marked clean, enlarging it again" >&2
-            if content=$(resize2fs "$dev" 2>&1) ; then
-                echo "Private device size management: resize2fs of $dev succeeded" >&2
-            else
-                echo "Private device size management: resize2fs of $dev failed even after marking file system clean:" >&2
-                echo "$content" >&2
-                echo "Private device size management: expect serious trouble ahead" >&2
-            fi
-        else
-            echo "Private device size management: $dev could not be marked clean:" >&2
-            echo "$content" >&2
-            echo "Private device size management: expect serious trouble ahead" >&2
-        fi
     fi
-
 fi
