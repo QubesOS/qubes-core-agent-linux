@@ -1,3 +1,58 @@
+qubes-core-agent (3.2.16-1) unstable; urgency=medium
+
+  [ Andrew David Wong ]
+  * Update Xen bug count in sudoers comment
+
+  [ Nicklaus McClendon ]
+  * Copied needed sources to build root
+
+  [ Patrick Schleizer ]
+  * comment
+
+  [ Olivier MEDOC ]
+  * archlinux: fix community repositories URL
+
+  [ Lorenzo ]
+  * Shut down after update only if it's a template.
+  * Shut down after update only if it's a template.
+
+  [ Olivier MEDOC ]
+  * archlinux: fix lsb_release missing
+  * archlinux: update installer script to use systemd preset file
+  * archlinux: fix bash syntax errors
+  * Makefile: enforce mode 750 for directories /etc/sudoers.d and
+    /etc/polkit-1/rules.d
+  * archlinux: fix pacman.d dropin not activated if pacman.conf does not
+    already contains qubes markers
+  * archlinux: add missing qubes-rpc dependencies
+
+  [ Gregorio Guidi ]
+  * Restore functionality of disable-default-route and disable-dns-
+    server.
+
+  [ unman ]
+  * Stop anacron from starting in Debian using existing constraint on
+    cron
+  * Constrain cron and anacron in Ubuntu also
+  * Reset iptables ACCEPT rule for updates proxy if service is running
+  * Fix build for trusty - locales-all not available
+  * Move trusty check and locales-all fix inside source-debian-quilt-
+    copy-in
+  * Apply gschema override preventing previews in nautilus in Debian
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: fix lintian warning - command-with-path-in-maintainer-script
+  * debian: don't fail the upgrade if glib-compile-schemas fails
+
+  [ unman ]
+  * Stop unnecessary services in Debian
+
+  [ Marek Marczykowski-Górecki ]
+  * systemd: place user dropins in /usr/lib instead of /lib
+  * Use online resize2fs, and run filesystem check only when needed
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 07 Mar 2017 23:04:47 +0100
+
 qubes-core-agent (3.2.15-1) wheezy; urgency=medium
 
   * Fix detection of dom0 updates
