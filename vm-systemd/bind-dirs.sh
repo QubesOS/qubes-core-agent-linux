@@ -55,7 +55,7 @@ bind_dirs() {
    ## ro: read-only
    ## rw: read-write
 
-   for fso_ro in ${binds[@]}; do
+   for fso_ro in "${binds[@]}"; do
       local symlink_level_counter
       symlink_level_counter="0"
 
