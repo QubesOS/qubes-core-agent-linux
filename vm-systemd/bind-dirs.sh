@@ -87,15 +87,21 @@ bind_dirs() {
          continue
       fi
 
-      # Initially copy over data directories to /rw if rw directory does not exist.
-      if [ -d "$fso_ro" ] || [ -f "$fso_ro" ]; then
-         if ! [ -d "$fso_rw" -o -f "$fso_rw" ]; then
-            echo "Initializing $rw_dest_dir with files from $fso_ro" >&2
-            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
+      if [ -d "$fso_rw" ] || [ -f "$fso_rw" ]; then
+         if [ ! -e "$fso_ro" ]; then
+            ## Create empty file or directory if path exists in /rw to allow to bind mount none existing files/dirs.
+            test -d "$fso_rw" && mkdir --parents "$fso_ro"
+            test -f "$fso_rw" && touch "$fso_ro"
          fi
       else
-         true "$fso_ro is neither a directory nor a file or does not exist, skipping."
-         continue
+         if [ -d "$fso_ro" ] || [ -f "$fso_ro" ]; then
+            ## Initially copy over data directories to /rw if rw directory does not exist.
+            echo "Initializing $rw_dest_dir with files from $fso_ro" >&2
+            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
+         else
+            true "$fso_ro is neither a directory nor a file and the path does not exist below /rw, skipping."
+            continue
+         fi
       fi
 
       # Bind the fso.
