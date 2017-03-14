@@ -25,7 +25,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Source Qubes library.
-. /usr/lib/qubes/init/functions
+source /usr/lib/qubes/init/functions
 
 prerequisite() {
    if ! is_rwonly_persistent ; then
@@ -111,6 +111,7 @@ main() {
    bind_dirs "$@"
 }
 
+binds=()
 for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do
    true "source_folder: $source_folder"
    if [ ! -d "$source_folder" ]; then
@@ -118,6 +119,7 @@ for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/confi
    fi
    for file_name in "$source_folder/"*".conf" ; do
       bash -n "$file_name"
+      # shellcheck source=/dev/null
       source "$file_name"
    done
 done
