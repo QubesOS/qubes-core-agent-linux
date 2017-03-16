@@ -6,8 +6,6 @@ NAME
 ====
 qvm-open-in-dvm - open a specified file in disposable VM
 
-:Date:   2012-05-30
-
 SYNOPSIS
 ========
 | qvm-open-in-dvm filename

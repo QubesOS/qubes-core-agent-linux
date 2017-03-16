@@ -6,8 +6,6 @@ NAME
 ====
 qvm-copy-to-vm - copy specified files to specified destination VM
 
-:Date:   2012-05-30
-
 SYNOPSIS
 ========
 | qvm-copy-to-vm [--without-progress] dest_vmname file [file]+

@@ -6,8 +6,6 @@ NAME
 ====
 qvm-open-in-vm - open a specified file in other VM
 
-:Date:   2012-05-30
-
 SYNOPSIS
 ========
 | qvm-open-in-vm vmname filename

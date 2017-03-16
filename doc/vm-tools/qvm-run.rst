@@ -6,8 +6,6 @@ NAME
 ====
 qvm-run - run a specified command in a specified VM
 
-:Date:   2012-05-30
-
 SYNOPSIS
 ========
 | qvm-run vmname command [aguments]
