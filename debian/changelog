@@ -1,3 +1,21 @@
+qubes-core-agent (3.2.17-1) unstable; urgency=medium
+
+  [ Jean-Philippe Ouellet ]
+  * Remove dates from man pages
+
+  [ Robin Schneider ]
+  * bind-dirs: Create ro if bind target exists
+  * Fix handling of binds containing spaces
+  * Fix more shellcheck warnings
+
+  [ unman ]
+  * If there is only 1 DNS server make both DNAT rules point to it
+
+  [ Daniel Moerner ]
+  * network: Properly handle comments in NetworkManager.conf (#2584)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 01 Apr 2017 21:45:29 +0200
+
 qubes-core-agent (3.2.16-1) unstable; urgency=medium
 
   [ Andrew David Wong ]
