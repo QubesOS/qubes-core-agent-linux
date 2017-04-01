@@ -5,6 +5,8 @@ addrule()
                 FIRSTONE=no
                 RULE1="-A PR-QBS -d $NS1 -p udp --dport 53 -j DNAT --to $1
 -A PR-QBS -d $NS1 -p tcp --dport 53 -j DNAT --to $1"
+                RULE2="-A PR-QBS -d $NS2 -p udp --dport 53 -j DNAT --to $1
+-A PR-QBS -d $NS2 -p tcp --dport 53 -j DNAT --to $1"
         else
                 RULE2="-A PR-QBS -d $NS2 -p udp --dport 53 -j DNAT --to $1
 -A PR-QBS -d $NS2 -p tcp --dport 53 -j DNAT --to $1"
