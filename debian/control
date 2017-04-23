@@ -59,7 +59,6 @@ Depends:
     ${misc:Depends}
 Recommends:
     cups,
-    gnome-packagekit,
     gnome-terminal,
     gnome-themes-standard,
     haveged,

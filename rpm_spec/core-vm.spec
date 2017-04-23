@@ -139,10 +139,6 @@ Requires:   pygobject3-base
 Requires:   dbus-python
 # for qubes-session-autostart, xdg-icon
 Requires:   pyxdg
-%if %{fedora} >= 20
-# gpk-update-viewer required by qubes-manager
-Requires:   gnome-packagekit-updater
-%endif
 Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   fakeroot
