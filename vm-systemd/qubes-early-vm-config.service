@@ -2,7 +2,7 @@
 Description=Early Qubes VM settings
 DefaultDependencies=no
 Before=sysinit.target
-After=local-fs.target
+After=local-fs.target qubes-db.service
 
 [Service]
 Type=oneshot
