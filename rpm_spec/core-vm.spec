@@ -261,7 +261,7 @@ if [ -L /lib/firmware/updates ]; then
   rm -f /lib/firmware/updates
 fi
 
-if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
+if test -f /etc/yum.conf && ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
   echo >> /etc/yum.conf
   echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
   echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
