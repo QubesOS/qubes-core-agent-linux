@@ -1,3 +1,13 @@
+qubes-core-agent (3.2.18-1) unstable; urgency=medium
+
+  * debian,fedora: drop gnome-packagekit from dependencies
+  * systemd: fix race condition between qubes-db and qubes-early-vm-
+    config
+  * dispvm: don't use perl to decode base64-encoded script
+  * rpm: don't "append" to not existing /etc/yum.conf
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 16 May 2017 00:54:18 +0200
+
 qubes-core-agent (3.2.17-1) unstable; urgency=medium
 
   [ Jean-Philippe Ouellet ]
