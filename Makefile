@@ -198,6 +198,7 @@ install-common:
 		misc/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override \
 		misc/20_org.gnome.nautilus.qubes.gschema.override \
 		misc/20_org.mate.NotificationDaemon.qubes.gschema.override \
+		misc/20_org.gnome.desktop.wm.preferences.qubes.gschema.override \
 		$(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc

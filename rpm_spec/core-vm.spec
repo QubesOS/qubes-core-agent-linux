@@ -523,6 +523,7 @@ rm -f %{name}-%{version}
 /usr/share/glib-2.0/schemas/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.gnome.nautilus.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.mate.NotificationDaemon.qubes.gschema.override
+/usr/share/glib-2.0/schemas/20_org.gnome.desktop.wm.preferences.qubes.gschema.override
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
