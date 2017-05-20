@@ -23,7 +23,7 @@ python2:
 python3:
 	rm -rf py3
 	mkdir -p py3
-	cp dnf-qubes-hooks.py xdg.py py3/
+	cp dnf-qubes-hooks.py qubesxdg.py py3/
 	python3 -m compileall py3
 	python3 -O -m compileall py3
 

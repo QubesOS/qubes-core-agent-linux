@@ -25,7 +25,7 @@ import subprocess
 import sys
 
 from xdg.DesktopEntry import DesktopEntry
-from qubes.xdg import launch
+from qubesxdg import launch
 import xdg.BaseDirectory
 import os
 

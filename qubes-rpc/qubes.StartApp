@@ -1,0 +1,24 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+    echo "This service require an argument" >&2
+    exit 1
+fi
+
+# make sure it have .desktop suffix, and only one of it
+app_basename="${1%.desktop}.desktop"
+
+# Based on XDG Base Directory Specification, Version 0.7
+[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
+[ -n "$XDG_DATA_DIRS" ] || XDG_DATA_DIRS="/usr/local/share:/usr/share"
+
+for dir in $(echo "$XDG_DATA_HOME:$XDG_DATA_DIRS" | tr : ' '); do
+    if ! [ -d "$dir/applications" ]; then
+        continue
+    fi
+    if [ -f "$dir/applications/$app_basename" ]; then
+        exec qubes-desktop-run "$dir/applications/$app_basename"
+    fi
+done
+echo "applications/$app_basename not found in $XDG_DATA_HOME:$XDG_DATA_DIRS" >&2
+exit 1

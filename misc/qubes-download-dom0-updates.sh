@@ -2,7 +2,6 @@
 
 DOM0_UPDATES_DIR=/var/lib/qubes/dom0-updates
 
-DOIT=0
 GUI=1
 CLEAN=0
 CHECK_ONLY=0
@@ -17,7 +16,7 @@ export LC_ALL=C
 while [ -n "$1" ]; do
     case "$1" in
         --doit)
-            DOIT=1
+            # ignore
             ;;
         --nogui)
             GUI=0
@@ -80,48 +79,30 @@ if [ "$CLEAN" = "1" ]; then
     rm -rf $DOM0_UPDATES_DIR/var/cache/yum/*
 fi
 
-if [ "x$PKGLIST" = "x" ]; then
+# just check for updates, but don't download any package
+if [ "x$PKGLIST" = "x" -a "$CHECK_ONLY" = "1" ]; then
     echo "Checking for dom0 updates..." >&2
     UPDATES_FULL=`$YUM $OPTS check-update`
     check_update_retcode=$?
-    UPDATES_FULL=`echo "$UPDATES_FULL" | grep -v "^Loaded plugins:\|^Last metadata\|^$"`
     if [ $check_update_retcode -eq 1 ]; then
         # Exit here if yum have reported an error. Exit code 100 isn't an
         # error, it's "updates available" info, so check specifically for exit code 1
         exit 1
     fi
-    UPDATES=`echo "$UPDATES_FULL" | grep -v "^Obsoleting\|Could not" | cut -f 1 -d ' '`
-    if [ -z "$UPDATES" -a $check_update_retcode -eq 100 ]; then
-        # save not empty string for below condition (-z "$UPDATES"), but blank
-        # to not confuse the user wwith magic strings in messages
-        UPDATES=" "
-    elif [ $check_update_retcode -eq 0 ]; then
-        # exit code 0 means no updates available - regardless of stdout messages
-        UPDATES=""
+    if [ $check_update_retcode -eq 100 ]; then
+        echo "Available updates: "
+        echo "$UPDATES_FULL"
+        exit 100
+    else
+        echo "No new updates available"
+        if [ "$GUI" = 1 ]; then
+            zenity --info --text="No new updates available"
+        fi
+        exit 0
     fi
-else
-    PKGS_FROM_CMDLINE=1
 fi
 
-if [ -z "$PKGLIST" -a -z "$UPDATES" ]; then
-    echo "No new updates available"
-    if [ "$GUI" = 1 ]; then
-        zenity --info --text="No new updates available"
-    fi
-    exit 0
-fi
-
-if [ "$CHECK_ONLY" = "1" ]; then
-    echo "Available updates: "
-    echo "$UPDATES_FULL"
-    exit 100
-fi
-
-if [ "$DOIT" != "1" -a "$PKGS_FROM_CMDLINE" != "1" ]; then
-    zenity --question --title="Qubes Dom0 updates" \
-      --text="There are updates for dom0 available, do you want to download them now?" || exit 0
-fi
-
+# now, we will download something
 YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y --downloadonly"
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
@@ -135,6 +116,15 @@ if ! $YUM --help | grep -q downloadonly; then
         exit 1
     fi
     if [ "$YUM_ACTION" = "upgrade" ]; then
+        UPDATES_FULL=`$YUM $OPTS check-update $PKGLIST`
+        check_update_retcode=$?
+        UPDATES_FULL=`echo "$UPDATES_FULL" | grep -v "^Loaded plugins:\|^Last metadata\|^$"`
+        UPDATES=`echo "$UPDATES_FULL" | grep -v "^Obsoleting\|Could not" | cut -f 1 -d ' '`
+        if [ $check_update_retcode -eq 0 ]; then
+            # exit code 0 means no updates available - regardless of stdout messages
+            echo "No new updates available"
+            exit 0
+        fi
         PKGLIST=$UPDATES
     fi
     YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"

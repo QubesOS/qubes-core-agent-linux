@@ -56,7 +56,6 @@ sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i qubes-rpc/*
 
 # Fix for archlinux sbindir
 sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
-sed 's:/usr/sbin/qubes-netwatcher:/usr/bin/qubes-netwatcher:g' -i vm-systemd/qubes-netwatcher.service
 sed 's:/usr/sbin/qubes-firewall:/usr/bin/qubes-firewall:g' -i vm-systemd/qubes-firewall.service
 
 for dir in qubes-rpc qrexec misc; do

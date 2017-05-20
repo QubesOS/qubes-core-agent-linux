@@ -20,7 +20,7 @@
 #
 #
 
-%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-netwatcher qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-dvm
+%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-dvm
 %define qubes_preset_file 75-qubes-vm.preset
 
 %{!?version: %define version %(cat version)}
@@ -139,6 +139,8 @@ Requires:   pygobject3-base
 Requires:   dbus-python
 # for qubes-session-autostart, xdg-icon
 Requires:   pyxdg
+Requires:   python-daemon
+Requires:   nftables
 Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   fakeroot
@@ -157,6 +159,7 @@ Requires:   python2-dnf-plugins-qubes-hooks
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
 BuildRequires: xen-devel
+BuildRequires: python3-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
@@ -430,6 +433,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetImageRGBA
 %config(noreplace) /etc/qubes-rpc/qubes.SetDateTime
 %config(noreplace) /etc/qubes-rpc/qubes.InstallUpdatesGUI
+%config(noreplace) /etc/qubes-rpc/qubes.ResizeDisk
+%config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
@@ -449,6 +454,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-suspend-module-blacklist
 /etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
 /etc/xen/scripts/vif-route-qubes
+/etc/xen/scripts/vif-qubes-nat.sh
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
@@ -464,6 +470,7 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-open-in-vm
 /usr/bin/qvm-run
 /usr/bin/qvm-mru-entry
+/usr/bin/qvm-features-request
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
 /usr/bin/qubes-open
@@ -510,16 +517,24 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/functions
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
-/usr/lib64/python2.7/site-packages/qubes/xdg.py*
+/usr/lib/python2.7/site-packages/qubesxdg.py*
 /usr/sbin/qubes-firewall
-/usr/sbin/qubes-netwatcher
 /usr/share/qubes/serial.conf
-/usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.updates.gschema.override
-/usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.override
-/usr/share/glib-2.0/schemas/org.mate.NotificationDaemon.gschema.override
+/usr/share/glib-2.0/schemas/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override
+/usr/share/glib-2.0/schemas/20_org.gnome.nautilus.qubes.gschema.override
+/usr/share/glib-2.0/schemas/20_org.mate.NotificationDaemon.qubes.gschema.override
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
+
+%dir %{python3_sitelib}/qubesagent-*.egg-info
+%{python3_sitelib}/qubesagent-*.egg-info/*
+%dir %{python3_sitelib}/qubesagent
+%dir %{python3_sitelib}/qubesagent/__pycache__
+%{python3_sitelib}/qubesagent/__pycache__/*
+%{python3_sitelib}/qubesagent/__init__.py
+%{python3_sitelib}/qubesagent/firewall.py
+%{python3_sitelib}/qubesagent/test_firewall.py
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc
@@ -553,7 +568,6 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-dvm
 /etc/init.d/qubes-core-netvm
 /etc/init.d/qubes-firewall
-/etc/init.d/qubes-netwatcher
 /etc/init.d/qubes-iptables
 /etc/init.d/qubes-updates-proxy
 /etc/init.d/qubes-qrexec-agent
@@ -588,6 +602,9 @@ for svc in %qubes_services ; do
     fi
 done
 
+# dropped services
+chkconfig qubes-netwatcher off || :
+
 # TODO: make this not display the silly message about security context...
 sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
 
@@ -620,7 +637,6 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-firewall.service
 /lib/systemd/system/qubes-mount-dirs.service
-/lib/systemd/system/qubes-netwatcher.service
 /lib/systemd/system/qubes-network.service
 /lib/systemd/system/qubes-iptables.service
 /lib/systemd/system/qubes-sysinit.service

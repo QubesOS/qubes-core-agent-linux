@@ -5,6 +5,7 @@ VERSION := $(shell cat version)
 DIST ?= fc18
 KDESERVICEDIR ?= /usr/share/kde4/services
 SBINDIR ?= /usr/sbin
+BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
@@ -132,7 +133,6 @@ install-sysvinit: install-init
 	install vm-init.d/qubes-core $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-core-netvm $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-firewall $(DESTDIR)/etc/init.d/
-	install vm-init.d/qubes-netwatcher $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-qrexec-agent $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-dvm $(DESTDIR)/etc/init.d/
@@ -142,10 +142,6 @@ install-sysvinit: install-init
 
 install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -D -m 0644 misc/qubes-r3.repo $(DESTDIR)/etc/yum.repos.d/qubes-r3.repo
-	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -m 0644 misc/org.gnome.nautilus.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -m 0644 misc/org.mate.NotificationDaemon.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
@@ -174,6 +170,11 @@ install-common:
 	$(MAKE) -C autostart-dropins install
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
+	# force /usr/bin before /bin to have /usr/bin/python instead of /bin/python
+	PATH="/usr/bin:$(PATH)" python3 setup.py install -O1 --root $(DESTDIR)
+	mkdir -p $(DESTDIR)$(SBINDIR)
+	mv $(DESTDIR)/usr/bin/qubes-firewall $(DESTDIR)$(SBINDIR)/qubes-firewall
+
 	install -d -m 0750 $(DESTDIR)/etc/sudoers.d/
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
@@ -181,7 +182,7 @@ install-common:
 
 	install -d $(DESTDIR)/var/lib/qubes
 
-	install -D misc/xenstore-watch $(DESTDIR)/usr/bin/xenstore-watch-qubes
+	install -D misc/xenstore-watch $(DESTDIR)$(BINDIR)/xenstore-watch-qubes
 	install -d $(DESTDIR)/etc/udev/rules.d
 	install -m 0644 misc/udev-qubes-misc.rules $(DESTDIR)/etc/udev/rules.d/50-qubes-misc.rules
 	install -d $(DESTDIR)$(LIBDIR)/qubes/
@@ -192,6 +193,12 @@ install-common:
 	install -D -m 0644 misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
 	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
+	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
+	install -m 0644 \
+		misc/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override \
+		misc/20_org.gnome.nautilus.qubes.gschema.override \
+		misc/20_org.mate.NotificationDaemon.qubes.gschema.override \
+		$(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc
 
@@ -213,6 +220,7 @@ install-common:
 	install -d $(DESTDIR)/usr/lib/NetworkManager/conf.d
 	install -m 0644 network/nm-30-qubes.conf $(DESTDIR)/usr/lib/NetworkManager/conf.d/30-qubes.conf
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
+	install -D network/vif-qubes-nat.sh $(DESTDIR)/etc/xen/scripts/vif-qubes-nat.sh
 	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
 	install -m 0644 -D network/updates-blacklist $(DESTDIR)/etc/tinyproxy/updates-blacklist
 	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)$(LIBDIR)/qubes/iptables-updates-proxy
@@ -223,14 +231,9 @@ install-common:
 	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
 	install -m 0755 network/update-proxy-configs $(DESTDIR)$(LIBDIR)/qubes/
 
-
-	install -d $(DESTDIR)/$(SBINDIR)
-	install network/qubes-firewall $(DESTDIR)/$(SBINDIR)/
-	install network/qubes-netwatcher $(DESTDIR)/$(SBINDIR)/
-
-	install -d $(DESTDIR)/usr/bin
-	install -m 0755 misc/qubes-session-autostart $(DESTDIR)/usr/bin/qubes-session-autostart
-
+	install -d $(DESTDIR)$(BINDIR)
+	install -m 0755 misc/qubes-session-autostart $(DESTDIR)$(BINDIR)/qubes-session-autostart
+	install -m 0755 misc/qvm-features-request $(DESTDIR)$(BINDIR)/qvm-features-request
 	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run,qvm-mru-entry} $(DESTDIR)/usr/bin
 	ln -s qvm-copy-to-vm $(DESTDIR)/usr/bin/qvm-move-to-vm
 	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
@@ -239,7 +242,7 @@ install-common:
 	install qubes-rpc/qvm-move-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/xdg-icon $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/qubes-open $(DESTDIR)/usr/bin
+	install qubes-rpc/qubes-open $(DESTDIR)$(BINDIR)
 	install qubes-rpc/tar2qfile $(DESTDIR)$(LIBDIR)/qubes
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
 	install -m 4755  qubes-rpc/qfile-unpacker $(DESTDIR)$(LIBDIR)/qubes
@@ -262,6 +265,8 @@ install-common:
 	install -m 0644 qubes-rpc/qubes.GetImageRGBA $(DESTDIR)/etc/qubes-rpc
 	install -m 0644 qubes-rpc/qubes.SetDateTime $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.InstallUpdatesGUI $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/qubes.ResizeDisk $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/qubes.StartApp $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/etc/qubes/suspend-pre.d
 	install -m 0644 qubes-rpc/suspend-pre.README $(DESTDIR)/etc/qubes/suspend-pre.d/README
@@ -271,14 +276,14 @@ install-common:
 	install -d $(DESTDIR)/usr/share/nautilus-python/extensions
 	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
 
-	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)/usr/bin/qubes-desktop-run
+	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)$(BINDIR)/qubes-desktop-run
 
 	mkdir -p $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 
 ifeq ($(shell lsb_release -is), Debian)
-	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+	install -m 0644 misc/qubesxdg.py $(DESTDIR)/$(PYTHON2_SITELIB)/
 else
-	install -m 0644 misc/py2/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+	install -m 0644 misc/py2/qubesxdg.py* $(DESTDIR)/$(PYTHON2_SITELIB)/
 endif
 
 ifneq (,$(filter xenial stretch, $(shell lsb_release -cs)))
@@ -311,8 +316,6 @@ install-deb: install-common install-systemd install-systemd-dropins
 	install -m 0644 misc/pam.d_su.qubes $(DESTDIR)/etc/pam.d/su.qubes
 	install -d $(DESTDIR)/etc/needrestart/conf.d
 	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
-	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -m 0644 misc/org.gnome.nautilus.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 
 
 install-vm: install-rh install-common

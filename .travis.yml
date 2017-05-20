@@ -1,6 +1,7 @@
 sudo: required
 dist: trusty
-language: generic
+language: python
+python: '3.5'
 install: git clone https://github.com/QubesOS/qubes-builder ~/qubes-builder
 script: ~/qubes-builder/scripts/travis-build
 env:
@@ -8,3 +9,22 @@ env:
  - DISTS_VM=fc24 USE_QUBES_REPO_VERSION=3.2 USE_QUBES_REPO_TESTING=1
  - DISTS_VM=jessie USE_QUBES_REPO_VERSION=3.2 USE_QUBES_REPO_TESTING=1
  - DISTS_VM=stretch USE_QUBES_REPO_VERSION=3.2 USE_QUBES_REPO_TESTING=1
+
+jobs:
+  include:
+    - python: '3.5'
+      install: pip install --quiet -r ci/requirements.txt
+      env: TESTS_ONLY=1
+      script:
+       - ./run-tests
+      after_success:
+       - codecov
+    - stage: deploy
+      python: '3.5'
+      env: DIST_DOM0=fc25 TESTS_ONLY=
+      script: ~/qubes-builder/scripts/travis-deploy
+
+
+branches:
+  except:
+    - /.*_.*/

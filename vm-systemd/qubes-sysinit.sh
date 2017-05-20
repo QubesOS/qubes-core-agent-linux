@@ -5,10 +5,20 @@
 
 # List of services enabled by default (in case of absence of qubesdb entry)
 DEFAULT_ENABLED_NETVM="network-manager qubes-network qubes-update-check qubes-updates-proxy"
-DEFAULT_ENABLED_PROXYVM="meminfo-writer qubes-network qubes-firewall qubes-netwatcher qubes-update-check"
-DEFAULT_ENABLED_APPVM="meminfo-writer cups qubes-update-check"
+DEFAULT_ENABLED_PROXYVM="qubes-network qubes-firewall qubes-update-check"
+DEFAULT_ENABLED_APPVM="cups qubes-update-check"
 DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup"
-DEFAULT_ENABLED="meminfo-writer"
+DEFAULT_ENABLED=""
+
+if [ -z "`ls /sys/bus/pci/devices/`" ]; then
+    # do not enable meminfo-writer (so qmemman for this domain) when any PCI
+    # device is present
+    DEFAULT_ENABLED="$DEFAULT_ENABLED meminfo-writer"
+    DEFAULT_ENABLED_APPVM="$DEFAULT_ENABLED_APPVM meminfo-writer"
+    DEFAULT_ENABLED_PROXYVM="$DEFAULT_ENABLED_PROXYVM meminfo-writer"
+    DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_TEMPLATEVM meminfo-writer"
+fi
+
 
 if systemd_version_changed ; then
     # Ensure we're running right version of systemd (the one started by initrd may be different)
