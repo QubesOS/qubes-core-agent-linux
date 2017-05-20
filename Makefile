@@ -113,10 +113,6 @@ install-sysvinit:
 
 install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -D -m 0644 misc/qubes-r3.repo $(DESTDIR)/etc/yum.repos.d/qubes-r3.repo
-	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -m 0644 misc/org.gnome.settings-daemon.plugins.updates.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -m 0644 misc/org.gnome.nautilus.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -m 0644 misc/org.mate.NotificationDaemon.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
@@ -166,6 +162,12 @@ install-common:
 	install -D -m 0644 misc/polkit-1-qubes-allow-all.rules $(DESTDIR)/etc/polkit-1/rules.d/00-qubes-allow-all.rules
 	install -D -m 0644 misc/mime-globs $(DESTDIR)/usr/share/qubes/mime-override/globs
 	install misc/qubes-download-dom0-updates.sh $(DESTDIR)$(LIBDIR)/qubes/
+	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
+	install -m 0644 \
+		misc/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override \
+		misc/20_org.gnome.nautilus.qubes.gschema.override \
+		misc/20_org.mate.NotificationDaemon.qubes.gschema.override \
+		$(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc
 
