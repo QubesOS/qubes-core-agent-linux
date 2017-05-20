@@ -9,7 +9,7 @@ include /usr/share/dpkg/default.mk
 export DESTDIR=$(shell pwd)/debian/tmp
 
 %:
-	dh $@ --with systemd,python3 --with=config-package
+	dh $@ --with systemd,python2 --with=config-package
 
 override_dh_auto_build:
 	make all

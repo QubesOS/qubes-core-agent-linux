@@ -157,7 +157,6 @@ Requires:   python2-dnf-plugins-qubes-hooks
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
 BuildRequires: xen-devel
-BuildRequires: python3-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
@@ -528,14 +527,12 @@ rm -f %{name}-%{version}
 /usr/share/glib-2.0/schemas/20_org.mate.NotificationDaemon.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.gnome.desktop.wm.preferences.qubes.gschema.override
 
-%dir %{python3_sitelib}/qubesagent-*.egg-info
-%{python3_sitelib}/qubesagent-*.egg-info/*
-%dir %{python3_sitelib}/qubesagent
-%dir %{python3_sitelib}/qubesagent/__pycache__
-%{python3_sitelib}/qubesagent/__pycache__/*
-%{python3_sitelib}/qubesagent/__init__.py
-%{python3_sitelib}/qubesagent/firewall.py
-%{python3_sitelib}/qubesagent/test_firewall.py
+%dir %{python_sitelib}/qubesagent-*-py2.7.egg-info
+%{python_sitelib}/qubesagent-*-py2.7.egg-info/*
+%dir %{python_sitelib}/qubesagent
+%{python_sitelib}/qubesagent/__init__.py*
+%{python_sitelib}/qubesagent/firewall.py*
+%{python_sitelib}/qubesagent/test_firewall.py*
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc

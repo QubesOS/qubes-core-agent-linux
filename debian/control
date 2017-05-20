@@ -7,12 +7,12 @@ Build-Depends:
     libqubes-rpc-filecopy-dev (>= 3.1.3),
     libvchan-xen-dev,
     python,
-    python3-setuptools,
     debhelper,
     quilt,
     libxen-dev,
     pkg-config,
     dh-systemd (>= 1.5),
+    dh-python,
     lsb-release,
     xserver-xorg-dev,
     config-package-dev
@@ -54,6 +54,7 @@ Depends:
     xenstore-utils,
     xinit,
     xserver-xorg-core,
+    ${python:Depends},
     ${shlibs:Depends},
     ${misc:Depends}
 Recommends:
