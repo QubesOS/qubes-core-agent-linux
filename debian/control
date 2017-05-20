@@ -41,7 +41,7 @@ Depends:
     procps,
     util-linux,
     python2.7,
-    python-daemon,
+    python3-daemon,
     python-gi,
     python-xdg,
     python-dbus,
