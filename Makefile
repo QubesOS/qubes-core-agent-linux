@@ -146,7 +146,7 @@ install-common:
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
 	# force /usr/bin before /bin to have /usr/bin/python instead of /bin/python
-	PATH="/usr/bin:$(PATH)" python setup.py install -O1 --root $(DESTDIR)
+	PATH="/usr/bin:$(PATH)" python3 setup.py install -O1 --root $(DESTDIR)
 	mkdir -p $(DESTDIR)$(SBINDIR)
 	mv $(DESTDIR)/usr/bin/qubes-firewall $(DESTDIR)$(SBINDIR)/qubes-firewall
 
