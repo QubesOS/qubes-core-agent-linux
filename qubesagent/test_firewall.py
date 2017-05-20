@@ -1,6 +1,7 @@
 import logging
 import operator
 from unittest import TestCase
+from unittest.mock import patch
 
 import qubesagent.firewall
 
@@ -150,6 +151,11 @@ class TestIptablesWorker(TestCase):
     def setUp(self):
         super(TestIptablesWorker, self).setUp()
         self.obj = IptablesWorker()
+        self.subprocess_patch = patch('subprocess.call')
+        self.subprocess_mock = self.subprocess_patch.start()
+
+    def tearDown(self):
+        self.subprocess_patch.stop()
 
     def test_000_chain_for_addr(self):
         self.assertEqual(
@@ -296,6 +302,11 @@ class TestNftablesWorker(TestCase):
     def setUp(self):
         super(TestNftablesWorker, self).setUp()
         self.obj = NftablesWorker()
+        self.subprocess_patch = patch('subprocess.call')
+        self.subprocess_mock = self.subprocess_patch.start()
+
+    def tearDown(self):
+        self.subprocess_patch.stop()
 
     def test_000_chain_for_addr(self):
         self.assertEqual(
@@ -464,6 +475,12 @@ class TestFirewallWorker(TestCase):
             for key, value in entries.items():
                 self.obj.qdb.entries[
                     '/qubes-firewall/{}/{}'.format(addr, key)] = value
+
+        self.subprocess_patch = patch('subprocess.call')
+        self.subprocess_mock = self.subprocess_patch.start()
+
+    def tearDown(self):
+        self.subprocess_patch.stop()
 
     def test_read_rules(self):
         expected_rules1 = [

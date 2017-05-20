@@ -4,3 +4,5 @@ deb/*
 *.pyo
 *~
 *.o
+.coverage
+*.egg-info

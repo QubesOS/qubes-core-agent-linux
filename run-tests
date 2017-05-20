@@ -1,0 +1,13 @@
+#!/bin/sh
+
+: "${PYTHON:=python3}"
+: "${ROOTDIR:=.}"
+: "${TESTPYTHONPATH:=$ROOTDIR/test-packages}"
+
+PYTHONPATH="${TESTPYTHONPATH}:${PYTHONPATH}"
+export PYTHONPATH
+
+[ -r version ] || ln -s ${ROOTDIR}/version ./
+[ -r setup.py ] || ln -s ${ROOTDIR}/setup.py ./
+"${PYTHON}" ./setup.py egg_info --egg-base "${TESTPYTHONPATH}"
+"${PYTHON}" -m coverage run -m unittest discover -p '*.py' -v "$@"
