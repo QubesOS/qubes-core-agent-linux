@@ -1,4 +1,5 @@
 import logging
+import operator
 from unittest import TestCase
 
 import qubesagent.firewall
@@ -275,18 +276,20 @@ class TestIptablesWorker(TestCase):
         self.obj.called_commands[4] = []
         self.obj.called_commands[6] = []
         self.obj.cleanup()
-        self.assertEqual(self.obj.called_commands[4],
+        self.assertEqual([self.obj.called_commands[4][0]] +
+                sorted(self.obj.called_commands[4][1:], key=operator.itemgetter(1)),
             [['-F', 'QBS-FORWARD'],
                 ['-F', 'chain-ip4-1'],
                 ['-X', 'chain-ip4-1'],
                 ['-F', 'chain-ip4-2'],
                 ['-X', 'chain-ip4-2']])
-        self.assertEqual(self.obj.called_commands[6],
+        self.assertEqual([self.obj.called_commands[6][0]] +
+                sorted(self.obj.called_commands[6][1:], key=operator.itemgetter(1)),
             [['-F', 'QBS-FORWARD'],
-                ['-F', 'chain-ip6-2'],
-                ['-X', 'chain-ip6-2'],
                 ['-F', 'chain-ip6-1'],
-                ['-X', 'chain-ip6-1']])
+                ['-X', 'chain-ip6-1'],
+                ['-F', 'chain-ip6-2'],
+                ['-X', 'chain-ip6-2']])
 
 
 class TestNftablesWorker(TestCase):
