@@ -147,7 +147,6 @@ Requires:   fakeroot
 Requires:   desktop-notification-daemon
 # to show/hide nm-applet
 Requires:   dconf
-Requires:   pygtk2
 Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
@@ -469,7 +468,6 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-open-in-dvm
 /usr/bin/qvm-open-in-vm
 /usr/bin/qvm-run
-/usr/bin/qvm-mru-entry
 /usr/bin/qvm-features-request
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
