@@ -34,7 +34,6 @@ Depends:
     librsvg2-bin,
     libvchan-xen,
     locales,
-    locales-all,
     ncurses-term,
     net-tools,
     psmisc,
@@ -55,7 +54,6 @@ Depends:
     xenstore-utils,
     xinit,
     xserver-xorg-core,
-    xserver-xorg-video-dummy,
     ${shlibs:Depends},
     ${misc:Depends}
 Recommends:
@@ -64,13 +62,14 @@ Recommends:
     gnome-themes-standard,
     haveged,
     libnotify-bin,
+    locales-all,
     mate-notification-daemon,
     network-manager (>= 0.8.1-1),
     network-manager-gnome,
     ntpdate,
-    python-nautilus,
     system-config-printer,
     tinyproxy,
+    qubes-nautilus,
     xsettingsd,
     yum,
     yum-utils
@@ -79,3 +78,10 @@ Conflicts: ${diverted-files}, qubes-core-agent-linux, firewalld, qubes-core-vm-s
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec.
+
+Package: qubes-nautilus
+Architecture: any
+Description: Qubes integration for Nautilus
+ Nautilus addons for inter-VM file copy/move/open.
+Depends:
+    python-nautilus,

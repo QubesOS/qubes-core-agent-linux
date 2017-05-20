@@ -126,7 +126,6 @@ Requires:   ethtool
 Requires:   tinyproxy
 Requires:   ntpdate
 Requires:   net-tools
-Requires:   nautilus-python
 Requires:   qubes-utils >= 3.1.3
 Requires:   initscripts
 Requires:   gawk
@@ -182,6 +181,14 @@ BuildRequires: python3-devel
 DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
+
+%package -n qubes-nautilus
+Summary:    Qubes integration for Nautilus
+Requires:   qubes-core-vm
+Requires:   nautilus-python
+
+%description -n qubes-nautilus
+Nautilus addons for inter-VM file copy/move/open.
 
 %define _builddir %(pwd)
 
@@ -494,9 +501,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qubes-fix-nm-conf.sh
 /usr/lib/qubes/qubes-setup-dnat-to-ns
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
-/usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-copy-to-vm.kde
-/usr/lib/qubes/qvm-move-to-vm.gnome
 /usr/lib/qubes/qvm-move-to-vm.kde
 /usr/lib/qubes/setup-ip
 /usr/lib/qubes/tar2qfile
@@ -522,9 +527,6 @@ rm -f %{name}-%{version}
 /usr/share/glib-2.0/schemas/20_org.gnome.nautilus.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.mate.NotificationDaemon.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.gnome.desktop.wm.preferences.qubes.gschema.override
-/usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
-/usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
-/usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
 
 %dir %{python3_sitelib}/qubesagent-*.egg-info
 %{python3_sitelib}/qubesagent-*.egg-info/*
@@ -547,6 +549,13 @@ rm -f %{name}-%{version}
 
 %files -n python3-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
+
+%files -n qubes-nautilus
+/usr/lib/qubes/qvm-copy-to-vm.gnome
+/usr/lib/qubes/qvm-move-to-vm.gnome
+/usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
+/usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
+/usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
