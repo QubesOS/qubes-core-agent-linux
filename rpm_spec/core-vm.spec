@@ -138,7 +138,7 @@ Requires:   pygobject3-base
 Requires:   dbus-python
 # for qubes-session-autostart, xdg-icon
 Requires:   pyxdg
-Requires:   python3-daemon
+Requires:   python-daemon
 Requires:   nftables
 Requires:   ImageMagick
 Requires:   librsvg2-tools

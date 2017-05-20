@@ -40,7 +40,7 @@ Depends:
     procps,
     util-linux,
     python2.7,
-    python3-daemon,
+    python-daemon,
     python-gi,
     python-xdg,
     python-dbus,
