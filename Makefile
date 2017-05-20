@@ -238,6 +238,7 @@ install-common:
 	install -m 0644 qubes-rpc/qubes.SetDateTime $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.InstallUpdatesGUI $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.ResizeDisk $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/qubes.StartApp $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/etc/qubes/suspend-pre.d
 	install -m 0644 qubes-rpc/suspend-pre.README $(DESTDIR)/etc/qubes/suspend-pre.d/README
