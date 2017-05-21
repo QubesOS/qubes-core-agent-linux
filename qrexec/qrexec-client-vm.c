@@ -122,7 +122,7 @@ int main(int argc, char **argv)
             perror("socketpair");
             exit(1);
         }
-        prepare_child_env();
+        prepare_child_env(exec_params.connect_domain, params.target_domain);
 
         switch (child_pid = fork()) {
             case -1:
