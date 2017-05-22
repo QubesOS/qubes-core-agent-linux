@@ -295,11 +295,6 @@ else
 	install -m 0644 misc/py2/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 endif
 
-ifneq (,$(filter xenial zesty stretch, $(shell lsb_release -cs)))
-	mkdir -p $(DESTDIR)/etc/systemd/system/
-	install -m 0644 vm-systemd/haveged.service  $(DESTDIR)/etc/systemd/system/
-endif
-
 	install -d $(DESTDIR)/mnt/removable
 
 	install -D -m 0644 misc/xorg-preload-apps.conf $(DESTDIR)/etc/X11/xorg-preload-apps.conf
@@ -328,5 +323,7 @@ install-deb: install-common install-systemd install-systemd-dropins
 	install -d $(DESTDIR)/usr/share/glib-2.0/schemas/
 	install -m 0644 misc/org.gnome.nautilus.gschema.override $(DESTDIR)/usr/share/glib-2.0/schemas/
 
+	mkdir -p $(DESTDIR)/etc/systemd/system/
+	install -m 0644 vm-systemd/haveged.service  $(DESTDIR)/etc/systemd/system/
 
 install-vm: install-rh install-common

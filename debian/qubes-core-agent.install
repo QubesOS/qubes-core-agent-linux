@@ -71,6 +71,7 @@ etc/apt/apt.conf.d/00notify-hook
 etc/apt/sources.list.d/qubes-r3.list
 etc/needrestart/conf.d/50_qubes.conf
 etc/sysctl.d/20_tcp_timestamps.conf
+etc/systemd/system/haveged.service
 usr/sbin/qubes-firewall
 usr/sbin/qubes-netwatcher
 usr/bin/qvm-run
