@@ -43,6 +43,7 @@ etc/sudoers.d/qubes
 etc/sudoers.d/umask
 etc/sysctl.d/20_tcp_timestamps.conf
 etc/sysctl.d/80-qubes.conf
+etc/systemd/system/haveged.service
 etc/tinyproxy/tinyproxy-updates.conf
 etc/tinyproxy/updates-blacklist
 etc/udev/rules.d/50-qubes-misc.rules
