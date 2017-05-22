@@ -7,6 +7,7 @@ Build-Depends:
     libqubes-rpc-filecopy-dev (>= 3.1.3),
     libvchan-xen-dev,
     python,
+    python-setuptools,
     debhelper,
     quilt,
     libxen-dev,
