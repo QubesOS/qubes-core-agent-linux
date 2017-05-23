@@ -281,7 +281,7 @@ else
 	install -m 0644 misc/py2/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 endif
 
-ifneq (,$(filter xenial stretch, $(shell lsb_release -cs)))
+ifneq (,$(filter xenial zesty stretch, $(shell lsb_release -cs)))
 	mkdir -p $(DESTDIR)/etc/systemd/system/
 	install -m 0644 vm-systemd/haveged.service  $(DESTDIR)/etc/systemd/system/
 endif

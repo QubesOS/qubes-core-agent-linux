@@ -1,7 +1,7 @@
 Source: qubes-core-agent
 Section: admin
 Priority: extra
-Maintainer: Davíð Steinn Geirsson <david@dsg.is>
+Maintainer: unman <unman@thirdeyesecurity.org>
 Build-Depends:
     libqrexec-utils-dev,
     libqubes-rpc-filecopy-dev (>= 3.1.3),
