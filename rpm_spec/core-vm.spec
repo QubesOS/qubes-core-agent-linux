@@ -473,7 +473,7 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-move-to-vm
 /usr/bin/qvm-open-in-dvm
 /usr/bin/qvm-open-in-vm
-/usr/bin/qvm-run
+/usr/bin/qvm-run-vm
 /usr/bin/qvm-features-request
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run

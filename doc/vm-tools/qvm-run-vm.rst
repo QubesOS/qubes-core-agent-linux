@@ -1,14 +1,14 @@
-=======
-qvm-run
-=======
+==========
+qvm-run-vm
+==========
 
 NAME
 ====
-qvm-run - run a specified command in a specified VM
+qvm-run-vm - run a specified command in a specified VM
 
 SYNOPSIS
 ========
-| qvm-run vmname command [aguments]
+| qvm-run-vm vmname command [aguments]
 
 OPTIONS
 =======
