@@ -1,0 +1,7 @@
+[Unit]
+Description=Forward connection to updates proxy over Qubes RPC
+
+[Service]
+ExecStart=/usr/bin/qrexec-client-vm '' qubes.UpdatesProxy
+StandardInput=socket
+StandardOutput=inherit

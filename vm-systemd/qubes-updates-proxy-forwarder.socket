@@ -1,0 +1,14 @@
+[Unit]
+Description=Forward connection to updates proxy over Qubes RPC
+ConditionPathExists=/var/run/qubes-service/updates-proxy-setup
+# don't start the forwarder when updates proxy itself is also enabled here,
+# otherwise it would most likely loop back to itself
+ConditionPathExists=!/var/run/qubes-service/qubes-updates-proxy
+
+[Socket]
+ListenStream=127.0.0.1:8082
+BindToDevice=lo
+Accept=true
+
+[Install]
+WantedBy=multi-user.target

@@ -90,6 +90,7 @@ enable qubes-mount-dirs.service
 enable qubes-firewall.service
 enable qubes-meminfo-writer.service
 enable qubes-iptables.service
+enable qubes-updates-proxy-forwarder.socket
 enable haveged.service
 enable chronyd.service
 enable xendriverdomain.service

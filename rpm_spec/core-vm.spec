@@ -20,7 +20,7 @@
 #
 #
 
-%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-dvm
+%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-dvm qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
 
 %{!?version: %define version %(cat version)}
@@ -124,6 +124,7 @@ Conflicts:  firewalld
 Requires:	xdg-utils
 Requires:   ethtool
 Requires:   tinyproxy
+Requires:   nmap-ncat
 Requires:   ntpdate
 Requires:   net-tools
 Requires:   qubes-utils >= 3.1.3
@@ -440,6 +441,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.InstallUpdatesGUI
 %config(noreplace) /etc/qubes-rpc/qubes.ResizeDisk
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
+%config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
@@ -576,6 +578,7 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-iptables
 /etc/init.d/qubes-updates-proxy
 /etc/init.d/qubes-qrexec-agent
+/etc/init.d/qubes-updates-proxy-forwarder
 /etc/sysconfig/modules/qubes-core.modules
 /etc/sysconfig/modules/qubes-misc.modules
 
@@ -650,6 +653,8 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-update-check.timer
 /lib/systemd/system/qubes-updates-proxy.service
 /lib/systemd/system/qubes-qrexec-agent.service
+/lib/systemd/system/qubes-updates-proxy-forwarder@.service
+/lib/systemd/system/qubes-updates-proxy-forwarder.socket
 /lib/systemd/system-preset/%qubes_preset_file
 /lib/modules-load.d/qubes-core.conf
 /lib/modules-load.d/qubes-misc.conf

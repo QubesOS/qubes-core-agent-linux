@@ -1,0 +1,2 @@
+#!/bin/sh
+exec nc localhost 8082

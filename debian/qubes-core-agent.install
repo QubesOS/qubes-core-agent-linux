@@ -30,6 +30,7 @@ etc/qubes-rpc/qubes.SuspendPostAll
 etc/qubes-rpc/qubes.SuspendPre
 etc/qubes-rpc/qubes.SuspendPreAll
 etc/qubes-rpc/qubes.SyncNtpClock
+etc/qubes-rpc/qubes.UpdatesProxy
 etc/qubes-rpc/qubes.VMShell
 etc/qubes-rpc/qubes.WaitForSession
 etc/qubes-suspend-module-blacklist
@@ -83,6 +84,8 @@ lib/systemd/system/qubes-sysinit.service
 lib/systemd/system/qubes-update-check.service
 lib/systemd/system/qubes-update-check.timer
 lib/systemd/system/qubes-updates-proxy.service
+lib/systemd/system/qubes-updates-proxy-forwarder@.service
+lib/systemd/system/qubes-updates-proxy-forwarder.socket
 lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
 lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
 lib/systemd/system/tmp.mount.d/30_qubes.conf

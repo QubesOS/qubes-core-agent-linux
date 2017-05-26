@@ -1,0 +1,115 @@
+#!/bin/bash
+#
+# Updates proxy forwarder     Startup script for the updates proxy forwarder
+#
+# chkconfig: 345 85 15
+# description: forwards connection to updates proxy over Qubes RPC
+#
+# processname: ncat
+# pidfile:     /var/run/qubes-updates-proxy-forwarder.pid
+#
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source Qubes library.
+. /usr/lib/qubes/init/functions
+
+# Source networking configuration.
+.  /etc/sysconfig/network
+
+# Check that networking is up.
+[ "$NETWORKING" = "no" ] && exit 0
+
+exec="/usr/bin/ncat"
+prog=$(basename $exec)
+pidfile="/var/run/qubes-updates-proxy-forwarder.pid"
+
+[ -e /etc/sysconfig/qubes-updates-proxy-forwarder ] && . /etc/sysconfig/qubes-updates-proxy-forwarder
+
+lockfile=/var/lock/subsys/qubes-updates-proxy-forwarder
+
+start() {
+    have_qubesdb || return
+
+    if ! qsvc updates-proxy-setup ; then
+        # updates proxy configuration disabled
+        exit 0
+    fi
+
+    if qsvc qubes-updates-proxy ; then
+        # updates proxy running here too, avoid looping traffic back to itself
+        exit 0
+    fi
+
+    [ -x $exec ] || exit 5
+
+    echo -n $"Starting $prog (as Qubes updates proxy forwarder): "
+    start-stop-daemon \
+        --exec $exec \
+        --pidfile "$pidfile" \
+        --make-pidfile \
+        --background \
+        --start \
+        -- \
+        -k -l -e 'qrexec-client-vm $default qubes.UpdatesProxy'
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc -p $pidfile $prog
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    status $prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|force-reload}"
+        exit 2
+esac
+exit $?
+

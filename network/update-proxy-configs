@@ -75,7 +75,7 @@ EOF
 
 # Determine whether the proxy should be used
 if qsvc yum-proxy-setup || qsvc updates-proxy-setup ; then
-    PROXY_ADDR="http://10.137.255.254:8082/"
+    PROXY_ADDR="http://127.0.0.1:8082/"
     PROXY_CONF_ENTRY="proxy=$PROXY_ADDR"
 else
     PROXY_ADDR=""

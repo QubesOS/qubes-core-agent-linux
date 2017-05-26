@@ -119,6 +119,7 @@ install-systemd: install-init
 	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d
 	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+	install -m 0644 vm-systemd/qubes-*.socket $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
 	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
 	install -m 0644 vm-systemd/qubes-misc.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
@@ -136,6 +137,7 @@ install-sysvinit: install-init
 	install vm-init.d/qubes-qrexec-agent $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-dvm $(DESTDIR)/etc/init.d/
+	install vm-init.d/qubes-updates-proxy-forwarder $(DESTDIR)/etc/init.d/
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install -D vm-init.d/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
@@ -268,6 +270,7 @@ install-common:
 	install -m 0755 qubes-rpc/qubes.InstallUpdatesGUI $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.ResizeDisk $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.StartApp $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/qubes.UpdatesProxy $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/etc/qubes/suspend-pre.d
 	install -m 0644 qubes-rpc/suspend-pre.README $(DESTDIR)/etc/qubes/suspend-pre.d/README
