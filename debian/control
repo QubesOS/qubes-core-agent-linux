@@ -42,6 +42,7 @@ Depends:
     util-linux,
     python2.7,
     python-daemon,
+    python-qubesdb,
     python-gi,
     python-xdg,
     python-dbus,

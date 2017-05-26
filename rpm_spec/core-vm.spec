@@ -140,6 +140,8 @@ Requires:   dbus-python
 # for qubes-session-autostart, xdg-icon
 Requires:   pyxdg
 Requires:   python-daemon
+# for qvm-feature-request
+Requires:   python2-qubesdb
 Requires:   nftables
 Requires:   ImageMagick
 Requires:   librsvg2-tools
@@ -442,6 +444,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.ResizeDisk
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
+%config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
@@ -449,6 +452,9 @@ rm -f %{name}-%{version}
 /etc/qubes/suspend-pre.d/README
 %dir /etc/qubes/suspend-post.d
 /etc/qubes/suspend-post.d/README
+%dir /etc/qubes/post-install.d
+/etc/qubes/post-install.d/README
+/etc/qubes/post-install.d/*.sh
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf

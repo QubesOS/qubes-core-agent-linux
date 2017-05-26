@@ -19,6 +19,7 @@ etc/qubes-rpc/qubes.GetImageRGBA
 etc/qubes-rpc/qubes.InstallUpdatesGUI
 etc/qubes-rpc/qubes.OpenInVM
 etc/qubes-rpc/qubes.OpenURL
+etc/qubes-rpc/qubes.PostInstall
 etc/qubes-rpc/qubes.ResizeDisk
 etc/qubes-rpc/qubes.Restore
 etc/qubes-rpc/qubes.SelectDirectory
@@ -37,6 +38,8 @@ etc/qubes-suspend-module-blacklist
 etc/qubes/autostart/*
 etc/qubes/ip6tables.rules
 etc/qubes/iptables.rules
+etc/qubes/post-install.d/README
+etc/qubes/post-install.d/*.sh
 etc/qubes/suspend-post.d/README
 etc/qubes/suspend-pre.d/README
 etc/sudoers.d/qt_x11_no_mitshm

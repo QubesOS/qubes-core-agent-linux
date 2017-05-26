@@ -271,11 +271,15 @@ install-common:
 	install -m 0755 qubes-rpc/qubes.ResizeDisk $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.StartApp $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.UpdatesProxy $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/qubes.PostInstall $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/etc/qubes/suspend-pre.d
 	install -m 0644 qubes-rpc/suspend-pre.README $(DESTDIR)/etc/qubes/suspend-pre.d/README
 	install -d $(DESTDIR)/etc/qubes/suspend-post.d
 	install -m 0644 qubes-rpc/suspend-post.README $(DESTDIR)/etc/qubes/suspend-post.d/README
+	install -d $(DESTDIR)/etc/qubes/post-install.d
+	install -m 0644 post-install.d/README $(DESTDIR)/etc/qubes/post-install.d/
+	install -m 0755 post-install.d/*.sh $(DESTDIR)/etc/qubes/post-install.d/
 
 	install -d $(DESTDIR)/usr/share/nautilus-python/extensions
 	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
