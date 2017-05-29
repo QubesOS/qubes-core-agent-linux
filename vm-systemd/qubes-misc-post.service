@@ -1,6 +1,6 @@
 [Unit]
 Description=Qubes misc post-boot actions
-After=network-pre.target qubes-dvm.service qubes-mount-dirs.service qubes-network.service qubes-firewall.service qubes-netwatcher.service
+After=network-pre.target qubes-mount-dirs.service qubes-network.service qubes-firewall.service qubes-netwatcher.service
 
 [Service]
 Type=oneshot

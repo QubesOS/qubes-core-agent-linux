@@ -475,7 +475,7 @@ post_remove() {
 
     rm -rf /var/lib/qubes/xdg
 
-    for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-network qubes-qrexec-agent; do
+    for srv in qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-network qubes-qrexec-agent; do
         systemctl disable $srv.service
     done
     

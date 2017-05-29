@@ -91,8 +91,6 @@ case "${1}" in
                 sed -i "/^127\.0\.0\.1\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
             fi
 
-            chown user:user /home_volatile/user
-
             # Set default "runlevel"
             rm -f /etc/systemd/system/default.target
             ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target

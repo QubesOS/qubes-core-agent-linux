@@ -136,7 +136,6 @@ install-sysvinit: install-init
 	install vm-init.d/qubes-firewall $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-qrexec-agent $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
-	install vm-init.d/qubes-dvm $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-updates-proxy-forwarder $(DESTDIR)/etc/init.d/
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install -D vm-init.d/qubes-misc.modules $(DESTDIR)/etc/sysconfig/modules/qubes-misc.modules
@@ -205,7 +204,6 @@ install-common:
 	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc
 
-	install misc/dispvm-prerun.sh $(DESTDIR)$(LIBDIR)/qubes/dispvm-prerun.sh
 	install misc/close-window $(DESTDIR)$(LIBDIR)/qubes/close-window
 
 	install misc/upgrades-installed-check $(DESTDIR)$(LIBDIR)/qubes/upgrades-installed-check
@@ -303,7 +301,6 @@ endif
 
 
 	install -d $(DESTDIR)/var/run/qubes
-	install -d $(DESTDIR)/home_volatile/user
 	install -d $(DESTDIR)/rw
 
 install-deb: install-common install-systemd install-systemd-dropins

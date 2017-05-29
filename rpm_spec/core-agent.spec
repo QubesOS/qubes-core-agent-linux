@@ -20,7 +20,7 @@
 #
 #
 
-%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-dvm qubes-updates-proxy-forwarder
+%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
 
 %{!?version: %define version %(cat version)}
@@ -126,8 +126,6 @@ Requires:   qubes-utils >= 3.1.3
 Requires:   initscripts
 Requires:   gawk
 Requires:   sed
-# for dispvm-prerun.sh
-Requires:   procps-ng
 Requires:   util-linux
 # for qubes-desktop-run
 Requires:   pygobject3-base
@@ -513,7 +511,6 @@ rm -f %{name}-%{version}
 /usr/bin/qubes-session-autostart
 %dir /usr/lib/qubes
 /usr/lib/qubes/vusb-ctl.py*
-/usr/lib/qubes/dispvm-prerun.sh
 /usr/lib/qubes/sync-ntp-clock
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qrexec-agent
@@ -543,11 +540,9 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/misc-post-stop.sh
 /usr/lib/qubes/init/misc-post.sh
 /usr/lib/qubes/init/mount-dirs.sh
-/usr/lib/qubes/init/prepare-dvm.sh
 /usr/lib/qubes/init/qubes-early-vm-config.sh
 /usr/lib/qubes/init/qubes-random-seed.sh
 /usr/lib/qubes/init/qubes-sysinit.sh
-/usr/lib/qubes/init/setup-dvm-home.sh
 /usr/lib/qubes/init/setup-rw.sh
 /usr/lib/qubes/init/setup-rwdev.sh
 /usr/lib/qubes/init/functions
@@ -569,8 +564,6 @@ rm -f %{name}-%{version}
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc
-%dir /home_volatile
-%attr(700,user,user) /home_volatile/user
 %dir /mnt/removable
 %dir /rw
 
@@ -641,7 +634,6 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-sysinit
 /etc/init.d/qubes-core-early
 /etc/init.d/qubes-core
-/etc/init.d/qubes-dvm
 /etc/init.d/qubes-core-netvm
 /etc/init.d/qubes-firewall
 /etc/init.d/qubes-iptables
@@ -712,7 +704,6 @@ The Qubes core startup configuration for SystemD init.
 
 %files systemd
 %defattr(-,root,root,-)
-/lib/systemd/system/qubes-dvm.service
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-mount-dirs.service
 /lib/systemd/system/qubes-sysinit.service
