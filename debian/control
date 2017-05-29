@@ -82,7 +82,7 @@ Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec.
 
-Package: qubes-nautilus
+Package: qubes-core-agent-nautilus
 Architecture: any
 Description: Qubes integration for Nautilus
  Nautilus addons for inter-VM file copy/move/open.

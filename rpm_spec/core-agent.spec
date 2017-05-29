@@ -186,12 +186,12 @@ DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
 
-%package -n qubes-nautilus
+%package nautilus
 Summary:    Qubes integration for Nautilus
 Requires:   qubes-core-agent
 Requires:   nautilus-python
 
-%description -n qubes-nautilus
+%description nautilus
 Nautilus addons for inter-VM file copy/move/open.
 
 %define _builddir %(pwd)
@@ -557,7 +557,7 @@ rm -f %{name}-%{version}
 %files -n python3-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 
-%files -n qubes-nautilus
+%files nautilus
 /usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-move-to-vm.gnome
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
