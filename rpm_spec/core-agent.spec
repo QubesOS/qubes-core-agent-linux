@@ -530,7 +530,20 @@ rm -f %{name}-%{version}
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 /usr/lib/NetworkManager/conf.d/30-qubes.conf
 %dir /usr/lib/qubes/init
-/usr/lib/qubes/init/*.sh
+/usr/lib/qubes/init/bind-dirs.sh
+/usr/lib/qubes/init/control-printer-icon.sh
+/usr/lib/qubes/init/functions
+/usr/lib/qubes/init/misc-post-stop.sh
+/usr/lib/qubes/init/misc-post.sh
+/usr/lib/qubes/init/mount-dirs.sh
+/usr/lib/qubes/init/network-proxy-setup.sh
+/usr/lib/qubes/init/prepare-dvm.sh
+/usr/lib/qubes/init/qubes-early-vm-config.sh
+/usr/lib/qubes/init/qubes-random-seed.sh
+/usr/lib/qubes/init/qubes-sysinit.sh
+/usr/lib/qubes/init/setup-dvm-home.sh
+/usr/lib/qubes/init/setup-rw.sh
+/usr/lib/qubes/init/setup-rwdev.sh
 /usr/lib/qubes/init/functions
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
