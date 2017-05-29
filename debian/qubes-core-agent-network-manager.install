@@ -1,0 +1,7 @@
+etc/NetworkManager/dispatcher.d/30-qubes-external-ip
+etc/NetworkManager/dispatcher.d/qubes-nmhook
+etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
+usr/lib/NetworkManager/conf.d/30-qubes.conf
+usr/lib/qubes/network-manager-prepare-conf-dir
+usr/lib/qubes/qubes-fix-nm-conf.sh
+usr/lib/qubes/show-hide-nm-applet.sh

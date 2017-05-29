@@ -116,17 +116,12 @@ Requires:   fedora-release
 %if %{fedora} < 22
 Requires:   yum-plugin-post-transaction-actions
 %endif
-Requires:   NetworkManager >= 0.8.1-1
 %if %{fedora} >= 18
 # Fedora >= 18 defaults to firewalld, which isn't supported nor needed by Qubes
 Conflicts:  firewalld
 %endif
 Requires:	xdg-utils
-Requires:   ethtool
-Requires:   tinyproxy
-Requires:   nmap-ncat
 Requires:   ntpdate
-Requires:   net-tools
 Requires:   qubes-utils >= 3.1.3
 Requires:   initscripts
 Requires:   gawk
@@ -142,12 +137,9 @@ Requires:   pyxdg
 Requires:   python-daemon
 # for qvm-feature-request
 Requires:   python2-qubesdb
-Requires:   nftables
 Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   desktop-notification-daemon
-# to show/hide nm-applet
-Requires:   dconf
 Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
@@ -203,6 +195,37 @@ Requires:   fakeroot
 
 %description dom0-updates
 Scripts required to handle dom0 updates.
+
+%package networking
+Summary:    Networking support for Qubes VM
+Requires:   ethtool
+Requires:   net-tools
+Requires:   nftables
+Requires:   nmap-ncat
+Requires:   qubes-core-agent
+Requires:   tinyproxy
+
+%description networking
+This package provides:
+ * basic network functionality (setting IP address, DNS, default gateway)
+ * proxy service used by TemplateVMs to download updates
+ * qubes-firewall service (FirewallVM)
+
+Note: if you want to use NetworkManager (you do want it in NetVM), install also
+qubes-core-agent-network-manager.
+
+%package network-manager
+Summary:    NetworkManager integration for Qubes VM
+# to show/hide nm-applet
+Requires:   NetworkManager >= 0.8.1-1
+Requires:   dconf
+Requires:   qubes-core-agent-networking
+
+%description network-manager
+Integration of NetworkManager for Qubes VM:
+ * make connections config persistent
+ * adjust DNS redirections when needed
+ * show/hide NetworkManager applet icon
 
 %define _builddir %(pwd)
 
@@ -264,17 +287,6 @@ for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
 	fi
 done
 
-# Create NetworkManager configuration if we do not have it
-if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
-echo '[main]' > /etc/NetworkManager/NetworkManager.conf
-echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
-echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
-fi
-/usr/lib/qubes/qubes-fix-nm-conf.sh
-
-
-# Remove ip_forward setting from sysctl, so NM will not reset it
-sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 
 # Remove old firmware updates link
 if [ -L /lib/firmware/updates ]; then
@@ -384,6 +396,20 @@ mv /etc/selinux/config.processed /etc/selinux/config
 setenforce 0 2>/dev/null
 exit 0
 
+%post network-manager
+
+# Create NetworkManager configuration if we do not have it
+if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
+echo '[main]' > /etc/NetworkManager/NetworkManager.conf
+echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
+echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
+fi
+
+# Remove ip_forward setting from sysctl, so NM will not reset it
+sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+
+/usr/lib/qubes/qubes-fix-nm-conf.sh
+
 %preun
 if [ "$1" = 0 ] ; then
     # no more packages left
@@ -421,10 +447,7 @@ rm -f %{name}-%{version}
 %{kde_service_dir}/qvm-copy.desktop
 %{kde_service_dir}/qvm-move.desktop
 %{kde_service_dir}/qvm-dvm.desktop
-/etc/NetworkManager/dispatcher.d/30-qubes-external-ip
-/etc/NetworkManager/dispatcher.d/qubes-nmhook
 %config(noreplace) /etc/X11/xorg-preload-apps.conf
-/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 %config(noreplace) /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
@@ -451,7 +474,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.InstallUpdatesGUI
 %config(noreplace) /etc/qubes-rpc/qubes.ResizeDisk
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
-%config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
@@ -466,16 +488,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
-%config(noreplace) /etc/qubes/iptables.rules
-%config(noreplace) /etc/qubes/ip6tables.rules
-%config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
-%config(noreplace) /etc/tinyproxy/updates-blacklist
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
-%config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
 %config(noreplace) /etc/qubes-suspend-module-blacklist
-/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
-/etc/xen/scripts/vif-route-qubes
-/etc/xen/scripts/vif-qubes-nat.sh
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
@@ -502,8 +516,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/dispvm-prerun.sh
 /usr/lib/qubes/sync-ntp-clock
 /usr/lib/qubes/prepare-suspend
-/usr/lib/qubes/network-manager-prepare-conf-dir
-/usr/lib/qubes/show-hide-nm-applet.sh
 /usr/lib/qubes/qrexec-agent
 /usr/lib/qubes/qrexec-client-vm
 /usr/lib/qubes/qrexec_client_vm
@@ -512,15 +524,11 @@ rm -f %{name}-%{version}
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
 /usr/lib/qubes/qrun-in-vm
-/usr/lib/qubes/qubes-fix-nm-conf.sh
-/usr/lib/qubes/qubes-setup-dnat-to-ns
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
 /usr/lib/qubes/qvm-copy-to-vm.kde
 /usr/lib/qubes/qvm-move-to-vm.kde
-/usr/lib/qubes/setup-ip
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
-/usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/close-window
 /usr/lib/qubes/xdg-icon
 /usr/lib/qubes/update-proxy-configs
@@ -528,7 +536,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/upgrades-status-notify
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
-/usr/lib/NetworkManager/conf.d/30-qubes.conf
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/bind-dirs.sh
 /usr/lib/qubes/init/control-printer-icon.sh
@@ -536,7 +543,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/misc-post-stop.sh
 /usr/lib/qubes/init/misc-post.sh
 /usr/lib/qubes/init/mount-dirs.sh
-/usr/lib/qubes/init/network-proxy-setup.sh
 /usr/lib/qubes/init/prepare-dvm.sh
 /usr/lib/qubes/init/qubes-early-vm-config.sh
 /usr/lib/qubes/init/qubes-random-seed.sh
@@ -548,7 +554,6 @@ rm -f %{name}-%{version}
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
 /usr/lib/python2.7/site-packages/qubesxdg.py*
-/usr/sbin/qubes-firewall
 /usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.gnome.nautilus.qubes.gschema.override
@@ -586,12 +591,44 @@ rm -f %{name}-%{version}
 %dir %attr(0775,user,user) /var/lib/qubes/dom0-updates
 /usr/lib/qubes/qubes-download-dom0-updates.sh
 
+%files networking
+%config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
+%config(noreplace) /etc/qubes/ip6tables.rules
+%config(noreplace) /etc/qubes/iptables.rules
+%config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
+%config(noreplace) /etc/tinyproxy/updates-blacklist
+%config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
+/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
+/etc/xen/scripts/vif-qubes-nat.sh
+/etc/xen/scripts/vif-route-qubes
+/lib/systemd/system/qubes-firewall.service
+/lib/systemd/system/qubes-iptables.service
+/lib/systemd/system/qubes-network.service
+/lib/systemd/system/qubes-updates-proxy.service
+/usr/lib/qubes/init/network-proxy-setup.sh
+/usr/lib/qubes/init/qubes-iptables
+/usr/lib/qubes/iptables-updates-proxy
+/usr/lib/qubes/qubes-setup-dnat-to-ns
+/usr/lib/qubes/setup-ip
+/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
+/usr/sbin/qubes-firewall
+
+%files network-manager
+/etc/NetworkManager/dispatcher.d/30-qubes-external-ip
+/etc/NetworkManager/dispatcher.d/qubes-nmhook
+/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
+/usr/lib/NetworkManager/conf.d/30-qubes.conf
+/usr/lib/qubes/network-manager-prepare-conf-dir
+/usr/lib/qubes/qubes-fix-nm-conf.sh
+/usr/lib/qubes/show-hide-nm-applet.sh
+
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
 License:        GPL v2 only
 Group:          Qubes
 Requires:       upstart
 Requires:       qubes-core-agent
+Requires:       qubes-core-agent-networking
 Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-systemd
 Provides:       qubes-core-vm-sysvinit = %{version}-%{release}
@@ -677,22 +714,17 @@ The Qubes core startup configuration for SystemD init.
 %defattr(-,root,root,-)
 /lib/systemd/system/qubes-dvm.service
 /lib/systemd/system/qubes-misc-post.service
-/lib/systemd/system/qubes-firewall.service
 /lib/systemd/system/qubes-mount-dirs.service
-/lib/systemd/system/qubes-network.service
-/lib/systemd/system/qubes-iptables.service
 /lib/systemd/system/qubes-sysinit.service
 /lib/systemd/system/qubes-early-vm-config.service
 /lib/systemd/system/qubes-update-check.service
 /lib/systemd/system/qubes-update-check.timer
-/lib/systemd/system/qubes-updates-proxy.service
 /lib/systemd/system/qubes-qrexec-agent.service
 /lib/systemd/system/qubes-updates-proxy-forwarder@.service
 /lib/systemd/system/qubes-updates-proxy-forwarder.socket
 /lib/systemd/system-preset/%qubes_preset_file
 /lib/modules-load.d/qubes-core.conf
 /lib/modules-load.d/qubes-misc.conf
-/usr/lib/qubes/init/qubes-iptables
 /lib/systemd/system/chronyd.service.d/30_qubes.conf
 /lib/systemd/system/crond.service.d/30_qubes.conf
 /lib/systemd/system/cups.service.d/30_qubes.conf
@@ -713,7 +745,6 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/tmp.mount.d/30_qubes.conf
 /usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
 /usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
-/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
 
 %post systemd
 

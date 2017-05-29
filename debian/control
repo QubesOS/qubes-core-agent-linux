@@ -25,17 +25,14 @@ Package: qubes-core-agent
 Architecture: any
 Depends:
     dmsetup,
-    ethtool,
     gawk,
     imagemagick,
     init-system-helpers,
     initscripts,
-    iptables,
     librsvg2-bin,
     libvchan-xen,
     locales,
     ncurses-term,
-    net-tools,
     psmisc,
     procps,
     util-linux,
@@ -66,12 +63,11 @@ Recommends:
     libnotify-bin,
     locales-all,
     mate-notification-daemon,
-    network-manager (>= 0.8.1-1),
-    network-manager-gnome,
     ntpdate,
     system-config-printer,
-    tinyproxy,
-    qubes-nautilus,
+    qubes-core-agent-nautilus,
+    qubes-core-agent-networking,
+    qubes-core-agent-network-manager,
     xsettingsd
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}, qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
@@ -96,3 +92,38 @@ Description: Scripts required to handle dom0 updates.
   Scripts required to handle dom0 updates. This will allow to use the VM as
   "Updates VM".
 
+Package: qubes-core-agent-networking
+Architecture: any
+Depends:
+    qubes-core-agent,
+    tinyproxy,
+    iptables,
+    net-tools,
+    ethtool,
+    tinyproxy,
+    nmap-ncat,
+    ${python:Depends},
+    ${misc:Depends}
+Recommends:
+    nftables,
+Description: Networking support for Qubes VM
+ This package provides:
+  * basic network functionality (setting IP address, DNS, default gateway)
+  * proxy service used by TemplateVMs to download updates
+  * qubes-firewall service (FirewallVM)
+ .
+ Note: if you want to use NetworkManager (you do want it in NetVM), install
+ also qubes-core-agent-network-manager.
+
+Package: qubes-core-agent-network-manager
+Architecture: any
+Depends:
+    qubes-core-agent-networking,
+    dconf,
+    network-manager (>= 0.8.1-1),
+    network-manager-gnome,
+Description: NetworkManager integration for Qubes VM
+ Integration of NetworkManager for Qubes VM:
+  * make connections config persistent
+  * adjust DNS redirections when needed
+  * show/hide NetworkManager applet icon
