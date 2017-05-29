@@ -145,7 +145,6 @@ Requires:   python2-qubesdb
 Requires:   nftables
 Requires:   ImageMagick
 Requires:   librsvg2-tools
-Requires:   fakeroot
 Requires:   desktop-notification-daemon
 # to show/hide nm-applet
 Requires:   dconf
@@ -165,6 +164,9 @@ BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
+
+%description
+The Qubes core files for installation inside a Qubes VM.
 
 %package -n python2-dnf-plugins-qubes-hooks
 Summary:	DNF plugin for Qubes specific post-installation actions
@@ -194,12 +196,17 @@ Requires:   nautilus-python
 %description nautilus
 Nautilus addons for inter-VM file copy/move/open.
 
+%package dom0-updates
+Summary:    Scripts required to handle dom0 updates
+Requires:   qubes-core-agent
+Requires:   fakeroot
+
+%description dom0-updates
+Scripts required to handle dom0 updates.
+
 %define _builddir %(pwd)
 
 %define kde_service_dir /usr/share/kde4/services
-
-%description
-The Qubes core files for installation inside a Qubes VM.
 
 %prep
 # we operate on the current directory, so no need to unpack anything
@@ -411,7 +418,6 @@ rm -f %{name}-%{version}
 %defattr(-,root,root,-)
 %dir /var/lib/qubes
 %dir /var/run/qubes
-%dir %attr(0775,user,user) /var/lib/qubes/dom0-updates
 %{kde_service_dir}/qvm-copy.desktop
 %{kde_service_dir}/qvm-move.desktop
 %{kde_service_dir}/qvm-dvm.desktop
@@ -506,7 +512,6 @@ rm -f %{name}-%{version}
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
 /usr/lib/qubes/qrun-in-vm
-/usr/lib/qubes/qubes-download-dom0-updates.sh
 /usr/lib/qubes/qubes-fix-nm-conf.sh
 /usr/lib/qubes/qubes-setup-dnat-to-ns
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
@@ -563,6 +568,10 @@ rm -f %{name}-%{version}
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
+
+%files dom0-updates
+%dir %attr(0775,user,user) /var/lib/qubes/dom0-updates
+/usr/lib/qubes/qubes-download-dom0-updates.sh
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart

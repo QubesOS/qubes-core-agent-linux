@@ -26,7 +26,6 @@ Architecture: any
 Depends:
     dmsetup,
     ethtool,
-    fakeroot,
     gawk,
     imagemagick,
     init-system-helpers,
@@ -73,9 +72,7 @@ Recommends:
     system-config-printer,
     tinyproxy,
     qubes-nautilus,
-    xsettingsd,
-    yum,
-    yum-utils
+    xsettingsd
 Provides: ${diverted-files}
 Conflicts: ${diverted-files}, qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
@@ -88,3 +85,14 @@ Description: Qubes integration for Nautilus
  Nautilus addons for inter-VM file copy/move/open.
 Depends:
     python-nautilus,
+
+Package: qubes-core-agent-dom0-updates
+Architecture: any
+Depends:
+    fakeroot,
+    yum,
+    yum-utils
+Description: Scripts required to handle dom0 updates.
+  Scripts required to handle dom0 updates. This will allow to use the VM as
+  "Updates VM".
+

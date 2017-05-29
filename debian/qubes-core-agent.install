@@ -138,7 +138,6 @@ usr/lib/qubes/qrexec-agent
 usr/lib/qubes/qrexec-client-vm
 usr/lib/qubes/qrexec_client_vm
 usr/lib/qubes/qrun-in-vm
-usr/lib/qubes/qubes-download-dom0-updates.sh
 usr/lib/qubes/qubes-fix-nm-conf.sh
 usr/lib/qubes/qubes-rpc-multiplexer
 usr/lib/qubes/qubes-setup-dnat-to-ns
