@@ -103,7 +103,7 @@ restore_units() { \
     done \
 } \
 
-Name:		qubes-core-vm
+Name:		qubes-core-agent
 Version:	%{version}
 Release:	1%{dist}
 Summary:	The Qubes core files for VM
@@ -159,6 +159,8 @@ Requires:   python2-dnf-plugins-qubes-hooks
 %endif
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
+Provides:   qubes-core-vm = %{version}-%{release}
+Obsoletes:  qubes-core-vm < 4.0.0
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
@@ -186,7 +188,7 @@ DNF plugin for Qubes specific post-installation actions:
 
 %package -n qubes-nautilus
 Summary:    Qubes integration for Nautilus
-Requires:   qubes-core-vm
+Requires:   qubes-core-agent
 Requires:   nautilus-python
 
 %description -n qubes-nautilus
@@ -567,9 +569,11 @@ Summary:        Qubes unit files for SysV init style or upstart
 License:        GPL v2 only
 Group:          Qubes
 Requires:       upstart
-Requires:       qubes-core-vm
-Provides:       qubes-core-vm-init-scripts
-Conflicts:      qubes-core-vm-systemd
+Requires:       qubes-core-agent
+Provides:       qubes-core-agent-init-scripts
+Conflicts:      qubes-core-agent-systemd
+Provides:       qubes-core-vm-sysvinit = %{version}-%{release}
+Obsoletes:      qubes-core-vm-sysvinit < 4.0.0
 
 %description sysvinit
 The Qubes core startup configuration for SysV init (or upstart).
@@ -638,9 +642,11 @@ Requires:       systemd
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
-Requires:       qubes-core-vm
-Provides:       qubes-core-vm-init-scripts
-Conflicts:      qubes-core-vm-sysvinit
+Requires:       qubes-core-agent
+Provides:       qubes-core-agent-init-scripts
+Conflicts:      qubes-core-agent-sysvinit
+Provides:       qubes-core-vm-systemd = %{version}-%{release}
+Obsoletes:      qubes-core-vm-systemd < 4.0.0
 
 %description systemd
 The Qubes core startup configuration for SystemD init.
