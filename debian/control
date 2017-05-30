@@ -77,10 +77,12 @@ Description: Qubes core agent
 
 Package: qubes-core-agent-nautilus
 Architecture: any
-Description: Qubes integration for Nautilus
- Nautilus addons for inter-VM file copy/move/open.
 Depends:
     python-nautilus,
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
+Description: Qubes integration for Nautilus
+ Nautilus addons for inter-VM file copy/move/open.
 
 Package: qubes-core-agent-dom0-updates
 Architecture: any
@@ -88,6 +90,8 @@ Depends:
     fakeroot,
     yum,
     yum-utils
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Scripts required to handle dom0 updates.
   Scripts required to handle dom0 updates. This will allow to use the VM as
   "Updates VM".
@@ -106,6 +110,8 @@ Depends:
     ${misc:Depends}
 Recommends:
     nftables,
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Networking support for Qubes VM
  This package provides:
   * basic network functionality (setting IP address, DNS, default gateway)
@@ -122,6 +128,8 @@ Depends:
     dconf,
     network-manager (>= 0.8.1-1),
     network-manager-gnome,
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: NetworkManager integration for Qubes VM
  Integration of NetworkManager for Qubes VM:
   * make connections config persistent

@@ -185,6 +185,7 @@ DNF plugin for Qubes specific post-installation actions:
 Summary:    Qubes integration for Nautilus
 Requires:   qubes-core-agent
 Requires:   nautilus-python
+Conflicts:  qubes-core-vm < 4.0.0
 
 %description nautilus
 Nautilus addons for inter-VM file copy/move/open.
@@ -193,6 +194,7 @@ Nautilus addons for inter-VM file copy/move/open.
 Summary:    Scripts required to handle dom0 updates
 Requires:   qubes-core-agent
 Requires:   fakeroot
+Conflicts:  qubes-core-vm < 4.0.0
 
 %description dom0-updates
 Scripts required to handle dom0 updates.
@@ -205,6 +207,7 @@ Requires:   nftables
 Requires:   nmap-ncat
 Requires:   qubes-core-agent
 Requires:   tinyproxy
+Conflicts:  qubes-core-vm < 4.0.0
 
 %description networking
 This package provides:
@@ -221,6 +224,7 @@ Summary:    NetworkManager integration for Qubes VM
 Requires:   NetworkManager >= 0.8.1-1
 Requires:   dconf
 Requires:   qubes-core-agent-networking
+Conflicts:  qubes-core-vm < 4.0.0
 
 %description network-manager
 Integration of NetworkManager for Qubes VM:
