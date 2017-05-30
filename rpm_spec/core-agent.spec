@@ -150,6 +150,9 @@ Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
 Provides:   qubes-core-vm = %{version}-%{release}
 Obsoletes:  qubes-core-vm < 4.0.0
+Provides:	qubes-core-vm-doc = %{version}-%{release}
+Obsoletes:	qubes-core-vm-doc < 4.0.0
+BuildRequires: pandoc
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
@@ -240,6 +243,7 @@ ln -sf . %{name}-%{version}
 for dir in qubes-rpc qrexec misc; do
   (cd $dir; make)
 done
+make -C doc manpages
 
 %pre
 # Make sure there is a qubes group
@@ -266,6 +270,8 @@ usermod -L user
 
 (cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
+
+make -C doc install DESTDIR=$RPM_BUILD_ROOT
 
 %if %{fedora} >= 22
 rm -f $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
@@ -554,6 +560,7 @@ rm -f %{name}-%{version}
 /usr/share/glib-2.0/schemas/20_org.gnome.nautilus.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.mate.NotificationDaemon.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.gnome.desktop.wm.preferences.qubes.gschema.override
+%{_mandir}/man1/qvm-*.1*
 
 %dir %{python_sitelib}/qubesagent-*-py2.7.egg-info
 %{python_sitelib}/qubesagent-*-py2.7.egg-info/*

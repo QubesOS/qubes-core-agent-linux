@@ -1,6 +1,5 @@
 ifeq ($(PACKAGE_SET),vm)
-  RPM_SPEC_FILES := rpm_spec/core-agent.spec \
-  rpm_spec/core-vm-doc.spec
+  RPM_SPEC_FILES := rpm_spec/core-agent.spec
 
   ifneq ($(filter $(DISTRIBUTION), debian qubuntu),)
     DEBIAN_BUILD_DIRS := debian
