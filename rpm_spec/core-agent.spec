@@ -137,7 +137,6 @@ Requires:   python-daemon
 Requires:   python2-qubesdb
 Requires:   ImageMagick
 Requires:   librsvg2-tools
-Requires:   desktop-notification-daemon
 Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
