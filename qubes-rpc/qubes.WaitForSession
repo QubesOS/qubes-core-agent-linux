@@ -1,2 +1,5 @@
+#!/bin/sh
 read USERNAME
 su -c 'echo $$ >> /tmp/qubes-session-waiter; [ ! -f /tmp/qubes-session-env ] && exec sleep inf' - "$USERNAME" 2> /dev/null
+# the above line is _expected_ to be terminated by a signal, don't treat this as a failure
+exit 0
