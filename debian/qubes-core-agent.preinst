@@ -44,13 +44,12 @@ if [ "$1" = "install" ] ; then
     # User add / modifications
     # --------------------------------------------------------------------------
     id -u 'user' >/dev/null 2>&1 || {
-        useradd --password "" --user-group --create-home --shell /bin/bash user
+        useradd --user-group --create-home --shell /bin/bash user
     }
     id -u 'tinyproxy' >/dev/null 2>&1 || {
         useradd --user-group --system -M --home /run/tinyproxy --shell /bin/false tinyproxy
     }
-    usermod -p '' root
-    usermod -L -a --groups qubes,sudo user
+    usermod -L -a --groups qubes user
 
     # --------------------------------------------------------------------------
     # Remove `mesg` from root/.profile?

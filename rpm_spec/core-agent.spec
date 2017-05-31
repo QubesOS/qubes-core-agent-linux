@@ -231,6 +231,16 @@ Integration of NetworkManager for Qubes VM:
  * adjust DNS redirections when needed
  * show/hide NetworkManager applet icon
 
+%package passwordless-root
+Summary:    Passwordless root access from normal user
+Conflicts:  qubes-core-vm < 4.0.0
+
+%description passwordless-root
+Configure sudo, PolicyKit and similar tool to not ask for any password when
+switching from user to root. Since all the user data in a VM is accessible
+already from normal user account, there is not much more to guard there. Qubes
+VM is a single user system.
+
 %define _builddir %(pwd)
 
 %define kde_service_dir /usr/share/kde4/services
@@ -266,8 +276,11 @@ if [ -e /etc/fstab ] ; then
 mv /etc/fstab /var/lib/qubes/fstab.orig
 fi
 
-usermod -p '' root
 usermod -L user
+
+%pre passwordless-root
+
+usermod -p '' root
 
 %install
 
@@ -440,6 +453,11 @@ if [ $1 -eq 0 ] ; then
     rm -rf /var/lib/qubes/xdg
 fi
 
+%postun passwordless-root
+if [ $1 -eq 0 ]; then
+    usermod -p '*' root
+fi
+
 %posttrans
     /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
@@ -457,8 +475,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/X11/xorg-preload-apps.conf
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
-%config(noreplace) /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
-%config(noreplace) /etc/polkit-1/rules.d/00-qubes-allow-all.rules
 %dir /etc/qubes-rpc
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
 %config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
@@ -492,7 +508,6 @@ rm -f %{name}-%{version}
 %dir /etc/qubes/post-install.d
 /etc/qubes/post-install.d/README
 /etc/qubes/post-install.d/*.sh
-%config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
@@ -624,6 +639,11 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/network-manager-prepare-conf-dir
 /usr/lib/qubes/qubes-fix-nm-conf.sh
 /usr/lib/qubes/show-hide-nm-applet.sh
+
+%files passwordless-root
+%config(noreplace) /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
+%config(noreplace) /etc/polkit-1/rules.d/00-qubes-allow-all.rules
+%config(noreplace) /etc/sudoers.d/qubes
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart

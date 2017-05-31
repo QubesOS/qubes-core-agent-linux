@@ -69,8 +69,7 @@ Recommends:
     qubes-core-agent-networking,
     qubes-core-agent-network-manager,
     xsettingsd
-Provides: ${diverted-files}
-Conflicts: ${diverted-files}, qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
+Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec.
@@ -135,3 +134,15 @@ Description: NetworkManager integration for Qubes VM
   * make connections config persistent
   * adjust DNS redirections when needed
   * show/hide NetworkManager applet icon
+
+Package: qubes-core-agent-passwordless-root
+Architecture: any
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
+Provides: ${diverted-files}
+Conflicts: ${diverted-files}
+Description: Passwordless root access from normal user
+ Configure sudo, PolicyKit and similar tool to not ask for any password when
+ switching from user to root. Since all the user data in a VM is accessible
+ already from normal user account, there is not much more to guard there. Qubes
+ VM is a single user system.

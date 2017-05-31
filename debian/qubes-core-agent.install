@@ -4,9 +4,6 @@ etc/apt/sources.list.d/qubes-r3.list
 etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 etc/fstab
 etc/needrestart/conf.d/50_qubes.conf
-etc/pam.d/su.qubes
-etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
-etc/polkit-1/rules.d/00-qubes-allow-all.rules
 etc/profile.d/qt_x11_no_mitshm.sh
 etc/qubes-rpc/qubes.Backup
 etc/qubes-rpc/qubes.DetachPciDevice
@@ -37,7 +34,6 @@ etc/qubes/post-install.d/*.sh
 etc/qubes/suspend-post.d/README
 etc/qubes/suspend-pre.d/README
 etc/sudoers.d/qt_x11_no_mitshm
-etc/sudoers.d/qubes
 etc/sudoers.d/umask
 etc/sysctl.d/20_tcp_timestamps.conf
 etc/sysctl.d/80-qubes.conf
