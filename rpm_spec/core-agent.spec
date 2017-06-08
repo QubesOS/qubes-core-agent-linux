@@ -534,7 +534,6 @@ rm -f %{name}-%{version}
 /usr/bin/qrexec-client-vm
 /usr/bin/qubes-session-autostart
 %dir /usr/lib/qubes
-/usr/lib/qubes/vusb-ctl.py*
 /usr/lib/qubes/sync-ntp-clock
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qrexec-agent

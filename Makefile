@@ -187,7 +187,6 @@ install-common:
 	install -d $(DESTDIR)/etc/udev/rules.d
 	install -m 0644 misc/udev-qubes-misc.rules $(DESTDIR)/etc/udev/rules.d/50-qubes-misc.rules
 	install -d $(DESTDIR)$(LIBDIR)/qubes/
-	install misc/vusb-ctl.py $(DESTDIR)$(LIBDIR)/qubes/
 	install misc/qubes-trigger-sync-appmenus.sh $(DESTDIR)$(LIBDIR)/qubes/
 	install -d -m 0750 $(DESTDIR)/etc/polkit-1/rules.d
 	install -D -m 0644 misc/polkit-1-qubes-allow-all.pkla $(DESTDIR)/etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla

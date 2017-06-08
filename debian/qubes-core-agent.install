@@ -121,7 +121,6 @@ usr/lib/qubes/update-proxy-configs
 usr/lib/qubes/upgrades-installed-check
 usr/lib/qubes/upgrades-status-notify
 usr/lib/qubes/vm-file-editor
-usr/lib/qubes/vusb-ctl.py
 usr/lib/qubes/xdg-icon
 usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
 usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
