@@ -1,0 +1,7 @@
+lib/systemd/system/qubes-qrexec-agent.service
+usr/bin/qrexec-client-vm
+usr/bin/qrexec-fork-server
+usr/lib/qubes/qrexec-agent
+usr/lib/qubes/qrexec-client-vm
+usr/lib/qubes/qrexec_client_vm
+usr/lib/qubes/qubes-rpc-multiplexer

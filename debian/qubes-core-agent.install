@@ -62,7 +62,6 @@ lib/systemd/system/org.cups.cupsd.socket.d/30_qubes.conf
 lib/systemd/system/qubes-early-vm-config.service
 lib/systemd/system/qubes-misc-post.service
 lib/systemd/system/qubes-mount-dirs.service
-lib/systemd/system/qubes-qrexec-agent.service
 lib/systemd/system/qubes-sysinit.service
 lib/systemd/system/qubes-update-check.service
 lib/systemd/system/qubes-update-check.timer
@@ -73,8 +72,6 @@ lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
 lib/systemd/system/tmp.mount.d/30_qubes.conf
 lib/systemd/system/tor.service.d/30_qubes.conf
 lib/systemd/system/tor@default.service.d/30_qubes.conf
-usr/bin/qrexec-client-vm
-usr/bin/qrexec-fork-server
 usr/bin/qubes-desktop-run
 usr/bin/qubes-open
 usr/bin/qubes-session-autostart
@@ -105,11 +102,7 @@ usr/lib/qubes/prepare-suspend
 usr/lib/qubes/qfile-agent
 usr/lib/qubes/qfile-unpacker
 usr/lib/qubes/qopen-in-vm
-usr/lib/qubes/qrexec-agent
-usr/lib/qubes/qrexec-client-vm
-usr/lib/qubes/qrexec_client_vm
 usr/lib/qubes/qrun-in-vm
-usr/lib/qubes/qubes-rpc-multiplexer
 usr/lib/qubes/qubes-trigger-sync-appmenus.sh
 usr/lib/qubes/qvm-copy-to-vm.gnome
 usr/lib/qubes/qvm-copy-to-vm.kde

@@ -138,6 +138,7 @@ Requires:   python2-qubesdb
 Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   zenity
+Requires:   qubes-core-agent-qrexec
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 %if 0%{fedora} >= 23
@@ -179,6 +180,16 @@ BuildRequires: python3-devel
 DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
+
+%package qrexec
+Summary:    Qubes qrexec agent
+Requires:   qubes-core-agent
+Requires:   nautilus-python
+Conflicts:  qubes-core-vm < 4.0.0
+
+%description qrexec
+Agent part of Qubes RPC system. A daemon responsible for starting processes as
+requested by dom0 or other VMs, according to dom0-enforced policy.
 
 %package nautilus
 Summary:    Qubes integration for Nautilus
@@ -530,16 +541,10 @@ rm -f %{name}-%{version}
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
 /usr/bin/qubes-open
-/usr/bin/qrexec-fork-server
-/usr/bin/qrexec-client-vm
 /usr/bin/qubes-session-autostart
 %dir /usr/lib/qubes
 /usr/lib/qubes/sync-ntp-clock
 /usr/lib/qubes/prepare-suspend
-/usr/lib/qubes/qrexec-agent
-/usr/lib/qubes/qrexec-client-vm
-/usr/lib/qubes/qrexec_client_vm
-/usr/lib/qubes/qubes-rpc-multiplexer
 /usr/lib/qubes/qfile-agent
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
@@ -597,6 +602,15 @@ rm -f %{name}-%{version}
 %files -n python3-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 
+%files qrexec
+/usr/bin/qrexec-fork-server
+/usr/bin/qrexec-client-vm
+/usr/lib/qubes/qrexec-agent
+/usr/lib/qubes/qrexec-client-vm
+/usr/lib/qubes/qrexec_client_vm
+/usr/lib/qubes/qubes-rpc-multiplexer
+/lib/systemd/system/qubes-qrexec-agent.service
+
 %files nautilus
 /usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-move-to-vm.gnome
@@ -650,6 +664,7 @@ License:        GPL v2 only
 Group:          Qubes
 Requires:       upstart
 Requires:       qubes-core-agent
+Requires:       qubes-core-agent-qrexec
 Requires:       qubes-core-agent-networking
 Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-systemd
@@ -739,7 +754,6 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-early-vm-config.service
 /lib/systemd/system/qubes-update-check.service
 /lib/systemd/system/qubes-update-check.timer
-/lib/systemd/system/qubes-qrexec-agent.service
 /lib/systemd/system/qubes-updates-proxy-forwarder@.service
 /lib/systemd/system/qubes-updates-proxy-forwarder.socket
 /lib/systemd/system-preset/%qubes_preset_file
