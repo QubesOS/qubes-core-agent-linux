@@ -42,7 +42,6 @@ Depends:
     python-xdg,
     python-dbus,
     qubes-utils (>= 3.1.3),
-    sudo,
     qubes-core-agent-qrexec,
     systemd,
     x11-xserver-utils,
