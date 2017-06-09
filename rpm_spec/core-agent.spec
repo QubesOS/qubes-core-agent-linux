@@ -492,6 +492,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.OpenURL
 %config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
 %config(noreplace) /etc/qubes-rpc/qubes.VMShell
+%config(noreplace) /etc/qubes-rpc/qubes.VMRootShell
 %config(noreplace) /etc/qubes-rpc/qubes.SyncNtpClock
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPre
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPreAll

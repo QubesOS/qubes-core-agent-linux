@@ -1,0 +1,4 @@
+#!/bin/sh
+# This is the same as qubes.VMShell. The actual difference is in qrexec policy,
+# which contains 'user=root' option.
+exec /bin/bash

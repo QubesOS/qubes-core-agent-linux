@@ -26,6 +26,7 @@ etc/qubes-rpc/qubes.SuspendPre
 etc/qubes-rpc/qubes.SuspendPreAll
 etc/qubes-rpc/qubes.SyncNtpClock
 etc/qubes-rpc/qubes.VMShell
+etc/qubes-rpc/qubes.VMRootShell
 etc/qubes-rpc/qubes.WaitForSession
 etc/qubes-suspend-module-blacklist
 etc/qubes/autostart/*
