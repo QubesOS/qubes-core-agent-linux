@@ -1,3 +1,4 @@
+#!/bin/sh
 echo Starting Restorecopy >&2
 read args
 read paths

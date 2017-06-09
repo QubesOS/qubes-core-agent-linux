@@ -1,1 +1,2 @@
+#!/bin/sh
 exec zenity --title="Qubes" --file-selection --directory
