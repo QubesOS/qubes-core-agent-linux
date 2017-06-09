@@ -1,3 +1,73 @@
+qubes-core-agent (4.0.0-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * qvm-copy-to-vm: fix handling empty target VM
+  * Rename qubes.xdg python module to qubesxdg
+  * Disable meminfo-writer if there is any PCI device attached
+
+  [ Wojtek Porczyk ]
+  * misc: add qvm-features-request
+
+  [ Marek Marczykowski-Górecki ]
+  * Add qubes.ResizeDisk service to adjust filesystem size
+  * network: rewrite qubes-firewall daemon
+  * network: remove qubes-netwatcher
+
+  [ qubesuser ]
+  * network: add vif-route-qubes-nat for IP address anonymization
+
+  [ Marek Marczykowski-Górecki ]
+  * network: reformat vif-route-qubes-nat
+  * network: change vif-route-qubes-nat parameters
+  * network: integrate vif-route-qubes-nat into vif-route-qubes
+  * network: keep the same MAC on vif interfaces
+  * network: properly handle DNS addresses in vif-qubes-nat.sh
+  * network: use /32 netmask on internal IPs in NAT providing namespace
+  * travis: drop debootstrap workaround
+  * Add qubes.StartApp service
+  * dom0-updates: restructure the script to not update metadata twice
+  * tests: make firewall tests working regardless of python version
+  * firewall: switch to python 3
+  * tests: add run-tests script, plug it into travis
+  * Apply gschema overrides also to debian, rename according to
+    guidelines
+  * fedora,debian: update python3-daemon dependency
+  * Remove duplicated 'close' button from titlebar of gnome applications
+  * Ask for target VM for file-copy in dom0
+  * travis: update to Qubes 4.0 repositories
+  * debian: fix qubes-firewall python packaging, make it more verbose
+  * debian,fedora: split nautilus integration into separate package
+  * Revert "firewall: switch to python 3"
+  * Revert "fedora,debian: update python3-daemon dependency"
+  * debian: add missing Build-Depends: python-setuptools
+  * debian: make haveged.service patch less intrusive...
+  * Rename qvm-run to qvm-run-vm
+  * Implement qrexec-based connection to updates proxy
+  * Implement qubes.PostInstall service
+  * Fix detection of PCI passthrough
+  * rpm: rename qubes-core-vm to qubes-core-agent
+  * Rename qubes-nautilus to qubes-core-agent-nautilus
+  * Split dom0-updates handling into subpackage
+  * rpm: make file list more verbose to ease splitting the package
+  * Split network-related files to -networking and -network-manager
+    packages
+  * Remove DisposableVM savefile related files
+  * rpm: integrate documentation into main package
+  * Adjust dependencies for clean upgrade
+  * rpm: drop dependency on desktop-notification-daemon
+  * Do not report spurious failure of qubes.WaitForSession service
+  * deb,rpm: split passwordless root access configs into separate
+    package
+  * Remove old vusb scripts
+  * debian: update basic metadata of package
+  * rpm,deb: split qrexec-agent into separate subpackage
+  * debian: drop explicit dependency on sudo
+  * Cleanup kernel modules loading configuration
+  * Add qubes.VMRootShell service
+  * Make all scripts in qubes-rpc executable
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 09 Jun 2017 23:30:10 +0200
+
 qubes-core-agent (3.2.18-1) unstable; urgency=medium
 
   * debian,fedora: drop gnome-packagekit from dependencies
