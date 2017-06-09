@@ -1,3 +1,4 @@
+#!/bin/sh
 find /usr/share/applications/ /usr/local/share/applications/ -name '*.desktop' -print0 2>/dev/null | \
          xargs -0 awk '
          BEGINFILE { entry="" }

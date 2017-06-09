@@ -1,1 +1,2 @@
+#!/bin/sh
 /usr/lib/qubes/prepare-suspend resume
