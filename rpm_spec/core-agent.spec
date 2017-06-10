@@ -232,7 +232,7 @@ qubes-core-agent-network-manager.
 Summary:    NetworkManager integration for Qubes VM
 # to show/hide nm-applet
 Requires:   NetworkManager >= 0.8.1-1
-Requires:   dconf
+Requires:   glib2
 Requires:   qubes-core-agent-networking
 Conflicts:  qubes-core-vm < 4.0.0
 

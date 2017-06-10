@@ -120,7 +120,7 @@ Depends:
     tinyproxy,
     ${python:Depends},
     ${misc:Depends}
-Recommends:
+Suggests:
     nftables,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
@@ -137,7 +137,7 @@ Package: qubes-core-agent-network-manager
 Architecture: any
 Depends:
     qubes-core-agent-networking,
-    dconf,
+    libglib2.0-bin,
     network-manager (>= 0.8.1-1),
     network-manager-gnome,
 Replaces: qubes-core-agent (<< 4.0.0-1)
