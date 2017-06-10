@@ -1,2 +1,2 @@
 #!/bin/sh
-exec nc localhost 8082
+exec socat STDIO TCP:localhost:8082

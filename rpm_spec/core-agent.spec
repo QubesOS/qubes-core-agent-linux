@@ -214,7 +214,7 @@ Summary:    Networking support for Qubes VM
 Requires:   ethtool
 Requires:   net-tools
 Requires:   nftables
-Requires:   nmap-ncat
+Requires:   socat
 Requires:   qubes-core-agent
 Requires:   tinyproxy
 Conflicts:  qubes-core-vm < 4.0.0

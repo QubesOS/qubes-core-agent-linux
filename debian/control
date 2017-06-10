@@ -116,8 +116,8 @@ Depends:
     iptables,
     net-tools,
     ethtool,
+    socat,
     tinyproxy,
-    nmap-ncat,
     ${python:Depends},
     ${misc:Depends}
 Recommends:
