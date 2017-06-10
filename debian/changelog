@@ -1,3 +1,10 @@
+qubes-core-agent (4.0.1-1) unstable; urgency=medium
+
+  * Switch qubes.UpdatesProxy to socat
+  * rpm,deb: fix dependencies
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 11 Jun 2017 00:02:49 +0200
+
 qubes-core-agent (4.0.0-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
