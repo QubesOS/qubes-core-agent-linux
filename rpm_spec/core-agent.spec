@@ -309,6 +309,14 @@ if [ -e /etc/init/serial.conf ]; then
 	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
 fi
 
+%triggerin -- grub2-tools
+
+if ! grep -q /etc/default/grub.qubes /etc/default/grub 2>/dev/null; then
+    # do not keep Qubes-related settings directly in user-controlled config,
+    # include another file
+    echo '. /etc/default/grub.qubes' >> /etc/default/grub
+fi
+
 %post
 
 # disable some Upstart services
@@ -511,6 +519,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %dir /etc/qubes/autostart
+%config(noreplace) /etc/default/grub.qubes
 /etc/qubes/autostart/README.txt
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
 %dir /etc/qubes/suspend-pre.d

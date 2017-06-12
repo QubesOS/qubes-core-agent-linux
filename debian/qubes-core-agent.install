@@ -2,6 +2,7 @@ etc/X11/xorg-preload-apps.conf
 etc/apt/apt.conf.d/00notify-hook
 etc/apt/sources.list.d/qubes-r3.list
 etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
+etc/default/grub.d/30-qubes.cfg
 etc/fstab
 etc/needrestart/conf.d/50_qubes.conf
 etc/profile.d/qt_x11_no_mitshm.sh

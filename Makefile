@@ -155,6 +155,7 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 
 	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 
+	install -D -m 0644 misc/grub.qubes $(DESTDIR)/etc/default/grub.qubes
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 	install -D -m 0644 misc/dracut-qubes.conf \
@@ -316,6 +317,7 @@ install-deb: install-common install-systemd install-systemd-dropins
 	install -m 0644 misc/pam.d_su.qubes $(DESTDIR)/etc/pam.d/su.qubes
 	install -d $(DESTDIR)/etc/needrestart/conf.d
 	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
+	install -D -m 0644 misc/grub.qubes $(DESTDIR)/etc/default/grub.d/30-qubes.cfg
 
 	mkdir -p $(DESTDIR)/etc/systemd/system/
 	install -m 0644 vm-systemd/haveged.service  $(DESTDIR)/etc/systemd/system/
