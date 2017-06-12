@@ -2,11 +2,8 @@
 # same fs, including UUID
 GRUB_DISABLE_LINUX_UUID=true
 GRUB_DISABLE_OS_PROBER=true
-# don't append twice
-if [ -z "$QUBES_APPENDED" ]; then
-    GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX root=/dev/mapper/dmroot console=hvc0"
-    # make SWIOTLB smaller - it isn't really needed unless PCI passthrough is used,
-    # and even then, 16MB is enough
-    GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX swiotlb=8192"
-    QUBES_APPENDED=1
-fi
+GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX root=/dev/mapper/dmroot console=hvc0"
+# make SWIOTLB smaller - it isn't really needed unless PCI passthrough is used,
+# and even then, 16MB is enough
+GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX swiotlb=8192"
+GRUB_TIMEOUT=0
