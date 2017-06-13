@@ -142,7 +142,7 @@ install-sysvinit: install-init
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
 
 install-rh: install-systemd install-systemd-dropins install-sysvinit
-	install -D -m 0644 misc/qubes-r3.repo $(DESTDIR)/etc/yum.repos.d/qubes-r3.repo
+	install -D -m 0644 misc/qubes-r4.repo $(DESTDIR)/etc/yum.repos.d/qubes-r4.repo
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
@@ -306,7 +306,7 @@ endif
 
 install-deb: install-common install-systemd install-systemd-dropins
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
-	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r3.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r3.list
+	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r4.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r4.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 	install -D -m 644 network/00notify-hook $(DESTDIR)/etc/apt/apt.conf.d/00notify-hook
 	install -d $(DESTDIR)/etc/sysctl.d

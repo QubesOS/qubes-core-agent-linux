@@ -534,7 +534,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
 %config(noreplace) /etc/qubes-suspend-module-blacklist
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
-%config(noreplace) /etc/yum.repos.d/qubes-r3.repo
+%config(noreplace) /etc/yum.repos.d/qubes-r4.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %if %{fedora} < 22
