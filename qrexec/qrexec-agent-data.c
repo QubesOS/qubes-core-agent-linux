@@ -48,7 +48,6 @@ int remote_process_status = 0;
 static void sigchld_handler(int __attribute__((__unused__))x)
 {
     child_exited = 1;
-    signal(SIGCHLD, sigchld_handler);
 }
 
 static void sigusr1_handler(int __attribute__((__unused__))x)
@@ -308,20 +307,21 @@ int process_child_io(libvchan_t *data_vchan,
     buffer_init(&stdin_buf);
     while (1) {
         if (child_exited) {
-            pid_t pid;
             int status;
-            while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-                if (pid == child_process_pid) {
+            if (child_process_pid &&
+                    waitpid(child_process_pid, &status, WNOHANG) > 0) {
+                if (WIFSIGNALED(status))
+                    child_process_status = 128 + WTERMSIG(status);
+                else
                     child_process_status = WEXITSTATUS(status);
-                    if (stdin_fd >= 0) {
-                        /* restore flags */
-                        set_block(stdin_fd);
-                        if (shutdown(stdin_fd, SHUT_WR) < 0) {
-                            if (errno == ENOTSOCK)
-                                close(stdin_fd);
-                        }
-                        stdin_fd = -1;
+                if (stdin_fd >= 0) {
+                    /* restore flags */
+                    set_block(stdin_fd);
+                    if (shutdown(stdin_fd, SHUT_WR) < 0) {
+                        if (errno == ENOTSOCK)
+                            close(stdin_fd);
                     }
+                    stdin_fd = -1;
                 }
             }
             child_exited = 0;
@@ -341,8 +341,6 @@ int process_child_io(libvchan_t *data_vchan,
         if (!libvchan_data_ready(data_vchan) &&
                 !libvchan_is_open(data_vchan) &&
                 !buffer_len(&stdin_buf)) {
-            if (child_process_pid == 0)
-                child_process_status = remote_process_status;
             break;
         }
         /* child signaled desire to use single socket for both stdin and stdout */
@@ -471,6 +469,8 @@ int process_child_io(libvchan_t *data_vchan,
         close(stderr_fd);
         stderr_fd = -1;
     }
+    if (child_process_pid == 0)
+        return remote_process_status;
     return child_process_status;
 }
 
