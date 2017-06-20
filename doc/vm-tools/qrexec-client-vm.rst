@@ -63,6 +63,9 @@ If service call is allowed by dom0 and ``qrexec-client-vm`` is started with
 *local_program* argument, it reports the local program exit code. There is no
 way to learn exit code of remote service in this case.
 
+In both cases, if process (local or remote) was terminated by a signal, exit
+status is 128+signal number.
+
 If service call is denied by dom0, ``qrexec-client-vm`` exit with status 126.
 
 AUTHORS

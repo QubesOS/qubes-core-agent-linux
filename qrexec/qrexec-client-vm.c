@@ -167,8 +167,16 @@ int main(int argc, char **argv)
     }
 
     close(trigger_fd);
-    if (start_local_process)
-        waitpid(child_pid, &i, 0);
+    if (start_local_process) {
+        if (waitpid(child_pid, &i, 0) != -1) {
+            if (WIFSIGNALED(i))
+                ret = 128 + WTERMSIG(i);
+            else
+                ret = WEXITSTATUS(i);
+        } else {
+            perror("wait for local process");
+        }
+    }
 
     return ret;
 }
