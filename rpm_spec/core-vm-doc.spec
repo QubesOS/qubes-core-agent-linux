@@ -55,3 +55,4 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{_mandir}/man1/qvm-*.1*
+%{_mandir}/man1/qrexec-client-vm.1*
