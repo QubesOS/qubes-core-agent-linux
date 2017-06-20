@@ -16,7 +16,8 @@ Build-Depends:
     dh-python,
     lsb-release,
     xserver-xorg-dev,
-    config-package-dev
+    config-package-dev,
+    pandoc,
 Standards-Version: 3.9.5
 Homepage: https://www.qubes-os.org
 Vcs-Git: https://github.com/QubesOS/qubes-core-agent-linux

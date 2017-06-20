@@ -167,8 +167,10 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 		$(DESTDIR)$(PYTHON3_SITELIB)/dnf-plugins/qubes-hooks.py
 	install -D -m 0644 misc/dnf-qubes-hooks.conf $(DESTDIR)/etc/dnf/plugins/qubes-hooks.conf
 
+install-doc:
+	$(MAKE) -C doc install
 
-install-common:
+install-common: install-doc
 	$(MAKE) -C autostart-dropins install
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 

@@ -298,8 +298,6 @@ usermod -p '' root
 (cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
 
-make -C doc install DESTDIR=$RPM_BUILD_ROOT
-
 %if %{fedora} >= 22
 rm -f $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 %endif
