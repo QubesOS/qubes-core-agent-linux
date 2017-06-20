@@ -618,6 +618,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qrexec_client_vm
 /usr/lib/qubes/qubes-rpc-multiplexer
 /lib/systemd/system/qubes-qrexec-agent.service
+%{_mandir}/man1/qrexec-client-vm.1*
 
 %files nautilus
 /usr/lib/qubes/qvm-copy-to-vm.gnome

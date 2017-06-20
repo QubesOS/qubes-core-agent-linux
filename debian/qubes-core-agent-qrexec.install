@@ -5,3 +5,4 @@ usr/lib/qubes/qrexec-agent
 usr/lib/qubes/qrexec-client-vm
 usr/lib/qubes/qrexec_client_vm
 usr/lib/qubes/qubes-rpc-multiplexer
+usr/share/man/man1/qrexec-client-vm.1.gz
