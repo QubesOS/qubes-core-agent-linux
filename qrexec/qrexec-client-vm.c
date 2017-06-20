@@ -109,7 +109,7 @@ int main(int argc, char **argv)
     ret = read(trigger_fd, &exec_params, sizeof(exec_params));
     if (ret == 0) {
         fprintf(stderr, "Request refused\n");
-        exit(1);
+        exit(126);
     }
     if (ret < 0 || ret != sizeof(exec_params)) {
         perror("read");
