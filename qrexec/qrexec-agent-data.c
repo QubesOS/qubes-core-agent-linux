@@ -237,9 +237,10 @@ int handle_remote_data(libvchan_t *data_vchan, int stdin_fd, int *status,
                 if (hdr.len == 0) {
                     /* restore flags */
                     set_block(stdin_fd);
-                    if (shutdown(stdin_fd, SHUT_WR) < 0) {
-                        if (errno == ENOTSOCK)
-                            close(stdin_fd);
+                    if (!child_process_pid || stdin_fd == 1 ||
+                            (shutdown(stdin_fd, SHUT_WR) == -1 &&
+                             errno == ENOTSOCK)) {
+                        close(stdin_fd);
                     }
                     stdin_fd = -1;
                     return 0;
@@ -251,9 +252,10 @@ int handle_remote_data(libvchan_t *data_vchan, int stdin_fd, int *status,
                             return 1;
                         case WRITE_STDIN_ERROR:
                             if (errno == EPIPE || errno == ECONNRESET) {
-                                if (shutdown(stdin_fd, SHUT_WR) < 0) {
-                                    if (errno == ENOTSOCK)
-                                        close(stdin_fd);
+                                if (!child_process_pid || stdin_fd == 1 ||
+                                        (shutdown(stdin_fd, SHUT_WR) == -1 &&
+                                         errno == ENOTSOCK)) {
+                                    close(stdin_fd);
                                 }
                                 stdin_fd = -1;
                             } else {
@@ -317,9 +319,10 @@ int process_child_io(libvchan_t *data_vchan,
                 if (stdin_fd >= 0) {
                     /* restore flags */
                     set_block(stdin_fd);
-                    if (shutdown(stdin_fd, SHUT_WR) < 0) {
-                        if (errno == ENOTSOCK)
-                            close(stdin_fd);
+                    if (!child_process_pid || stdin_fd == 1 ||
+                            (shutdown(stdin_fd, SHUT_WR) == -1 &&
+                             errno == ENOTSOCK)) {
+                        close(stdin_fd);
                     }
                     stdin_fd = -1;
                 }
@@ -409,10 +412,12 @@ int process_child_io(libvchan_t *data_vchan,
                 stdin_fd = -1;
                 break;
             case -2:
-                /* remote process exited, no sense in sending more data to it */
-                if (shutdown(stdout_fd, SHUT_RD) < 0) {
-                    if (errno == ENOTSOCK)
-                        close(stdout_fd);
+                /* remote process exited, no sense in sending more data to it;
+                 * be careful to not shutdown socket inherited from parent */
+                if (!child_process_pid || stdout_fd == 0 ||
+                        (shutdown(stdout_fd, SHUT_RD) == -1 &&
+                         errno == ENOTSOCK)) {
+                    close(stdout_fd);
                 }
                 stdout_fd = -1;
                 close(stderr_fd);
@@ -448,18 +453,20 @@ int process_child_io(libvchan_t *data_vchan,
     if (stdout_fd != -1) {
         /* restore flags */
         set_block(stdout_fd);
-        if (shutdown(stdout_fd, SHUT_RD) < 0) {
-            if (errno == ENOTSOCK)
-                close(stdout_fd);
+        /* be careful to not shutdown socket inherited from parent */
+        if (!child_process_pid || stdout_fd == 0 ||
+                (shutdown(stdout_fd, SHUT_RD) == -1 && errno == ENOTSOCK)) {
+            close(stdout_fd);
         }
         stdout_fd = -1;
     }
     if (stdin_fd != -1) {
         /* restore flags */
         set_block(stdin_fd);
-        if (shutdown(stdin_fd, SHUT_WR) < 0) {
-            if (errno == ENOTSOCK)
-                close(stdin_fd);
+        /* be careful to not shutdown socket inherited from parent */
+        if (!child_process_pid || stdin_fd == 1 ||
+                (shutdown(stdin_fd, SHUT_WR) == -1 && errno == ENOTSOCK)) {
+            close(stdin_fd);
         }
         stdin_fd = -1;
     }
