@@ -1,3 +1,16 @@
+qubes-core-agent (4.0.2-1) unstable; urgency=medium
+
+  * Ship grub configuration
+  * Ship Qubes 4.0 repository definition and keys
+  * Update grub configuration
+  * debian: install man pages
+  * Add qrexec-client-vm man page
+  * qrexec: exit with code 126 when service request was refused
+  * qrexec: fix reporting exit code in qrexec-client-vm
+  * qrexec: do not shutdown stdout socket inherited from parent
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 24 Jun 2017 02:19:14 +0200
+
 qubes-core-agent (4.0.1-1) unstable; urgency=medium
 
   * Switch qubes.UpdatesProxy to socat
