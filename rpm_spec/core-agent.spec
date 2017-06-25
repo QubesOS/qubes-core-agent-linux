@@ -694,7 +694,6 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-qrexec-agent
 /etc/init.d/qubes-updates-proxy-forwarder
 /etc/sysconfig/modules/qubes-core.modules
-/etc/sysconfig/modules/qubes-misc.modules
 
 %post sysvinit
 
@@ -767,7 +766,6 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-updates-proxy-forwarder.socket
 /lib/systemd/system-preset/%qubes_preset_file
 /lib/modules-load.d/qubes-core.conf
-/lib/modules-load.d/qubes-misc.conf
 /lib/systemd/system/chronyd.service.d/30_qubes.conf
 /lib/systemd/system/crond.service.d/30_qubes.conf
 /lib/systemd/system/cups.service.d/30_qubes.conf
