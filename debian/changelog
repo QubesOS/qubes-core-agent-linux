@@ -1,3 +1,19 @@
+qubes-core-agent (4.0.3-1) unstable; urgency=medium
+
+  [ unman ]
+  * Enable build for Zesty
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not load 'dummy-hcd' kernel module
+
+  [ Vincent Penquerc'h ]
+  * core-agent-linux: misc const fixups
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: use PAM directly instead of calling su to setup the session
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 05 Jul 2017 02:37:51 +0200
+
 qubes-core-agent (4.0.2-1) unstable; urgency=medium
 
   * Ship grub configuration
