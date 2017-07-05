@@ -1,3 +1,11 @@
+qubes-core-agent (4.0.4-1) unstable; urgency=medium
+
+  * grub: add console=tty0 to kernel cmdline
+  * rpm: do not mess with locales in post-install script
+  * Don't use 'su' in qubes.WaitForSession if not needed
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 05 Jul 2017 14:02:22 +0200
+
 qubes-core-agent (4.0.3-1) unstable; urgency=medium
 
   [ unman ]
