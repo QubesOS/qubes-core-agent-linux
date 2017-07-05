@@ -367,22 +367,6 @@ if ! is_protected_file /etc/hostname ; then
     done
 fi
 
-%if %{fedora} >= 20
-# Make sure there is a default locale set so gnome-terminal will start
-if [ ! -e /etc/locale.conf ] || ! grep -q LANG /etc/locale.conf; then
-    touch /etc/locale.conf
-    echo "LANG=en_US.UTF-8" >> /etc/locale.conf
-fi
-# ... and make sure it is really generated
-current_locale=`grep LANG /etc/locale.conf|cut -f 2 -d = | tr -d '"'`
-if [ -n "$current_locale" ] && ! locale -a | grep -q "$current_locale"; then
-    base=`echo "$current_locale" | cut -f 1 -d .`
-    charmap=`echo "$current_locale.UTF-8" | cut -f 2 -d .`
-    [ -n "$charmap" ] && charmap="-f $charmap"
-    localedef -i $base $charmap $current_locale
-fi
-%endif
-
 if [ "$1" !=  1 ] ; then
 # do the rest of %%post thing only when updating for the first time...
 exit 0
