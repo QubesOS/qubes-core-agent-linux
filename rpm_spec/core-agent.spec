@@ -121,7 +121,6 @@ Requires:   yum-plugin-post-transaction-actions
 Conflicts:  firewalld
 %endif
 Requires:	xdg-utils
-Requires:   ntpdate
 Requires:   qubes-utils >= 3.1.3
 Requires:   initscripts
 Requires:   gawk
@@ -484,7 +483,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
 %config(noreplace) /etc/qubes-rpc/qubes.VMShell
 %config(noreplace) /etc/qubes-rpc/qubes.VMRootShell
-%config(noreplace) /etc/qubes-rpc/qubes.SyncNtpClock
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPre
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPreAll
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPost
@@ -501,6 +499,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.ResizeDisk
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
+%config(noreplace) /etc/qubes-rpc/qubes.GetDate
 %dir /etc/qubes/autostart
 %config(noreplace) /etc/default/grub.qubes
 /etc/qubes/autostart/README.txt
@@ -509,6 +508,7 @@ rm -f %{name}-%{version}
 /etc/qubes/suspend-pre.d/README
 %dir /etc/qubes/suspend-post.d
 /etc/qubes/suspend-post.d/README
+/etc/qubes/suspend-post.d/qvm-sync-clock.sh
 %dir /etc/qubes/post-install.d
 /etc/qubes/post-install.d/README
 /etc/qubes/post-install.d/*.sh
@@ -531,12 +531,12 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-open-in-vm
 /usr/bin/qvm-run-vm
 /usr/bin/qvm-features-request
+/usr/bin/qvm-sync-clock
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
 /usr/bin/qubes-open
 /usr/bin/qubes-session-autostart
 %dir /usr/lib/qubes
-/usr/lib/qubes/sync-ntp-clock
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
@@ -552,6 +552,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/update-proxy-configs
 /usr/lib/qubes/upgrades-installed-check
 /usr/lib/qubes/upgrades-status-notify
+/usr/lib/qubes/qubes-sync-clock
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 %dir /usr/lib/qubes/init
@@ -748,6 +749,8 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/qubes-early-vm-config.service
 /lib/systemd/system/qubes-update-check.service
 /lib/systemd/system/qubes-update-check.timer
+/lib/systemd/system/qubes-sync-time.service
+/lib/systemd/system/qubes-sync-time.timer
 /lib/systemd/system/qubes-updates-proxy-forwarder@.service
 /lib/systemd/system/qubes-updates-proxy-forwarder.socket
 /lib/systemd/system-preset/%qubes_preset_file
@@ -764,8 +767,8 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/ModemManager.service.d/30_qubes.conf
 /lib/systemd/system/NetworkManager.service.d/30_qubes.conf
 /lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
-/lib/systemd/system/ntpd.service.d/30_qubes.conf
 /lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
+/lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 /lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
 /lib/systemd/system/tor.service.d/30_qubes.conf
 /lib/systemd/system/tor@default.service.d/30_qubes.conf

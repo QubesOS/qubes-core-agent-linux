@@ -56,12 +56,13 @@ SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
 USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
 SYSTEM_DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
-SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
+SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service getty@tty.service
 SYSTEM_DROPINS += tinyproxy.service
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket
 SYSTEM_DROPINS += systemd-random-seed.service
 SYSTEM_DROPINS += tor.service tor@default.service
+SYSTEM_DROPINS += systemd-timesyncd.service
 
 USER_DROPINS := pulseaudio.service pulseaudio.socket
 
@@ -76,9 +77,6 @@ endif
 
 # Debian Dropins
 ifeq ($(shell lsb_release -is), Debian)
-    # Don't have 'ntpd' in Debian
-    SYSTEM_DROPINS := $(filter-out ntpd.service, $(SYSTEM_DROPINS))
-
     # 'crond.service' is named 'cron.service in Debian
     SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
 
@@ -235,6 +233,7 @@ install-common: install-doc
 	install -d $(DESTDIR)$(BINDIR)
 	install -m 0755 misc/qubes-session-autostart $(DESTDIR)$(BINDIR)/qubes-session-autostart
 	install -m 0755 misc/qvm-features-request $(DESTDIR)$(BINDIR)/qvm-features-request
+	install -m 0755 qubes-rpc/qvm-sync-clock $(DESTDIR)$(BINDIR)/qvm-sync-clock
 	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run-vm} $(DESTDIR)/usr/bin
 	ln -s qvm-copy-to-vm $(DESTDIR)/usr/bin/qvm-move-to-vm
 	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
@@ -248,13 +247,13 @@ install-common: install-doc
 	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
 	install -m 4755  qubes-rpc/qfile-unpacker $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qrun-in-vm $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/sync-ntp-clock $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/prepare-suspend $(DESTDIR)$(LIBDIR)/qubes
+	install qubes-rpc/qubes-sync-clock $(DESTDIR)$(LIBDIR)/qubes
 	install -m 0644 misc/qubes-suspend-module-blacklist $(DESTDIR)/etc/qubes-suspend-module-blacklist
 	install -d $(DESTDIR)/$(KDESERVICEDIR)
 	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-move.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDESERVICEDIR)
 	install -d $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/{qubes.Filecopy,qubes.OpenInVM,qubes.VMShell,qubes.SyncNtpClock} $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/{qubes.Filecopy,qubes.OpenInVM,qubes.VMShell} $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.VMRootShell $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.OpenURL $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/{qubes.SuspendPre,qubes.SuspendPost,qubes.GetAppmenus} $(DESTDIR)/etc/qubes-rpc
@@ -271,15 +270,16 @@ install-common: install-doc
 	install -m 0755 qubes-rpc/qubes.StartApp $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.UpdatesProxy $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.PostInstall $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/qubes.GetDate $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/etc/qubes/suspend-pre.d
 	install -m 0644 qubes-rpc/suspend-pre.README $(DESTDIR)/etc/qubes/suspend-pre.d/README
 	install -d $(DESTDIR)/etc/qubes/suspend-post.d
 	install -m 0644 qubes-rpc/suspend-post.README $(DESTDIR)/etc/qubes/suspend-post.d/README
+	ln -s $(BINDIR)/qvm-sync-clock $(DESTDIR)/etc/qubes/suspend-post.d/qvm-sync-clock.sh
 	install -d $(DESTDIR)/etc/qubes/post-install.d
 	install -m 0644 post-install.d/README $(DESTDIR)/etc/qubes/post-install.d/
 	install -m 0755 post-install.d/*.sh $(DESTDIR)/etc/qubes/post-install.d/
-
 	install -d $(DESTDIR)/usr/share/nautilus-python/extensions
 	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
 

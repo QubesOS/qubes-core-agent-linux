@@ -1,0 +1,7 @@
+[Unit]
+Description=Update time from ClockVM
+ConditionPathExists=!/var/run/qubes-service/clocksync
+
+[Service]
+ExecStart=/usr/bin/qvm-sync-clock
+User=root
