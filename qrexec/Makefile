@@ -19,5 +19,9 @@ install:
 	ln -s ../../bin/qrexec-client-vm $(DESTDIR)/usr/lib/qubes/qrexec_client_vm
 	install qrexec-fork-server $(DESTDIR)/usr/bin
 	install qubes-rpc-multiplexer $(DESTDIR)/usr/lib/qubes
+ifeq ($(shell lsb_release -is), Debian)
+	install -D -m 0644 qrexec.pam.debian $(DESTDIR)/etc/pam.d/qrexec
+else
 	install -D -m 0644 qrexec.pam $(DESTDIR)/etc/pam.d/qrexec
+endif
 
