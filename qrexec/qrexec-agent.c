@@ -211,7 +211,7 @@ void do_exec(const char *cmd)
             setsid();
             /* This is a copy but don't care to free as we exec later anyways.  */
             env = pam_getenvlist (pamh);
-            execle("/bin/sh", "sh", "-c", realcmd, (char*)NULL, env);
+            execle("/bin/sh", "-sh", "-c", realcmd, (char*)NULL, env);
             exit(127);
         default:
             /* parent */
