@@ -432,6 +432,15 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 
 /usr/lib/qubes/qubes-fix-nm-conf.sh
 
+%post networking
+%systemd_post qubes-firewall.service
+%systemd_post qubes-iptables.service
+%systemd_post qubes-network.service
+%systemd_post qubes-updates-proxy.service
+
+%post qrexec
+%systemd_post qubes-qrexec-agent.service
+
 %preun
 if [ "$1" = 0 ] ; then
     # no more packages left
@@ -443,6 +452,15 @@ if [ "$1" = 0 ] ; then
     mv /var/lib/qubes/serial.orig /etc/init/serial.conf
     fi
 fi
+
+%preun networking
+%systemd_preun qubes-firewall.service
+%systemd_preun qubes-iptables.service
+%systemd_preun qubes-network.service
+%systemd_preun qubes-updates-proxy.service
+
+%preun qrexec
+%systemd_preun qubes-qrexec-agent.service
 
 %postun
 if [ $1 -eq 0 ] ; then
