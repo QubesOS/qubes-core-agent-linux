@@ -55,7 +55,6 @@ disable plymouth-quit-wait.service
 disable smartd.service
 disable upower.service
 disable colord.service
-disable systemd-timesyncd.service
 
 # Fedora only services
 disable cpuspeed.service
@@ -93,3 +92,6 @@ enable qubes-updates-proxy-forwarder.socket
 enable haveged.service
 enable chronyd.service
 enable xendriverdomain.service
+enable systemd-timesyncd.service
+enable qubes-sync-time.service
+enable qubes-sync-time.timer
