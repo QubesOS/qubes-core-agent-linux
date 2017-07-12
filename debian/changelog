@@ -1,3 +1,20 @@
+qubes-core-agent (4.0.5-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: ship pam configuration for debian
+  * rpm: add services enabling/disabling logic
+  * qrexec: start process in a login shell
+
+  [ Marta Marczykowska-Górecka ]
+  * clock synchronization rewrite
+  * minor amends to clock synchronization
+
+  [ Marek Marczykowski-Górecki ]
+  * clock sync: drop untrusted_ prefix after value validation, fix error
+    msg
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 12 Jul 2017 23:40:54 +0200
+
 qubes-core-agent (4.0.4-1) unstable; urgency=medium
 
   * grub: add console=tty0 to kernel cmdline
