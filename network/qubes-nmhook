@@ -11,3 +11,10 @@ if under_systemd ; then
 else
     service qubes-updates-proxy try-restart
 fi
+
+# Let ntpdate use the ntp servers received by dhcp options:
+if [ -z "${DHCP4_NTP_SERVERS}" ]; then
+    echo "pool.ntp.org" > /etc/ntp/step-tickers
+else
+    echo ${DHCP4_NTP_SERVERS} |tr '[[:space:]]' '\n' > /etc/ntp/step-tickers
+fi
