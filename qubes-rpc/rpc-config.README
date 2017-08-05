@@ -1,0 +1,13 @@
+This is directory for qrexec service additional configuration. Configuration
+file needs to be named exactly as service. Configuration format is 'key=value'
+(without spaces around '='). Lines starting with '#' are ignored.
+
+Supported settings:
+
+* wait-for-session - wait for full GUI session initialization before starting
+  the service. This is done using /etc/qubes-rpc/qubes.WaitForSession script.
+  There is no timeout - if the session is never initialized
+  (for example because there is no GUI running at all), service will never be
+  started.
+  Allowed values are 0 or 1.
+

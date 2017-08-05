@@ -518,6 +518,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
+%dir /etc/qubes/rpc-config
+/etc/qubes/rpc-config/README
 %dir /etc/qubes/autostart
 %config(noreplace) /etc/default/grub.qubes
 /etc/qubes/autostart/README.txt
