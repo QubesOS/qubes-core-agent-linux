@@ -274,6 +274,9 @@ install-common: install-doc
 
 	install -d $(DESTDIR)/etc/qubes/rpc-config
 	install -m 0644 qubes-rpc/rpc-config.README $(DESTDIR)/etc/qubes/rpc-config/README
+	for config in qubes-rpc/*.config; do \
+		install -m 0644 $$config $(DESTDIR)/etc/qubes/rpc-config/`basename $$config .config`; \
+	done
 
 	install -d $(DESTDIR)/etc/qubes/suspend-pre.d
 	install -m 0644 qubes-rpc/suspend-pre.README $(DESTDIR)/etc/qubes/suspend-pre.d/README

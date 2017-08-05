@@ -520,6 +520,12 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
 %dir /etc/qubes/rpc-config
 /etc/qubes/rpc-config/README
+%config(noreplace) /etc/qubes/rpc-config/qubes.OpenInVM
+%config(noreplace) /etc/qubes/rpc-config/qubes.OpenURL
+%config(noreplace) /etc/qubes/rpc-config/qubes.SelectFile
+%config(noreplace) /etc/qubes/rpc-config/qubes.SelectDirectory
+%config(noreplace) /etc/qubes/rpc-config/qubes.StartApp
+%config(noreplace) /etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 %dir /etc/qubes/autostart
 %config(noreplace) /etc/default/grub.qubes
 /etc/qubes/autostart/README.txt
