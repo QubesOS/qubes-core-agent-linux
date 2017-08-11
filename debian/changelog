@@ -1,3 +1,11 @@
+qubes-core-agent (4.0.7-1) unstable; urgency=medium
+
+  * qrexec: add configurable waiting for session before starting service
+  * document /etc/qubes/rpc-config
+  * qubes-rpc: add 'wait-for-session=1' option for some services
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 11 Aug 2017 13:33:35 +0200
+
 qubes-core-agent (4.0.6-1) unstable; urgency=medium
 
   * Announce if qubes-firewall service is supported+enabled in this
