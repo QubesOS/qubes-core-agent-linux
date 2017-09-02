@@ -112,7 +112,11 @@ Group:		Qubes
 Vendor:		Invisible Things Lab
 License:	GPL
 URL:		http://www.qubes-os.org
+%if 0%{?rhel}
+Requires:   centos-release
+%else
 Requires:   fedora-release
+%endif
 %if %{fedora} < 22
 Requires:   yum-plugin-post-transaction-actions
 %endif
@@ -154,6 +158,9 @@ Requires:   python3-dnf-plugins-qubes-hooks
 %else
 Requires:   python2-dnf-plugins-qubes-hooks
 %endif
+%if 0%{?rhel} >= 7
+Requires:   python34-dnf-plugins-qubes-hooks
+%endif
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
 BuildRequires: xen-devel
@@ -171,8 +178,9 @@ DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
 
+%if 0%{fedora} >= 23
 %package -n python3-dnf-plugins-qubes-hooks
-Summary:	DNF plugin for Qubes specific post-installation actions
+Summary:        DNF plugin for Qubes specific post-installation actions
 BuildRequires: python3-devel
 %{?python_provide:%python_provide python3-dnf-plugins-qubes-hooks}
 
@@ -180,6 +188,19 @@ BuildRequires: python3-devel
 DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
+%endif
+
+%if 0%{?rhel} >= 7
+%package -n python34-dnf-plugins-qubes-hooks
+Summary:        DNF plugin for Qubes specific post-installation actions
+BuildRequires: python34-devel
+%{?python_provide:%python_provide python34-dnf-plugins-qubes-hooks}
+
+%description -n python34-dnf-plugins-qubes-hooks
+DNF plugin for Qubes specific post-installation actions:
+ * notify dom0 that updates were installed
+ * refresh applications shortcut list
+%endif
 
 %define _builddir %(pwd)
 
