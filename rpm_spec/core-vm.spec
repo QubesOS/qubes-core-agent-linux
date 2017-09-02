@@ -552,8 +552,15 @@ rm -f %{name}-%{version}
 %files -n python2-dnf-plugins-qubes-hooks
 %{python2_sitelib}/dnf-plugins/*
 
+%if 0%{fedora} >= 23
 %files -n python3-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
+%endif
+
+%if 0%{?rhel} >= 7
+%files -n python34-dnf-plugins-qubes-hooks
+%{python3_sitelib}/dnf-plugins/*
+%endif
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
