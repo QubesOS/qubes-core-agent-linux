@@ -62,7 +62,6 @@ if ! [ -d "$DOM0_UPDATES_DIR" ]; then
 fi
 
 mkdir -p $DOM0_UPDATES_DIR/etc
-sed -i '/^reposdir\s*=/d' $DOM0_UPDATES_DIR/etc/yum.conf
 
 if [ -e /etc/debian_version ]; then
     # Default rpm configuration on Debian uses ~/.rpmdb for rpm database (as
