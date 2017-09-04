@@ -112,11 +112,6 @@ Group:		Qubes
 Vendor:		Invisible Things Lab
 License:	GPL
 URL:		http://www.qubes-os.org
-%if 0%{?rhel}
-Requires:   centos-release
-%else
-Requires:   fedora-release
-%endif
 %if %{fedora} < 22
 Requires:   yum-plugin-post-transaction-actions
 %endif
