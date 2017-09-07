@@ -65,7 +65,6 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
 	switch (pid=fork()) {
 		case -1:
 			gui_fatal("Failed to create new process");
-			__attribute__ ((fallthrough));
 		case 0:
 			if (asprintf(&procdir_path, "/proc/%d/fd", getpid()) < 0) {
 				gui_fatal("Error allocating memory");
