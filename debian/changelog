@@ -1,3 +1,21 @@
+qubes-core-agent (4.0.8-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: do not modify yum.conf
+
+  [ Frederic Pierret (Epitre) ]
+  * Add CENTOS/RHEL support (drop fedora-release dependancy as template
+    builder will install it anyway and here it only make harder to
+    support non-fedora builds)
+  * Handle fallthrough with attribute(noreturn) for consistancy and
+    compatiblity with older GCC
+
+  [ Marek Marczykowski-Górecki ]
+  * (redo) updates-proxy: explicitly block connection looping back to
+    the proxy IP
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 Sep 2017 13:44:17 +0200
+
 qubes-core-agent (4.0.7-1) unstable; urgency=medium
 
   * qrexec: add configurable waiting for session before starting service
