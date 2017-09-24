@@ -1,3 +1,31 @@
+qubes-core-agent (3.2.19-1) unstable; urgency=medium
+
+  [ unman ]
+  * Enable build for Zesty
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not report spurious failure of qubes.WaitForSession service
+  * Make all scripts in qubes-rpc executable
+  * Add qrexec-client-vm man page
+  * qrexec: exit with code 126 when service request was refused
+  * qrexec: fix reporting exit code in qrexec-client-vm
+  * qrexec: do not shutdown stdout socket inherited from parent
+
+  [ Vincent Penquerc'h ]
+  * core-agent-linux: misc const fixups
+
+  [ Frederic Pierret (Epitre) ]
+  * Add CENTOS/RHEL support (drop fedora-release dependancy as template
+    builder will install it anyway and here it only make harder to
+    support non-fedora builds)
+  * Handle fallthrough with attribute(noreturn) for consistancy and
+    compatiblity with older GCC
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: add fc25 and fc26 targets
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 24 Sep 2017 22:24:36 +0200
+
 qubes-core-agent (3.2.18-1) unstable; urgency=medium
 
   * debian,fedora: drop gnome-packagekit from dependencies
