@@ -20,8 +20,10 @@
 #
 
 from __future__ import absolute_import
+from distutils.version import LooseVersion
 import logging
 import dnf
+import dnf.const
 import subprocess
 
 PLUGIN_CONF = 'qubes-hooks'
@@ -35,7 +37,10 @@ class QubesHooks(dnf.Plugin):
         self.log = logging.getLogger('dnf')
 
     def transaction(self):
-        config = self.read_config(self.base.conf, PLUGIN_CONF)
+        if LooseVersion(dnf.const.VERSION) < '2.0.0':
+            config = self.read_config(self.base.conf, PLUGIN_CONF)
+        else:
+            config = self.read_config(self.base.conf)
 
         if config.getboolean('main', 'notify-updates'):
             # Get all updates available _before_ this transaction
