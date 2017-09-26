@@ -1,3 +1,14 @@
+qubes-core-agent (4.0.9-1) unstable; urgency=medium
+
+  [ Frédéric Pierret ]
+  * dnf-qubes-hooks: handle newer DNF >= 2.x
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: add fc26 build
+  * Look for applications also in subdirectories of .../applications
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 26 Sep 2017 23:09:45 +0200
+
 qubes-core-agent (4.0.8-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
