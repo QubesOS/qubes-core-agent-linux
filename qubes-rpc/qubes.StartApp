@@ -16,9 +16,11 @@ for dir in $(echo "$XDG_DATA_HOME:$XDG_DATA_DIRS" | tr : ' '); do
     if ! [ -d "$dir/applications" ]; then
         continue
     fi
-    if [ -f "$dir/applications/$app_basename" ]; then
-        exec qubes-desktop-run "$dir/applications/$app_basename"
-    fi
+    for subdir in $(find $dir/applications -type d | sort); do
+        if [ -f "$subdir/$app_basename" ]; then
+            exec qubes-desktop-run "$subdir/$app_basename"
+        fi
+    done
 done
 echo "applications/$app_basename not found in $XDG_DATA_HOME:$XDG_DATA_DIRS" >&2
 exit 1
