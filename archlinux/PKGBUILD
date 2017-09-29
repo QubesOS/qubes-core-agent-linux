@@ -69,7 +69,7 @@ package() {
 
   (cd qrexec; make install DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib)
 
-  make install-vm DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib DROPIN_DIR=usr/lib/systemd DIST=archlinux
+  make install-vm DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
 
   # Remove things non wanted in archlinux
   rm -r $pkgdir/etc/yum*
