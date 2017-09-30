@@ -9,6 +9,7 @@
 
 if [ -e /etc/system-release ]; then
    ## Fedora
+   # shellcheck disable=SC2034
    yum_output="$(yum -q check-update 2>&1)"
    exit_code="$?"
    [ "$exit_code" -eq 100 ] && echo "false" && exit 0
@@ -17,6 +18,7 @@ elif [ -e /etc/debian_version ]; then
    ## Debian
    set -e
    set -o pipefail
+   # shellcheck disable=SC2034
    apt_get_update_output="$(apt-get -q update 2>&1)"
    apt_get_upgrade_output="$(LANG="C" apt-get -s upgrade 2>&1)"
    exit_code="$?"

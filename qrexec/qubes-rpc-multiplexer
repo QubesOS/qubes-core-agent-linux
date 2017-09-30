@@ -37,10 +37,12 @@ for CFG_FILE in $LOCAL_QUBES_RPC/"$1" $QUBES_RPC/"$1" \
 done
 
 if [ -x "$CFG_FILE" ] ; then
+    # shellcheck disable=SC2086
 	exec "$CFG_FILE" ${QREXEC_SERVICE_ARGUMENT}
 	echo "$0: failed to execute handler for" "$1" >&2
 	exit 1
 else
+    # shellcheck disable=SC2086
 	exec /bin/sh -- "$CFG_FILE" ${QREXEC_SERVICE_ARGUMENT}
 	echo "$0: failed to execute handler for" "$1" >&2
 	exit 1
