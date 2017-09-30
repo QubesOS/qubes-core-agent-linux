@@ -318,6 +318,13 @@ make install-vm DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 %endif
 
+%if 0%{?rhel} >= 7
+sed -i \
+        -e 's:-primary:-centos:' \
+        -e 's:/fc:/centos:' \
+        $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
+%endif
+
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
 	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
