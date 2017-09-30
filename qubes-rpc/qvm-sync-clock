@@ -18,4 +18,5 @@
 #
 #
 
+# shellcheck disable=SC2016
 qrexec-client-vm '$default' qubes.GetDate /usr/lib/qubes/qubes-sync-clock

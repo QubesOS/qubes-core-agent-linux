@@ -18,7 +18,7 @@ QUBES_RPC=/etc/qubes-rpc
 LOCAL_QUBES_RPC=/usr/local/etc/qubes-rpc
 
 if ! [ $# = 2 ] ; then
-	echo $0: bad argument count, usage: $0 SERVICE-NAME REMOTE-DOMAIN-NAME >&2
+	echo "$0: bad argument count, usage: $0 SERVICE-NAME REMOTE-DOMAIN-NAME" >&2
 	exit 1
 fi
 export QREXEC_REMOTE_DOMAIN="$2"

@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-read filename
+read -r filename
 
 ICON_MAXSIZE=512
 
@@ -29,8 +29,8 @@ if [ "$m" = SVG ]; then
     tmpfile2="$(mktemp /tmp/qimg-XXXXXXXX.png)"
     rsvg-convert -o "$tmpfile2" "$filename"
     # downscale the image if necessary
-    if [ -n "$forcemaxsize" -a \
-            \( "$w" -gt "$forcemaxsize" -o "$h" -gt "$forcemaxsize" \) ]; then
+    if [ -n "$forcemaxsize" ] && \
+            ( [ "$w" -gt "$forcemaxsize" ] || [ "$h" -gt "$forcemaxsize" ] ); then
         convert "$tmpfile2" -scale "${forcemaxsize}x${forcemaxsize}" "$tmpfile2"
         # read the size again, because icon may not be a square
         s="$(identify -format '%w %h' "$tmpfile2")"
@@ -42,7 +42,11 @@ fi
 echo "$w $h"
 convert -depth 8 -size "${w}x${h}" "$filename" rgba:-
 
-[ -n "${tmpfile}" ] && rm -f "${tmpfile}" || true
-[ -n "${tmpfile2}" ] && rm -f "${tmpfile2}" || true
+if [ -n "${tmpfile}" ]; then
+    rm -f "${tmpfile}"
+fi
+if [ -n "${tmpfile2}" ]; then
+    rm -f "${tmpfile2}"
+fi
 
 # vim: ft=sh ts=4 sw=4 et

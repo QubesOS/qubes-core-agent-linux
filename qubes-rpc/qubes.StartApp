@@ -16,7 +16,7 @@ for dir in $(echo "$XDG_DATA_HOME:$XDG_DATA_DIRS" | tr : ' '); do
     if ! [ -d "$dir/applications" ]; then
         continue
     fi
-    for subdir in $(find $dir/applications -type d | sort); do
+    for subdir in $(find "$dir/applications" -type d | sort); do
         if [ -f "$subdir/$app_basename" ]; then
             exec qubes-desktop-run "$subdir/$app_basename"
         fi

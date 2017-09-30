@@ -24,8 +24,9 @@ SIZE=$(du --apparent-size -c -- "$@" 2>/dev/null | tail -1 | cut -f 1)
 
 export PROGRESS_TYPE=gui
 
+# shellcheck disable=SC2016
 /usr/lib/qubes/qrexec-client-vm '$default' qubes.Filecopy /usr/lib/qubes/qfile-agent "$@" |
-(while read sentsize ; do
-	CURRSIZE=$(($sentsize/1024))
-	echo $((100*$CURRSIZE/$SIZE))
+(while read -r sentsize ; do
+	CURRSIZE=$((sentsize / 1024))
+	echo $((100 * CURRSIZE / SIZE))
 done) | zenity --progress --text="Copying files..." --auto-close

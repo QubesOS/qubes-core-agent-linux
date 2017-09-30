@@ -1,5 +1,5 @@
 #!/bin/sh
-read USERNAME
+read -r USERNAME
 cmd='echo $$ >> /tmp/qubes-session-waiter; [ ! -f /tmp/qubes-session-env ] && exec sleep inf'
 if [ "$(id -un)" = "$USERNAME" ]; then
     sh -c "$cmd" 2>/dev/null

@@ -1,4 +1,4 @@
 #!/bin/sh
-read dev
+read -r dev
 BDF=0000:$dev
-echo $BDF > /sys/bus/pci/devices/$BDF/driver/unbind
+echo "$BDF" > "/sys/bus/pci/devices/$BDF/driver/unbind"

@@ -44,6 +44,7 @@ VMNAME="$1"
 shift
 
 if [ "$VMNAME" = "--dispvm" ] ; then
+    # shellcheck disable=SC2016
     VMNAME='$dispvm'
 elif [ "$VMNAME" = "" ] ; then
     print_usage

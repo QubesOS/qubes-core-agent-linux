@@ -1,6 +1,6 @@
 #!/bin/sh
 
-read url
+read -r url
 
 case "$url" in
     http://*|\

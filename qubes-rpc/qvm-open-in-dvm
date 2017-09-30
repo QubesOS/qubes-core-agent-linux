@@ -25,4 +25,5 @@ if ! [ $# = 1 ] ; then
 	exit 1
 fi
 
+# shellcheck disable=SC2016
 exec qvm-open-in-vm '$dispvm' "$1"

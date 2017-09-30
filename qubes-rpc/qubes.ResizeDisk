@@ -1,6 +1,6 @@
 #!/bin/sh
 
-read disk_name
+read -r disk_name
 
 set -e
 
@@ -15,7 +15,7 @@ case $disk_name in
         head /dev/xvda > /dev/null
         new_size=$(cat /sys/block/xvda/size)
         ro=$(/sys/block/xvda/ro)
-        if [ $ro -eq 1 ]; then
+        if [ "$ro" -eq 1 ]; then
             new_table="0 $new_size snapshot /dev/xvda /dev/xvdc2 N 16"
         else
             new_table="0 $new_size linear /dev/xvda 0"

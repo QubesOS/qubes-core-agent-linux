@@ -4,13 +4,13 @@
 # If you are creating package for other distribution, feel free to replace it
 # with distribution-specific script.
 
-if [ -e /etc/redhat-release -a -x /usr/bin/dnf ]; then
+if [ -e /etc/redhat-release ] && [ -x /usr/bin/dnf ]; then
     update_cmd='dnf update --best'
-elif [ -e /etc/redhat-release -a -x /usr/bin/yum ]; then
+elif [ -e /etc/redhat-release ] && [ -x /usr/bin/yum ]; then
     update_cmd='yum update'
 elif [ -e /etc/debian_version ]; then
     update_cmd='apt-get update && apt-get -V dist-upgrade'
-elif [ -e /etc/arch-release -a -x /usr/bin/powerpill ]; then
+elif [ -e /etc/arch-release ] && [ -x /usr/bin/powerpill ]; then
     update_cmd='powerpill -Suy'
 elif [ -e /etc/arch-release ]; then
     update_cmd='pacman -Suy'

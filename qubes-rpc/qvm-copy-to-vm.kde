@@ -19,21 +19,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 #
-if type kdialog 2> /dev/null; then
+if command -v kdialog 2> /dev/null; then
     SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
     REF=$(kdialog --progressbar "Copy progress")
-    qdbus $REF org.freedesktop.DBus.Properties.Set "" maximum $SIZE
+    qdbus "$REF" org.freedesktop.DBus.Properties.Set "" maximum "$SIZE"
 
     export PROGRESS_TYPE=gui
 
+    # shellcheck disable=SC2016
     /usr/lib/qubes/qrexec-client-vm '$default' qubes.Filecopy \
         /usr/lib/qubes/qfile-agent "$@" |
-    (while read sentsize ; do
-        CURRSIZE=$(($sentsize/1024))
-        qdbus $REF  org.freedesktop.DBus.Properties.Set "" value $CURRSIZE
+    (while read -r sentsize ; do
+        CURRSIZE=$((sentsize / 1024))
+        qdbus "$REF" org.freedesktop.DBus.Properties.Set "" value "$CURRSIZE"
     done)
 
-    qdbus $REF close
+    qdbus "$REF" close
     # we do not want a dozen error messages, do we
     # if ! [ "x"$agentstatus = xDONE ] ; then
     # 	kdialog --sorry 'Abnormal file copy termination; see /var/log/qubes/qrexec.xid.log in dom0 for more details'

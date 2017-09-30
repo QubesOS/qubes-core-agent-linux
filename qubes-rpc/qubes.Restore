@@ -1,27 +1,29 @@
 #!/bin/sh
 echo Starting Restorecopy >&2
-read args
-read paths
-echo Arguments: $args >&2
-echo Paths: $paths >&2
+read -r args
+read -r paths
+echo "Arguments: $args" >&2
+echo "Paths: $paths" >&2
 if [ -f "$args" ] ; then
   echo "Performing restore from backup file $args" >&2
   TARGET="$args"
   echo "Copying $TARGET to STDOUT" >&2
+  # shellcheck disable=SC2086
   /usr/lib/qubes/tar2qfile "$TARGET" $paths
 else
   echo "Checking if arguments is matching a command" >&2
-  COMMAND=`echo $args | cut -d ' ' -f 1`
-  if type "$COMMAND" >/dev/null; then
-    tmpdir=`mktemp -d`
-    mkfifo $tmpdir/backup-data
+  COMMAND=$(echo "$args" | cut -d ' ' -f 1)
+  if command -v "$COMMAND" >/dev/null; then
+    tmpdir=$(mktemp -d)
+    mkfifo "$tmpdir/backup-data"
     echo "Redirecting $args to STDOUT" >&2
     # Parsing args to handle quotes correctly
     # Dangerous method if args are uncontrolled
     eval "set -- $args"
     # Use named pipe to pass original stdin to tar2file
-    $@ > $tmpdir/backup-data < /dev/null &
-    /usr/lib/qubes/tar2qfile $tmpdir/backup-data $paths
+    "$@" > "$tmpdir/backup-data" < /dev/null &
+    # shellcheck disable=SC2086
+    /usr/lib/qubes/tar2qfile "$tmpdir/backup-data" $paths
     # Restoration may be terminated earlier because of selected files. This
     # will be seen as EPIPE to the retrieving process, which may cause retcode
     # other than 0 in some cases - which would be incorrectly treated as backup
@@ -29,9 +31,9 @@ else
     # detect if anything wrong with actual data)
     retcode=$?
     wait -n
-    rm $tmpdir/backup-data
-    rmdir $tmpdir
-    exit $retcode
+    rm "$tmpdir/backup-data"
+    rmdir "$tmpdir"
+    exit "$retcode"
   else
     echo "Invalid command $COMMAND" >&2
     exit 2

@@ -22,7 +22,7 @@ set -e
 #
 
 if [ $# -lt 2 ] ; then
-	echo usage: $0 '[--without-progress] dest_vmname file [file]+'
+	echo "usage: $0 [--without-progress] dest_vmname file [file]+"
 	exit 1
 fi
 
@@ -38,7 +38,8 @@ VM="$1"
 shift
 
 if [ $PROGRESS_TYPE = console ] ; then
-	export FILECOPY_TOTAL_SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
+    FILECOPY_TOTAL_SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
+    export FILECOPY_TOTAL_SIZE
 fi
 
 /usr/lib/qubes/qrexec-client-vm "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"

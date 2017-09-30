@@ -26,9 +26,10 @@ export PROGRESS_TYPE=gui
 
 set -o pipefail
 set -e
+# shellcheck disable=SC2016
 /usr/lib/qubes/qrexec-client-vm '$default' qubes.Filecopy /usr/lib/qubes/qfile-agent "$@" |
-(while read sentsize ; do
-	CURRSIZE=$(($sentsize/1024))
-	echo $((100*$CURRSIZE/$SIZE))
+(while read -r sentsize ; do
+	CURRSIZE=$((sentsize / 1024))
+	echo $((100 * CURRSIZE / SIZE))
 done) | zenity --progress --text="Moving files..." --auto-close
 rm -rf "$@"

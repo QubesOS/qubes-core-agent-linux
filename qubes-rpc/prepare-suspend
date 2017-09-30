@@ -8,10 +8,10 @@ action=$1
 
 MODULES_BLACKLIST=""
 if [ -r /etc/qubes-suspend-module-blacklist ]; then
-    MODULES_BLACKLIST="$MODULES_BLACKLIST `grep -v '^#' /etc/qubes-suspend-module-blacklist`"
+    MODULES_BLACKLIST="$MODULES_BLACKLIST $(grep -v '^#' /etc/qubes-suspend-module-blacklist)"
 fi
 if [ -r /rw/config/suspend-module-blacklist ]; then
-    MODULES_BLACKLIST="$MODULES_BLACKLIST `grep -v '^#' /rw/config/suspend-module-blacklist`"
+    MODULES_BLACKLIST="$MODULES_BLACKLIST $(grep -v '^#' /rw/config/suspend-module-blacklist)"
 fi
 
 if [ x"$action" = x"suspend" ]; then
@@ -23,23 +23,28 @@ if [ x"$action" = x"suspend" ]; then
             service NetworkManager stop
     fi
     # Force interfaces down, just in case when NM didn't done it
-    for if in `ls /sys/class/net|grep -v "lo\|vif"`; do
-        if [ "`cat /sys/class/net/$if/device/devtype 2>/dev/null`" = "vif" ]; then
+    for intf in /sys/class/net/*; do
+        intf=$(basename "$intf")
+        if [ "$intf" = "lo" ] || [[ "$intf" = "vif"* ]]; then
             continue
         fi
-        ip l s $if down
+        if [ "$(cat "/sys/class/net/$intf/device/devtype" 2>/dev/null$)" = "vif" ]; then
+            continue
+        fi
+        ip l s "$intf" down
     done
     LOADED_MODULES=""
     for mod in $MODULES_BLACKLIST; do
-        if lsmod |grep -q $mod; then
+        if lsmod |grep -q "$mod"; then
             LOADED_MODULES="$LOADED_MODULES $mod"
-            modprobe -r $mod
+            modprobe -r "$mod"
         fi
     done
-    echo $LOADED_MODULES > /var/run/qubes/suspend-modules-loaded
+    echo "$LOADED_MODULES" > /var/run/qubes/suspend-modules-loaded
 else
-    for mod in `cat /var/run/qubes/suspend-modules-loaded`; do
-        modprobe $mod
+    # shellcheck disable=SC2013
+    for mod in $(cat /var/run/qubes/suspend-modules-loaded); do
+        modprobe "$mod"
     done
     if qsvc network-manager ; then
         dbus-send --system --print-reply          \
