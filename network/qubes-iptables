@@ -35,8 +35,9 @@ start() {
 
     echo -n $"${CMD}: Applying firewall rules: "
 
-    $CMD-restore $IPTABLES_DATA
-    if [ $? -eq 0 ]; then
+    "$CMD-restore" "$IPTABLES_DATA"
+    ret="$?"
+    if [ "$ret" -eq 0 ]; then
         echo OK
     else
         echo FAIL; return 1

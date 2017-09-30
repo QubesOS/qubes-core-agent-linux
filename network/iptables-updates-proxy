@@ -14,7 +14,9 @@ COMMIT
 __EOF__
 else
     # Remove rules
+    # shellcheck disable=SC2086
     iptables -D $RULE_FILTER
+    # shellcheck disable=SC2086
     iptables -t nat -D $RULE_NAT
     exit 0
 fi

@@ -21,46 +21,51 @@
 #============================================================================
 
 dir=$(dirname "$0")
+# shellcheck disable=SC1091,SC1090
 . "$dir/vif-common.sh"
 
 #main_ip=$(dom0_ip)
 lockfile=/var/run/xen-hotplug/vif-lock
 
+# shellcheck disable=SC2154
 if [ "${ip}" ]; then
     # IPs as seen by this VM
     netvm_ip="$ip"
-    netvm_gw_ip=`qubesdb-read /qubes-netvm-gateway`
-    netvm_dns1_ip=`qubesdb-read /qubes-netvm-primary-dns`
-    netvm_dns2_ip=`qubesdb-read /qubes-netvm-secondary-dns`
+    netvm_gw_ip=$(qubesdb-read /qubes-netvm-gateway)
+    netvm_dns1_ip=$(qubesdb-read /qubes-netvm-primary-dns)
+    netvm_dns2_ip=$(qubesdb-read /qubes-netvm-secondary-dns)
 
     back_ip="$netvm_gw_ip"
 
     # IPs as seen by the VM - if other than $netvm_ip
-    appvm_gw_ip="`qubesdb-read /mapped-ip/$ip/visible-gateway 2>/dev/null || :`"
-    appvm_ip="`qubesdb-read /mapped-ip/$ip/visible-ip 2>/dev/null || :`"
+    appvm_gw_ip="$(qubesdb-read "/mapped-ip/$ip/visible-gateway" 2>/dev/null || :)"
+    appvm_ip="$(qubesdb-read "/mapped-ip/$ip/visible-ip" 2>/dev/null || :)"
 fi
 
 # Apply NAT if IP visible from the VM is different than the "real" one
 # See vif-qubes-nat.sh for details
-if [ -n "$appvm_ip" -a -n "$appvm_gw_ip" -a "$appvm_ip" != "$netvm_ip" ]; then
+if [ -n "$appvm_ip" ] && [ -n "$appvm_gw_ip" ] && [ "$appvm_ip" != "$netvm_ip" ]; then
+    # shellcheck disable=SC2154
     if test "$command" == online; then
-        echo 1 >/proc/sys/net/ipv4/conf/${vif}/proxy_arp
+        # shellcheck disable=SC2154
+        echo 1 >"/proc/sys/net/ipv4/conf/${vif}/proxy_arp"
     fi
 
+    # shellcheck source=network/vif-qubes-nat.sh
     . "$dir/vif-qubes-nat.sh"
 fi
 
-
+# shellcheck disable=SC2154
 case "$command" in
 	online)
-		ifconfig ${vif} up
-		echo 1 >/proc/sys/net/ipv4/conf/${vif}/proxy_arp
+		ifconfig "${vif}" up
+		echo 1 >"/proc/sys/net/ipv4/conf/${vif}/proxy_arp"
 		ipcmd='add'
 		iptables_cmd='-I PREROUTING 1'
 		cmdprefix=''
 		;;
 	offline)
-		do_without_error ifdown ${vif}
+		do_without_error ifdown "${vif}"
 		ipcmd='del'
 		iptables_cmd='-D PREROUTING'
 		cmdprefix='do_without_error'
@@ -71,23 +76,23 @@ domid=${vif/vif/}
 domid=${domid/.*/}
 # metric must be possitive, but prefer later interface
 #  32752 is max XID aka domid
-metric=$[ 32752 - $domid ]
+metric=$(( 32752 - domid ))
 
 if [ "${ip}" ] ; then
 	# If we've been given a list of IP addresses, then add routes from dom0 to
 	# the guest using those addresses.
 	for addr in ${ip} ; do
-		${cmdprefix} ip route ${ipcmd} ${addr} dev ${vif} metric $metric
+		${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
 	done
 	echo -e "*raw\n$iptables_cmd -i ${vif} ! -s ${ip} -j DROP\nCOMMIT" | \
 		${cmdprefix} flock $lockfile iptables-restore --noflush
-	${cmdprefix} ip addr ${ipcmd} ${back_ip}/32 dev ${vif}
+	${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
 fi
 
 log debug "Successful vif-route-qubes $command for $vif."
 if [ "$command" = "online" ]
 then
   # disable tx checksumming offload, apparently it doesn't work with our ancient qemu in stubdom
-  do_without_error ethtool -K $vif tx off
+  do_without_error ethtool -K "$vif" tx off
   success
 fi

@@ -1,8 +1,9 @@
 #!/bin/sh
 
-type nm-applet > /dev/null 2>&1 || exit 0
+command -v nm-applet > /dev/null 2>&1 || exit 0
 
 # Source Qubes library.
+# shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
 # Hide nm-applet when network-manager is disabled

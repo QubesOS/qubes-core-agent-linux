@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 #set -x
 
 undetectable_netvm_ips=

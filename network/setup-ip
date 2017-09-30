@@ -1,27 +1,28 @@
 #!/bin/sh
 
 # Source Qubes library.
+# shellcheck disable=SC1091
 . /usr/lib/qubes/init/functions
 
 have_qubesdb || exit 0
 
-ip=`/usr/bin/qubesdb-read /qubes-ip 2> /dev/null`
-if [ x$ip != x ]; then
-    netmask=`/usr/bin/qubesdb-read /qubes-netmask`
-    gateway=`/usr/bin/qubesdb-read /qubes-gateway`
-    primary_dns=`/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null || echo $gateway`
-    secondary_dns=`/usr/bin/qubesdb-read /qubes-secondary-dns`
-    /sbin/ethtool -K $INTERFACE sg off
-    /sbin/ethtool -K $INTERFACE tx off
+ip=$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)
+if [ "x$ip" != x ]; then
+    #netmask=$(/usr/bin/qubesdb-read /qubes-netmask)
+    gateway=$(/usr/bin/qubesdb-read /qubes-gateway)
+    primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null || echo "$gateway")
+    secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns)
+    /sbin/ethtool -K "$INTERFACE" sg off
+    /sbin/ethtool -K "$INTERFACE" tx off
     # If NetworkManager is enabled, let it configure the network
     if qsvc network-manager ; then
         nm_config=/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE
-        cat > $nm_config <<__EOF__
+        cat > "$nm_config" <<__EOF__
 [802-3-ethernet]
 duplex=full
 
 [ethernet]
-mac-address=`ip l show dev $INTERFACE |grep link|awk '{print $2}'`
+mac-address=$(ip l show dev "$INTERFACE" |grep link|awk '{print $2}')
 
 [connection]
 id=VM uplink $INTERFACE
@@ -36,23 +37,23 @@ method=manual
 may-fail=false
 __EOF__
         if ! qsvc disable-dns-server ; then
-            echo "dns=$primary_dns;$secondary_dns" >> $nm_config
+            echo "dns=$primary_dns;$secondary_dns" >> "$nm_config"
         fi
         if ! qsvc disable-default-route ; then
-            echo "addresses1=$ip;32;$gateway" >> $nm_config
+            echo "addresses1=$ip;32;$gateway" >> "$nm_config"
         else
-            echo "addresses1=$ip;32" >> $nm_config
+            echo "addresses1=$ip;32" >> "$nm_config"
         fi
-        chmod 600 $nm_config
+        chmod 600 "$nm_config"
         # reload connection
-        nmcli connection load $nm_config || :
+        nmcli connection load "$nm_config" || :
     else
         # No NetworkManager enabled, configure the network manually
-        /sbin/ifconfig $INTERFACE $ip netmask 255.255.255.255
-        /sbin/ifconfig $INTERFACE up
-        /sbin/route add -host $gateway dev $INTERFACE
+        /sbin/ifconfig "$INTERFACE" "$ip" netmask 255.255.255.255
+        /sbin/ifconfig "$INTERFACE" up
+        /sbin/route add -host "$gateway" dev "$INTERFACE"
         if ! qsvc disable-default-route ; then
-            /sbin/route add default gw $gateway
+            /sbin/route add default gw "$gateway"
         fi
         if ! is_protected_file /etc/resolv.conf ; then
             echo > /etc/resolv.conf
@@ -65,8 +66,8 @@ __EOF__
     network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
     if [ "x$network" != "x" ] && ! qsvc disable-dns-server ; then
         gateway=$(qubesdb-read /qubes-netvm-gateway)
-        netmask=$(qubesdb-read /qubes-netvm-netmask)
-        primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo $gateway)
+        #netmask=$(qubesdb-read /qubes-netvm-netmask)
+        primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
         secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
         echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
         echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
