@@ -45,6 +45,7 @@ start() {
     [ -x $exec ] || exit 5
 
     echo -n $"Starting $prog (as Qubes updates proxy forwarder): "
+    # shellcheck disable=SC2016
     start-stop-daemon \
         --exec $exec \
         --pidfile "$pidfile" \
@@ -61,7 +62,7 @@ start() {
 
 stop() {
     echo -n $"Stopping $prog: "
-    killproc -p $pidfile $prog
+    killproc -p $pidfile "$prog"
     retval=$?
     echo
     [ $retval -eq 0 ] && rm -f $lockfile
@@ -78,7 +79,7 @@ force_reload() {
 }
 
 rh_status() {
-    status $prog
+    status "$prog"
 }
 
 rh_status_q() {

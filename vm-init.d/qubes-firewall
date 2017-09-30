@@ -28,7 +28,8 @@ stop()
 {
     if [ -r $PIDFILE ]; then
         echo -n "Stopping Qubes Firewall monitor:"
-        kill -9 $(cat $PIDFILE) 2>/dev/null && success || failure
+        # shellcheck disable=SC2015
+        kill -9 "$(cat "$PIDFILE")" 2>/dev/null && success || failure
         echo ""
     fi
 	return 0
@@ -47,4 +48,5 @@ case "$1" in
 	;;
 esac
 
+# shellcheck disable=SC2086
 exit $RETVAL

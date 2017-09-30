@@ -38,4 +38,5 @@ case "$1" in
 	;;
 esac
 
+# shellcheck disable=SC2086
 exit $RETVAL

@@ -5,8 +5,8 @@
 
 /usr/lib/qubes/update-proxy-configs
 
-if [ -n "`ls -A /usr/local/lib 2>/dev/null`" -o \
-     -n "`ls -A /usr/local/lib64 2>/dev/null`" ]; then
+if [ -n "$(ls -A /usr/local/lib 2>/dev/null)" ] || \
+     [ -n "$(ls -A /usr/local/lib64 2>/dev/null)" ]; then
     ldconfig
 fi
 

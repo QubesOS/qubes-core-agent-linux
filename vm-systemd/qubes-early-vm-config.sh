@@ -5,13 +5,14 @@
 # but before sysinit.target is reached.
 
 # Source Qubes library.
+# shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
 # Set the hostname
 if ! is_protected_file /etc/hostname ; then
-    name=`qubesdb-read /name`
+    name=$(qubesdb-read /name)
     if [ -n "$name" ]; then
-        hostname $name
+        hostname "$name"
         if [ -e /etc/debian_version ]; then
             ipv4_localhost_re="127\.0\.1\.1"
         else
@@ -24,7 +25,7 @@ fi
 
 # Set the timezone
 if ! is_protected_file /etc/timezone ; then
-    timezone=`qubesdb-read /qubes-timezone 2> /dev/null`
+    timezone=$(qubesdb-read /qubes-timezone 2> /dev/null)
     if [ -n "$timezone" ]; then
         ln -sf ../usr/share/zoneinfo/"$timezone" /etc/localtime
         if [ -e /etc/debian_version ]; then

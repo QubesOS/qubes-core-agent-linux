@@ -35,6 +35,7 @@ start()
 	fi
 
 	echo -n $"Executing Qubes misc post scripts:"
+    # shellcheck disable=SC2015
 	/usr/lib/qubes/init/misc-post.sh && success || failure
 	echo
 }
@@ -59,4 +60,5 @@ case "$1" in
 	;;
 esac
 
+# shellcheck disable=SC2086
 exit $RETVAL

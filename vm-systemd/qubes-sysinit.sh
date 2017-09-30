@@ -26,8 +26,8 @@ qemu_devices="0x8086
 0x0001
 0x00b8
 "
-if [ -z "$(ls /sys/bus/pci/devices/)" -o \
-        "$(cat /sys/bus/pci/devices/*/{vendor,device})" != "$qemu_devices" ]; then
+if [ -z "$(ls /sys/bus/pci/devices/)" ] || \
+        [ "$(cat /sys/bus/pci/devices/*/{vendor,device})" != "$qemu_devices" ]; then
     # do not enable meminfo-writer (so qmemman for this domain) when any real PCI
     # device is present
     DEFAULT_ENABLED="$DEFAULT_ENABLED meminfo-writer"
@@ -43,7 +43,7 @@ if systemd_version_changed ; then
 fi
 
 # Wait for xenbus initialization
-while [ ! -e /dev/xen/xenbus -a ! -e /proc/xen/xenbus ]; do
+while [ ! -e /dev/xen/xenbus ] && [ -e /proc/xen/xenbus ]; do
   sleep 0.1
 done
 
@@ -74,24 +74,24 @@ is_templatevm && DEFAULT_ENABLED=$DEFAULT_ENABLED_TEMPLATEVM && touch /var/run/q
 
 # Enable default services
 for srv in $DEFAULT_ENABLED; do
-    touch /var/run/qubes-service/$srv
+    touch "/var/run/qubes-service/$srv"
 done
 
 # Enable services
-for srv in `qubesdb-multiread /qubes-service/ 2>/dev/null |grep ' = 1'|cut -f 1 -d ' '`; do
-    touch /var/run/qubes-service/$srv
+for srv in $(qubesdb-multiread /qubes-service/ 2>/dev/null |grep ' = 1'|cut -f 1 -d ' '); do
+    touch "/var/run/qubes-service/$srv"
 done
 
 # Disable services
-for srv in `qubesdb-multiread /qubes-service/ 2>/dev/null |grep ' = 0'|cut -f 1 -d ' '`; do
-    rm -f /var/run/qubes-service/$srv
+for srv in $(qubesdb-multiread /qubes-service/ 2>/dev/null |grep ' = 0'|cut -f 1 -d ' '); do
+    rm -f "/var/run/qubes-service/$srv"
 done
 
 # Prepare environment for other services
 echo > /var/run/qubes-service-environment
 
-debug_mode=`qubesdb-read /qubes-debug-mode 2> /dev/null`
-if [ -n "$debug_mode" -a "$debug_mode" -gt 0 ]; then
+debug_mode=$(qubesdb-read /qubes-debug-mode 2> /dev/null)
+if [ -n "$debug_mode" ] && [ "$debug_mode" -gt 0 ]; then
     echo "GUI_OPTS=-vv" >> /var/run/qubes-service-environment
 fi
 

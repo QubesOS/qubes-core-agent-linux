@@ -8,7 +8,7 @@ if [ -e "$dev" ] ; then
     # The private /dev/xvdb device is present.
 
     # check if private.img (xvdb) is empty - all zeros
-    private_size_512=`blockdev --getsz "$dev"`
+    private_size_512=$(blockdev --getsz "$dev")
     if dd if=/dev/zero bs=512 count="$private_size_512" 2>/dev/null | diff "$dev" - >/dev/null; then
         # the device is empty, create filesystem
         echo "Virgin boot of the VM: creating private.img filesystem on $dev" >&2

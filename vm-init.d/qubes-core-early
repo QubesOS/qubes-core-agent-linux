@@ -14,10 +14,12 @@ start()
 	have_qubesdb || return
 
 	echo -n $"Setting up Qubes persistent file systems:"
+    # shellcheck disable=SC2015
 	/usr/lib/qubes/init/mount-dirs.sh && success || failure
 	echo
 
 	echo -n $"Executing Qubes random seed scripts:"
+    # shellcheck disable=SC2015
 	/usr/lib/qubes/init/qubes-random-seed.sh && success || failure
 	echo
 
@@ -41,4 +43,5 @@ case "$1" in
 	;;
 esac
 
+# shellcheck disable=SC2086
 exit $RETVAL

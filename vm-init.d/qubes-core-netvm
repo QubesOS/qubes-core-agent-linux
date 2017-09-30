@@ -19,6 +19,7 @@ start()
 	fi
 
 	echo -n $"Executing Qubes Core scripts NetVM:"
+    # shellcheck disable=SC2015
 	/usr/lib/qubes/init/network-proxy-setup && success || failure
 	echo
 }
@@ -41,4 +42,5 @@ case "$1" in
 	;;
 esac
 
+# shellcheck disable=SC2086
 exit $RETVAL

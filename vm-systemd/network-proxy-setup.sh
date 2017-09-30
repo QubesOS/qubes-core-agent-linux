@@ -11,8 +11,8 @@ if [ "x$network" != "x" ]; then
     fi
 
     gateway=$(qubesdb-read /qubes-netvm-gateway)
-    netmask=$(qubesdb-read /qubes-netvm-netmask)
-    primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo $gateway)
+    #netmask=$(qubesdb-read /qubes-netvm-netmask)
+    primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
     secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
     modprobe netbk 2> /dev/null || modprobe xen-netback || "${modprobe_fail_cmd}"
     echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
