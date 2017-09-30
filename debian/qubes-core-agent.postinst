@@ -22,7 +22,7 @@ set -e
 
 debug() {
     if [ "${DEBDEBUG}" == "1" ]; then
-        echo -e ""$@""
+        echo -e "$@"
     fi
 }
 
@@ -34,11 +34,11 @@ systemdPreload() {
     systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
 
     # Mask any static unit files that are marked to be disabled
-    grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read action unit_name; do
+    grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read -r action unit_name; do
         case "${action}" in
         disable)
             if [ -e "/lib/systemd/system/${unit_name}" ]; then
-                if ! fgrep -q '[Install]' "/lib/systemd/system/${unit_name}"; then
+                if ! grep -F -q '[Install]' "/lib/systemd/system/${unit_name}"; then
                     deb-systemd-helper mask "${unit_name}" > /dev/null 2>&1 || true
                 fi
             fi
@@ -70,6 +70,7 @@ case "${1}" in
 
             debug "FIRST INSTALL..."
             # Location of files which contains list of protected files
+            # shellcheck source=init/functions
             . /usr/lib/qubes/init/functions
 
             # ensure that hostname resolves to 127.0.1.1 resp. ::1 and that /etc/hosts is
@@ -77,10 +78,10 @@ case "${1}" in
             if ! is_protected_file /etc/hostname ; then
                 for ip in '127\.0\.1\.1' '::1'; do
                     if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
-                        sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
-                        sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts || true
+                        sed -i "/^${ip}\s/,+0s/\(\s$(hostname)\)\+\(\s\|$\)/\2/g" /etc/hosts || true
+                        sed -i "s/^${ip}\(\s\|$\).*$/\0 $(hostname)/" /etc/hosts || true
                     else
-                        echo "${ip//\\/} `hostname`" >> /etc/hosts || true
+                        echo "${ip//\\/} $(hostname)" >> /etc/hosts || true
                     fi
                 done
             fi
@@ -88,7 +89,7 @@ case "${1}" in
             # remove hostname from 127.0.0.1 line (in debian the hostname is by default
             # resolved to 127.0.1.1)
             if ! is_protected_file /etc/hosts ; then
-                sed -i "/^127\.0\.0\.1\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts || true
+                sed -i "/^127\.0\.0\.1\s/,+0s/\(\s$(hostname)\)\+\(\s\|$\)/\2/g" /etc/hosts || true
             fi
 
             # Set default "runlevel"
