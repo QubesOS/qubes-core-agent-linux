@@ -28,10 +28,10 @@ get_dev() {
   if [ -f "$dev" ]; then
     file=$dev
 
-    loopdev=$(losetup -j $file | head -1 | cut -d : -f 1)
+    loopdev=$(losetup -j "$file" | head -1 | cut -d : -f 1)
     if [ -n "$loopdev" ]; then
       # found existing loop to this file
-      echo $loopdev
+      echo "$loopdev"
       return
     fi
 
@@ -44,7 +44,7 @@ get_dev() {
     fi
 
     do_or_die losetup "$loopdev" "$file"
-    echo $loopdev
+    echo "$loopdev"
   else
     test -e "$dev" || fatal "$dev does not exist."
     test -b "$dev" || fatal "$dev is not a block device nor file."
@@ -55,7 +55,7 @@ get_dm_snapshot_name() {
   base=$1
   cow=$2
 
-  echo snapshot-$(stat -c '%D:%i' "$base")-$(stat -c '%D:%i' "$cow")
+  echo "snapshot-$(stat -c '%D:%i' "$base")-$(stat -c '%D:%i' "$cow")"
 }
 
 create_dm_snapshot() {
@@ -65,12 +65,12 @@ create_dm_snapshot() {
   base=$2
   cow=$3
 
-  if [ ! -e /dev/mapper/$dm_devname ]; then
+  if [ ! -e "/dev/mapper/$dm_devname" ]; then
     # prepare new snapshot device
-    base_dev=$(get_dev $base)
-    cow_dev=$(get_dev $cow)
-    base_sz=$(blockdev --getsz $base_dev)
-    do_or_die dmsetup create $dm_devname --table "0 $base_sz snapshot $base_dev $cow_dev P 256"
+    base_dev=$(get_dev "$base")
+    cow_dev=$(get_dev "$cow")
+    base_sz=$(blockdev --getsz "$base_dev")
+    do_or_die dmsetup create "$dm_devname" --table "0 $base_sz snapshot $base_dev $cow_dev P 256"
   fi
 
 }
@@ -81,11 +81,11 @@ create_dm_snapshot_origin() {
   dm_devname=$1
   base=$2
 
-  if [ ! -e /dev/mapper/$dm_devname ]; then
+  if [ ! -e "/dev/mapper/$dm_devname" ]; then
     # prepare new snapshot-origin device
-    base_dev=$(get_dev $base)
-    base_sz=$(blockdev --getsz $base_dev)
-    do_or_die dmsetup create $dm_devname --table "0 $base_sz snapshot-origin $base_dev"
+    base_dev=$(get_dev "$base")
+    base_sz=$(blockdev --getsz "$base_dev")
+    do_or_die dmsetup create "$dm_devname" --table "0 $base_sz snapshot-origin $base_dev"
   fi
 }
 
@@ -116,28 +116,28 @@ case "$command" in
         claim_lock "block"
 
         # prepare snapshot device
-        create_dm_snapshot $dm_devname "$base" "$cow"
+        create_dm_snapshot "$dm_devname" "$base" "$cow"
 
         if [ "$t" == "snapshot" ]; then
           #that's all for snapshot, store name of prepared device
           xenstore_write "$XENBUS_PATH/node" "/dev/mapper/$dm_devname"
           echo "/dev/mapper/$dm_devname" > "$HOTPLUG_STORE-node"
-          write_dev /dev/mapper/$dm_devname
+          write_dev "/dev/mapper/$dm_devname"
         elif [ "$t" == "origin" ]; then
           # for origin - prepare snapshot-origin device and store its name
           dm_devname=origin-$(stat -c '%D:%i' "$base")
-          create_dm_snapshot_origin $dm_devname "$base"
+          create_dm_snapshot_origin "$dm_devname" "$base"
           xenstore_write "$XENBUS_PATH/node" "/dev/mapper/$dm_devname"
           echo "/dev/mapper/$dm_devname" > "$HOTPLUG_STORE-node"
-          write_dev /dev/mapper/$dm_devname
+          write_dev "/dev/mapper/$dm_devname"
         fi
         # Save domain name for template commit on device remove
         domain=$(xenstore_read_default "$XENBUS_PATH/domain" '')
         if [ -z "$domain" ]; then
           domid=$(xenstore_read "$XENBUS_PATH/frontend-id")
-          domain=$(xl domname $domid)
+          domain=$(xl domname "$domid")
         fi
-        echo $domain > "$HOTPLUG_STORE-domain"
+        echo "$domain" > "$HOTPLUG_STORE-domain"
 
         release_lock "block"
         exit 0
@@ -166,7 +166,7 @@ case "$command" in
         claim_lock "block"
 
         # prepare snapshot device
-        create_dm_snapshot $dm_devname "$base" "$cow"
+        create_dm_snapshot "$dm_devname" "$base" "$cow"
 
         if [ "$t" == "snapshot" ]; then
           #that's all for snapshot, store name of prepared device
@@ -174,7 +174,7 @@ case "$command" in
         elif [ "$t" == "origin" ]; then
           # for origin - prepare snapshot-origin device and store its name
           dm_devname=origin-$(stat -c '%D:%i' "$base")
-          create_dm_snapshot_origin $dm_devname "$base"
+          create_dm_snapshot_origin "$dm_devname" "$base"
           echo "/dev/mapper/$dm_devname"
         fi
 
@@ -187,7 +187,7 @@ case "$command" in
     if [ "$command" = "cleanup" ]; then
       t=$2
     else
-      t=$(cat $HOTPLUG_STORE-type 2>/dev/null || echo 'MISSING')
+      t=$(cat "$HOTPLUG_STORE-type" 2>/dev/null || echo 'MISSING')
     fi
     case "$t" in
       snapshot|origin)
@@ -209,10 +209,10 @@ case "$command" in
 
         claim_lock "block"
 
-        use_count=$(dmsetup info $node|grep Open|awk '{print $3}')
+        use_count=$(dmsetup info "$node"|grep Open|awk '{print $3}')
 
         # do not remove snapshot if snapshot origin is still present
-        if [ "${node/snapshot/}" != "$node" -a -e "/dev/mapper/origin-$(echo $node|cut -d- -f2)" ]; then
+        if [ "${node/snapshot/}" != "$node" ] && [ -e "/dev/mapper/origin-$(echo "$node"|cut -d- -f2)" ]; then
           use_count=1
         fi
 
@@ -223,18 +223,18 @@ case "$command" in
         fi
 
         # get list of used (loop) devices
-        deps="$(dmsetup deps $node | cut -d: -f2 | sed -e 's#(7, \([0-9]\+\))#/dev/loop\1#g')"
+        deps="$(dmsetup deps "$node" | cut -d: -f2 | sed -e 's#(7, \([0-9]\+\))#/dev/loop\1#g')"
 
         # if this is origin
         if [ "${node/origin/}" != "$node" ]; then
           # remove unused snapshots
-          for snap in /dev/mapper/snapshot-$(echo $node|cut -d- -f2)-*; do
-            use_count=$(dmsetup info $snap|grep Open|awk '{print $3}')
+          for snap in /dev/mapper/snapshot-$(echo "$node"|cut -d- -f2)-*; do
+            use_count=$(dmsetup info "$snap"|grep Open|awk '{print $3}')
             if [ "$use_count" -eq 0 ]; then
               # unused snapshot - remove it
-              deps="$deps $(dmsetup deps $snap | cut -d: -f2 | sed -e 's#(7, \([0-9]\+\))#/dev/loop\1#g')"
+              deps="$deps $(dmsetup deps "$snap" | cut -d: -f2 | sed -e 's#(7, \([0-9]\+\))#/dev/loop\1#g')"
               log debug "Removing $snap"
-              dmsetup remove $snap
+              dmsetup remove "$snap"
             fi
           done
           if [ "$command" = "remove" ]; then
@@ -247,21 +247,21 @@ case "$command" in
           fi
         fi
 
-        if [ -e $node ]; then
+        if [ -e "$node" ]; then
           log debug "Removing $node"
-          dmsetup remove $node
+          dmsetup remove "$node"
         fi
 
         # try to free loop devices
         for dev in $deps; do
           if [ -b "$dev" ]; then
             log debug "Removing $dev"
-            losetup -d $dev 2> /dev/null || true
+            losetup -d "$dev" 2> /dev/null || true
           fi
         done
 
         if [ -n "$HOTPLUG_STORE" ]; then
-          rm $HOTPLUG_STORE-*
+          rm "$HOTPLUG_STORE-"*
         fi
         release_lock "block"
 
