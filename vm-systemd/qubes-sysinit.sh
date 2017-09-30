@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Source Qubes library.
+# shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
 # List of services enabled by default (in case of absence of qubesdb entry)

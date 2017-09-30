@@ -10,12 +10,15 @@
 #
 
 # Source function library.
+# shellcheck disable=SC1091
 . /etc/rc.d/init.d/functions
 
 # Source Qubes library.
+# shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
 # Source networking configuration.
+# shellcheck disable=SC1091
 .  /etc/sysconfig/network
 
 # Check that networking is up.
@@ -25,6 +28,7 @@ exec="/usr/bin/ncat"
 prog=$(basename $exec)
 pidfile="/var/run/qubes-updates-proxy-forwarder.pid"
 
+# shellcheck disable=SC1091
 [ -e /etc/sysconfig/qubes-updates-proxy-forwarder ] && . /etc/sysconfig/qubes-updates-proxy-forwarder
 
 lockfile=/var/lock/subsys/qubes-updates-proxy-forwarder

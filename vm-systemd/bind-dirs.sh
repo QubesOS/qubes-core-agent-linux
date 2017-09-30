@@ -25,6 +25,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Source Qubes library.
+# shellcheck source=init/functions
 source /usr/lib/qubes/init/functions
 
 prerequisite() {

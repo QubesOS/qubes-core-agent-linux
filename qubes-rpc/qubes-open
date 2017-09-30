@@ -1,6 +1,7 @@
 #!/bin/sh
 
 if [ -r /etc/profile.d/qubes-session.sh ]; then
+    # shellcheck disable=SC1091
     . /etc/profile.d/qubes-session.sh
 fi
 

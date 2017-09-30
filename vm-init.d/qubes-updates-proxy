@@ -14,12 +14,15 @@
 # see PidFile in the configuration file.
 
 # Source function library.
+# shellcheck disable=SC1091
 . /etc/rc.d/init.d/functions
 
 # Source Qubes library.
+# shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
 # Source networking configuration.
+# shellcheck disable=SC1091
 .  /etc/sysconfig/network
 
 # Check that networking is up.
@@ -30,6 +33,7 @@ prog=$(basename $exec)
 config="/etc/tinyproxy/tinyproxy-updates.conf"
 pidfile="/var/run/tinyproxy-updates/tinyproxy.pid"
 
+# shellcheck disable=SC1091
 [ -e /etc/sysconfig/tinyproxy-updates ] && . /etc/sysconfig/tinyproxy-updates
 
 lockfile=/var/lock/subsys/tinyproxy-updates

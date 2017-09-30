@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Source Qubes library.
+# shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
 /usr/lib/qubes/update-proxy-configs

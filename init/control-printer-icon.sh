@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Source Qubes library.
+# shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
 if ! is_fully_persistent && test -f /etc/xdg/autostart/print-applet.desktop ; then

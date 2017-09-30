@@ -5,6 +5,7 @@
 #
 
 # Source function library.
+# shellcheck disable=SC1091
 . /etc/rc.d/init.d/functions
 
 start()
