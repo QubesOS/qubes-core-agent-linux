@@ -1,3 +1,4 @@
+#!/bin/bash
 qubes_preset_file="75-qubes-vm.preset"
 
 ###########################
@@ -5,50 +6,47 @@ qubes_preset_file="75-qubes-vm.preset"
 ###########################
 
 update_default_user() {
+    # Make sure there is a qubes group
+    groupadd --force --system --gid 98 qubes
 
-	# Make sure there is a qubes group
-	groupadd --force --system --gid 98 qubes
-
-	# Archlinux bash version has a 'bug' when running su -c, /etc/profile is not loaded because bash consider there is no interactive pty when running 'su - user -c' or something like this.
-	# See https://bugs.archlinux.org/task/31831
-	id -u 'user' >/dev/null 2>&1 || {
-	  useradd --user-group --create-home --shell /bin/zsh user
-	}
-	usermod -a --groups qubes user
-
+    # Archlinux bash version has a 'bug' when running su -c, /etc/profile is not loaded because bash consider there is no interactive pty when running 'su - user -c' or something like this.
+    # See https://bugs.archlinux.org/task/31831
+    id -u 'user' >/dev/null 2>&1 || {
+        useradd --user-group --create-home --shell /bin/zsh user
+    }
+    usermod -a --groups qubes user
 }
 
 ## arg 1:  the new package version
 pre_install() {
-	echo "Pre install..."
+    echo "Pre install..."
 
-	update_default_user
+    update_default_user
 
-	# do this whole %pre thing only when updating for the first time...
+    # do this whole %pre thing only when updating for the first time...
 
-	mkdir -p /var/lib/qubes
+    mkdir -p /var/lib/qubes
 
-	# Backup fstab / But use archlinux defaults (cp instead of mv)
-	if [ -e /etc/fstab ] ; then
-		cp /etc/fstab /var/lib/qubes/fstab.orig
-	fi
+    # Backup fstab / But use archlinux defaults (cp instead of mv)
+    if [ -e /etc/fstab ] ; then
+        cp /etc/fstab /var/lib/qubes/fstab.orig
+    fi
 
-	# Add qubes core related fstab entries
-	echo "xen	/proc/xen	xenfs	defaults	0 0" >> /etc/fstab
+    # Add qubes core related fstab entries
+    echo "xen	/proc/xen	xenfs	defaults	0 0" >> /etc/fstab
 
-	usermod -p '' root
-	usermod -L user
+    usermod -p '' root
+    usermod -L user
 }
 
 
 ## arg 1:  the new package version
 ## arg 2:  the old package version
 pre_upgrade() {
-	# do something here
-	echo "Pre upgrade..."
+    # do something here
+    echo "Pre upgrade..."
 
-	update_default_user
-
+    update_default_user
 }
 
 ###################
@@ -64,13 +62,11 @@ configure_notification-daemon() {
 }
 
 configure_selinux() {
-
-	# SELinux is not enabled on archlinux
-	#echo "--> Disabling SELinux..."
-	echo "SELINUX not enabled on archlinux. skipped."
-	# sed -e s/^SELINUX=.*$/SELINUX=disabled/ -i /etc/selinux/config
-	# setenforce 0 2>/dev/null
-
+    # SELinux is not enabled on archlinux
+    #echo "--> Disabling SELinux..."
+    echo "SELINUX not enabled on archlinux. skipped."
+    # sed -e s/^SELINUX=.*$/SELINUX=disabled/ -i /etc/selinux/config
+    # setenforce 0 2>/dev/null
 }
 
 ############################
@@ -78,75 +74,76 @@ configure_selinux() {
 ############################
 
 update_qubesconfig() {
+    # Create NetworkManager configuration if we do not have it
+    if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
+    echo '[main]' > /etc/NetworkManager/NetworkManager.conf
+    echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
+    echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
+    fi
+    /usr/lib/qubes/qubes-fix-nm-conf.sh
 
-	# Create NetworkManager configuration if we do not have it
-	if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
-	echo '[main]' > /etc/NetworkManager/NetworkManager.conf
-	echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
-	echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
-	fi
-	/usr/lib/qubes/qubes-fix-nm-conf.sh
+    # Remove ip_forward setting from sysctl, so NM will not reset it
+    # Archlinux now use sysctl.d/ instead of sysctl.conf
+    #sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 
-	# Remove ip_forward setting from sysctl, so NM will not reset it
-	# Archlinux now use sysctl.d/ instead of sysctl.conf
-	#sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+    # Remove old firmware updates link
+    if [ -L /lib/firmware/updates ]; then
+      rm -f /lib/firmware/updates
+    fi
 
-	# Remove old firmware updates link
-	if [ -L /lib/firmware/updates ]; then
-	  rm -f /lib/firmware/updates
-	fi
+    # Yum proxy configuration is fedora specific
+    #if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
+    #  echo >> /etc/yum.conf
+    #  echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
+    #  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
+    #fi
+    #/usr/lib/qubes/update-proxy-configs
+    # Archlinux pacman configuration is handled in update_finalize
 
-	# Yum proxy configuration is fedora specific
-	#if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
-	#  echo >> /etc/yum.conf
-	#  echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
-	#  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
-	#fi
-	#/usr/lib/qubes/update-proxy-configs
-	# Archlinux pacman configuration is handled in update_finalize
+    # Location of files which contains list of protected files
+    mkdir -p /etc/qubes/protected-files.d
+    # shellcheck source=../init/functions
+    . /usr/lib/qubes/init/functions
 
-	# Location of files which contains list of protected files
-	mkdir -p /etc/qubes/protected-files.d
-	. /usr/lib/qubes/init/functions
+    # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
+    if ! is_protected_file /etc/hosts ; then
+        if ! grep -q localhost /etc/hosts; then
 
-	# qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
-	if ! is_protected_file /etc/hosts ; then
-	    if ! grep -q localhost /etc/hosts; then
-	      cat <<EOF > /etc/hosts
-	127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 `hostname`
-	::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+          cat <<EOF > /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 $(hostname)
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 EOF
-	    fi
-	fi
 
-	# ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
-	# in the form expected by qubes-sysinit.sh
-	if ! is_protected_file /etc/hostname ; then
-	    for ip in '127\.0\.0\.1' '::1'; do
-	        if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
-	            sed -i "/^${ip}\s/,+0s/\(\s`hostname`\)\+\(\s\|$\)/\2/g" /etc/hosts
-	            sed -i "s/^${ip}\(\s\|$\).*$/\0 `hostname`/" /etc/hosts
-	        else
-	            echo "${ip} `hostname`" >> /etc/hosts
-	        fi
-	    done
-	fi
+        fi
+    fi
 
-	# Make sure there is a default locale set so gnome-terminal will start
-	if [ ! -e /etc/locale.conf ] || ! grep -q LANG /etc/locale.conf; then
-	    touch /etc/locale.conf
-	    echo "LANG=en_US.UTF-8" >> /etc/locale.conf
-	fi
-	# ... and make sure it is really generated
-	# This line is buggy as LANG can be set to LANG="en_US.UTF-8". The Quotes must be stripped
-	current_locale=`grep LANG /etc/locale.conf|cut -f 2 -d = | tr -d '"'`
-	if [ -n "$current_locale" ] && ! locale -a | grep -q "$current_locale"; then
-	    base=`echo "$current_locale" | cut -f 1 -d .`
-	    charmap=`echo "$current_locale.UTF-8" | cut -f 2 -d .`
-	    [ -n "$charmap" ] && charmap="-f $charmap"
-	    localedef -i $base $charmap $current_locale
-	fi
+    # ensure that hostname resolves to 127.0.0.1 resp. ::1 and that /etc/hosts is
+    # in the form expected by qubes-sysinit.sh
+    if ! is_protected_file /etc/hostname ; then
+        for ip in '127\.0\.0\.1' '::1'; do
+            if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
+                sed -i "/^${ip}\s/,+0s/\(\s$(hostname)\)\+\(\s\|$\)/\2/g" /etc/hosts
+                sed -i "s/^${ip}\(\s\|$\).*$/\0 $(hostname)/" /etc/hosts
+            else
+                echo "${ip} $(hostname)" >> /etc/hosts
+            fi
+        done
+    fi
 
+    # Make sure there is a default locale set so gnome-terminal will start
+    if [ ! -e /etc/locale.conf ] || ! grep -q LANG /etc/locale.conf; then
+        touch /etc/locale.conf
+        echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+    fi
+    # ... and make sure it is really generated
+    # This line is buggy as LANG can be set to LANG="en_US.UTF-8". The Quotes must be stripped
+    current_locale=$(grep LANG /etc/locale.conf|cut -f 2 -d = | tr -d '"')
+    if [ -n "$current_locale" ] && ! locale -a | grep -q "$current_locale"; then
+        base=$(echo "$current_locale" | cut -f 1 -d .)
+        charmap=$(echo "$current_locale.UTF-8" | cut -f 2 -d .)
+        [ -n "$charmap" ] && charmap="-f $charmap"
+        localedef -i "$base" "$charmap" "$current_locale"
+    fi
 }
 
 ############################
@@ -159,12 +156,12 @@ is_static() {
 is_masked() {
     if [ ! -L /etc/systemd/system/"$1" ]
     then
-       return 1
+        return 1
     fi
-    target=`readlink /etc/systemd/system/"$1" 2>/dev/null` || :
+    target=$(readlink /etc/systemd/system/"$1" 2>/dev/null) || :
     if [ "$target" = "/dev/null" ]
     then
-       return 0
+        return 0
     fi
     return 1
 }
@@ -183,16 +180,16 @@ unmask() {
 
 preset_units() {
     local represet=
-    cat "$1" | while read action unit_name
+    while read -r action unit_name < "$1"
     do
-        if [ "$action" = "#" -a "$unit_name" = "Units below this line will be re-preset on package upgrade" ]
+        if [ "$action" = "#" ] && [ "$unit_name" = "Units below this line will be re-preset on package upgrade" ]
         then
             represet=1
             continue
         fi
         echo "$action $unit_name" | grep -q '^[[:space:]]*[^#;]' || continue
-        [ -n "$action" -a -n "$unit_name" ] || continue
-        if [ "$2" = "initial" -o "$represet" = "1" ]
+        [[ -n "$action" && -n "$unit_name" ]] || continue
+        if [ "$2" = "initial" ] || [ "$represet" = "1" ]
         then
             if [ "$action" = "disable" ] && is_static "$unit_name"
             then
@@ -208,7 +205,7 @@ preset_units() {
                     # We masked this static unit before, now we unmask it.
                     unmask "$unit_name"
                 fi
-                 systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
+                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
             else
                 systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
             fi
@@ -217,7 +214,7 @@ preset_units() {
 }
 
 restore_units() {
-    grep '^[[:space:]]*[^#;]' "$1" | while read action unit_name
+    while read -r action unit_name < grep '^[[:space:]]*[^#;]' "$1"
     do
         if is_static "$unit_name" && is_masked "$unit_name"
         then
@@ -230,119 +227,116 @@ restore_units() {
 }
 
 configure_systemd() {
+    if [ "$1" -eq 1 ]
+    then
+        preset_units /usr/lib/systemd/system-preset/$qubes_preset_file initial
+        changed=true
+    else
+        preset_units /usr/lib/systemd/system-preset/$qubes_preset_file upgrade
+        changed=true
+        # Upgrade path - now qubes-iptables is used instead
+        for svc in iptables ip6tables
+        do
+            if [ -f "$svc".service ]
+            then
+                systemctl --no-reload preset "$svc".service
+                changed=true
+            fi
+        done
+    fi
 
-if [ $1 -eq 1 ]
-then
-    preset_units /usr/lib/systemd/system-preset/$qubes_preset_file initial
-    changed=true
-else
-    preset_units /usr/lib/systemd/system-preset/$qubes_preset_file upgrade
-    changed=true
-    # Upgrade path - now qubes-iptables is used instead
-    for svc in iptables ip6tables
-    do
-      if [ -f "$svc".service ]
-      then
-        systemctl --no-reload preset "$svc".service
-	changed=true
-      fi
-    done
-fi
+    if [ "$1" -eq 1 ]
+    then
+        # First install.
+        # Set default "runlevel".
+        # FIXME: this ought to be done via kernel command line.
+        # The fewer deviations of the template from the seed
+        # image, the better.
+        rm -f /etc/systemd/system/default.target
+        ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
+        changed=true
+    fi
 
-if [ $1 -eq 1 ]
-then
-    # First install.
-    # Set default "runlevel".
-    # FIXME: this ought to be done via kernel command line.
-    # The fewer deviations of the template from the seed
-    # image, the better.
-    rm -f /etc/systemd/system/default.target
-    ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
-    changed=true
-fi
+    # remove old symlinks
+    if [ -L /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service ]
+    then
+        rm -f /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service
+        changed=true
+    fi
+    if [ -L /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service ]
+    then
+        rm -f /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service
+        changed=true
+    fi
 
-# remove old symlinks
-if [ -L /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service ]
-then
-    rm -f /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service
-    changed=true
-fi
-if [ -L /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service ]
-then
-    rm -f /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service
-    changed=true
-fi
-
-if [ "x$changed" != "x" ]
-then
-    systemctl daemon-reload
-fi
-
+    if [ "x$changed" != "x" ]
+    then
+        systemctl daemon-reload
+    fi
 }
 
 ######################
 ## Archlinux Specific Functions ##
 ######################
 config_prependtomark() {
-FILE=$1
-APPENDBEFORELINE=$2
-APPENDLINE=$3
-grep -F -q "$APPENDLINE" "$FILE" || sed "/$APPENDBEFORELINE/i$APPENDLINE" -i "$FILE"
+    FILE=$1
+    APPENDBEFORELINE=$2
+    APPENDLINE=$3
+    grep -F -q "$APPENDLINE" "$FILE" || sed "/$APPENDBEFORELINE/i$APPENDLINE" -i "$FILE"
 }
 
 config_appendtomark() {
-FILE=$1
-APPENDAFTERLINE=$2
-APPENDLINE=$3
-grep -F -q "$APPENDLINE" "$FILE" || sed "/$APPENDAFTERLINE/a$APPENDLINE" -i "$FILE"
+    FILE=$1
+    APPENDAFTERLINE=$2
+    APPENDLINE=$3
+    grep -F -q "$APPENDLINE" "$FILE" || sed "/$APPENDAFTERLINE/a$APPENDLINE" -i "$FILE"
 }
 
 config_cleanupmark() {
-FILE="$1"
-BEGINMARK="$2"
-ENDMARK="$3"
-if grep -F -q "$BEGINMARK" "$FILE"; then
-	if grep -F -q "$ENDMARK" "$FILE"; then
-		cp "$FILE" "$FILE.qubes-update-orig"
-		sed -i -e "/^$BEGINMARK$/,/^$ENDMARK$/{
-			/^$ENDMARK$/b
-			/^$BEGINMARK$/!d
-			}" "$FILE"
-		rm -f "$FILE.qubes-update-orig"
-	else
-		echo "ERROR: found $BEGINMARK marker but not $ENDMARK in $FILE. Please cleanup this file manually."
-	fi
-elif grep -F -q "$ENDMARK" "$FILE"; then
-	echo "ERROR: found $ENDMARK marker but not $BEGINMARK in $FILE. Please cleanup this file manually."
-fi
+    FILE="$1"
+    BEGINMARK="$2"
+    ENDMARK="$3"
+    if grep -F -q "$BEGINMARK" "$FILE"; then
+        if grep -F -q "$ENDMARK" "$FILE"; then
+            cp "$FILE" "$FILE.qubes-update-orig"
+            sed -i -e "/^$BEGINMARK$/,/^$ENDMARK$/{
+                /^$ENDMARK$/b
+                /^$BEGINMARK$/!d
+                }" "$FILE"
+            rm -f "$FILE.qubes-update-orig"
+        else
+            echo "ERROR: found $BEGINMARK marker but not $ENDMARK in $FILE. Please cleanup this file manually."
+        fi
+    elif grep -F -q "$ENDMARK" "$FILE"; then
+        echo "ERROR: found $ENDMARK marker but not $BEGINMARK in $FILE. Please cleanup this file manually."
+    fi
 }
 
 update_finalize() {
+    # Archlinux specific: If marker exists, cleanup text between begin and end marker
+    QUBES_MARKER="### QUBES CONFIG MARKER ###"
+    if grep -F -q "$QUBES_MARKER" /etc/pacman.conf; then
+        config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "### QUBES CONFIG END MARKER ###"
+        config_cleanupmark "/etc/pacman.conf" "$QUBES_MARKER" "### QUBES CONFIG END MARKER ###"
+    # Else, add qubes config block marker
+    else
+        config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "$QUBES_MARKER"
+        config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "### QUBES CONFIG END MARKER ###"
+    fi
 
-	# Archlinux specific: If marker exists, cleanup text between begin and end marker
-	QUBES_MARKER="### QUBES CONFIG MARKER ###"
-	if grep -F -q "$QUBES_MARKER" /etc/pacman.conf; then
-		config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "### QUBES CONFIG END MARKER ###"
-		config_cleanupmark "/etc/pacman.conf" "$QUBES_MARKER" "### QUBES CONFIG END MARKER ###"
-	# Else, add qubes config block marker
-	else
-		config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "$QUBES_MARKER"
-		config_prependtomark "/etc/pacman.conf" "# REPOSITORIES" "### QUBES CONFIG END MARKER ###"
-	fi
+    # Include /etc/pacman.d drop-in directory
+    config_appendtomark "/etc/pacman.conf" "$QUBES_MARKER" "Include = /etc/pacman.d/*.conf"
 
-	# Include /etc/pacman.d drop-in directory
-	config_appendtomark "/etc/pacman.conf" "$QUBES_MARKER" "Include = /etc/pacman.d/*.conf"
+    /usr/lib/qubes/update-proxy-configs
 
-	/usr/lib/qubes/update-proxy-configs
+    # Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
+    # Also remove pam_unix.so from su configuration
+    # as system-login (which include system-auth) already gives pam_unix.so
+    # with more appropriate parameters (fix the missing nullok parameter)
 
-	# Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
-	# Also remove pam_unix.so from su configuration
-	# as system-login (which include system-auth) already gives pam_unix.so
-	# with more appropriate parameters (fix the missing nullok parameter)
-
-	if [ -n "`cat /etc/pam.d/su | grep pam_unix.so`" ] ; then
-		echo "Fixing pam.d"
-		cat <<EOF > /etc/pam.d/su
+    if grep -q pam_unix.so /etc/pam.d/su; then
+        echo "Fixing pam.d"
+        cat <<EOF > /etc/pam.d/su
 #%PAM-1.0
 auth		sufficient	pam_rootok.so
 # Uncomment the following line to implicitly trust users in the "wheel" group.
@@ -353,73 +347,69 @@ auth		include		system-login
 account		include         system-login
 session		include		system-login
 EOF
-		cp /etc/pam.d/su /etc/pam.d/su-l
-	fi
+        cp /etc/pam.d/su /etc/pam.d/su-l
+    fi
 
-	# Archlinux specific: ensure tty1 is enabled
-	rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
-	systemctl enable getty\@tty1.service
+    # Archlinux specific: ensure tty1 is enabled
+    rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
+    systemctl enable getty\@tty1.service
 
-	systemctl daemon-reload
+    systemctl daemon-reload
 }
 
 ## arg 1:  the new package version
 post_install() {
+    update_qubesconfig
 
-	update_qubesconfig
+    # do the rest of %post thing only when updating for the first time...
+    if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
+        cp /etc/init/serial.conf /var/lib/qubes/serial.orig
+    fi
 
-	# do the rest of %post thing only when updating for the first time...
-	if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
-		cp /etc/init/serial.conf /var/lib/qubes/serial.orig
-	fi
+    # Remove most of the udev scripts to speed up the VM boot time
+    # Just leave the xen* scripts, that are needed if this VM was
+    # ever used as a net backend (e.g. as a VPN domain in the future)
+    #echo "--> Removing unnecessary udev scripts..."
+    mkdir -p /var/lib/qubes/removed-udev-scripts
+    for f in /etc/udev/rules.d/*
+    do
+        if [ "$(basename "$f")" == "xen-backend.rules" ] ; then
+            continue
+        fi
 
-	# Remove most of the udev scripts to speed up the VM boot time
-	# Just leave the xen* scripts, that are needed if this VM was
-	# ever used as a net backend (e.g. as a VPN domain in the future)
-	#echo "--> Removing unnecessary udev scripts..."
-	mkdir -p /var/lib/qubes/removed-udev-scripts
-	for f in /etc/udev/rules.d/*
-	do
-	    if [ $(basename $f) == "xen-backend.rules" ] ; then
-	        continue
-	    fi
+        if [ "$(basename "$f")" == "50-qubes-misc.rules" ] ; then
+            continue
+        fi
 
-	    if [ $(basename $f) == "50-qubes-misc.rules" ] ; then
-	        continue
-	    fi
+        if echo "$f" | grep -q qubes; then
+            continue
+        fi
 
-	    if echo $f | grep -q qubes; then
-	        continue
-	    fi
+        mv "$f" /var/lib/qubes/removed-udev-scripts/
+    done
 
-	    mv $f /var/lib/qubes/removed-udev-scripts/
-	done
+    mkdir -p /rw
 
-	mkdir -p /rw
+    configure_notification-daemon
+    configure_selinux
 
-	configure_notification-daemon
-	configure_selinux
+    configure_systemd 0
 
-	configure_systemd 0
-
-	update_finalize
-	
+    update_finalize
 }
 
 ## arg 1:  the new package version
 ## arg 2:  the old package version
 post_upgrade() {
+    update_qubesconfig
 
-	update_qubesconfig
+    configure_notification-daemon
+    configure_selinux
 
-	configure_notification-daemon
-	configure_selinux
-
-	configure_systemd 1
+    configure_systemd 1
 
 
-	update_finalize
-
+    update_finalize
 }
 
 ######################
@@ -428,7 +418,6 @@ post_upgrade() {
 
 ## arg 1:  the old package version
 pre_remove() {
-
     # no more packages left
     if [ -e /var/lib/qubes/fstab.orig ] ; then
     mv /var/lib/qubes/fstab.orig /etc/fstab
@@ -438,7 +427,7 @@ pre_remove() {
     mv /var/lib/qubes/serial.orig /etc/init/serial.conf
     fi
 
-    if [ $1 -eq 0 ] ; then
+    if [ "$1" -eq 0 ] ; then
         # Run this only during uninstall.
         # Save the preset file to later use it to re-preset services there
         # once the Qubes OS preset file is removed.
@@ -446,12 +435,10 @@ pre_remove() {
         cp -f /usr/lib/systemd/system-preset/$qubes_preset_file /run/qubes-uninstall/
         cp -f /usr/lib/systemd/system-preset/$qubes_preset_file /run/qubes-uninstall/
     fi
-
 }
 
 ## arg 1:  the old package version
 post_remove() {
-
     changed=
 
     if [ -d /run/qubes-uninstall ]
@@ -478,5 +465,4 @@ post_remove() {
     for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-netwatcher qubes-network qubes-qrexec-agent; do
         systemctl disable $srv.service
     done
-    
 }

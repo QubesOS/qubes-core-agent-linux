@@ -1,11 +1,8 @@
-# This is an example PKGBUILD file. Use this as a start to creating your own,
-# and remove these comments. For more information, see 'man PKGBUILD'.
-# NOTE: Please fill out the license field for your package! If it is unknown,
-# then please put 'unknown'.
-
+#!/bin/bash
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
+# shellcheck disable=SC2034
 pkgname=qubes-vm-core
-pkgver=`cat version`
+pkgver=$(cat version)
 pkgrel=11
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
@@ -25,86 +22,84 @@ options=()
 install=PKGBUILD.install
 changelog=
 
-source=(	PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook
-		PKGBUILD-qubes-noupgrade.conf
-		PKGBUILD-qubes-repo-3.1.conf
-		PKGBUILD-qubes-repo-3.2.conf
-		)
+source=(
+    PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook
+    PKGBUILD-qubes-noupgrade.conf
+    PKGBUILD-qubes-repo-3.1.conf
+    PKGBUILD-qubes-repo-3.2.conf
+)
 
 noextract=()
 md5sums=(SKIP)
 
 build() {
+    for source in autostart-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network init version; do
+        # shellcheck disable=SC2154
+        (ln -s "$srcdir/../$source" "$srcdir/$source")
+    done
 
-for source in autostart-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network init version; do
-  (ln -s $srcdir/../$source $srcdir/$source)
-done
+    # Fix for network tools paths
+    sed 's:/sbin/ifconfig:ifconfig:g' -i network/*
+    sed 's:/sbin/route:route:g' -i network/*
+    sed 's:/sbin/ethtool:ethtool:g' -i network/*
+    sed 's:/sbin/ip:ip:g' -i network/*
+    sed 's:/bin/grep:grep:g' -i network/*
 
-# Fix for network tools paths
-sed 's:/sbin/ifconfig:ifconfig:g' -i network/*
-sed 's:/sbin/route:route:g' -i network/*
-sed 's:/sbin/ethtool:ethtool:g' -i network/*
-sed 's:/sbin/ip:ip:g' -i network/*
-sed 's:/bin/grep:grep:g' -i network/*
+    # Force running all scripts with python2
+    sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i misc/*
+    sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i misc/*
+    sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i qubes-rpc/*
+    sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i qubes-rpc/*
 
-# Force running all scripts with python2
-sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i misc/*
-sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i misc/*
-sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i qubes-rpc/*
-sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i qubes-rpc/*
+    # Fix for archlinux sbindir
+    sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
+    sed 's:/usr/sbin/qubes-netwatcher:/usr/bin/qubes-netwatcher:g' -i vm-systemd/qubes-netwatcher.service
+    sed 's:/usr/sbin/qubes-firewall:/usr/bin/qubes-firewall:g' -i vm-systemd/qubes-firewall.service
 
-
-# Fix for archlinux sbindir
-sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
-sed 's:/usr/sbin/qubes-netwatcher:/usr/bin/qubes-netwatcher:g' -i vm-systemd/qubes-netwatcher.service
-sed 's:/usr/sbin/qubes-firewall:/usr/bin/qubes-firewall:g' -i vm-systemd/qubes-firewall.service
-
-for dir in qubes-rpc qrexec misc; do
-  (cd $dir; make)
-done
-
+    for dir in qubes-rpc qrexec misc; do
+      (cd $dir || exit 1; make)
+    done
 }
 
 package() {
-  # Note: Archlinux removed use of directory such as /sbin /bin /usr/sbin (https://mailman.archlinux.org/pipermail/arch-dev-public/2012-March/022625.html)
+    # Note: Archlinux removed use of directory such as /sbin /bin /usr/sbin (https://mailman.archlinux.org/pipermail/arch-dev-public/2012-March/022625.html)
+    # shellcheck disable=SC2154
+    (cd qrexec || exit 1; make install DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib)
 
-  (cd qrexec; make install DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib)
+    make install-vm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
 
-  make install-vm DESTDIR=$pkgdir SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
+    # Remove things non wanted in archlinux
+    rm -r "$pkgdir/etc/yum"*
+    rm -r "$pkgdir/etc/init.d"
+    # Remove fedora specific scripts
+    rm "$pkgdir/etc/fstab"
 
-  # Remove things non wanted in archlinux
-  rm -r $pkgdir/etc/yum*
-  rm -r $pkgdir/etc/init.d
-  # Remove fedora specific scripts
-  rm $pkgdir/etc/fstab
+    # Install systemd script allowing to automount /lib/modules
+    install -m 644 "$srcdir/PKGBUILD.qubes-ensure-lib-modules.service" "${pkgdir}/usr/lib/systemd/system/qubes-ensure-lib-modules.service"
 
-  # Install systemd script allowing to automount /lib/modules
-  install -m 644 $srcdir/PKGBUILD.qubes-ensure-lib-modules.service ${pkgdir}/usr/lib/systemd/system/qubes-ensure-lib-modules.service
+    # Install pacman hook to update desktop icons
+    mkdir -p "${pkgdir}/usr/share/libalpm/hooks/"
+    install -m 644 "$srcdir/PKGBUILD.qubes-update-desktop-icons.hook" "${pkgdir}/usr/share/libalpm/hooks/qubes-update-desktop-icons.hook"
 
-  # Install pacman hook to update desktop icons
-  mkdir -p ${pkgdir}/usr/share/libalpm/hooks/
-  install -m 644 $srcdir/PKGBUILD.qubes-update-desktop-icons.hook ${pkgdir}/usr/share/libalpm/hooks/qubes-update-desktop-icons.hook
+    # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
+    mkdir -p "${pkgdir}/etc/pacman.d"
+    install -m 644 "$srcdir/PKGBUILD-qubes-noupgrade.conf" "${pkgdir}/etc/pacman.d/10-qubes-noupgrade.conf"
 
-  # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
-  mkdir -p ${pkgdir}/etc/pacman.d
-  install -m 644 $srcdir/PKGBUILD-qubes-noupgrade.conf ${pkgdir}/etc/pacman.d/10-qubes-noupgrade.conf
+    # Install pacman repository
+    release=$(echo "$pkgver" | cut -d '.' -f 1,2)
+    echo "Installing repository for release ${release}"
+    install -m 644 "$srcdir/PKGBUILD-qubes-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf.disabled"
 
-  # Install pacman repository
-  release=`echo $pkgver | cut -d '.' -f 1,2`
-  echo "Installing repository for release ${release}"
-  install -m 644 $srcdir/PKGBUILD-qubes-repo-${release}.conf ${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf.disabled
-
-  # Archlinux specific: enable autologin on tty1
-  mkdir -p $pkgdir/etc/systemd/system/getty@tty1.service.d/
-  cat <<EOF > $pkgdir/etc/systemd/system/getty@tty1.service.d/autologin.conf
+    # Archlinux specific: enable autologin on tty1
+    mkdir -p "$pkgdir/etc/systemd/system/getty@tty1.service.d/"
+    cat <<EOF > "$pkgdir/etc/systemd/system/getty@tty1.service.d/autologin.conf"
 [Service]
 ExecStart=
 ExecStart=-/usr/bin/agetty --autologin user --noclear %I 38400 linux
 EOF
 
-  # Archlinux packaging guidelines: /var/run is a symlink to a tmpfs. Don't create it
-  rm -r $pkgdir/var/run
-
+    # Archlinux packaging guidelines: /var/run is a symlink to a tmpfs. Don't create it
+    rm -r "$pkgdir/var/run"
 }
 
 # vim:set ts=2 sw=2 et:
