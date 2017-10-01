@@ -142,7 +142,8 @@ EOF
         base=$(echo "$current_locale" | cut -f 1 -d .)
         charmap=$(echo "$current_locale.UTF-8" | cut -f 2 -d .)
         [ -n "$charmap" ] && charmap="-f $charmap"
-        localedef -i "$base" "$charmap" "$current_locale"
+        # shellcheck disable=SC2086
+        localedef -i "$base" $charmap "$current_locale"
     fi
 }
 
@@ -180,7 +181,7 @@ unmask() {
 
 preset_units() {
     local represet=
-    while read -r action unit_name < "$1"
+    while read -r action unit_name
     do
         if [ "$action" = "#" ] && [ "$unit_name" = "Units below this line will be re-preset on package upgrade" ]
         then
@@ -210,7 +211,7 @@ preset_units() {
                 systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
             fi
         fi
-    done
+    done < "$1"
 }
 
 restore_units() {
