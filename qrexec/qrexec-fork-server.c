@@ -35,6 +35,7 @@
 
 void do_exec(const char *cmd)
 {
+    char *shell;
     char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - strlen(RPC_REQUEST_COMMAND) + 1];
     /* replace magic RPC cmd with RPC multiplexer path */
     if (strncmp(cmd, RPC_REQUEST_COMMAND " ", strlen(RPC_REQUEST_COMMAND)+1)==0) {
@@ -45,7 +46,11 @@ void do_exec(const char *cmd)
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
 
-    execl("/bin/sh", "sh", "-c", cmd, NULL);
+    shell = getenv("SHELL");
+    if (!shell)
+        shell = "/bin/sh";
+
+    execl(shell, basename(shell), "-c", cmd, NULL);
     perror("execl");
     exit(1);
 }
