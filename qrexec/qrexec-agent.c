@@ -160,6 +160,7 @@ void do_exec(const char *cmd)
         strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + RPC_REQUEST_COMMAND_LEN);
         realcmd = buf;
     }
+
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
 
