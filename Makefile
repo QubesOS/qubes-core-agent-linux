@@ -235,7 +235,9 @@ install-common: install-doc
 	install -m 0755 misc/qvm-features-request $(DESTDIR)$(BINDIR)/qvm-features-request
 	install -m 0755 qubes-rpc/qvm-sync-clock $(DESTDIR)$(BINDIR)/qvm-sync-clock
 	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run-vm} $(DESTDIR)/usr/bin
+	install qubes-rpc/qvm-copy $(DESTDIR)/usr/bin
 	ln -s qvm-copy-to-vm $(DESTDIR)/usr/bin/qvm-move-to-vm
+	ln -s qvm-copy $(DESTDIR)/usr/bin/qvm-move
 	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-move-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes

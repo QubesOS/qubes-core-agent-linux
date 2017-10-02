@@ -86,8 +86,10 @@ lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 usr/bin/qubes-desktop-run
 usr/bin/qubes-open
 usr/bin/qubes-session-autostart
+usr/bin/qvm-copy
 usr/bin/qvm-copy-to-vm
 usr/bin/qvm-features-request
+usr/bin/qvm-move
 usr/bin/qvm-move-to-vm
 usr/bin/qvm-open-in-dvm
 usr/bin/qvm-open-in-vm
