@@ -102,7 +102,7 @@ update_qubesconfig() {
 
     # Location of files which contains list of protected files
     mkdir -p /etc/qubes/protected-files.d
-    # shellcheck source=../init/functions
+    # shellcheck source=init/functions
     . /usr/lib/qubes/init/functions
 
     # qubes-core-vm has been broken for some time - it overrides /etc/hosts; restore original content
@@ -215,7 +215,7 @@ preset_units() {
 }
 
 restore_units() {
-    while read -r action unit_name < grep '^[[:space:]]*[^#;]' "$1"
+    grep '^[[:space:]]*[^#;]' "$1" | while read -r action unit_name
     do
         if is_static "$unit_name" && is_masked "$unit_name"
         then
