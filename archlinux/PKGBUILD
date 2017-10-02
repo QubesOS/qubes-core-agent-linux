@@ -57,14 +57,14 @@ build() {
     sed 's:/usr/sbin/qubes-firewall:/usr/bin/qubes-firewall:g' -i vm-systemd/qubes-firewall.service
 
     for dir in qubes-rpc qrexec misc; do
-      (cd $dir || exit 1; make)
+        make -C "$dir"
     done
 }
 
 package() {
     # Note: Archlinux removed use of directory such as /sbin /bin /usr/sbin (https://mailman.archlinux.org/pipermail/arch-dev-public/2012-March/022625.html)
     # shellcheck disable=SC2154
-    (cd qrexec || exit 1; make install DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib)
+    make -C qrexec install DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
 
     make install-vm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
 
