@@ -152,7 +152,7 @@ void send_exit_code(libvchan_t *data_vchan, int status)
  */
 int handle_input(libvchan_t *vchan, int fd, int msg_type)
 {
-	char buf[MAX_DATA_CHUNK];
+    char buf[MAX_DATA_CHUNK];
     int len;
     struct msg_header hdr;
 
@@ -201,7 +201,7 @@ int handle_input(libvchan_t *vchan, int fd, int msg_type)
 int handle_remote_data(libvchan_t *data_vchan, int stdin_fd, int *status,
         struct buffer *stdin_buf)
 {
-	struct msg_header hdr;
+    struct msg_header hdr;
     char buf[MAX_DATA_CHUNK];
 
     /* do not receive any data if we have something already buffered */
