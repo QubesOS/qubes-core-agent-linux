@@ -1,3 +1,29 @@
+qubes-core-agent (4.0.10-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * centos: add package signing key, setup repository
+  * network: fix issues found by shellcheck
+  * qubes-rpc: fix issues found by shellcheck
+  * init: fix issues found by shellcheck in init scripts
+  * debian: fix shellcheck warnings in debian packaging
+  * Fix shellcheck warnings in block-snapshot script
+  * Fix shellcheck warnings in download-dom0-updates.sh
+  * Few more shellcheck warnings fixes/ignores
+  * Hint shellcheck where to look for sourced files, if in repository
+  * travis: add shellcheck call for all scripts in the repository
+
+  [ Nedyalko Andreev ]
+  * Fix the archlinux package, use correct DROPIN dirs
+  * Disable Oliver's binary pacman repo by default
+  * Fix indentation and shellcheck issues for archlinux
+  * Fix the install script after the shellcheck "fixes"
+  * Fix the previous shellcheck-related "fixes" again
+
+  [ Jussi Timperi ]
+  * archlinux: add correct section to qubes-noupgrade.conf
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 04 Oct 2017 15:19:35 +0200
+
 qubes-core-agent (4.0.9-1) unstable; urgency=medium
 
   [ Frédéric Pierret ]
