@@ -576,6 +576,8 @@ rm -f %{name}-%{version}
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
 /usr/bin/qvm-move-to-vm
+/usr/bin/qvm-copy
+/usr/bin/qvm-move
 /usr/bin/qvm-open-in-dvm
 /usr/bin/qvm-open-in-vm
 /usr/bin/qvm-run-vm

@@ -144,6 +144,8 @@ void do_exec(const char *cmd)
     pid_t child, pid;
     char **env;
     char pid_s[32];
+    char *arg0;
+    char *shell_basename;
 #endif
 
     if (!realcmd)
@@ -160,6 +162,7 @@ void do_exec(const char *cmd)
         strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + RPC_REQUEST_COMMAND_LEN);
         realcmd = buf;
     }
+
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
 
@@ -182,6 +185,14 @@ void do_exec(const char *cmd)
     pw->pw_dir = strdup(pw->pw_dir);
     pw->pw_shell = strdup(pw->pw_shell);
     endpwent();
+
+    shell_basename = basename (pw->pw_shell);
+    /* this process is going to die shortly, so don't care about freeing */
+    arg0 = malloc (strlen (shell_basename) + 2);
+    if (!arg0)
+        goto error;
+    arg0[0] = '-';
+    strcpy (arg0 + 1, shell_basename);
 
     retval = pam_start("qrexec", user, &conv, &pamh);
     if (retval != PAM_SUCCESS)
@@ -219,6 +230,7 @@ void do_exec(const char *cmd)
             goto error;
         case 0:
             /* child */
+
             if (setgid (pw->pw_gid))
                 exit(126);
             if (setuid (pw->pw_uid))
@@ -226,7 +238,8 @@ void do_exec(const char *cmd)
             setsid();
             /* This is a copy but don't care to free as we exec later anyways.  */
             env = pam_getenvlist (pamh);
-            execle("/bin/sh", "-sh", "-c", realcmd, (char*)NULL, env);
+
+            execle(pw->pw_shell, arg0, "-c", realcmd, (char*)NULL, env);
             exit(127);
         default:
             /* parent */

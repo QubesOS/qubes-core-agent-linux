@@ -35,19 +35,24 @@
 
 void do_exec(const char *cmd)
 {
-	char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - strlen(RPC_REQUEST_COMMAND) + 1];
-	/* replace magic RPC cmd with RPC multiplexer path */
-	if (strncmp(cmd, RPC_REQUEST_COMMAND " ", strlen(RPC_REQUEST_COMMAND)+1)==0) {
-		strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
-		strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), cmd + strlen(RPC_REQUEST_COMMAND));
-		cmd = buf;
-	}
-	signal(SIGCHLD, SIG_DFL);
-	signal(SIGPIPE, SIG_DFL);
+    char *shell;
+    char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - strlen(RPC_REQUEST_COMMAND) + 1];
+    /* replace magic RPC cmd with RPC multiplexer path */
+    if (strncmp(cmd, RPC_REQUEST_COMMAND " ", strlen(RPC_REQUEST_COMMAND)+1)==0) {
+        strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
+        strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), cmd + strlen(RPC_REQUEST_COMMAND));
+        cmd = buf;
+    }
+    signal(SIGCHLD, SIG_DFL);
+    signal(SIGPIPE, SIG_DFL);
 
-	execl("/bin/sh", "sh", "-c", cmd, NULL);
-	perror("execl");
-	exit(1);
+    shell = getenv("SHELL");
+    if (!shell)
+        shell = "/bin/sh";
+
+    execl(shell, basename(shell), "-c", cmd, NULL);
+    perror("execl");
+    exit(1);
 }
 
 void handle_vchan_error(const char *op)
@@ -57,43 +62,43 @@ void handle_vchan_error(const char *op)
 }
 
 void handle_single_command(int fd, struct qrexec_cmd_info *info) {
-	char cmdline[info->cmdline_len+1];
+    char cmdline[info->cmdline_len+1];
 
-	if (!read_all(fd, cmdline, info->cmdline_len))
-		return;
-	cmdline[info->cmdline_len] = 0;
+    if (!read_all(fd, cmdline, info->cmdline_len))
+        return;
+    cmdline[info->cmdline_len] = 0;
 
-	handle_new_process(info->type, info->connect_domain,
-			info->connect_port,
-			cmdline, info->cmdline_len);
+    handle_new_process(info->type, info->connect_domain,
+            info->connect_port,
+            cmdline, info->cmdline_len);
 }
 
 int main(int argc, char **argv) {
-	int s, fd;
-	char *socket_path;
-	struct qrexec_cmd_info info;
-	struct sockaddr_un peer;
-	unsigned int addrlen;
+    int s, fd;
+    char *socket_path;
+    struct qrexec_cmd_info info;
+    struct sockaddr_un peer;
+    unsigned int addrlen;
 
 
-	if (argc == 2) {
-		socket_path = argv[1];
-	} else if (argc == 1) {
-		/* this will be leaked, but we don't care as the process will then terminate */
-		if (asprintf(&socket_path, QREXEC_FORK_SERVER_SOCKET, getenv("USER")) < 0) {
-			fprintf(stderr, "Memory allocation failed\n");
-			exit(1);
-		}
-	} else {
-		fprintf(stderr, "Usage: %s [socket path]\n", argv[0]);
-		exit(1);
-	}
+    if (argc == 2) {
+        socket_path = argv[1];
+    } else if (argc == 1) {
+        /* this will be leaked, but we don't care as the process will then terminate */
+        if (asprintf(&socket_path, QREXEC_FORK_SERVER_SOCKET, getenv("USER")) < 0) {
+            fprintf(stderr, "Memory allocation failed\n");
+            exit(1);
+        }
+    } else {
+        fprintf(stderr, "Usage: %s [socket path]\n", argv[0]);
+        exit(1);
+    }
 
-	s = get_server_socket(socket_path);
-	if (fcntl(s, F_SETFD, O_CLOEXEC) < 0) {
-		perror("fcntl");
-		exit(1);
-	}
+    s = get_server_socket(socket_path);
+    if (fcntl(s, F_SETFD, O_CLOEXEC) < 0) {
+        perror("fcntl");
+        exit(1);
+    }
     /* fork into background */
     switch (fork()) {
         case -1:
@@ -104,17 +109,17 @@ int main(int argc, char **argv) {
         default:
             exit(0);
     }
-	signal(SIGCHLD, SIG_IGN);
+    signal(SIGCHLD, SIG_IGN);
     register_exec_func(do_exec);
 
-	while ((fd = accept(s, (struct sockaddr *) &peer, &addrlen)) >= 0) {
-		if (read_all(fd, &info, sizeof(info))) {
-			handle_single_command(fd, &info);
-		}
-		close(fd);
-		addrlen = sizeof(peer);
-	}
-	close(s);
-	unlink(socket_path);
-	return 0;
+    while ((fd = accept(s, (struct sockaddr *) &peer, &addrlen)) >= 0) {
+        if (read_all(fd, &info, sizeof(info))) {
+            handle_single_command(fd, &info);
+        }
+        close(fd);
+        addrlen = sizeof(peer);
+    }
+    close(s);
+    unlink(socket_path);
+    return 0;
 }
