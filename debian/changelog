@@ -1,3 +1,20 @@
+qubes-core-agent (4.0.11-1) unstable; urgency=medium
+
+  [ Tray Torrance ]
+  * Add archlinux support to upgrade checker
+
+  [ Nedyalko Andreev ]
+  * Fix an incorrect grep usage in archlinux upgrade check
+  * Simplify archlinux upgrade check
+
+  [ Marek Marczykowski-Górecki ]
+  * Add convenient wrappers for qvm-copy-to-vm and qvm-move-to-vm
+  * qrexec: code style fix - use spaces for indentation
+  * qrexec: use user shell instead of hardcoded /bin/sh
+  * qubes.ResizeDisk: handle dmroot being a symlink
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 07 Oct 2017 02:35:42 +0200
+
 qubes-core-agent (4.0.10-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
