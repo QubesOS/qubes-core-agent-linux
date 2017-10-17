@@ -604,6 +604,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/upgrades-installed-check
 /usr/lib/qubes/upgrades-status-notify
 /usr/lib/qubes/qubes-sync-clock
+/usr/lib/qubes/resize-rootfs
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 %dir /usr/lib/qubes/init

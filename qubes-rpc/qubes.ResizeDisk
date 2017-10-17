@@ -13,22 +13,10 @@ case $disk_name in
     root)
         # force some read to refresh device size
         head /dev/xvda > /dev/null
-        if [ "$(stat -Lc %t /dev/mapper/dmroot)" != "ca" ]; then
-            new_size=$(cat /sys/block/xvda/size)
-            ro=$(/sys/block/xvda/ro)
-            if [ "$ro" -eq 1 ]; then
-                new_table="0 $new_size snapshot /dev/xvda /dev/xvdc2 N 16"
-            else
-                new_table="0 $new_size linear /dev/xvda 0"
-            fi
-            dmsetup load dmroot --table "$new_table"
-            dmsetup resume dmroot
-        fi
-        resize2fs /dev/mapper/dmroot
+        /usr/lib/qubes/resize-rootfs
         ;;
     *)
         echo "Automatic resize of '$disk_name' not supported" >&2
         exit 1
         ;;
 esac
-        
