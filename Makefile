@@ -173,7 +173,11 @@ install-common: install-doc
 	# force /usr/bin before /bin to have /usr/bin/python instead of /bin/python
 	PATH="/usr/bin:$(PATH)" python setup.py install $(PYTHON_PREFIX_ARG) -O1 --root $(DESTDIR)
 	mkdir -p $(DESTDIR)$(SBINDIR)
+
+ifneq ($(SBINDIR),/usr/bin)
 	mv $(DESTDIR)/usr/bin/qubes-firewall $(DESTDIR)$(SBINDIR)/qubes-firewall
+endif
+
 
 	install -d -m 0750 $(DESTDIR)/etc/sudoers.d/
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
