@@ -1,0 +1,19 @@
+[Unit]
+Description=Adjust root filesystem size
+# There is a dependency on dev-xvdb.device because
+# mount-dirs.sh calls setup-rwdev.sh which
+# must happen only when /dev/xvdb has appeared.
+After=qubes-sysinit.service dev-xvda.device
+DefaultDependencies=no
+Before=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/qubes/init/resize-rootfs-if-needed.sh
+# There is no need for an ExecStop because systemd
+# cleans up mount units in the right order, killing
+# processes as needed.
+
+[Install]
+WantedBy=multi-user.target

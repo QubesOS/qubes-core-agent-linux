@@ -617,6 +617,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/qubes-early-vm-config.sh
 /usr/lib/qubes/init/qubes-random-seed.sh
 /usr/lib/qubes/init/qubes-sysinit.sh
+/usr/lib/qubes/init/resize-rootfs-if-needed.sh
 /usr/lib/qubes/init/setup-rw.sh
 /usr/lib/qubes/init/setup-rwdev.sh
 /usr/lib/qubes/init/functions
@@ -804,6 +805,7 @@ The Qubes core startup configuration for SystemD init.
 %defattr(-,root,root,-)
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-mount-dirs.service
+/lib/systemd/system/qubes-rootfs-resize.service
 /lib/systemd/system/qubes-sysinit.service
 /lib/systemd/system/qubes-early-vm-config.service
 /lib/systemd/system/qubes-update-check.service
