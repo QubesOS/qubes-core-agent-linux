@@ -15,6 +15,7 @@
 // #define DEBUG
 
 static const char *cleanup_filename = NULL;
+static const char *cleanup_dirname = NULL;
 
 static void cleanup_file(void)
 {
@@ -22,6 +23,11 @@ static void cleanup_file(void)
 		if (unlink(cleanup_filename) < 0)
 			fprintf(stderr, "Failed to remove file at exit\n");
 		cleanup_filename = NULL;
+	}
+	if (cleanup_dirname) {
+		if (rmdir(cleanup_dirname) < 0)
+			fprintf(stderr, "Failed to remove directory at exit\n");
+		cleanup_dirname = NULL;
 	}
 }
 
@@ -40,8 +46,7 @@ static char *get_directory(void)
 	const char *remote_domain;
 	char *dir;
 	size_t len;
-	struct stat dstat;
-	int ret;
+	char *ret;
 
 	remote_domain = getenv("QREXEC_REMOTE_DOMAIN");
 	if (!remote_domain) {
@@ -53,29 +58,21 @@ static char *get_directory(void)
 	if (!strcmp(remote_domain, ".") || !strcmp(remote_domain, ".."))
 		goto fail;
 
-	len = strlen("/tmp")+1+strlen(remote_domain)+1;
+	len = strlen("/tmp/-XXXXXX")+strlen(remote_domain)+1;
 	dir = malloc(len);
 	if (!dir) {
 		fprintf(stderr, "Cannot allocate memory\n");
 		exit(1);
 	}
-	snprintf(dir, len, "/tmp/%s", remote_domain);
+	snprintf(dir, len, "/tmp/%s-XXXXXX", remote_domain);
 
-	ret=mkdir(dir, 0777);
-	if (ret<0 && errno!=EEXIST) {
-		perror("mkdir");
+	ret = mkdtemp(dir);
+	if (ret == NULL) {
+		perror("mkdtemp");
 		exit(1);
 	}
-	if (stat(dir, &dstat)) {
-		perror("stat dir");
-		exit(1);
-	}
-	if (!S_ISDIR(dstat.st_mode)) {
-		fprintf(stderr, "%s exists and is not a directory\n", dir);
-		exit(1);
-	}
-
-	return dir;
+	cleanup_dirname = strdup(ret);
+	return ret;
 
 fail:
 	fprintf(stderr, "Invalid remote domain name: %s\n", remote_domain);
@@ -122,7 +119,7 @@ void copy_file_by_name(const char *filename)
 		exit(1);
 	}
 	/* we now have created a new file, ensure we delete it at the end */
-	cleanup_filename = filename;
+	cleanup_filename = strdup(filename);
 	atexit(cleanup_file);
 	if (!copy_fd_all(fd, 0))
         exit(1);
