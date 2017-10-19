@@ -1,3 +1,14 @@
+qubes-core-agent (4.0.12-1) unstable; urgency=medium
+
+  * Add support for new root volume partition layout to qubes.ResizeDisk
+  * Resize root filesystem at VM startup if needed
+  * debian: disable timer-based apt-get
+  * network: fix rules for network setup on new udev
+  * Fix removing temporary file after editing in (Disp)VM
+  * debian: cleanup after splitting qubes-core-agent
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 19 Oct 2017 17:28:27 +0200
+
 qubes-core-agent (4.0.11-1) unstable; urgency=medium
 
   [ Tray Torrance ]
