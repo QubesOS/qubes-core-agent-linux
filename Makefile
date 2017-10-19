@@ -303,6 +303,7 @@ install-deb: install-common install-systemd install-systemd-dropins
 	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r3.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r3.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 	install -D -m 644 network/00notify-hook $(DESTDIR)/etc/apt/apt.conf.d/00notify-hook
+	install -D -m 0644 misc/apt-conf-70no-unattended $(DESTDIR)/etc/apt/apt.conf.d/70no-unattended
 	install -d $(DESTDIR)/etc/sysctl.d
 	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/
 	install -D -m 644 misc/profile.d_qt_x11_no_mitshm.sh $(DESTDIR)/etc/profile.d/qt_x11_no_mitshm.sh
