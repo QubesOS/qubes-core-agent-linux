@@ -1,2 +1,5 @@
 
+# old udev has ENV{ID_NET_DRIVER}
 SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", ENV{ID_NET_DRIVER}=="vif", RUN+="/usr/lib/qubes/setup-ip"
+# new udev has DRIVERS
+SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", DRIVERS=="vif", RUN+="/usr/lib/qubes/setup-ip"
