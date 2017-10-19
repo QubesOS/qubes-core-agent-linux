@@ -1,0 +1,26 @@
+## Based on pkg-manager-no-autoupdate by Patrick Schleizer <adrelanos@riseup.net>
+## https://github.com/Whonix/pkg-manager-no-autoupdate
+
+## Disable automatic update check APT::Periodic::Update-Package-Lists
+## which is the Debian default in /etc/apt/apt.conf.d/10periodic.
+##
+## The execution time would be too predictable, thus make us fingerprintable.
+##
+## 20noperiodic comes after 10periodic in alphabet so it takes precedence.
+##
+## Quoted from the Debian Handbook
+## http://debian-handbook.info/browse/wheezy/sect.apt-get.html
+##
+## "[...] Each directory represents a configuration file which is split over multiple
+## files. In this sense, all of the files in /etc/apt/apt.conf.d/ are instructions
+## for the configuration of APT. APT includes them in alphabetical order, so that the
+## last ones can modify a configuration element defined in one of the first ones. [...]
+##
+## That changes take effect can be verified using:
+## apt-config dump
+
+APT::Periodic::Update-Package-Lists "0";
+APT::Periodic::Download-Upgradeable-Packages "0";
+APT::Periodic::AutocleanInterval "0";
+APT::Periodic::Unattended-Upgrade "0";
+APT::Periodic::Enable "0";
