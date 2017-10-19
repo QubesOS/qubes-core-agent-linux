@@ -327,6 +327,7 @@ install-deb: install-common install-systemd install-systemd-dropins
 	install -d $(DESTDIR)/etc/needrestart/conf.d
 	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
 	install -D -m 0644 misc/grub.qubes $(DESTDIR)/etc/default/grub.d/30-qubes.cfg
+	install -D -m 0644 misc/apt-conf-70no-unattended $(DESTDIR)/etc/apt/apt.conf.d/70no-unattended
 
 	mkdir -p $(DESTDIR)/etc/systemd/system/
 	install -m 0644 vm-systemd/haveged.service  $(DESTDIR)/etc/systemd/system/
