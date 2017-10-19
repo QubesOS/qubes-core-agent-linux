@@ -1,0 +1,2 @@
+# moved to qubes-core-agent-passwordless-root
+/etc/pam.d/su.qubes
