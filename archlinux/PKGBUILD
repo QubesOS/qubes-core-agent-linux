@@ -25,8 +25,8 @@ changelog=
 source=(
     PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook
     PKGBUILD-qubes-noupgrade.conf
-    PKGBUILD-qubes-repo-3.1.conf
     PKGBUILD-qubes-repo-3.2.conf
+    PKGBUILD-qubes-repo-4.0.conf
 )
 
 noextract=()
