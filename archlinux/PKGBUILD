@@ -85,9 +85,9 @@ package() {
     install -m 644 "$srcdir/PKGBUILD-qubes-noupgrade.conf" "${pkgdir}/etc/pacman.d/10-qubes-noupgrade.conf"
 
     # Install pacman repository
-    #release=$(echo "$pkgver" | cut -d '.' -f 1,2)
-    #echo "Installing repository for release ${release}"
-    #install -m 644 "$srcdir/PKGBUILD-qubes-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf.disabled"
+    release=$(echo "$pkgver" | cut -d '.' -f 1,2)
+    echo "Installing repository for release ${release}"
+    install -m 644 "$srcdir/PKGBUILD-qubes-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf.disabled"
 
     # Archlinux specific: enable autologin on tty1
     mkdir -p "$pkgdir/etc/systemd/system/getty@tty1.service.d/"
