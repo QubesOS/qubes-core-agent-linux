@@ -45,10 +45,10 @@ build() {
     sed 's:/bin/grep:grep:g' -i network/*
 
     # Force running all scripts with python2
-    sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i misc/*
-    sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i misc/*
-    sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i qubes-rpc/*
-    sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i qubes-rpc/*
+    sed 's:^#!/usr/bin/python.*:#!/usr/bin/python2:' -i misc/*
+    sed 's:^#!/usr/bin/env python.*:#!/usr/bin/env python2:' -i misc/*
+    sed 's:^#!/usr/bin/python.*:#!/usr/bin/python2:' -i qubes-rpc/*
+    sed 's:^#!/usr/bin/env python.*:#!/usr/bin/env python2:' -i qubes-rpc/*
 
     # Fix for archlinux sbindir
     sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
@@ -64,7 +64,7 @@ package() {
     # shellcheck disable=SC2154
     make -C qrexec install DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
 
-    make install-vm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
+    PYTHON=python2 make install-vm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
 
     # Remove things non wanted in archlinux
     rm -r "$pkgdir/etc/yum"*
