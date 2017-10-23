@@ -24,6 +24,7 @@ changelog=
 
 source=(
     PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook
+    PKGBUILD-qubes-pacman-options.conf
     PKGBUILD-qubes-repo-3.2.conf
     PKGBUILD-qubes-repo-4.0.conf
 )
@@ -81,6 +82,7 @@ package() {
 
     # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
     mkdir -p "${pkgdir}/etc/pacman.d"
+    install -m 644 "$srcdir/PKGBUILD-qubes-pacman-options.conf" "${pkgdir}/etc/pacman.d/10-qubes-options.conf"
 
     # Install pacman repository
     release=$(echo "$pkgver" | cut -d '.' -f 1,2)

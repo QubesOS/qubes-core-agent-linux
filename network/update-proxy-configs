@@ -121,7 +121,7 @@ if [ -d /etc/pacman.d ]; then
 ### All modifications here will be lost.
 ### If you want to override some of this settings, create another file under 
 ### /etc/pacman.d
-
+[options]
 XferCommand = http_proxy=$PROXY_ADDR /usr/bin/curl -C - -f %u > %o
 EOF
     else
