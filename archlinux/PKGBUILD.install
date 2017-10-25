@@ -315,6 +315,17 @@ update_finalize() {
 
     /usr/lib/qubes/update-proxy-configs
 
+    # Archlinux specific: Update pam.d configuration for su to enable systemd-login wrapper
+    # This is required as qubes-gui agent calls xinit with su -l user without initializing properly
+    # the user session.
+    # pam_unix.so can also be removed from su configuration
+    # as system-login (which include system-auth) already gives pam_unix.so
+    # with more appropriate parameters (fix the missing nullok parameter)
+    if grep -q pam_unix.so /etc/pam.d/su; then
+        echo "Fixing pam.d"
+	cp /etc/pam.d/qrexec /etc/pam.d/su-l
+    fi
+
     # Archlinux specific: ensure tty1 is enabled
     rm -f /etc/systemd/system/getty.target.wants/getty@tty*.service
     systemctl enable getty\@tty1.service
