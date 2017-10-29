@@ -384,4 +384,8 @@ install-deb: install-common install-systemd install-systemd-dropins install-syst
 	mkdir -p $(DESTDIR)/etc/systemd/system/
 	install -m 0644 vm-systemd/haveged.service  $(DESTDIR)/etc/systemd/system/
 
-install-vm: install-rh install-common
+install-corevm: install-rh install-common install-systemd install-sysvinit install-systemd-dropins
+
+install-netvm: install-systemd-networking-dropins install-networkmanager install-netvm
+
+install-vm: install-corevm install-netvm
