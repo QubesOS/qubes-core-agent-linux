@@ -365,7 +365,7 @@ install-networkmanager:
 	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)$(LIBDIR)/qubes/
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
 
-install-deb: install-common install-systemd install-systemd-dropins install-systemd-networking-dropins
+install-deb: install-common install-systemd install-systemd-dropins install-systemd-networking-dropins install-networking install-networkmanager install-netvm
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
 	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r4.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r4.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
