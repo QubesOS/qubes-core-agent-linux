@@ -56,13 +56,16 @@ SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
 USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
 SYSTEM_DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
-SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service getty@tty.service
-SYSTEM_DROPINS += tinyproxy.service
+SYSTEM_DROPINS += getty@tty.service
+
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket
 SYSTEM_DROPINS += systemd-random-seed.service
 SYSTEM_DROPINS += tor.service tor@default.service
 SYSTEM_DROPINS += systemd-timesyncd.service
+
+SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
+SYSTEM_DROPINS_NETWORKING += tinyproxy.service
 
 USER_DROPINS := pulseaudio.service pulseaudio.socket
 
@@ -106,6 +109,13 @@ install-systemd-dropins:
 	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)/$(USER_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
 
+install-systemd-networking-dropins:
+	# Install system dropins
+	@for dropin in $(SYSTEM_DROPINS_NETWORKING); do \
+	    install -d $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
+	done
+
 install-init:
 	install -d $(DESTDIR)$(LIBDIR)/qubes/init
 	# FIXME: do a source code move vm-systemd/*.sh to init/
@@ -113,16 +123,17 @@ install-init:
 	install -m 0755 init/*.sh vm-systemd/*.sh $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 init/functions $(DESTDIR)$(LIBDIR)/qubes/init/
 
+# Systemd service files
+SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service)
+SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service
+SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES), $(SYSTEMD_ALL_SERVICES))
+
 install-systemd: install-init
 	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d
-	install -m 0644 vm-systemd/qubes-*.service $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+	install -m 0644 $(SYSTEMD_CORE_SERVICES) $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
-	install -m 0644 vm-systemd/qubes-*.socket $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
 	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
-	install -m 0755 network/qubes-iptables $(DESTDIR)$(LIBDIR)/qubes/init/
-	install -D -m 0644 vm-systemd/qubes-core-agent-linux.tmpfiles \
-		$(DESTDIR)/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
 
 install-sysvinit: install-init
 	install -d $(DESTDIR)/etc/init.d
@@ -137,7 +148,7 @@ install-sysvinit: install-init
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
 
-install-rh: install-systemd install-systemd-dropins install-sysvinit
+install-rh: install-systemd install-systemd-dropins install-sysvinit install-systemd-networking-dropins
 	install -D -m 0644 misc/qubes-r4.repo $(DESTDIR)/etc/yum.repos.d/qubes-r4.repo
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)$(LIBDIR)/yum-plugins/
@@ -174,11 +185,6 @@ install-common: install-doc
 	PATH="/usr/bin:$(PATH)" $(PYTHON) setup.py install $(PYTHON_PREFIX_ARG) -O1 --root $(DESTDIR)
 	mkdir -p $(DESTDIR)$(SBINDIR)
 
-ifneq ($(SBINDIR),/usr/bin)
-	mv $(DESTDIR)/usr/bin/qubes-firewall $(DESTDIR)$(SBINDIR)/qubes-firewall
-endif
-
-
 	install -d -m 0750 $(DESTDIR)/etc/sudoers.d/
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
 	install -D -m 0440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
@@ -213,26 +219,6 @@ endif
 	install misc/upgrades-status-notify $(DESTDIR)$(LIBDIR)/qubes/upgrades-status-notify
 
 	install -m 0644 network/udev-qubes-network.rules $(DESTDIR)/etc/udev/rules.d/99-qubes-network.rules
-	install network/qubes-setup-dnat-to-ns $(DESTDIR)$(LIBDIR)/qubes
-	install network/qubes-fix-nm-conf.sh $(DESTDIR)$(LIBDIR)/qubes
-	install network/setup-ip $(DESTDIR)$(LIBDIR)/qubes/
-	install network/network-manager-prepare-conf-dir $(DESTDIR)$(LIBDIR)/qubes/
-	install -d $(DESTDIR)/etc/dhclient.d
-	ln -s /usr/lib/qubes/qubes-setup-dnat-to-ns $(DESTDIR)/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
-	install -d $(DESTDIR)/etc/NetworkManager/dispatcher.d/
-	install network/{qubes-nmhook,30-qubes-external-ip} $(DESTDIR)/etc/NetworkManager/dispatcher.d/
-	install -d $(DESTDIR)/usr/lib/NetworkManager/conf.d
-	install -m 0644 network/nm-30-qubes.conf $(DESTDIR)/usr/lib/NetworkManager/conf.d/30-qubes.conf
-	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
-	install -D network/vif-qubes-nat.sh $(DESTDIR)/etc/xen/scripts/vif-qubes-nat.sh
-	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
-	install -m 0644 -D network/updates-blacklist $(DESTDIR)/etc/tinyproxy/updates-blacklist
-	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)$(LIBDIR)/qubes/iptables-updates-proxy
-	install -d $(DESTDIR)/etc/xdg/autostart
-	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)$(LIBDIR)/qubes/show-hide-nm-applet.sh
-	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
-	install -m 0400 -D network/iptables $(DESTDIR)/etc/qubes/iptables.rules
-	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
 	install -m 0755 network/update-proxy-configs $(DESTDIR)$(LIBDIR)/qubes/
 
 	install -d $(DESTDIR)$(BINDIR)
@@ -275,7 +261,6 @@ endif
 	install -m 0755 qubes-rpc/qubes.InstallUpdatesGUI $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.ResizeDisk $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.StartApp $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.UpdatesProxy $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.PostInstall $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.GetDate $(DESTDIR)/etc/qubes-rpc
 
@@ -317,7 +302,70 @@ endif
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/rw
 
-install-deb: install-common install-systemd install-systemd-dropins
+# Networking install target includes:
+# * basic network functionality (setting IP address, DNS, default gateway)
+# * package update proxy client
+install-networking:
+	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system
+	install -m 0644 vm-systemd/qubes-*.socket $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+
+	install -d $(DESTDIR)$(LIBDIR)/qubes/
+	install network/setup-ip $(DESTDIR)$(LIBDIR)/qubes/
+
+# Netvm install target includes:
+# * qubes-firewall service (FirewallVM)
+# * DNS redirection setup
+# * proxy service used by TemplateVMs to download updates
+install-netvm:
+	install -D -m 0644 $(SYSTEMD_NETWORK_SERVICES) $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+
+	install -D -m 0755 network/qubes-iptables $(DESTDIR)$(LIBDIR)/qubes/init/qubes-iptables
+
+	install -D -m 0644 vm-systemd/qubes-core-agent-linux.tmpfiles \
+		$(DESTDIR)/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
+
+	mkdir -p $(DESTDIR)$(SBINDIR)
+
+ifneq ($(SBINDIR),/usr/bin)
+	mv $(DESTDIR)/usr/bin/qubes-firewall $(DESTDIR)$(SBINDIR)/qubes-firewall
+endif
+
+	install -D network/qubes-setup-dnat-to-ns $(DESTDIR)$(LIBDIR)/qubes/qubes-setup-dnat-to-ns
+
+	install -d $(DESTDIR)/etc/dhclient.d
+	ln -s /usr/lib/qubes/qubes-setup-dnat-to-ns $(DESTDIR)/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
+
+	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
+	install -D network/vif-qubes-nat.sh $(DESTDIR)/etc/xen/scripts/vif-qubes-nat.sh
+	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
+	install -m 0644 -D network/updates-blacklist $(DESTDIR)/etc/tinyproxy/updates-blacklist
+	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)$(LIBDIR)/qubes/iptables-updates-proxy
+
+	install -m 0400 -D network/iptables $(DESTDIR)/etc/qubes/iptables.rules
+	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
+
+	install -m 0755 -D qubes-rpc/qubes.UpdatesProxy $(DESTDIR)/etc/qubes-rpc/qubes.UpdatesProxy
+
+# networkmanager install target allow integration of NetworkManager for Qubes VM:
+# * make connections config persistent
+# * adjust DNS redirections when needed
+# * show/hide NetworkManager applet icon
+install-networkmanager:
+	install -d $(DESTDIR)$(LIBDIR)/qubes/
+	install network/qubes-fix-nm-conf.sh $(DESTDIR)$(LIBDIR)/qubes/
+	install network/network-manager-prepare-conf-dir $(DESTDIR)$(LIBDIR)/qubes/
+
+	install -d $(DESTDIR)/etc/NetworkManager/dispatcher.d/
+	install network/{qubes-nmhook,30-qubes-external-ip} $(DESTDIR)/etc/NetworkManager/dispatcher.d/
+
+	install -d $(DESTDIR)/usr/lib/NetworkManager/conf.d
+	install -m 0644 network/nm-30-qubes.conf $(DESTDIR)/usr/lib/NetworkManager/conf.d/30
+
+	install -d $(DESTDIR)/etc/xdg/autostart
+	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)$(LIBDIR)/qubes/
+	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
+
+install-deb: install-common install-systemd install-systemd-dropins install-systemd-networking-dropins
 	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
 	sed -e "s/@DIST@/`lsb_release -cs`/" misc/qubes-r4.list.in > $(DESTDIR)/etc/apt/sources.list.d/qubes-r4.list
 	install -D -m 644 misc/qubes-archive-keyring.gpg $(DESTDIR)/etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
