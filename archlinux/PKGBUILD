@@ -1,9 +1,9 @@
 #!/bin/bash
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 # shellcheck disable=SC2034
-pkgname=(qubes-vm-core qubes-vm-networking)
+pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring)
 pkgver=$(cat version)
-pkgrel=13
+pkgrel=14
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
@@ -24,6 +24,9 @@ source=(
     PKGBUILD-qubes-pacman-options.conf
     PKGBUILD-qubes-repo-3.2.conf
     PKGBUILD-qubes-repo-4.0.conf
+    PKGBUILD-keyring-keys
+    PKGBUILD-keyring-trusted
+    PKGBUILD-keyring-revoked
 )
 
 noextract=()
@@ -126,6 +129,18 @@ package_qubes-vm-networking() {
 
     # shellcheck disable=SC2154
     PYTHON=python2 make install-netvm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
+
+}
+
+package_qubes-vm-keyring() {
+    pkgdesc="Qubes OS Binary Repository Activation package and Keyring"
+    install=PKGBUILD-keyring.install
+
+    # Install keyring (will be activated through the .install file)
+    install -dm755 ${pkgdir}/usr/share/pacman/keyrings/
+    install -m0644 PKGBUILD-keyring-keys ${pkgdir}/usr/share/pacman/keyrings/qubesos-vm.gpg
+    install -m0644 PKGBUILD-keyring-trusted ${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-trusted
+    install -m0644 PKGBUILD-keyring-revoked ${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-revoked
 
 }
 
