@@ -74,29 +74,11 @@ configure_selinux() {
 ############################
 
 update_qubesconfig() {
-    # Create NetworkManager configuration if we do not have it
-    if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
-    echo '[main]' > /etc/NetworkManager/NetworkManager.conf
-    echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
-    echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
-    fi
-    /usr/lib/qubes/qubes-fix-nm-conf.sh
-
-    # Remove ip_forward setting from sysctl, so NM will not reset it
-    # Archlinux now use sysctl.d/ instead of sysctl.conf
-    #sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
-
     # Remove old firmware updates link
     if [ -L /lib/firmware/updates ]; then
       rm -f /lib/firmware/updates
     fi
 
-    # Yum proxy configuration is fedora specific
-    #if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
-    #  echo >> /etc/yum.conf
-    #  echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
-    #  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
-    #fi
     #/usr/lib/qubes/update-proxy-configs
     # Archlinux pacman configuration is handled in update_finalize
 
@@ -130,21 +112,6 @@ EOF
         done
     fi
 
-    # Make sure there is a default locale set so gnome-terminal will start
-    if [ ! -e /etc/locale.conf ] || ! grep -q LANG /etc/locale.conf; then
-        touch /etc/locale.conf
-        echo "LANG=en_US.UTF-8" >> /etc/locale.conf
-    fi
-    # ... and make sure it is really generated
-    # This line is buggy as LANG can be set to LANG="en_US.UTF-8". The Quotes must be stripped
-    current_locale=$(grep LANG /etc/locale.conf|cut -f 2 -d = | tr -d '"')
-    if [ -n "$current_locale" ] && ! locale -a | grep -q "$current_locale"; then
-        base=$(echo "$current_locale" | cut -f 1 -d .)
-        charmap=$(echo "$current_locale.UTF-8" | cut -f 2 -d .)
-        [ -n "$charmap" ] && charmap="-f $charmap"
-        # shellcheck disable=SC2086
-        localedef -i "$base" $charmap "$current_locale"
-    fi
 }
 
 ############################
@@ -334,7 +301,6 @@ update_finalize() {
     # Also remove pam_unix.so from su configuration
     # as system-login (which include system-auth) already gives pam_unix.so
     # with more appropriate parameters (fix the missing nullok parameter)
-
     if grep -q pam_unix.so /etc/pam.d/su; then
         echo "Fixing pam.d"
         cat <<EOF > /etc/pam.d/su
@@ -463,7 +429,7 @@ post_remove() {
 
     rm -rf /var/lib/qubes/xdg
 
-    for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-netwatcher qubes-network qubes-qrexec-agent; do
+    for srv in qubes-dvm qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-netwatcher qubes-qrexec-agent; do
         systemctl disable $srv.service
     done
 }
