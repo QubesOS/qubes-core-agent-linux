@@ -137,10 +137,10 @@ package_qubes-vm-keyring() {
     install=PKGBUILD-keyring.install
 
     # Install keyring (will be activated through the .install file)
-    install -dm755 ${pkgdir}/usr/share/pacman/keyrings/
-    install -m0644 PKGBUILD-keyring-keys ${pkgdir}/usr/share/pacman/keyrings/qubesos-vm.gpg
-    install -m0644 PKGBUILD-keyring-trusted ${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-trusted
-    install -m0644 PKGBUILD-keyring-revoked ${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-revoked
+    install -dm755 "${pkgdir}/usr/share/pacman/keyrings/"
+    install -m0644 PKGBUILD-keyring-keys "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm.gpg"
+    install -m0644 PKGBUILD-keyring-trusted "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-trusted"
+    install -m0644 PKGBUILD-keyring-revoked "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-revoked"
 
 }
 
