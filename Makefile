@@ -9,7 +9,7 @@ BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
-PYTHON = /usr/bin/python2
+PYTHON ?= /usr/bin/python2
 PYTHON_SITEARCH = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)'`
 PYTHON2_SITELIB = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()'`
 PYTHON3_SITELIB = `python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())'`
@@ -171,9 +171,13 @@ install-common: install-doc
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
 	# force /usr/bin before /bin to have /usr/bin/python instead of /bin/python
-	PATH="/usr/bin:$(PATH)" python setup.py install $(PYTHON_PREFIX_ARG) -O1 --root $(DESTDIR)
+	PATH="/usr/bin:$(PATH)" $(PYTHON) setup.py install $(PYTHON_PREFIX_ARG) -O1 --root $(DESTDIR)
 	mkdir -p $(DESTDIR)$(SBINDIR)
+
+ifneq ($(SBINDIR),/usr/bin)
 	mv $(DESTDIR)/usr/bin/qubes-firewall $(DESTDIR)$(SBINDIR)/qubes-firewall
+endif
+
 
 	install -d -m 0750 $(DESTDIR)/etc/sudoers.d/
 	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
