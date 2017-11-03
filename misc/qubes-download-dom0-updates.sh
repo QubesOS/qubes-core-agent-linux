@@ -52,7 +52,7 @@ fi
 
 YUM="yum"
 if type dnf >/dev/null 2>&1; then
-    YUM="dnf --best --allowerasing"
+    YUM="dnf --best --allowerasing --noplugins"
 fi
 
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
