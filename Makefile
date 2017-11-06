@@ -148,7 +148,7 @@ install-sysvinit: install-init
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
 
-install-rh: install-systemd install-systemd-dropins install-sysvinit install-systemd-networking-dropins
+install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -D -m 0644 misc/qubes-r4.repo $(DESTDIR)/etc/yum.repos.d/qubes-r4.repo
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)$(LIBDIR)/yum-plugins/
