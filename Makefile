@@ -302,6 +302,8 @@ endif
 
 ifeq ($(shell lsb_release -is), Debian)
 	install -m 0644 misc/qubesxdg.py $(DESTDIR)/$(PYTHON2_SITELIB)/
+else ifeq ($(shell lsb_release -is), Ubuntu)
+	install -m 0644 misc/qubesxdg.py $(DESTDIR)/$(PYTHON2_SITELIB)/
 else
 	install -m 0644 misc/py2/qubesxdg.py* $(DESTDIR)/$(PYTHON2_SITELIB)/
 endif

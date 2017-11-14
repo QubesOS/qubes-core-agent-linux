@@ -15,6 +15,11 @@ source-debian-quilt-copy-in:
 	if [ $(DIST) == trusty ] ; then \
 		sed -i /locales-all/d $(CHROOT_DIR)/$(DIST_SRC)/debian/control ;\
 	fi
+	if [ $(DIST) == xenial ] ; then \
+		sed -i /avahi-daemon.service.d/d $(CHROOT_DIR)/$(DIST_SRC)/debian/qubes-core-agent.install;\
+		sed -i /exim4/d $(CHROOT_DIR)/$(DIST_SRC)/debian/qubes-core-agent.install;\
+		sed -i /netfilter-persistent/d $(CHROOT_DIR)/$(DIST_SRC)/debian/qubes-core-agent.install;\
+	fi
 	if [ $(DIST) == zesty ] ; then \
 		sed -i /initscripts/d $(CHROOT_DIR)/$(DIST_SRC)/debian/control ;\
 	fi
