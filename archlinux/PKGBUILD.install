@@ -74,29 +74,11 @@ configure_selinux() {
 ############################
 
 update_qubesconfig() {
-    # Create NetworkManager configuration if we do not have it
-    if ! [ -e /etc/NetworkManager/NetworkManager.conf ]; then
-    echo '[main]' > /etc/NetworkManager/NetworkManager.conf
-    echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
-    echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
-    fi
-    /usr/lib/qubes/qubes-fix-nm-conf.sh
-
-    # Remove ip_forward setting from sysctl, so NM will not reset it
-    # Archlinux now use sysctl.d/ instead of sysctl.conf
-    #sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
-
     # Remove old firmware updates link
     if [ -L /lib/firmware/updates ]; then
       rm -f /lib/firmware/updates
     fi
 
-    # Yum proxy configuration is fedora specific
-    #if ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
-    #  echo >> /etc/yum.conf
-    #  echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
-    #  echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
-    #fi
     #/usr/lib/qubes/update-proxy-configs
     # Archlinux pacman configuration is handled in update_finalize
 
@@ -438,7 +420,7 @@ post_remove() {
 
     rm -rf /var/lib/qubes/xdg
 
-    for srv in qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-network qubes-qrexec-agent; do
+    for srv in qubes-sysinit qubes-misc-post qubes-mount-dirs qubes-qrexec-agent; do
         systemctl disable $srv.service
     done
 }
