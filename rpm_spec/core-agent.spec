@@ -471,11 +471,11 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %systemd_post qubes-qrexec-agent.service
 
 %post thunar 
-# There is no system-wide Thunar custom actions. There is only a default
-# file and a user file created from the default one. Qubes actions need
-# to be placed after all already defined actions and before </actions>
-# the end of file.
 if [ "$1" = 1 ]; then
+  # There is no system-wide Thunar custom actions. There is only a default
+  # file and a user file created from the default one. Qubes actions need
+  # to be placed after all already defined actions and before </actions>
+  # the end of file.
   if [ -f /etc/xdg/Thunar/uca.xml ] ; then
     cp -p /etc/xdg/Thunar/uca.xml{,.bak}
     sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /etc/xdg/Thunar/uca.xml
@@ -712,6 +712,7 @@ rm -f %{name}-%{version}
 %files thunar
 /usr/lib/qubes/qvm-actions.sh
 /usr/lib/qubes/uca_qubes.xml
+/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/thunar.xml
 
 %files dom0-updates
 %dir %attr(0775,user,user) /var/lib/qubes/dom0-updates

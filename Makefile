@@ -249,6 +249,8 @@ endif
 	install qubes-rpc/qvm-move-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-actions.sh $(DESTDIR)$(LIBDIR)/qubes
 	install -m 0644 misc/uca_qubes.xml $(DESTDIR)$(LIBDIR)/qubes
+	mkdir -p $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
+	install -m 0644 misc/thunar.xml $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
 	install qubes-rpc/xdg-icon $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qubes-open $(DESTDIR)$(BINDIR)
