@@ -198,6 +198,13 @@ DNF plugin for Qubes specific post-installation actions:
  * refresh applications shortcut list
 %endif
 
+%package thunar
+Summary: Thunar support for Qubes VM tools
+Requires: Thunar
+
+%description thunar
+Thunar support for Qubes VM tools
+
 %define _builddir %(pwd)
 
 %define kde_service_dir /usr/share/kde4/services
@@ -381,6 +388,22 @@ mv /etc/selinux/config.processed /etc/selinux/config
 setenforce 0 2>/dev/null
 exit 0
 
+%post thunar 
+# There is no system-wide Thunar custom actions. There is only a default
+# file and a user file created from the default one. Qubes actions need
+# to be placed after all already defined actions and before </actions>
+# the end of file.
+if [ "$1" = 1 ]; then
+  if [ -f /etc/xdg/Thunar/uca.xml ] ; then
+    cp -p /etc/xdg/Thunar/uca.xml{,.bak}
+    sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /etc/xdg/Thunar/uca.xml
+  fi
+  if [ -f /home/user/.config/Thunar/uca.xml ] ; then
+    cp -p /home/user/.config/Thunar/uca.xml{,.bak}
+    sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /home/user/.config/Thunar/uca.xml
+  fi
+fi
+
 %preun
 if [ "$1" = 0 ] ; then
     # no more packages left
@@ -391,6 +414,18 @@ if [ "$1" = 0 ] ; then
     if [ -e /var/lib/qubes/serial.orig ] ; then
     mv /var/lib/qubes/serial.orig /etc/init/serial.conf
     fi
+fi
+
+%postun thunar 
+if [ "$1" = 0 ]; then
+  if [ -f /etc/xdg/Thunar/uca.xml ] ; then
+    mv /etc/xdg/Thunar/uca.xml{,.uninstall}
+    mv /etc/xdg/Thunar/uca.xml{.bak,}
+  fi
+  if [ -f /home/user/.config/Thunar/uca.xml ] ; then
+    mv /home/user/.config/Thunar/uca.xml{,.uninstall}
+    mv /home/user/.config/Thunar/uca.xml{.bak,}
+  fi
 fi
 
 %postun
@@ -557,6 +592,10 @@ rm -f %{name}-%{version}
 %files -n python34-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 %endif
+
+%files thunar
+/usr/lib/qubes/qvm-actions.sh
+/usr/lib/qubes/uca_qubes.xml
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
