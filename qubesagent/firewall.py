@@ -204,7 +204,7 @@ class IptablesWorker(FirewallWorker):
 
         self.run_ipt(family, ['-N', chain])
         self.run_ipt(family,
-            ['-A', 'QBS-FORWARD', '-s', addr, '-j', chain])
+            ['-I', 'QBS-FORWARD', '-s', addr, '-j', chain])
         self.chains[family].add(chain)
 
     def prepare_rules(self, chain, rules, family):
@@ -340,8 +340,10 @@ class IptablesWorker(FirewallWorker):
         # make sure 'QBS_FORWARD' chain exists - should be created before
         # starting qubes-firewall
         try:
-            self.run_ipt(4, ['-nL', 'QBS-FORWARD'])
-            self.run_ipt(6, ['-nL', 'QBS-FORWARD'])
+            self.run_ipt(4, ['-F', 'QBS-FORWARD'])
+            self.run_ipt(4, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
+            self.run_ipt(6, ['-F', 'QBS-FORWARD'])
+            self.run_ipt(6, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
         except subprocess.CalledProcessError:
             self.log_error('\'QBS-FORWARD\' chain not found, create it first')
             sys.exit(1)
@@ -542,6 +544,8 @@ class NftablesWorker(FirewallWorker):
             'table {family} qubes-firewall {{\n'
             '  chain forward {{\n'
             '    type filter hook forward priority 0;\n'
+            '    policy drop;\n'
+            '    ct state established accept\n'
             '  }}\n'
             '}}\n'
         )

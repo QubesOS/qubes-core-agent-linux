@@ -173,7 +173,7 @@ class TestIptablesWorker(TestCase):
             self.obj.create_chain(addr, chain, family)
             self.assertEqual(self.obj.called_commands[family],
                 [['-N', chain],
-                    ['-A', 'QBS-FORWARD', '-s', addr, '-j', chain]])
+                    ['-I', 'QBS-FORWARD', '-s', addr, '-j', chain]])
 
     def test_002_prepare_rules4(self):
         rules = [
@@ -244,7 +244,7 @@ class TestIptablesWorker(TestCase):
         self.assertEqual(self.obj.called_commands[4],
             [
                 ['-N', chain],
-                ['-A', 'QBS-FORWARD', '-s', '10.137.0.1', '-j', chain],
+                ['-I', 'QBS-FORWARD', '-s', '10.137.0.1', '-j', chain],
                 ['-F', chain]])
         self.assertEqual(self.obj.loaded_iptables[4],
             self.obj.prepare_rules(chain, rules, 4))
@@ -258,7 +258,7 @@ class TestIptablesWorker(TestCase):
         self.assertEqual(self.obj.called_commands[6],
             [
                 ['-N', chain],
-                ['-A', 'QBS-FORWARD', '-s', '2000::a', '-j', chain],
+                ['-I', 'QBS-FORWARD', '-s', '2000::a', '-j', chain],
                 ['-F', chain]])
         self.assertEqual(self.obj.loaded_iptables[6],
             self.obj.prepare_rules(chain, rules, 6))
@@ -268,9 +268,9 @@ class TestIptablesWorker(TestCase):
     def test_006_init(self):
         self.obj.init()
         self.assertEqual(self.obj.called_commands[4],
-            [['-nL', 'QBS-FORWARD']])
+            [['-F', 'QBS-FORWARD'], ['-A', 'QBS-FORWARD', '-j', 'DROP']])
         self.assertEqual(self.obj.called_commands[6],
-            [['-nL', 'QBS-FORWARD']])
+            [['-F', 'QBS-FORWARD'], ['-A', 'QBS-FORWARD', '-j', 'DROP']])
 
     def test_007_cleanup(self):
         self.obj.init()
@@ -429,11 +429,15 @@ class TestNftablesWorker(TestCase):
             'table ip qubes-firewall {\n'
             '  chain forward {\n'
             '    type filter hook forward priority 0;\n'
+            '    policy drop;\n'
+            '    ct state established accept\n'
             '  }\n'
             '}\n'
             'table ip6 qubes-firewall {\n'
             '  chain forward {\n'
             '    type filter hook forward priority 0;\n'
+            '    policy drop;\n'
+            '    ct state established accept\n'
             '  }\n'
             '}\n'
         ])
