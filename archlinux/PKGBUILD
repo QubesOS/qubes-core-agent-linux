@@ -62,6 +62,22 @@ build() {
     done
 }
 
+#This package provides:
+# * qrexec agent
+# * qubes rpc scripts
+# * core linux tools and scripts
+# * core systemd services and drop-ins
+# * basic network functionality (setting IP address, DNS, default gateway)
+#
+# NetVM/ProxyVM tools
+# * proxy service used by TemplateVMs to download updates
+# * qubes-firewall service (FirewallVM)
+#
+# Integration of NetworkManager for Qubes VM:
+# * make connections config persistent
+# * adjust DNS redirections when needed
+# * show/hide NetworkManager applet icon
+#
 package_qubes-vm-core() {
     depends=("qubes-vm-utils>=3.1.3" python2 python2-xdg ethtool ntp net-tools
              gnome-packagekit imagemagick fakeroot notification-daemon dconf
@@ -69,7 +85,7 @@ package_qubes-vm-core() {
              python2-dbus xdg-utils notification-daemon gawk sed procps-ng librsvg
              socat pygtk
              )
-    optdepends=(gnome-keyring gnome-settings-daemon python2-nautilus gpk-update-viewer)
+    optdepends=(gnome-keyring gnome-settings-daemon python2-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
     install=PKGBUILD.install
 
     # Note: Archlinux removed use of directory such as /sbin /bin /usr/sbin (https://mailman.archlinux.org/pipermail/arch-dev-public/2012-March/022625.html)
@@ -113,8 +129,10 @@ EOF
     rm -r "$pkgdir/var/run"
 }
 
-#This is a stub package providing required dependencies for a netvm
+#This package provides:
+# * dependencies required for using the template as a NetvVM/ProxyVM
 package_qubes-vm-networking() {
+    pkgdesc="Stub package providing Qubes OS dependencies allowing to use a Qubes VM as a NetVM/ProxyVM"
     depends=(qubes-vm-core "qubes-vm-utils>=3.1.3" python2 ethtool net-tools
              "qubes-db-vm>=3.2.1" networkmanager iptables tinyproxy nftables
              )
