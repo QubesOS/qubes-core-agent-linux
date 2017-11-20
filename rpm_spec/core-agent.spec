@@ -228,6 +228,7 @@ Scripts required to handle dom0 updates.
 %package networking
 Summary:    Networking support for Qubes VM
 Requires:   ethtool
+Requires:   iptables
 Requires:   net-tools
 Requires:   nftables
 Requires:   socat
