@@ -1,7 +1,8 @@
 [Unit]
 Description=Qubes firewall updater
 ConditionPathExists=/var/run/qubes-service/qubes-firewall
-After=qubes-network.service
+After=qubes-iptables.service
+Before=qubes-network.service
 
 [Service]
 ExecStart=/usr/sbin/qubes-firewall
