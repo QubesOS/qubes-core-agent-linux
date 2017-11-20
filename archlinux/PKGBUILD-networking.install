@@ -23,7 +23,7 @@ post_install() {
     #fi
 
     for srv in qubes-firewall.service qubes-iptables.service qubes-network.service qubes-updates-proxy.service ; do
-        systemctl enable $srv.service
+        systemctl enable $srv
     done
 }
 
@@ -36,6 +36,6 @@ post_upgrade() {
 ## arg 1:  the old package version
 post_remove() {
     for srv in qubes-firewall.service qubes-iptables.service qubes-network.service qubes-updates-proxy.service ; do
-        systemctl disable $srv.service
+        systemctl disable $srv
     done
 }
