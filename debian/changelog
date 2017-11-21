@@ -1,3 +1,51 @@
+qubes-core-agent (4.0.13-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix starting time synchronization service
+
+  [ Nedyalko Andreev ]
+  * Disable dnf plugins when downloading dom0 updates in sys-firewall
+  * Update the arch PKGBUILD script for QubesOS 4.0
+  * Fix the makefile for archlinux - SBINDIR is already /usr/bin
+  * Restore the binary pacman repo and update it for QubesOS 4.0
+  * Add the 4.0 repo to the PKGBUILD sources list
+
+  [ Olivier MEDOC ]
+  * archlinux: remove deprecated setup of pam since v4.0.3
+  * archlinux: remove pam configuration for su and su-l
+  * archlinux: do not mess with locales in post-install script
+  * archlinux: ship pam.d/qrexec as a replacement of using su
+  * archlinux: create user 'user' using bash by default instead of zsh
+  * Makefile: avoid using python interpreter as a static name
+  * archlinux: enforce usage of python2 in all scripts
+  * archlinux: ensure [options] section is present in all pacman drop-
+    ins
+  * archlinux: remove python3 dependency
+  * archlinux: restore setup of pam.d/su-l
+
+  [ unman ]
+  * Allow build for Xenial in 4.0
+
+  [ Paul Holcomb ]
+  * Fix Ubuntu template builds
+
+  [ Marek Marczykowski-Górecki ]
+  * network: have safe fallback in case of qubes-firewall crash/error
+  * Dumb down meminfo-writer enabling logic
+  * Enable qubes-firewall also in "NetVM"
+
+  [ Nedyalko Andreev ]
+  * Fix the Archlinux template update proxy to work for HTTPS URLs as
+    well
+
+  [ Rusty Bird ]
+  * Add iptables dep to qubes-core-agent-networking RPM spec
+
+  [ Marek Marczykowski-Górecki ]
+  * network: order qubes-firewall service before enabling IP forwarding
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 21 Nov 2017 04:51:27 +0100
+
 qubes-core-agent (4.0.12-1) unstable; urgency=medium
 
   * Add support for new root volume partition layout to qubes.ResizeDisk
