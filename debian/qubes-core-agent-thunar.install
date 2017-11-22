@@ -1,0 +1,3 @@
+usr/lib/qubes/qvm-actions.sh
+usr/lib/qubes/uca_qubes.xml
+etc/xdg/xfce4/xfconf/xfce-perchannel-xml/thunar.xml

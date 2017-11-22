@@ -97,6 +97,16 @@ Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for Nautilus
  Nautilus addons for inter-VM file copy/move/open.
 
+Package: qubes-core-agent-thunar
+Architecture: any
+Depends:
+    thunar,
+    qubes-core-agent-qrexec,
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
+Description: Qubes integration for Thunar
+ Thunar addons for inter-VM file copy/move/open.
+
 Package: qubes-core-agent-dom0-updates
 Architecture: any
 Depends:
