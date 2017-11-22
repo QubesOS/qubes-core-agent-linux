@@ -38,12 +38,12 @@ set -e
 
 if [ "${1}" = "remove" ] ; then
   if [ -f /etc/xdg/Thunar/uca.xml ] ; then
-    mv /etc/xdg/Thunar/uca.xml{,.uninstall}
-    mv /etc/xdg/Thunar/uca.xml{.bak,}
+    mv /etc/xdg/Thunar/uca.xml /etc/xdg/Thunar/uca.xml.uninstall
+    mv /etc/xdg/Thunar/uca.xml.bak /etc/xdg/Thunar/uca.xml
   fi
   if [ -f /home/user/.config/Thunar/uca.xml ] ; then
-    mv /home/user/.config/Thunar/uca.xml{,.uninstall}
-    mv /home/user/.config/Thunar/uca.xml{.bak,}
+    mv /home/user/.config/Thunar/uca.xml /home/user/.config/Thunar/uca.xml.uninstall
+    mv /home/user/.config/Thunar/uca.xml.bak /home/user/.config/Thunar/uca.xml
   fi
 fi
 

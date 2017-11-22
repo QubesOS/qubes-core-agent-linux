@@ -27,11 +27,13 @@ case "${1}" in
         # to be placed after all already defined actions and before </actions>
         # the end of file.
         if [ -f /etc/xdg/Thunar/uca.xml ] ; then
-          cp -p /etc/xdg/Thunar/uca.xml{,.bak}
+          cp -p /etc/xdg/Thunar/uca.xml /etc/xdg/Thunar/uca.xml.bak
+          #shellcheck disable=SC2016
           sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /etc/xdg/Thunar/uca.xml
         fi
         if [ -f /home/user/.config/Thunar/uca.xml ] ; then
-          cp -p /home/user/.config/Thunar/uca.xml{,.bak}
+          cp -p /home/user/.config/Thunar/uca.xml /home/user/.config/Thunar/uca.xml.bak
+          #shellcheck disable=SC2016
           sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /home/user/.config/Thunar/uca.xml
         fi
         ;;
