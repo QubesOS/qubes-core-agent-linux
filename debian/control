@@ -78,3 +78,11 @@ Conflicts: ${diverted-files}, qubes-core-agent-linux, firewalld, qubes-core-vm-s
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec.
+
+Package: qubes-core-agent-thunar
+Architecture: any
+Depends:
+    thunar,
+    qubes-core-agent-qrexec,
+Description: Qubes integration for Thunar
+ Thunar addons for inter-VM file copy/move/open.
