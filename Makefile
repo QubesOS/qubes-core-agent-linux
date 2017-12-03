@@ -345,6 +345,7 @@ endif
 
 	install -m 0400 -D network/iptables $(DESTDIR)/etc/qubes/iptables.rules
 	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
+	install -m 0400 -D network/ip6tables-enabled $(DESTDIR)/etc/qubes/ip6tables-enabled.rules
 
 	install -m 0755 -D qubes-rpc/qubes.UpdatesProxy $(DESTDIR)/etc/qubes-rpc/qubes.UpdatesProxy
 

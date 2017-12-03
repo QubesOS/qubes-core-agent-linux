@@ -11,6 +11,7 @@ if [ "x$network" != "x" ]; then
     fi
 
     gateway=$(qubesdb-read /qubes-netvm-gateway)
+    gateway6=$(qubesdb-read /qubes-netvm-gateway6 ||:)
     #netmask=$(qubesdb-read /qubes-netvm-netmask)
     primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
     secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
@@ -19,5 +20,9 @@ if [ "x$network" != "x" ]; then
     echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
     /usr/lib/qubes/qubes-setup-dnat-to-ns
     echo "1" > /proc/sys/net/ipv4/ip_forward
+    # enable also IPv6 forwarding, if IPv6 is enabled
+    if [ -n "$gateway6" ]; then
+        echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+    fi
     /sbin/ethtool -K eth0 sg off || true
 fi

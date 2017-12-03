@@ -29,6 +29,15 @@ fi
 start() {
     ipt=$1
     IPTABLES_DATA=$IPTABLES_DATA_DIR/${ipt}.rules
+    ipv6_enabled=
+    if qubesdb-read /qubes-ip6 >/dev/null 2>&1 || \
+        qubesdb-read /qubes-netvm-gateway6 >/dev/null 2>&1; then
+        ipv6_enabled=true
+    fi
+    # if IPv6 is enabled, load alternative rules file
+    if [ "$ipt" = "ip6tables" ] && [ -n "$ipv6_enabled" ]; then
+        IPTABLES_DATA=$IPTABLES_DATA_DIR/${ipt}-enabled.rules
+    fi
     CMD=$ipt
     # Do not start if there is no config file.
     [ ! -f "$IPTABLES_DATA" ] && return 6

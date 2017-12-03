@@ -682,6 +682,7 @@ rm -f %{name}-%{version}
 %files networking
 %config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
 %config(noreplace) /etc/qubes/ip6tables.rules
+%config(noreplace) /etc/qubes/ip6tables-enabled.rules
 %config(noreplace) /etc/qubes/iptables.rules
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/tinyproxy/updates-blacklist

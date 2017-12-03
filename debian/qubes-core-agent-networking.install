@@ -1,6 +1,7 @@
 etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 etc/qubes-rpc/qubes.UpdatesProxy
 etc/qubes/ip6tables.rules
+etc/qubes/ip6tables-enabled.rules
 etc/qubes/iptables.rules
 etc/tinyproxy/tinyproxy-updates.conf
 etc/tinyproxy/updates-blacklist
