@@ -7,9 +7,11 @@
 have_qubesdb || exit 0
 
 ip=$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)
+ip6=$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)
 if [ "x$ip" != x ]; then
     #netmask=$(/usr/bin/qubesdb-read /qubes-netmask)
     gateway=$(/usr/bin/qubesdb-read /qubes-gateway)
+    gateway6=$(/usr/bin/qubesdb-read /qubes-gateway6)
     primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null || echo "$gateway")
     secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns)
     /sbin/ethtool -K "$INTERFACE" sg off
@@ -28,32 +30,72 @@ mac-address=$(ip l show dev "$INTERFACE" |grep link|awk '{print $2}')
 id=VM uplink $INTERFACE
 uuid=de85f79b-8c3d-405f-a652-cb4c10b4f9ef
 type=802-3-ethernet
-
-[ipv6]
-method=ignore
-
+__EOF__
+        ip4_nm_config=""
+        ip6_nm_config=""
+        if ! qsvc disable-dns-server ; then
+            ip4_nm_config="${ip4_nm_config}
+dns=${primary_dns};${secondary_dns}"
+        fi
+        if ! qsvc disable-default-route ; then
+            ip4_nm_config="${ip4_nm_config}
+addresses1=$ip;32;$gateway"
+            if [ -n "$ip6" ]; then
+                ip6_nm_config="${ip6_nm_config}
+addresses1=$ip6;128;$gateway6"
+            fi
+        else
+            ip4_nm_config="${ip4_nm_config}
+addresses1=$ip;32"
+            if [ -n "$ip6" ]; then
+                ip6_nm_config="${ip6_nm_config}
+addresses1=$ip6;128"
+            fi
+        fi
+        if [ -n "$ip4_nm_config" ]; then
+            cat >> "$nm_config" <<__EOF__
 [ipv4]
 method=manual
 may-fail=false
+$ip4_nm_config
 __EOF__
-        if ! qsvc disable-dns-server ; then
-            echo "dns=$primary_dns;$secondary_dns" >> "$nm_config"
-        fi
-        if ! qsvc disable-default-route ; then
-            echo "addresses1=$ip;32;$gateway" >> "$nm_config"
         else
-            echo "addresses1=$ip;32" >> "$nm_config"
+            cat >> "$nm_config" <<__EOF__
+[ipv4]
+method=ignore
+__EOF__
         fi
+
+        if [ -n "$ip6_nm_config" ]; then
+            cat >> "$nm_config" <<__EOF__
+[ipv6]
+method=manual
+may-fail=false
+$ip6_nm_config
+__EOF__
+        else
+            cat >> "$nm_config" <<__EOF__
+[ipv6]
+method=ignore
+__EOF__
+        fi
+
         chmod 600 "$nm_config"
         # reload connection
         nmcli connection load "$nm_config" || :
     else
         # No NetworkManager enabled, configure the network manually
         /sbin/ifconfig "$INTERFACE" "$ip" netmask 255.255.255.255
+        if [ -n "$ip6" ]; then
+            /sbin/ifconfig "$INTERFACE" add "$ip6"/128
+        fi
         /sbin/ifconfig "$INTERFACE" up
         /sbin/route add -host "$gateway" dev "$INTERFACE"
         if ! qsvc disable-default-route ; then
             /sbin/route add default gw "$gateway"
+            if [ -n "$gateway6" ]; then
+                /sbin/route -6 add default gw "$gateway6" dev "$INTERFACE"
+            fi
         fi
         if ! is_protected_file /etc/resolv.conf ; then
             echo > /etc/resolv.conf

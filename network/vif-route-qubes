@@ -29,8 +29,16 @@ lockfile=/var/run/xen-hotplug/vif-lock
 
 # shellcheck disable=SC2154
 if [ "${ip}" ]; then
+    # get first IPv4 and first IPv6
+    for addr in ${ip}; do
+        if [ -z "$ip4" ] && [[ "$addr" = *.* ]]; then
+            ip4="$addr"
+        elif [ -z "$ip6" ] && [[ "$addr" = *:* ]]; then
+            ip6="$addr"
+        fi
+    done
     # IPs as seen by this VM
-    netvm_ip="$ip"
+    netvm_ip="$ip4"
     netvm_gw_ip=$(qubesdb-read /qubes-netvm-gateway)
     netvm_dns1_ip=$(qubesdb-read /qubes-netvm-primary-dns)
     netvm_dns2_ip=$(qubesdb-read /qubes-netvm-secondary-dns)
@@ -38,12 +46,14 @@ if [ "${ip}" ]; then
     back_ip="$netvm_gw_ip"
 
     # IPs as seen by the VM - if other than $netvm_ip
-    appvm_gw_ip="$(qubesdb-read "/mapped-ip/$ip/visible-gateway" 2>/dev/null || :)"
-    appvm_ip="$(qubesdb-read "/mapped-ip/$ip/visible-ip" 2>/dev/null || :)"
+    appvm_gw_ip="$(qubesdb-read "/mapped-ip/$ip4/visible-gateway" 2>/dev/null || :)"
+    appvm_ip="$(qubesdb-read "/mapped-ip/$ip4/visible-ip" 2>/dev/null || :)"
 fi
 
 # Apply NAT if IP visible from the VM is different than the "real" one
 # See vif-qubes-nat.sh for details
+# XXX: supported only for the first IPv4 address, IPv6 is dropped if this
+# feature is enabled
 if [ -n "$appvm_ip" ] && [ -n "$appvm_gw_ip" ] && [ "$appvm_ip" != "$netvm_ip" ]; then
     # shellcheck disable=SC2154
     if test "$command" == online; then
@@ -83,9 +93,19 @@ if [ "${ip}" ] ; then
 	# the guest using those addresses.
 	for addr in ${ip} ; do
 		${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
+        if [[ "$addr" = *:* ]]; then
+            ipt=ip6tables-restore
+        else
+            ipt=iptables-restore
+        fi
+        echo -e "*raw\n$iptables_cmd -i ${vif} ! -s ${addr} -j DROP\nCOMMIT" | \
+            ${cmdprefix} flock $lockfile $ipt --noflush
 	done
-	echo -e "*raw\n$iptables_cmd -i ${vif} ! -s ${ip} -j DROP\nCOMMIT" | \
-		${cmdprefix} flock $lockfile iptables-restore --noflush
+    # if no IPv6 is assigned, block all IPv6 traffic on that interface
+    if ! [[ "$ip" = *:* ]]; then
+        echo -e "*raw\n$iptables_cmd -i ${vif} -j DROP\nCOMMIT" | \
+            ${cmdprefix} flock $lockfile ip6tables-restore --noflush
+    fi
 	${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
 fi
 
