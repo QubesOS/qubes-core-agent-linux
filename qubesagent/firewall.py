@@ -169,7 +169,7 @@ class IptablesWorker(FirewallWorker):
     @staticmethod
     def chain_for_addr(addr):
         '''Generate iptables chain name for given source address address'''
-        return 'qbs-' + addr.replace('.', '-').replace(':', '-')
+        return 'qbs-' + addr.replace('.', '-').replace(':', '-')[-20:]
 
     def run_ipt(self, family, args, **kwargs):
         # pylint: disable=no-self-use
@@ -236,7 +236,10 @@ class IptablesWorker(FirewallWorker):
                 raise RuleParseError('dst6 rule found for IPv4 address')
 
             if 'proto' in rule:
-                protos = [rule['proto']]
+                if rule['proto'] == 'icmp' and family == 6:
+                    protos = ['icmpv6']
+                else:
+                    protos = [rule['proto']]
             else:
                 protos = None
 

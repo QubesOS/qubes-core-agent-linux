@@ -162,7 +162,7 @@ class TestIptablesWorker(TestCase):
             self.obj.chain_for_addr('10.137.0.1'), 'qbs-10-137-0-1')
         self.assertEqual(
             self.obj.chain_for_addr('fd09:24ef:4179:0000::3'),
-            'qbs-fd09-24ef-4179-0000--3')
+            'qbs-09-24ef-4179-0000--3')
 
     def test_001_create_chain(self):
         testdata = [
@@ -230,7 +230,7 @@ class TestIptablesWorker(TestCase):
             "-A chain -d 2001::2/128 -p udp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 2001::1/128 -p udp --dport 53:53 -j DROP\n"
             "-A chain -d 2001::2/128 -p udp --dport 53:53 -j DROP\n"
-            "-A chain -p icmp -j DROP\n"
+            "-A chain -p icmpv6 -j DROP\n"
             "-A chain -j DROP\n"
             "COMMIT\n"
         )
