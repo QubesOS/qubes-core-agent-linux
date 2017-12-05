@@ -62,6 +62,7 @@ lib/systemd/system/cron.service.d/30_qubes.conf
 lib/systemd/system/cups.path.d/30_qubes.conf
 lib/systemd/system/cups.service.d/30_qubes.conf
 lib/systemd/system/cups.socket.d/30_qubes.conf
+lib/systemd/system/cups-browsed.service.d/30_qubes.conf
 lib/systemd/system/exim4.service.d/30_qubes.conf
 lib/systemd/system/getty@tty.service.d/30_qubes.conf
 lib/systemd/system/netfilter-persistent.service.d/30_qubes.conf
