@@ -54,7 +54,8 @@ all:
 SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
 USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
-SYSTEM_DROPINS := chronyd.service crond.service cups.service cups.path cups.socket ModemManager.service
+SYSTEM_DROPINS := chronyd.service crond.service
+SYSTEM_DROPINS += cups.service cups-browsed.service cups.path cups.socket ModemManager.service
 SYSTEM_DROPINS += NetworkManager.service NetworkManager-wait-online.service ntpd.service getty@tty.service
 SYSTEM_DROPINS += tinyproxy.service
 SYSTEM_DROPINS += tmp.mount

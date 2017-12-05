@@ -661,6 +661,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/cups.service.d/30_qubes.conf
 /lib/systemd/system/cups.socket.d/30_qubes.conf
 /lib/systemd/system/cups.path.d/30_qubes.conf
+/lib/systemd/system/cups-browsed.service.d/30_qubes.conf
 /lib/systemd/system/org.cups.cupsd.service.d/30_qubes.conf
 /lib/systemd/system/org.cups.cupsd.socket.d/30_qubes.conf
 /lib/systemd/system/org.cups.cupsd.path.d/30_qubes.conf
