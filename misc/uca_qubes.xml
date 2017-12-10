@@ -43,7 +43,7 @@
 	<icon>gtk-convert</icon>
 	<name>Convert in DisposableVM</name>
 	<unique-id>1507455488971315-6</unique-id>
-	<command>/usr/lib/qubes/qvm-actions.sh p %F</command>
+	<command>/usr/lib/qubes/qvm-actions.sh pdf %F</command>
 	<description></description>
 	<patterns>*.pdf</patterns>
 	<other-files/>
