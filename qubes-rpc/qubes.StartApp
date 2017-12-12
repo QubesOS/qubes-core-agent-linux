@@ -1,11 +1,11 @@
 #!/bin/sh
 
 if [ -z "$1" ]; then
-    echo "This service require an argument" >&2
+    echo "This service requires an argument" >&2
     exit 1
 fi
 
-# make sure it have .desktop suffix, and only one of it
+# make sure it has .desktop suffix, and only one of it
 app_basename="${1%.desktop}.desktop"
 
 # Based on XDG Base Directory Specification, Version 0.7
