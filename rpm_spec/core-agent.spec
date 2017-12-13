@@ -269,6 +269,13 @@ switching from user to root. Since all the user data in a VM is accessible
 already from normal user account, there is not much more to guard there. Qubes
 VM is a single user system.
 
+%package thunar
+Summary: Thunar support for Qubes VM tools
+Requires: Thunar
+
+%description thunar
+Thunar support for Qubes VM tools
+
 %define _builddir %(pwd)
 
 %define kde_service_dir /usr/share/kde4/services
@@ -464,6 +471,22 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %post qrexec
 %systemd_post qubes-qrexec-agent.service
 
+%post thunar 
+if [ "$1" = 1 ]; then
+  # There is no system-wide Thunar custom actions. There is only a default
+  # file and a user file created from the default one. Qubes actions need
+  # to be placed after all already defined actions and before </actions>
+  # the end of file.
+  if [ -f /etc/xdg/Thunar/uca.xml ] ; then
+    cp -p /etc/xdg/Thunar/uca.xml{,.bak}
+    sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /etc/xdg/Thunar/uca.xml
+  fi
+  if [ -f /home/user/.config/Thunar/uca.xml ] ; then
+    cp -p /home/user/.config/Thunar/uca.xml{,.bak}
+    sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' /home/user/.config/Thunar/uca.xml
+  fi
+fi
+
 %preun
 if [ "$1" = 0 ] ; then
     # no more packages left
@@ -484,6 +507,18 @@ fi
 
 %preun qrexec
 %systemd_preun qubes-qrexec-agent.service
+
+%postun thunar 
+if [ "$1" = 0 ]; then
+  if [ -f /etc/xdg/Thunar/uca.xml ] ; then
+    mv /etc/xdg/Thunar/uca.xml{,.uninstall}
+    mv /etc/xdg/Thunar/uca.xml{.bak,}
+  fi
+  if [ -f /home/user/.config/Thunar/uca.xml ] ; then
+    mv /home/user/.config/Thunar/uca.xml{,.uninstall}
+    mv /home/user/.config/Thunar/uca.xml{.bak,}
+  fi
+fi
 
 %postun
 if [ $1 -eq 0 ] ; then
@@ -674,6 +709,11 @@ rm -f %{name}-%{version}
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
+
+%files thunar
+/usr/lib/qubes/qvm-actions.sh
+/usr/lib/qubes/uca_qubes.xml
+/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/thunar.xml
 
 %files dom0-updates
 %dir %attr(0775,user,user) /var/lib/qubes/dom0-updates
