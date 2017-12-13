@@ -1,3 +1,30 @@
+qubes-core-agent (3.2.21-1) unstable; urgency=medium
+
+  [ Nedyalko Andreev ]
+  * Fix the archlinux package, use correct DROPIN dirs
+  * Disable Oliver's binary pacman repo by default
+  * Fix indentation and shellcheck issues for archlinux
+  * Fix the install script after the shellcheck "fixes"
+  * Fix the previous shellcheck-related "fixes" again
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: code style fix - use spaces for indentation
+  * debian: disable timer-based apt-get
+  * network: fix rules for network setup on new udev
+  * Fix removing temporary file after editing in (Disp)VM
+
+  [ Nedyalko Andreev ]
+  * Disable dnf plugins when downloading dom0 updates in sys-firewall
+
+  [ Marek Marczykowski-Górecki ]
+  * network: order qubes-firewall service before enabling IP forwarding
+  * Disable cups-browsed service together with cups
+
+  [ Rusty Bird ]
+  * Add iptables dep to qubes-core-vm RPM spec
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 13 Dec 2017 19:44:07 +0100
+
 qubes-core-agent (3.2.20-1) unstable; urgency=medium
 
   [ Frédéric Pierret ]
