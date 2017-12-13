@@ -122,6 +122,7 @@ Conflicts:  firewalld
 %endif
 Requires:	xdg-utils
 Requires:   ethtool
+Requires:   iptables
 Requires:   tinyproxy
 Requires:   ntpdate
 Requires:   net-tools
