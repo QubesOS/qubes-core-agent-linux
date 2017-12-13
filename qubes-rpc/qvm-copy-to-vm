@@ -42,6 +42,9 @@ if [ $PROGRESS_TYPE = console ] ; then
     export FILECOPY_TOTAL_SIZE
 fi
 
+echo "qvm-copy-to-vm/qvm-move-to-vm tools are deprecated," >&2
+echo "use qvm-copy/qvm-move to avoid typing target qube name twice" >&2
+
 /usr/lib/qubes/qrexec-client-vm "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
 
 if [ "${0##*/}" = "qvm-move-to-vm" ]; then
