@@ -55,6 +55,7 @@ disable plymouth-quit-wait.service
 disable smartd.service
 disable upower.service
 disable colord.service
+disable wpa_supplicant@.service
 
 # Fedora only services
 disable cpuspeed.service
