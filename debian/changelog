@@ -1,3 +1,14 @@
+qubes-core-agent (3.2.22-1) unstable; urgency=medium
+
+  [ unman ]
+  * Disable wpa_supplicant@.service
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: fix shellcheck warnings in debian packaging
+  * debian: use systemd-preset logic from rpm package
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 Dec 2017 09:22:54 +0100
+
 qubes-core-agent (3.2.21-1) unstable; urgency=medium
 
   [ Nedyalko Andreev ]
