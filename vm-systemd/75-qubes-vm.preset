@@ -56,6 +56,7 @@ disable smartd.service
 disable upower.service
 disable colord.service
 disable systemd-timesyncd.service
+disable wpa_supplicant@.service
 
 # Fedora only services
 disable cpuspeed.service
