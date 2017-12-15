@@ -26,31 +26,70 @@ debug() {
     fi
 }
 
-systemdPreload() {
-    # Debian systemd helper does not yet honour preset, therefore use
-    # systemctl preset on each unit file (not using preset-all either since
-    # wheezy does not support it) listed in 75-qubes-vm.preset.
+is_static() {
+    [ -f "/lib/sytemd/system/$1" ] && ! grep -q '^[[].nstall]' "/lib/systemd/system/$1"
+}
 
-    systemctl --no-reload preset-all > /dev/null 2>&1 && PRESET_FAILED=0 || PRESET_FAILED=1
+is_masked() {
+    if [ ! -L /etc/systemd/system/"$1" ]
+    then
+       return 1
+    fi
+    target=$(readlink /etc/systemd/system/"$1" 2>/dev/null || :)
+    if [ "$target" = "/dev/null" ]
+    then
+       return 0
+    fi
+    return 1
+}
 
-    # Mask any static unit files that are marked to be disabled
-    grep '^[[:space:]]*[^#;]' /lib/systemd/system-preset/75-qubes-vm.preset | while read -r action unit_name; do
-        case "${action}" in
-        disable)
-            if [ -e "/lib/systemd/system/${unit_name}" ]; then
-                if ! grep -F -q '[Install]' "/lib/systemd/system/${unit_name}"; then
+mask() {
+    ln -sf /dev/null /etc/systemd/system/"$1"
+}
+
+unmask() {
+    if ! is_masked "$1"
+    then
+        return 0
+    fi
+    rm -f /etc/systemd/system/"$1"
+}
+
+preset_units() {
+    local represet=
+    while read -r action unit_name
+    do
+        if [ "$action" = "#" ] && [ "$unit_name" = "Units below this line will be re-preset on package upgrade" ]
+        then
+            represet=1
+            continue
+        fi
+        echo "$action $unit_name" | grep -q '^[[:space:]]*[^#;]' || continue
+        if ! [ -n "$action" ] || ! [ -n "$unit_name" ]; then
+            continue
+        fi
+        if [ "$2" = "initial" ] || [ "$represet" = "1" ]
+        then
+            if [ "$action" = "disable" ] && is_static "$unit_name"
+            then
+                if ! is_masked "$unit_name"
+                then
+                    # We must effectively mask these units, even if they are static.
                     deb-systemd-helper mask "${unit_name}" > /dev/null 2>&1 || true
                 fi
+            elif [ "$action" = "enable" ] && is_static "$unit_name"
+            then
+                if is_masked "$unit_name"
+                then
+                    # We masked this static unit before, now we unmask it.
+                    deb-systemd-helper unmask "${unit_name}" > /dev/null 2>&1 || true
+                fi
+                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
+            else
+                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
             fi
-            ;;
-        *)
-            # preset-all is not available in wheezy; so preset each unit file listed in 75-qubes-vm.preset
-            if [ "${PRESET_FAILED}" -eq 1 ]; then
-                systemctl --no-reload preset "${unit_name}" > /dev/null 2>&1 || true
-            fi
-            ;;
-        esac
-    done
+        fi
+    done < "$1"
 
     systemctl daemon-reload
 }
@@ -97,10 +136,12 @@ case "${1}" in
             ln -s /lib/systemd/system/multi-user.target /etc/systemd/system/default.target
 
             # Systemd preload-all
-            systemdPreload
+            preset_units /lib/systemd/system-preset/75-qubes-vm.preset initial
 
             # Maybe install overridden serial.conf init script
             installSerialConf
+        else
+            preset_units /lib/systemd/system-preset/75-qubes-vm.preset upgrade
         fi
         systemctl reenable haveged
 
