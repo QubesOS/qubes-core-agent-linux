@@ -1,3 +1,57 @@
+qubes-core-agent (4.0.14-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Disable cups-browsed service together with cups
+
+  [ Olivier Médoc ]
+  * Makefile: split network install target from core agent install
+    target
+  * Makefile: ensure that everything is installed by default for rh
+    based agents
+  * archlinux: split core-agent from netvm-agent
+
+  [ Olivier MEDOC ]
+  * Makefile: add basic networking to the new install-corevm target
+  * Makefile: fix typo created when spliting the install targets
+  * Makefile: add network install targets to install-deb
+  * archlinux: create a keyring package to install binary repository
+    automatically
+  * archlinux: fix shellcheck issues
+  * Makefile: remove invalid reference to network dropins install target
+  * archlinux: fix incorrect keyring being populated
+  * archlinux: add recently splitted packages as optional dependencies
+    of qubes-vm-core
+  * Makefile: install-netvm shouldn't be a dependency of itself.
+  * archlinux fix .service added twice in networking install script
+
+  [ Marek Marczykowski-Górecki ]
+  * network: configure IPv6 when enabled
+  * network: IPv6-enabled firewall
+  * network: drop unsolicited IPv6 neighbor advertisements by default
+  * Fix IPv6 support in qubes-firewall
+  * Add hint to use qvm-copy/qvm-move instead of qvm-*-to-vm
+
+  [ Frédéric Pierret ]
+  * Add support for Thunar Qubes VM tools
+  * Disable Thunar thumbnails
+  * Add debian package support
+  * Fix ShellCheck comments
+  * Fix UCA mistake and qvm-actions script
+
+  [ TomZ ]
+  * Fix language issues and usability issue
+
+  [ Rusty Bird ]
+  * qvm-{copy,move}: fix spurious deprecation message
+
+  [ unman ]
+  * Disable wpa_supplicant@.service
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: use systemd-preset logic from rpm package
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 Dec 2017 09:23:22 +0100
+
 qubes-core-agent (4.0.13-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
