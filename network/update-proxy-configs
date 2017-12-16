@@ -93,6 +93,7 @@ if [ -d /etc/apt/apt.conf.d ]; then
 ### /etc/apt/apt.conf.d.
 
 Acquire::http::Proxy "$PROXY_ADDR";
+Acquire::tor::proxy "$PROXY_ADDR";
 EOF
     else
         rm -f /etc/apt/apt.conf.d/01qubes-proxy
