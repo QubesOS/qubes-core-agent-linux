@@ -30,6 +30,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
+#include <err.h>
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <string.h>
@@ -143,7 +144,7 @@ void do_exec(const char *cmd)
     struct passwd pw_copy;
     pid_t child, pid;
     char **env;
-    char pid_s[32];
+    char env_buf[64];
     char *arg0;
     char *shell_basename;
 #endif
@@ -217,8 +218,24 @@ void do_exec(const char *cmd)
         goto error;
 
     /* provide this variable to child process */
-    snprintf(pid_s, sizeof(pid_s), "QREXEC_AGENT_PID=%d", getppid());
-    retval = pam_putenv(pamh, pid_s);
+    snprintf(env_buf, sizeof(env_buf), "QREXEC_AGENT_PID=%d", getppid());
+    retval = pam_putenv(pamh, env_buf);
+    if (retval != PAM_SUCCESS)
+        goto error;
+    snprintf(env_buf, sizeof(env_buf), "HOME=%s", pw->pw_dir);
+    retval = pam_putenv(pamh, env_buf);
+    if (retval != PAM_SUCCESS)
+        goto error;
+    snprintf(env_buf, sizeof(env_buf), "SHELL=%s", pw->pw_shell);
+    retval = pam_putenv(pamh, env_buf);
+    if (retval != PAM_SUCCESS)
+        goto error;
+    snprintf(env_buf, sizeof(env_buf), "USER=%s", pw->pw_name);
+    retval = pam_putenv(pamh, env_buf);
+    if (retval != PAM_SUCCESS)
+        goto error;
+    snprintf(env_buf, sizeof(env_buf), "LOGNAME=%s", pw->pw_name);
+    retval = pam_putenv(pamh, env_buf);
     if (retval != PAM_SUCCESS)
         goto error;
 
@@ -236,9 +253,13 @@ void do_exec(const char *cmd)
             if (setuid (pw->pw_uid))
                 exit(126);
             setsid();
-            /* This is a copy but don't care to free as we exec later anyways.  */
+            /* This is a copy but don't care to free as we exec later anyway.  */
             env = pam_getenvlist (pamh);
 
+            /* try to enter home dir, but don't abort if it fails */
+            retval = chdir(pw->pw_dir);
+            if (retval == -1)
+                warn("chdir(%s)", pw->pw_dir);
             execle(pw->pw_shell, arg0, "-c", realcmd, (char*)NULL, env);
             exit(127);
         default:
