@@ -12,7 +12,7 @@ if [ "${filename%%:*}" = xdgicon ]; then
 elif [ "${filename}" = "-" ] || [ "${filename##*:}" = "-" ]; then
     tmpfile="$(mktemp /tmp/qimg-XXXXXXXX)"
     cat > "${tmpfile}"
-    if [ "${filename##*:}" = "-" ]; then
+    if [ "${filename%:*}" != "-" ]; then
         filename="${filename%:*}:${tmpfile}"
     else
         filename="${tmpfile}"
