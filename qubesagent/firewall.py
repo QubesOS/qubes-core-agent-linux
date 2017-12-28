@@ -248,8 +248,12 @@ class IptablesWorker(FirewallWorker):
             elif 'dst6' in rule:
                 dsthosts = [rule['dst6']]
             elif 'dsthost' in rule:
-                addrinfo = socket.getaddrinfo(rule['dsthost'], None,
-                    (socket.AF_INET6 if family == 6 else socket.AF_INET))
+                try:
+                    addrinfo = socket.getaddrinfo(rule['dsthost'], None,
+                        (socket.AF_INET6 if family == 6 else socket.AF_INET))
+                except socket.gaierror as e:
+                    raise RuleParseError('Failed to resolve {}: {}'.format(
+                        rule['dsthost'], str(e)))
                 dsthosts = set(item[4][0] + fullmask for item in addrinfo)
             else:
                 dsthosts = None
@@ -458,8 +462,12 @@ class NftablesWorker(FirewallWorker):
             elif 'dst6' in rule:
                 nft_rule += ' ip6 daddr {}'.format(rule['dst6'])
             elif 'dsthost' in rule:
-                addrinfo = socket.getaddrinfo(rule['dsthost'], None,
-                    (socket.AF_INET6 if family == 6 else socket.AF_INET))
+                try:
+                    addrinfo = socket.getaddrinfo(rule['dsthost'], None,
+                        (socket.AF_INET6 if family == 6 else socket.AF_INET))
+                except socket.gaierror as e:
+                    raise RuleParseError('Failed to resolve {}: {}'.format(
+                        rule['dsthost'], str(e)))
                 nft_rule += ' {} daddr {{ {} }}'.format(ip_match,
                     ', '.join(set(item[4][0] + fullmask for item in addrinfo)))
 
