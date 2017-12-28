@@ -624,8 +624,8 @@ void handle_server_exec_request_init(struct msg_header *hdr)
 
     if (hdr->type != MSG_SERVICE_CONNECT && wait_for_session_maybe(buf)) {
         /* waiting for session, postpone actual call */
-        int slot_index = 0;
-        while (slot_index < MAX_FDS)
+        int slot_index;
+        for (slot_index = 0; slot_index < MAX_FDS; slot_index++)
             if (!requests_waiting_for_session[slot_index].cmdline)
                 break;
         if (slot_index == MAX_FDS) {
