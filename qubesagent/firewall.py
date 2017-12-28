@@ -556,7 +556,7 @@ class NftablesWorker(FirewallWorker):
             '  chain forward {{\n'
             '    type filter hook forward priority 0;\n'
             '    policy drop;\n'
-            '    ct state established accept\n'
+            '    ct state established,related accept\n'
             '  }}\n'
             '}}\n'
         )
