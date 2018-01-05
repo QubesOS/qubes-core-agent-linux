@@ -198,11 +198,11 @@ DNF plugin for Qubes specific post-installation actions:
  * refresh applications shortcut list
 %endif
 
-%package thunar
+%package -n qubes-core-agent-thunar
 Summary: Thunar support for Qubes VM tools
 Requires: Thunar
 
-%description thunar
+%description -n qubes-core-agent-thunar
 Thunar support for Qubes VM tools
 
 %define _builddir %(pwd)
@@ -388,7 +388,7 @@ mv /etc/selinux/config.processed /etc/selinux/config
 setenforce 0 2>/dev/null
 exit 0
 
-%post thunar 
+%post -n qubes-core-agent-thunar
 if [ "$1" = 1 ]; then
   # There is no system-wide Thunar custom actions. There is only a default
   # file and a user file created from the default one. Qubes actions need
@@ -416,7 +416,7 @@ if [ "$1" = 0 ] ; then
     fi
 fi
 
-%postun thunar 
+%postun -n qubes-core-agent-thunar
 if [ "$1" = 0 ]; then
   if [ -f /etc/xdg/Thunar/uca.xml ] ; then
     mv /etc/xdg/Thunar/uca.xml{,.uninstall}
@@ -593,7 +593,7 @@ rm -f %{name}-%{version}
 %{python3_sitelib}/dnf-plugins/*
 %endif
 
-%files thunar
+%files -n qubes-core-agent-thunar
 /usr/lib/qubes/qvm-actions.sh
 /usr/lib/qubes/uca_qubes.xml
 /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/thunar.xml
