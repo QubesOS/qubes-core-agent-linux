@@ -22,7 +22,8 @@
 if command -v kdialog 2> /dev/null; then
     SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
     REF=$(kdialog --progressbar "Copy progress")
-    qdbus "$REF" org.freedesktop.DBus.Properties.Set "" maximum "$SIZE"
+    # shellcheck disable=SC2086
+    qdbus $REF org.freedesktop.DBus.Properties.Set "" maximum "$SIZE"
 
     export PROGRESS_TYPE=gui
 
@@ -31,10 +32,12 @@ if command -v kdialog 2> /dev/null; then
         /usr/lib/qubes/qfile-agent "$@" |
     (while read -r sentsize ; do
         CURRSIZE=$((sentsize / 1024))
-        qdbus "$REF" org.freedesktop.DBus.Properties.Set "" value "$CURRSIZE"
+        # shellcheck disable=SC2086
+        qdbus $REF org.freedesktop.DBus.Properties.Set "" value "$CURRSIZE"
     done)
 
-    qdbus "$REF" close
+    # shellcheck disable=SC2086
+    qdbus $REF close
     # we do not want a dozen error messages, do we
     # if ! [ "x"$agentstatus = xDONE ] ; then
     # 	kdialog --sorry 'Abnormal file copy termination; see /var/log/qubes/qrexec.xid.log in dom0 for more details'
