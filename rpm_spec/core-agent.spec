@@ -279,6 +279,7 @@ Thunar support for Qubes VM tools
 %define _builddir %(pwd)
 
 %define kde_service_dir /usr/share/kde4/services
+%define kde5_service_dir /usr/share/kservices5/ServiceMenus
 
 %prep
 # we operate on the current directory, so no need to unpack anything
@@ -550,6 +551,9 @@ rm -f %{name}-%{version}
 %{kde_service_dir}/qvm-copy.desktop
 %{kde_service_dir}/qvm-move.desktop
 %{kde_service_dir}/qvm-dvm.desktop
+%{kde5_service_dir}/qvm-copy.desktop
+%{kde5_service_dir}/qvm-move.desktop
+%{kde5_service_dir}/qvm-dvm.desktop
 %config(noreplace) /etc/X11/xorg-preload-apps.conf
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*

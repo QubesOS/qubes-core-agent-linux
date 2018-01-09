@@ -4,6 +4,7 @@ VERSION := $(shell cat version)
 
 DIST ?= fc18
 KDESERVICEDIR ?= /usr/share/kde4/services
+KDE5SERVICEDIR ?= /usr/share/kservices5/ServiceMenus/
 SBINDIR ?= /usr/sbin
 BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
@@ -249,6 +250,8 @@ install-common: install-doc
 	install -m 0644 misc/qubes-suspend-module-blacklist $(DESTDIR)/etc/qubes-suspend-module-blacklist
 	install -d $(DESTDIR)/$(KDESERVICEDIR)
 	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-move.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDESERVICEDIR)
+	install -d $(DESTDIR)/$(KDE5SERVICEDIR)
+	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-move.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDE5SERVICEDIR)
 	install -d $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/{qubes.Filecopy,qubes.OpenInVM,qubes.VMShell} $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.VMRootShell $(DESTDIR)/etc/qubes-rpc
