@@ -201,6 +201,7 @@ DNF plugin for Qubes specific post-installation actions:
 %define _builddir %(pwd)
 
 %define kde_service_dir /usr/share/kde4/services
+%define kde5_service_dir /usr/share/kservices5/ServiceMenus
 
 %description
 The Qubes core files for installation inside a Qubes VM.
@@ -419,6 +420,9 @@ rm -f %{name}-%{version}
 %{kde_service_dir}/qvm-copy.desktop
 %{kde_service_dir}/qvm-move.desktop
 %{kde_service_dir}/qvm-dvm.desktop
+%{kde5_service_dir}/qvm-copy.desktop
+%{kde5_service_dir}/qvm-move.desktop
+%{kde5_service_dir}/qvm-dvm.desktop
 /etc/NetworkManager/dispatcher.d/30-qubes-external-ip
 /etc/NetworkManager/dispatcher.d/qubes-nmhook
 %config(noreplace) /etc/X11/xorg-preload-apps.conf
