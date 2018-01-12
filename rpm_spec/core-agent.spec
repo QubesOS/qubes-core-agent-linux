@@ -368,6 +368,8 @@ if test -f /etc/yum.conf && ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc
   echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
 fi
 
+dconf update &> /dev/null || :
+
 # And actually setup the proxy usage in package managers
 /usr/lib/qubes/update-proxy-configs
 
@@ -612,6 +614,8 @@ rm -f %{name}-%{version}
 %if %{fedora} < 22
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 %endif
+%config(noreplace) /etc/dconf/profile/user
+%config(noreplace) /etc/dconf/db/local.d/dpi
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
