@@ -1,3 +1,15 @@
+qubes-core-agent (4.0.16-1) unstable; urgency=medium
+
+  * firewall: don't crash the whole qubes-firewall service on DNS fail
+  * firewall: allow also related traffic
+  * qrexec: fix infinite loop when multiple services are waiting for GUI
+  * Fix kdialog --progressbar usage
+  * Install KDE actions for KDE5
+  * Enable gnome settings daemon xsettings plugin
+  * Disable automatic scaling in GNOME/GTK applications
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 12 Jan 2018 06:18:51 +0100
+
 qubes-core-agent (4.0.15-1) unstable; urgency=medium
 
   [ MB ]
