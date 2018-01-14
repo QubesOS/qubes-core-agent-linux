@@ -42,6 +42,7 @@ etc/qubes/rpc-config/qubes.SelectFile
 etc/qubes/rpc-config/qubes.SelectDirectory
 etc/qubes/rpc-config/qubes.StartApp
 etc/qubes/rpc-config/qubes.InstallUpdatesGUI
+etc/qubes/rpc-config/qubes.VMShell+WaitForSession
 etc/qubes/suspend-post.d/README
 etc/qubes/suspend-post.d/*.sh
 etc/qubes/suspend-pre.d/README

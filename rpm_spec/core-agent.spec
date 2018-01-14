@@ -591,6 +591,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectDirectory
 %config(noreplace) /etc/qubes/rpc-config/qubes.StartApp
 %config(noreplace) /etc/qubes/rpc-config/qubes.InstallUpdatesGUI
+%config(noreplace) /etc/qubes/rpc-config/qubes.VMShell+WaitForSession
 %dir /etc/qubes/autostart
 %config(noreplace) /etc/default/grub.qubes
 /etc/qubes/autostart/README.txt
