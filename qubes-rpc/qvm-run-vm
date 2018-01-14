@@ -49,4 +49,10 @@ elif [ "$VMNAME" = "" ] ; then
     print_usage
     exit 1
 fi
-exec /usr/lib/qubes/qrexec-client-vm "$VMNAME" qubes.VMShell "/usr/lib/qubes/qrun-in-vm" "$@"
+
+service="qubes.VMShell"
+case "$VMNAME" in \$dispvm|\$dispvm:*)
+    service="$service+WaitForSession"
+esac
+
+exec /usr/lib/qubes/qrexec-client-vm "$VMNAME" "$service" "/usr/lib/qubes/qrun-in-vm" "$@"
