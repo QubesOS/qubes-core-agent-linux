@@ -1,3 +1,13 @@
+qubes-core-agent (4.0.17-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * Set 'wait-for-session=1' for 'qubes.VMShell+WaitForSession'
+  * qvm-run-vm: appease ShellCheck without comment
+  * qvm-run-vm: wait for X11 in DispVM case
+  * Remove stranded block-snapshot script
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 18 Jan 2018 19:30:32 +0100
+
 qubes-core-agent (4.0.16-1) unstable; urgency=medium
 
   * firewall: don't crash the whole qubes-firewall service on DNS fail
