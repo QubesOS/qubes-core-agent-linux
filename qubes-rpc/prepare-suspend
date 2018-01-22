@@ -34,6 +34,24 @@ if [ x"$action" = x"suspend" ]; then
         fi
         ip l s "$intf" down
     done
+
+    # detach all drivers from PCI devices (the real ones, not emulated by qemu)
+    echo -n > /var/run/qubes-suspend-pci-devs-detached
+    for dev_path in /sys/bus/pci/devices/*; do
+        # skip qemu emulated devs
+        subsystem_vendor=$(cat "$dev_path/subsystem_vendor")
+        if [ "$subsystem_vendor" = "0x1af4" ] || [ "$subsystem_vendor" = "0x5853" ]; then
+            continue
+        fi
+        if ! [ -e "$dev_path/driver" ]; then
+            continue
+        fi
+        bdf=$(basename "$dev_path")
+        driver_path=$(readlink -f "$dev_path/driver")
+        echo "$bdf" > "$driver_path/unbind"
+        echo "$bdf $driver_path" >> /var/run/qubes-suspend-pci-devs-detached
+    done
+
     LOADED_MODULES=""
     for mod in $MODULES_BLACKLIST; do
         if lsmod |grep -q "$mod"; then
@@ -48,6 +66,12 @@ else
         modprobe "$mod"
     done
     rm -f /var/run/qubes-suspend-modules-loaded
+
+    while read -r dev driver_path; do
+        echo "$dev" > "$driver_path/bind"
+    done < /var/run/qubes-suspend-pci-devs-detached
+    rm -f /var/run/qubes-suspend-pci-devs-detached
+
     if qsvc network-manager ; then
         dbus-send --system --print-reply          \
             --dest=org.freedesktop.NetworkManager \
