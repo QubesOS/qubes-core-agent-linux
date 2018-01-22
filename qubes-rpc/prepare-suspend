@@ -36,11 +36,13 @@ if [ x"$action" = x"suspend" ]; then
             modprobe -r $mod
         fi
     done
-    echo $LOADED_MODULES > /var/run/qubes/suspend-modules-loaded
+    echo "$LOADED_MODULES" > /var/run/qubes-suspend-modules-loaded
 else
-    for mod in `cat /var/run/qubes/suspend-modules-loaded`; do
-        modprobe $mod
+    # shellcheck disable=SC2013
+    for mod in $(cat /var/run/qubes-suspend-modules-loaded); do
+        modprobe "$mod"
     done
+    rm -f /var/run/qubes-suspend-modules-loaded
     if qsvc network-manager ; then
         dbus-send --system --print-reply          \
             --dest=org.freedesktop.NetworkManager \
