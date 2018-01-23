@@ -1,3 +1,10 @@
+qubes-core-agent (4.0.18-1) unstable; urgency=medium
+
+  * Place list of loaded modules in /var/run directly
+  * Detach all drivers from PCI devices before suspend
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 23 Jan 2018 14:17:05 +0100
+
 qubes-core-agent (4.0.17-1) unstable; urgency=medium
 
   [ Rusty Bird ]
