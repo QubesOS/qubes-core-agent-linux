@@ -1,3 +1,9 @@
+qubes-core-agent (4.0.19-1) unstable; urgency=medium
+
+  * Mount root fs with 'discard' option by default
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 24 Jan 2018 01:46:25 +0100
+
 qubes-core-agent (4.0.18-1) unstable; urgency=medium
 
   * Place list of loaded modules in /var/run directly
