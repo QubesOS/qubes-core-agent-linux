@@ -275,10 +275,6 @@ Requires: Thunar
 %description thunar
 Thunar support for Qubes VM tools
 
-%if 0%{?qubes_builder}
-%define _builddir %(pwd)
-%endif
-
 %define kde_service_dir /usr/share/kde4/services
 %define kde5_service_dir /usr/share/kservices5/ServiceMenus
 
@@ -467,7 +463,7 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %post qrexec
 %systemd_post qubes-qrexec-agent.service
 
-%post thunar 
+%post thunar
 if [ "$1" = 1 ]; then
   # There is no system-wide Thunar custom actions. There is only a default
   # file and a user file created from the default one. Qubes actions need
@@ -504,7 +500,7 @@ fi
 %preun qrexec
 %systemd_preun qubes-qrexec-agent.service
 
-%postun thunar 
+%postun thunar
 if [ "$1" = 0 ]; then
   if [ -f /etc/xdg/Thunar/uca.xml ] ; then
     mv /etc/xdg/Thunar/uca.xml{,.uninstall}
