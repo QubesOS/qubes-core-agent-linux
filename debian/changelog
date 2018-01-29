@@ -1,3 +1,9 @@
+qubes-core-agent (4.0.20-1) unstable; urgency=medium
+
+  * Add intel wifi drivers to suspend-module-blacklist
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 29 Jan 2018 21:57:11 +0100
+
 qubes-core-agent (4.0.19-1) unstable; urgency=medium
 
   * Mount root fs with 'discard' option by default
