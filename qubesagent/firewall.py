@@ -62,6 +62,13 @@ class FirewallWorker(object):
         '''Apply rules in given source address'''
         raise NotImplementedError
 
+    def run_user_script(self):
+        '''Run user script in /rw/config'''
+        user_script_path = '/rw/config/qubes-firewall-user-script'
+        if os.path.isfile(user_script_path) and \
+                os.access(user_script_path, os.X_OK):
+            subprocess.call([user_script_path])
+
     def read_rules(self, target):
         '''Read rules from QubesDB and return them as a list of dicts'''
         entries = self.qdb.multiread('/qubes-firewall/{}/'.format(target))
@@ -133,6 +140,7 @@ class FirewallWorker(object):
     def main(self):
         self.terminate_requested = False
         self.init()
+        self.run_user_script()
         # initial load
         for source_addr in self.list_targets():
             self.handle_addr(source_addr)
