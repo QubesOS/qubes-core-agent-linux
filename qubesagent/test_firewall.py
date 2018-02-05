@@ -63,6 +63,7 @@ class FirewallWorker(qubesagent.firewall.FirewallWorker):
 
         self.init_called = False
         self.cleanup_called = False
+        self.user_script_called = False
         self.rules = {}
 
     def apply_rules(self, source_addr, rules):
@@ -73,6 +74,9 @@ class FirewallWorker(qubesagent.firewall.FirewallWorker):
 
     def init(self):
         self.cleanup_called = True
+
+    def run_user_script(self):
+        self.user_script_called = True
 
 
 class IptablesWorker(qubesagent.firewall.IptablesWorker):
@@ -522,10 +526,31 @@ class TestFirewallWorker(TestCase):
         self.obj.handle_addr('10.137.0.4')
         self.assertEqual(self.obj.rules['10.137.0.4'], [{'action': 'drop'}])
 
+    @patch('os.path.isfile')
+    @patch('os.access')
+    @patch('subprocess.call')
+    def test_run_user_script(self, mock_subprocess, mock_os_access,
+            mock_os_path_isfile):
+        mock_os_path_isfile.return_value = False
+        mock_os_access.return_value = False
+        super(FirewallWorker, self.obj).run_user_script()
+        self.assertFalse(mock_subprocess.called)
+
+        mock_os_path_isfile.return_value = True
+        mock_os_access.return_value = False
+        super(FirewallWorker, self.obj).run_user_script()
+        self.assertFalse(mock_subprocess.called)
+
+        mock_os_path_isfile.return_value = True
+        mock_os_access.return_value = True
+        super(FirewallWorker, self.obj).run_user_script()
+        mock_subprocess.assert_called_once_with(
+            ['/rw/config/qubes-firewall-user-script'])
 
     def test_main(self):
         self.obj.main()
         self.assertTrue(self.obj.init_called)
         self.assertTrue(self.obj.cleanup_called)
+        self.assertTrue(self.obj.user_script_called)
         self.assertEqual(set(self.obj.rules.keys()), self.obj.list_targets())
         # rules content were already tested
