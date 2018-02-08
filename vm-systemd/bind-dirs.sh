@@ -1,4 +1,5 @@
 #!/bin/bash -e
+shopt -s nullglob dotglob
 # vim: set ts=4 sw=4 sts=4 et :
 #
 # bind-dirs
@@ -38,8 +39,6 @@ init() {
    [ -n "$rw_dest_dir" ] || rw_dest_dir="/rw/bind-dirs"
    [ -n "$symlink_level_max" ] || symlink_level_max="10"
    mkdir --parents "$rw_dest_dir"
-   shopt -s nullglob
-   shopt -s dotglob
 }
 
 legacy() {
