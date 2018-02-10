@@ -1,19 +1,17 @@
 #!/bin/bash
 # Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 # shellcheck disable=SC2034
-pkgname=qubes-vm-core
+pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring)
 pkgver=$(cat version)
-pkgrel=11
+pkgrel=12
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
 url="http://qubes-os.org/"
 license=('GPL')
 groups=()
-depends=("qubes-vm-utils>=3.1.3" python2 python3 python2-xdg ethtool ntp net-tools gnome-packagekit imagemagick fakeroot notification-daemon dconf pygtk zenity qubes-libvchan "qubes-db-vm>=3.2.1" haveged python2-gobject python2-dbus xdg-utils notification-daemon gawk sed procps-ng librsvg)
-makedepends=(gcc make pkg-config "qubes-vm-utils>=3.1.3" qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python2 python3 lsb-release)
+makedepends=(gcc make pkg-config "qubes-vm-utils>=3.1.3" qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python2 python3 lsb-release pandoc)
 checkdepends=()
-optdepends=(gnome-keyring gnome-settings-daemon networkmanager iptables tinyproxy python2-nautilus gpk-update-viewer)
 provides=()
 conflicts=()
 replaces=()
@@ -24,9 +22,12 @@ changelog=
 
 source=(
     PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook
-    PKGBUILD-qubes-noupgrade.conf
+    PKGBUILD-qubes-pacman-options.conf
     PKGBUILD-qubes-repo-3.1.conf
     PKGBUILD-qubes-repo-3.2.conf
+    PKGBUILD-keyring-keys
+    PKGBUILD-keyring-trusted
+    PKGBUILD-keyring-revoked
 )
 
 noextract=()
@@ -46,10 +47,10 @@ build() {
     sed 's:/bin/grep:grep:g' -i network/*
 
     # Force running all scripts with python2
-    sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i misc/*
-    sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i misc/*
-    sed 's:#!/usr/bin/python:#!/usr/bin/python2:' -i qubes-rpc/*
-    sed 's:#!/usr/bin/env python:#!/usr/bin/env python2:' -i qubes-rpc/*
+    sed 's:^#!/usr/bin/python.*:#!/usr/bin/python2:' -i misc/*
+    sed 's:^#!/usr/bin/env python.*:#!/usr/bin/env python2:' -i misc/*
+    sed 's:^#!/usr/bin/python.*:#!/usr/bin/python2:' -i qubes-rpc/*
+    sed 's:^#!/usr/bin/env python.*:#!/usr/bin/env python2:' -i qubes-rpc/*
 
     # Fix for archlinux sbindir
     sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
@@ -61,15 +62,41 @@ build() {
     done
 }
 
-package() {
+#This package provides:
+# * qrexec agent
+# * qubes rpc scripts
+# * core linux tools and scripts
+# * core systemd services and drop-ins
+# * basic network functionality (setting IP address, DNS, default gateway)
+#
+# NetVM/ProxyVM tools
+# * proxy service used by TemplateVMs to download updates
+# * qubes-firewall service (FirewallVM)
+#
+# Integration of NetworkManager for Qubes VM:
+# * make connections config persistent
+# * adjust DNS redirections when needed
+# * show/hide NetworkManager applet icon
+#
+package_qubes-vm-core() {
+    depends=("qubes-vm-utils>=3.1.3" python2 python2-xdg ethtool ntp net-tools
+             gnome-packagekit imagemagick fakeroot notification-daemon dconf
+             zenity qubes-libvchan "qubes-db-vm>=3.2.1" haveged python2-gobject
+             python2-dbus xdg-utils notification-daemon gawk sed procps-ng librsvg
+             socat pygtk
+             )
+    optdepends=(gnome-keyring gnome-settings-daemon python2-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
+    install=PKGBUILD.install
+
     # Note: Archlinux removed use of directory such as /sbin /bin /usr/sbin (https://mailman.archlinux.org/pipermail/arch-dev-public/2012-March/022625.html)
     # shellcheck disable=SC2154
     make -C qrexec install DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
 
-    make install-vm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
+    PYTHON=python2 make install-vm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
 
     # Remove things non wanted in archlinux
     rm -r "$pkgdir/etc/yum"*
+    rm -r "$pkgdir/etc/dnf"*
     rm -r "$pkgdir/etc/init.d"
     # Remove fedora specific scripts
     rm "$pkgdir/etc/fstab"
@@ -83,7 +110,7 @@ package() {
 
     # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
     mkdir -p "${pkgdir}/etc/pacman.d"
-    install -m 644 "$srcdir/PKGBUILD-qubes-noupgrade.conf" "${pkgdir}/etc/pacman.d/10-qubes-noupgrade.conf"
+    install -m 644 "$srcdir/PKGBUILD-qubes-pacman-options.conf" "${pkgdir}/etc/pacman.d/10-qubes-options.conf"
 
     # Install pacman repository
     release=$(echo "$pkgver" | cut -d '.' -f 1,2)
@@ -100,6 +127,28 @@ EOF
 
     # Archlinux packaging guidelines: /var/run is a symlink to a tmpfs. Don't create it
     rm -r "$pkgdir/var/run"
+}
+
+#This package provides:
+# * dependencies required for using the template as a NetvVM/ProxyVM
+package_qubes-vm-networking() {
+    pkgdesc="Stub package providing Qubes OS dependencies allowing to use a Qubes VM as a NetVM/ProxyVM"
+    depends=(qubes-vm-core "qubes-vm-utils>=3.1.3" python2 ethtool net-tools
+             "qubes-db-vm>=3.2.1" networkmanager iptables tinyproxy nftables
+             )
+    install=PKGBUILD-networking.install
+}
+
+package_qubes-vm-keyring() {
+    pkgdesc="Qubes OS Binary Repository Activation package and Keyring"
+    install=PKGBUILD-keyring.install
+
+    # Install keyring (will be activated through the .install file)
+    install -dm755 "${pkgdir}/usr/share/pacman/keyrings/"
+    install -m0644 PKGBUILD-keyring-keys "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm.gpg"
+    install -m0644 PKGBUILD-keyring-trusted "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-trusted"
+    install -m0644 PKGBUILD-keyring-revoked "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-revoked"
+
 }
 
 # vim:set ts=2 sw=2 et:
