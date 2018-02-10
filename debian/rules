@@ -5,7 +5,7 @@
 #export DH_VERBOSE=1
 
 include /usr/share/dpkg/default.mk
-export DESTDIR=$(shell pwd)/debian/qubes-core-agent
+export DESTDIR=$(shell pwd)/debian/tmp
 
 %:
 	dh $@ --with systemd --with=config-package
