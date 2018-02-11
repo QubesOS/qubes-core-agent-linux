@@ -108,15 +108,9 @@ YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y --downloadonly"
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
 if ! $YUM --help | grep -q downloadonly; then
-    if [ "$YUM_ACTION" != "install" ] && [ "$YUM_ACTION" != "upgrade" ]; then
-        echo "ERROR: yum version installed in VM $(hostname) does not suppport --downloadonly option" >&2
-        echo "ERROR: only 'install' and 'upgrade' actions supported ($YUM_ACTION not)" >&2
-        if [ "$GUI" = 1 ]; then
-            zenity --error --text="yum version too old for '$YUM_ACTION' action, see console for details"
-        fi
-        exit 1
-    fi
-    if [ "$YUM_ACTION" = "upgrade" ]; then
+    if [ "$YUM_ACTION" = "install" ]; then
+        YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
+    elif [ "$YUM_ACTION" = "upgrade" ]; then
         # shellcheck disable=SC2086
         UPDATES_FULL=$($YUM $OPTS check-update $PKGLIST)
         check_update_retcode=$?
@@ -128,8 +122,14 @@ if ! $YUM --help | grep -q downloadonly; then
             exit 0
         fi
         PKGLIST=$UPDATES
+    else
+        echo "ERROR: yum version installed in VM $(hostname) does not suppport --downloadonly option" >&2
+        echo "ERROR: only 'install' and 'upgrade' actions supported ($YUM_ACTION not)" >&2
+        if [ "$GUI" = 1 ]; then
+            zenity --error --text="yum version too old for '$YUM_ACTION' action, see console for details"
+        fi
+        exit 1
     fi
-    YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
 fi
 
 mkdir -p "$DOM0_UPDATES_DIR/packages"
