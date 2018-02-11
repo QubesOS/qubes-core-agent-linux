@@ -122,6 +122,15 @@ if ! $YUM --help | grep -q downloadonly; then
             exit 0
         fi
         PKGLIST=$UPDATES
+        YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
+    elif [ "$YUM_ACTION" == "list" ] || [ "$YUM_ACTION" == "search" ]; then
+        # those actions do not download any package, so lack of --downloadonly is irrelevant
+        YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y"
+    elif [ "$YUM_ACTION" == "reinstal" ]; then
+        # this is just approximation of 'reinstall' action...
+        # shellcheck disable=SC2086
+        PKGLIST=$(rpm --root=$DOM0_UPDATES_DIR -q $PKGLIST)
+        YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
     else
         echo "ERROR: yum version installed in VM $(hostname) does not suppport --downloadonly option" >&2
         echo "ERROR: only 'install' and 'upgrade' actions supported ($YUM_ACTION not)" >&2
