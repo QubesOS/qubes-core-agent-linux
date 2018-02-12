@@ -1,3 +1,37 @@
+qubes-core-agent (3.2.23-1) unstable; urgency=medium
+
+  [ MB ]
+  * Fall back to direct execution when dbus is not installed or running
+
+  [ Patrick Schleizer ]
+  * make apt-get apt-transport-tor broken in Qubes non-networked
+    TemplateVMs
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes.GetImageRGBA: fix handling '-' path without explicit type
+  * Install KDE actions for KDE5
+  * Enable gnome settings daemon xsettings plugin
+  * Disable automatic scaling in GNOME/GTK applications
+  * Place list of loaded modules in /var/run directly
+  * Add intel wifi drivers to suspend-module-blacklist
+
+  [ Olivier MEDOC ]
+  * archlinux: pick Qubes4.0 mergeable changes
+  * archlinux: fix incorrect keyring being populated
+  * archlinux: add recently splitted packages as optional dependencies
+    of qubes-vm-core
+
+  [ Frédéric Pierret ]
+  * Add support for Thunar Qubes VM tools
+  * Disable Thunar thumbnails
+  * Add debian package support
+  * Fix ShellCheck comments
+  * Fix UCA mistake and qvm-actions script
+  * debian: change qubes-core-agent as a subpackage
+  * Fix macros for Thunar to be compatible with qubes-core-agent in R4.0
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 12 Feb 2018 16:48:21 +0100
+
 qubes-core-agent (3.2.22-1) unstable; urgency=medium
 
   [ unman ]
