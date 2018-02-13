@@ -161,8 +161,6 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -d $(DESTDIR)/etc/yum.conf.d
 	touch $(DESTDIR)/etc/yum.conf.d/qubes-proxy.conf
 
-	install -D -m 0644 misc/qubes-trigger-sync-appmenus.action $(DESTDIR)/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-
 	install -D -m 0644 misc/grub.qubes $(DESTDIR)/etc/default/grub.qubes
 	install -D -m 0644 misc/serial.conf $(DESTDIR)/usr/share/qubes/serial.conf
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
