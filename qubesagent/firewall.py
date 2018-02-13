@@ -62,6 +62,17 @@ class FirewallWorker(object):
         '''Apply rules in given source address'''
         raise NotImplementedError
 
+    def run_firewall_dir(self):
+        '''Run scripts dir contents, before user script'''
+        script_dir_path = '/rw/config/qubes-firewall.d'
+        if not os.path.isdir(script_dir_path):
+            return
+        for d_script in sorted(os.listdir(script_dir_path)):
+            d_script_path = os.path.join(script_dir_path, d_script)
+            if os.path.isfile(d_script_path) and \
+                    os.access(d_script_path, os.X_OK):
+                subprocess.call([d_script_path])
+
     def run_user_script(self):
         '''Run user script in /rw/config'''
         user_script_path = '/rw/config/qubes-firewall-user-script'
@@ -140,6 +151,7 @@ class FirewallWorker(object):
     def main(self):
         self.terminate_requested = False
         self.init()
+        self.run_firewall_dir()
         self.run_user_script()
         # initial load
         for source_addr in self.list_targets():
