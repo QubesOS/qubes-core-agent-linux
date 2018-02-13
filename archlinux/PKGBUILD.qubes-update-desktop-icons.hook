@@ -6,6 +6,6 @@ Operation = Remove
 Target = usr/share/applications/*.desktop
 
 [Action]
-Description = Updating the Qubes desktop file App Icons...
+Description = Updating the Qubes desktop file App Icons and features...
 When = PostTransaction
-Exec = /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
+Exec = /etc/qubes-rpc/qubes.PostInstall

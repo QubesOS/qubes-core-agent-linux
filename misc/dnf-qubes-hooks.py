@@ -61,6 +61,5 @@ class QubesHooks(dnf.Plugin):
                 str(len(updates))
             ])
 
-        if config.getboolean('main', 'sync-appmenus'):
-            self.log.info("Sending application list and icons to dom0")
-            subprocess.call(['/usr/lib/qubes/qubes-trigger-sync-appmenus.sh'])
+        self.log.info("Notifying dom0 about installed applications")
+        subprocess.call(['/etc/qubes-rpc/qubes.PostInstall'])
