@@ -281,7 +281,8 @@ install-common: install-doc
 	install -m 0644 qubes-rpc/suspend-pre.README $(DESTDIR)/etc/qubes/suspend-pre.d/README
 	install -d $(DESTDIR)/etc/qubes/suspend-post.d
 	install -m 0644 qubes-rpc/suspend-post.README $(DESTDIR)/etc/qubes/suspend-post.d/README
-	ln -s $(BINDIR)/qvm-sync-clock $(DESTDIR)/etc/qubes/suspend-post.d/qvm-sync-clock.sh
+	install -m 0755 qubes-rpc/suspend-post-qvm-sync-clock.sh \
+		$(DESTDIR)/etc/qubes/suspend-post.d/qvm-sync-clock.sh
 	install -d $(DESTDIR)/etc/qubes/post-install.d
 	install -m 0644 post-install.d/README $(DESTDIR)/etc/qubes/post-install.d/
 	install -m 0755 post-install.d/*.sh $(DESTDIR)/etc/qubes/post-install.d/
