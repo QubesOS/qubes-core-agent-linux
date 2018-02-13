@@ -125,7 +125,7 @@ if ! $YUM --help | grep -q downloadonly; then
         YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
     elif [ "$YUM_ACTION" == "list" ] || [ "$YUM_ACTION" == "search" ]; then
         # those actions do not download any package, so lack of --downloadonly is irrelevant
-        YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y"
+        YUM_COMMAND="$YUM $YUM_ACTION -y"
     elif [ "$YUM_ACTION" == "reinstal" ]; then
         # this is just approximation of 'reinstall' action...
         # shellcheck disable=SC2086
