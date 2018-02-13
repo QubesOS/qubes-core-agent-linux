@@ -1,3 +1,22 @@
+qubes-core-agent (4.0.21-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix systemd-timesyncd.service startup
+  * Do not sync VM time with clockvm if it's set to network time sync
+  * network: reload DNS only on "up" event from NetworkManager
+
+  [ Rusty Bird ]
+  * bind-dirs.sh: don't fail on empty configuration directory
+
+  [ unman ]
+  * Stop Debian templates from forwarding by default.
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes-firewall: call firewall-user-script at service startup
+  * tests: check if qubes-firewall-user-script is called
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 13 Feb 2018 04:56:43 +0100
+
 qubes-core-agent (4.0.20-1) unstable; urgency=medium
 
   * Add intel wifi drivers to suspend-module-blacklist
