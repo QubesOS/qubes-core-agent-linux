@@ -64,14 +64,16 @@ class FirewallWorker(object):
 
     def run_firewall_dir(self):
         '''Run scripts dir contents, before user script'''
-        script_dir_path = '/rw/config/qubes-firewall.d'
-        if not os.path.isdir(script_dir_path):
-            return
-        for d_script in sorted(os.listdir(script_dir_path)):
-            d_script_path = os.path.join(script_dir_path, d_script)
-            if os.path.isfile(d_script_path) and \
-                    os.access(d_script_path, os.X_OK):
-                subprocess.call([d_script_path])
+        script_dir_paths = ['/etc/qubes/qubes-firewall.d',
+                      '/rw/config/qubes-firewall.d']
+        for script_dir_path in script_dir_paths:
+           if not os.path.isdir(script_dir_path):
+               continue
+           for d_script in sorted(os.listdir(script_dir_path)):
+               d_script_path = os.path.join(script_dir_path, d_script)
+               if os.path.isfile(d_script_path) and \
+                       os.access(d_script_path, os.X_OK):
+                   subprocess.call([d_script_path])
 
     def run_user_script(self):
         '''Run user script in /rw/config'''
