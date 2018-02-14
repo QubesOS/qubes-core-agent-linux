@@ -6,4 +6,5 @@ ConditionPathExists=!/var/run/qubes-service/clocksync
 OnBootSec=10s
 OnUnitActiveSec=6h
 
-
+[Install]
+WantedBy=multi-user.target
