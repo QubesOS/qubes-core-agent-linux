@@ -1,5 +1,11 @@
 #!/bin/sh
-read -r USERNAME
+
+# old API - get the user from caller
+#read -r IGNORE_USERNAME
+
+# use default user provided in QubesDB, or hardcoded 'user' - this must be the
+# same as the X session owner
+USERNAME=$(qubesdb-read /default-user || echo 'user')
 cmd='echo $$ >> /tmp/qubes-session-waiter; [ ! -f /tmp/qubes-session-env ] && exec sleep inf'
 if [ "$(id -un)" = "$USERNAME" ]; then
     sh -c "$cmd" 2>/dev/null
