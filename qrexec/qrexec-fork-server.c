@@ -33,19 +33,19 @@
 #include "libqrexec-utils.h"
 #include "qrexec-agent.h"
 
-void do_exec(const char *cmd)
+extern char **environ;
+
+void do_exec(char *cmd)
 {
     char *shell;
-    char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - strlen(RPC_REQUEST_COMMAND) + 1];
-    /* replace magic RPC cmd with RPC multiplexer path */
-    if (strncmp(cmd, RPC_REQUEST_COMMAND " ", strlen(RPC_REQUEST_COMMAND)+1)==0) {
-        strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
-        strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), cmd + strlen(RPC_REQUEST_COMMAND));
-        cmd = buf;
-    }
+
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
 
+    /* call QUBESRPC if requested */
+    exec_qubes_rpc_if_requested(cmd, environ);
+
+    /* otherwise, pass it to shell */
     shell = getenv("SHELL");
     if (!shell)
         shell = "/bin/sh";

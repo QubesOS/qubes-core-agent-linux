@@ -133,9 +133,8 @@ static struct pam_conv conv = {
  * If dom0 sends overly long cmd, it will probably crash qrexec-agent (unless
  * process can allocate up to 4GB on both stack and heap), sorry.
  */
-void do_exec(const char *cmd)
+void do_exec(char *cmd)
 {
-    char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - RPC_REQUEST_COMMAND_LEN + 1];
     char *realcmd = index(cmd, ':'), *user;
 #ifdef HAVE_PAM
     int retval, status;
@@ -157,12 +156,6 @@ void do_exec(const char *cmd)
     /* ignore "nogui:" prefix in linux agent */
     if (strncmp(realcmd, NOGUI_CMD_PREFIX, NOGUI_CMD_PREFIX_LEN) == 0)
         realcmd += NOGUI_CMD_PREFIX_LEN;
-    /* replace magic RPC cmd with RPC multiplexer path */
-    if (strncmp(realcmd, RPC_REQUEST_COMMAND " ", RPC_REQUEST_COMMAND_LEN+1)==0) {
-        strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
-        strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + RPC_REQUEST_COMMAND_LEN);
-        realcmd = buf;
-    }
 
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
@@ -260,6 +253,11 @@ void do_exec(const char *cmd)
             retval = chdir(pw->pw_dir);
             if (retval == -1)
                 warn("chdir(%s)", pw->pw_dir);
+
+            /* call QUBESRPC if requested */
+            exec_qubes_rpc_if_requested(realcmd, env);
+
+            /* otherwise exec shell */
             execle(pw->pw_shell, arg0, "-c", realcmd, (char*)NULL, env);
             exit(127);
         default:
@@ -294,6 +292,10 @@ error:
     pam_end(pamh, PAM_ABORT);
     exit(1);
 #else
+    /* call QUBESRPC if requested */
+    exec_qubes_rpc_if_requested(realcmd, environ);
+
+    /* otherwise exec shell */
     execl("/bin/su", "su", "-", user, "-c", realcmd, NULL);
     perror("execl");
     exit(1);
