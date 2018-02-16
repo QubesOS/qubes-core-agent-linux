@@ -82,9 +82,8 @@ void no_colon_in_cmd()
  * If dom0 sends overly long cmd, it will probably crash qrexec-agent (unless
  * process can allocate up to 4GB on both stack and heap), sorry.
  */
-void do_exec(const char *cmd)
+void do_exec(char *cmd)
 {
-    char buf[strlen(QUBES_RPC_MULTIPLEXER_PATH) + strlen(cmd) - RPC_REQUEST_COMMAND_LEN + 1];
     char *realcmd = index(cmd, ':'), *user;
     if (!realcmd)
         no_colon_in_cmd();
@@ -94,16 +93,14 @@ void do_exec(const char *cmd)
     /* ignore "nogui:" prefix in linux agent */
     if (strncmp(realcmd, NOGUI_CMD_PREFIX, NOGUI_CMD_PREFIX_LEN) == 0)
         realcmd += NOGUI_CMD_PREFIX_LEN;
-    /* replace magic RPC cmd with RPC multiplexer path */
-    if (strncmp(realcmd, RPC_REQUEST_COMMAND " ", RPC_REQUEST_COMMAND_LEN+1)==0) {
-        strcpy(buf, QUBES_RPC_MULTIPLEXER_PATH);
-        strcpy(buf + strlen(QUBES_RPC_MULTIPLEXER_PATH), realcmd + RPC_REQUEST_COMMAND_LEN);
-        realcmd = buf;
-    }
 
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
 
+    /* call QUBESRPC if requested */
+    exec_qubes_rpc_if_requested(realcmd, environ);
+
+    /* otherwise exec shell */
     execl("/bin/su", "su", "-", user, "-c", realcmd, NULL);
     perror("execl");
     exit(1);
