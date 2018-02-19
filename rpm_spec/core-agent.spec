@@ -121,6 +121,7 @@ Conflicts:  firewalld
 %endif
 Requires:	xdg-utils
 Requires:   qubes-utils >= 3.1.3
+Requires:   qubes-utils-libs >= 4.0.16
 Requires:   initscripts
 Requires:   gawk
 Requires:   sed
