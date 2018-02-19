@@ -72,6 +72,19 @@ char *get_program_name(char *prog)
         return prog;
 }
 
+/* Target specification with keyword have changed from $... to @... . Convert
+ * the argument appropriately, to avoid breaking user tools.
+ */
+void convert_target_name_keyword(char *target)
+{
+    size_t i;
+    size_t len = strlen(target);
+
+    for (i = 0; i < len; i++)
+        if (target[i] == '$')
+            target[i] = '@';
+}
+
 int main(int argc, char **argv)
 {
     int trigger_fd;
@@ -97,8 +110,11 @@ int main(int argc, char **argv)
 
     memset(&params, 0, sizeof(params));
     strncpy(params.service_name, argv[2], sizeof(params.service_name));
+
+    convert_target_name_keyword(argv[1]);
     strncpy(params.target_domain, argv[1],
             sizeof(params.target_domain));
+
     snprintf(params.request_id.ident,
             sizeof(params.request_id.ident), "SOCKET");
 
