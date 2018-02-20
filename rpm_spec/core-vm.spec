@@ -128,6 +128,7 @@ Requires:   ntpdate
 Requires:   net-tools
 Requires:   nautilus-python
 Requires:   qubes-utils >= 3.1.3
+Requires:   qubes-utils-libs >= 3.2.7
 Requires:   initscripts
 Requires:   gawk
 Requires:   sed
