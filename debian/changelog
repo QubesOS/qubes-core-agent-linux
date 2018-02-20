@@ -1,3 +1,20 @@
+qubes-core-agent (4.0.22-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Wait for user session as X session owner
+
+  [ Christopher Laprise ]
+  * Add qubes-firewall.d feature
+  * Add /etc/qubes path
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: use exec_qubes_rpc_if_requested() from qubes-utils
+  * qrexec: translate keywords in target specification on the client
+    side
+  * rpm: adjust dependencies
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 20 Feb 2018 01:04:55 +0100
+
 qubes-core-agent (4.0.21-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
