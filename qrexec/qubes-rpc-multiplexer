@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -l
 
 # write stderr to both calling party and local log; be very careful about
 # closing file descriptors here - if either stdout or stderr will not be closed
