@@ -504,8 +504,10 @@ rm -f %{name}-%{version}
 %if %{fedora} < 22
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 %endif
+%if 0%{?fedora} >= 23
 %config(noreplace) /etc/dconf/profile/user
 %config(noreplace) /etc/dconf/db/local.d/dpi
+%endif
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
