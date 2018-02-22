@@ -68,7 +68,6 @@ etc/apt/apt.conf.d/70no-unattended
 etc/apt/apt.conf.d/00notify-hook
 etc/apt/sources.list.d/qubes-r3.list
 etc/needrestart/conf.d/50_qubes.conf
-etc/sysctl.d/80-qubes.conf
 etc/sysctl.d/20_tcp_timestamps.conf
 usr/sbin/qubes-firewall
 usr/sbin/qubes-netwatcher
