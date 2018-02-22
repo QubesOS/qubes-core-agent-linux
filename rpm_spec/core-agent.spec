@@ -609,8 +609,10 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
+%if 0%{?fedora} >= 23
 %config(noreplace) /etc/dconf/profile/user
 %config(noreplace) /etc/dconf/db/local.d/dpi
+%endif
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm
