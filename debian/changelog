@@ -1,3 +1,9 @@
+qubes-core-agent (3.2.25-1) unstable; urgency=medium
+
+  * qrexec: launch services in login shell
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 22 Feb 2018 12:44:52 +0100
+
 qubes-core-agent (3.2.24-1) unstable; urgency=medium
 
   * qrexec: use exec_qubes_rpc_if_requested() from qubes-utils
