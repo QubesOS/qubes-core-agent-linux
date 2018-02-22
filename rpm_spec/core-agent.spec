@@ -324,10 +324,6 @@ usermod -p '' root
 (cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
 
-%if %{fedora} >= 22
-rm -f $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-%endif
-
 %if 0%{?rhel} >= 7
 sed -i \
         -e 's:-primary:-centos:' \
@@ -613,9 +609,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
-%if %{fedora} < 22
-/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-%endif
 %config(noreplace) /etc/dconf/profile/user
 %config(noreplace) /etc/dconf/db/local.d/dpi
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf

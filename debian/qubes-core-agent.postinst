@@ -181,8 +181,8 @@ case "${1}" in
 
         dconf update || true
 
-        # Update Qubes App Menus
-        /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
+        # tell dom0 about installed updates (applications, features etc)
+        /etc/qubes-rpc/qubes.PostInstall || true
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -194,8 +194,8 @@ case "${1}" in
             case "${trigger}" in
 
                 /usr/share/applications)
-                    debug "Updating Qubes App Menus..."
-                    /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
+                    debug "Updating Qubes App Menus and advertising features..."
+                    /etc/qubes-rpc/qubes.PostInstall || true
                     ;;
 
                 # Install overridden serial.conf init script
