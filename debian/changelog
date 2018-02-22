@@ -1,3 +1,9 @@
+qubes-core-agent (4.0.23-1) unstable; urgency=medium
+
+  * qrexec: launch services in login shell
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 22 Feb 2018 12:43:55 +0100
+
 qubes-core-agent (4.0.22-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
