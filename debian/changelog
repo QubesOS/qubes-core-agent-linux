@@ -1,3 +1,28 @@
+qubes-core-agent (4.0.24-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Drop Fedora < 22 support
+  * Call qubes.PostInstall service to notify dom0 about all
+    apps/features
+  * dom0-updates: refactor for ease adding new actions with old yum
+  * dom0-update: add some approximation of 'list', 'search' and
+    'reinstall'
+  * Drop fakeroot for list/search actions on Debian
+
+  [ Rusty Bird ]
+  * Really enable qubes-sync-time.timer
+
+  [ Frédéric Pierret ]
+  * centos: fix conflict with dconf
+
+  [ Marek Marczykowski-Górecki ]
+  * Speed up initial /rw setup
+
+  [ awokd ]
+  * reinstal -> reinstall
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 27 Feb 2018 15:17:51 +0100
+
 qubes-core-agent (4.0.23-1) unstable; urgency=medium
 
   * qrexec: launch services in login shell
