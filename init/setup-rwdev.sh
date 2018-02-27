@@ -9,7 +9,7 @@ if [ -e "$dev" ] ; then
 
     # check if private.img (xvdb) is empty - all zeros
     private_size_512=$(blockdev --getsz "$dev")
-    if dd if=/dev/zero bs=512 count="$private_size_512" 2>/dev/null | diff "$dev" - >/dev/null; then
+    if head -c $(( private_size_512 * 512 )) /dev/zero | diff "$dev" - >/dev/null; then
         # the device is empty, create filesystem
         echo "Virgin boot of the VM: creating private.img filesystem on $dev" >&2
         if ! content=$(mkfs.ext4 -m 0 -q "$dev" 2>&1) ; then
