@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-from gi.repository import Gio
-from gi.repository import GLib
+from gi.repository import Gio  # pylint: disable=import-error
+from gi.repository import GLib  # pylint: disable=import-error
 import sys
 import os
 
