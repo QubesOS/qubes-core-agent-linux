@@ -11,9 +11,9 @@ LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
 PYTHON ?= /usr/bin/python2
-PYTHON_SITEARCH = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)'`
-PYTHON2_SITELIB = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()'`
-PYTHON3_SITELIB = `python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())'`
+PYTHON_SITEARCH = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)')
+PYTHON2_SITELIB = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()')
+PYTHON3_SITELIB = $(shell python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
 
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
