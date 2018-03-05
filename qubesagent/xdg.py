@@ -1,9 +1,15 @@
 #!/usr/bin/python
 
 from gi.repository import Gio
+from gi.repository import GLib
 import sys
+import os
 
-def launch(desktop, *files):
+def pid_callback(launcher, pid, pid_list):
+    pid_list.append(pid)
+
+def launch(desktop, *files, **kwargs):
+    wait = kwargs.pop('wait', True)
     launcher = Gio.DesktopAppInfo.new_from_filename(desktop)
     try:
         import dbus
@@ -18,10 +24,17 @@ def launch(desktop, *files):
                     bus.start_service_by_name(service_id)
                 except dbus.DBusException:
                     pass
-        return launcher.launch(files, None)
     except ImportError:
         pass
-    launcher.launch(files, None)
+    if wait:
+        pid_list = []
+        flags = GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD
+        launcher.launch_uris_as_manager(files, None, flags, None, None,
+                pid_callback, pid_list)
+        for pid in pid_list:
+            os.waitpid(pid, 0)
+    else:
+        launcher.launch(files, None)
 
 if __name__ == "__main__":
     launch(*sys.argv[1:])
