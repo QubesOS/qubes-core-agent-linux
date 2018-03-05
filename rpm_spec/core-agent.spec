@@ -664,7 +664,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/functions
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
-/usr/lib/python2.7/site-packages/qubesxdg.py*
 /usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.gnome.nautilus.qubes.gschema.override
@@ -678,6 +677,7 @@ rm -f %{name}-%{version}
 %{python_sitelib}/qubesagent/__init__.py*
 %{python_sitelib}/qubesagent/firewall.py*
 %{python_sitelib}/qubesagent/test_firewall.py*
+%{python_sitelib}/qubesagent/xdg.py*
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc

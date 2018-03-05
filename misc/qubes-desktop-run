@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from qubesxdg import launch
+from qubesagent.xdg import launch
 import sys
 
 if __name__ == '__main__':
