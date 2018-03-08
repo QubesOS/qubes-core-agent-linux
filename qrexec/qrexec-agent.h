@@ -32,7 +32,8 @@ pid_t handle_new_process(int type,
         char *cmdline, int cmdline_len);
 int handle_data_client(int type,
         int connect_domain, int connect_port,
-        int stdin_fd, int stdout_fd, int stderr_fd);
+        int stdin_fd, int stdout_fd, int stderr_fd,
+        int buffer_size);
 
 
 struct qrexec_cmd_info {
