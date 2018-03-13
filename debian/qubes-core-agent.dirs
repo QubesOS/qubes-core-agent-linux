@@ -1,4 +1,12 @@
 etc/qubes/protected-files.d
 etc/systemd/system
+etc/qubes
+etc/qubes/autostart
+etc/qubes/suspend-post.d
+etc/qubes/suspend-pre.d
+usr/lib/qubes-bind-dirs.d
 lib/modules
+var/lib/qubes
 var/lib/qubes/dom0-updates
+rw
+home_volatile/user
