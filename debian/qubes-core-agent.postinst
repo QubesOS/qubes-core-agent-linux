@@ -179,7 +179,9 @@ case "${1}" in
 
         glib-compile-schemas /usr/share/glib-2.0/schemas || true
 
-        dconf update || true
+        if [ -x /usr/bin/dconf ]; then
+            dconf update
+        fi
 
         # tell dom0 about installed updates (applications, features etc)
         /etc/qubes-rpc/qubes.PostInstall || true
