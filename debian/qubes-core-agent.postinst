@@ -189,7 +189,9 @@ case "${1}" in
 
         glib-compile-schemas /usr/share/glib-2.0/schemas || true
 
-        dconf update || true
+        if [ -x /usr/bin/dconf ]; then
+            dconf update
+        fi
 
         # Update Qubes App Menus
         /usr/lib/qubes/qubes-trigger-sync-appmenus.sh || true
