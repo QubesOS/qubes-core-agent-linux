@@ -1,3 +1,21 @@
+qubes-core-agent (3.2.26-1) unstable; urgency=medium
+
+  [ unman ]
+  * Configure for build of artful templates, and remove zesty.
+  * Stop Debian templates from forwarding by default.
+
+  [ Marek Marczykowski-Górecki ]
+  * Remove 80-qubes.conf from .install file too
+
+  [ Ilpo Järvinen ]
+  * Fix qubes-dom0-update regression by restoring dom0-updates dir
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: don't call dconf if it isn't installed
+  * debian: add back missing directories to package
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 13 Mar 2018 21:55:14 +0100
+
 qubes-core-agent (3.2.25-1) unstable; urgency=medium
 
   * qrexec: launch services in login shell
