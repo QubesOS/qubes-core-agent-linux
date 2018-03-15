@@ -105,12 +105,15 @@ int main(int argc, char **argv) {
     signal(SIGCHLD, SIG_IGN);
     register_exec_func(do_exec);
 
-    while ((fd = accept(s, (struct sockaddr *) &peer, &addrlen)) >= 0) {
+    while (1) {
+        addrlen = sizeof(peer);
+        fd = accept(s, (struct sockaddr *) &peer, &addrlen);
+        if (fd < 0)
+            break;
         if (read_all(fd, &info, sizeof(info))) {
             handle_single_command(fd, &info);
         }
         close(fd);
-        addrlen = sizeof(peer);
     }
     close(s);
     unlink(socket_path);
