@@ -77,6 +77,10 @@ ifeq ($(shell lsb_release -is), Ubuntu)
     SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
     SYSTEM_DROPINS += anacron.service
     SYSTEM_DROPINS += anacron-resume.service
+    SYSTEM_DROPINS += netfilter-persistent.service
+    SYSTEM_DROPINS += exim4.service
+    SYSTEM_DROPINS += avahi-daemon.service
+
 endif
 
 # Debian Dropins
