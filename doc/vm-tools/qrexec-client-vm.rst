@@ -8,7 +8,7 @@ qrexec-client-vm - call Qubes RPC service
 
 SYNOPSIS
 ========
-| qrexec-client-vm *target_vmname* *service* [*local_program* [*local program arguments*]]
+| qrexec-client-vm [--buffer-size=*BUFFER_SIZE*] *target_vmname* *service* [*local_program* [*local program arguments*]]
 
 DESCRIPTION
 ===========
@@ -26,6 +26,12 @@ stdin/stdout is connected to those of ``qrexec-client-vm``.
 
 OPTIONS
 =======
+
+--buffer-size=*BUFFER_SIZE*
+
+    Optional buffer size for vchan connection. This size is used as minimum
+    size for a buffer in each connection direction (read and write).
+    Default: 64KiB.
 
 *target_vmname*
 
