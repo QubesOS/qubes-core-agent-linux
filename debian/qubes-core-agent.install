@@ -136,6 +136,9 @@ usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.override
 usr/share/kde4/services/qvm-copy.desktop
 usr/share/kde4/services/qvm-move.desktop
 usr/share/kde4/services/qvm-dvm.desktop
+usr/share/kservices5/ServiceMenus/qvm-move.desktop
+usr/share/kservices5/ServiceMenus/qvm-copy.desktop
+usr/share/kservices5/ServiceMenus/qvm-dvm.desktop
 usr/share/qubes/mime-override/globs
 usr/share/qubes/qubes-master-key.asc
 usr/share/nautilus-python/extensions/qvm_copy_nautilus.py
