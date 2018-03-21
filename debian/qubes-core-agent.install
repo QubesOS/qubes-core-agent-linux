@@ -63,6 +63,8 @@ etc/qubes-rpc/qubes.GetImageRGBA
 etc/polkit-1/rules.d/00-qubes-allow-all.rules
 etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 etc/pam.d/su.qubes
+etc/dconf/profile/user
+etc/dconf/db/local.d/dpi
 etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 etc/apt/apt.conf.d/70no-unattended
 etc/apt/apt.conf.d/00notify-hook
