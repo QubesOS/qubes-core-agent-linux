@@ -40,6 +40,7 @@ etc/qubes/autostart/user-dirs-update-gtk.desktop.d/30_qubes.conf
 etc/qubes/autostart/README.txt
 etc/qubes/autostart/gnome-keyring-gpg.desktop.d/30_qubes.conf
 etc/qubes/autostart/pulseaudio-kde.desktop.d/30_qubes.conf
+etc/qubes/autostart/org.gnome.SettingsDaemon.XSettings.desktop.d/30_qubes.conf
 etc/qubes/suspend-post.d/README
 etc/qubes-rpc/qubes.SuspendPreAll
 etc/qubes-rpc/qubes.SelectDirectory
