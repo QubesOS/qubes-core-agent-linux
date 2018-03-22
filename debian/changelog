@@ -1,3 +1,29 @@
+qubes-core-agent (3.2.27-1) unstable; urgency=medium
+
+  [ unman ]
+  * Add missing services in Ubuntu templates.
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: list KDE5 actions in qubes-core-agent.install
+  * debian: add missing dconf related files to debian/qubes-core-
+    agent.install
+  * debian: make haveged.service patch less intrusive...
+  * debian: add missing autostart dropin to debian/qubes-core-
+    agent.install
+  * debian: use dh_install --fail-missing
+
+  [ Rusty Bird ]
+  * bind-dirs.sh: don't fail on empty configuration directory
+
+  [ Marek Marczykowski-Górecki ]
+  * network: reload DNS only on "up" event from NetworkManager
+  * qrexec: add qrexec-client-vm --buffer-size option
+
+  [ Simon Gaiser ]
+  * qrexec-fork-server: Always initialize addrlen argument of accept()
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 22 Mar 2018 01:03:39 +0100
+
 qubes-core-agent (3.2.26-1) unstable; urgency=medium
 
   [ unman ]
