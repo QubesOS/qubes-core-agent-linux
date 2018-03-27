@@ -626,6 +626,7 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-sync-clock
 /usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
+/usr/bin/qubes-run-terminal
 /usr/bin/qubes-open
 /usr/bin/qubes-session-autostart
 %dir /usr/lib/qubes
@@ -665,6 +666,7 @@ rm -f %{name}-%{version}
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
 /usr/lib/python2.7/site-packages/qubesxdg.py*
+/usr/share/applications/qubes-run-terminal.desktop
 /usr/share/qubes/serial.conf
 /usr/share/glib-2.0/schemas/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.gnome.nautilus.qubes.gschema.override

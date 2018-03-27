@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=Run Terminal
+Exec=qubes-run-terminal
+Icon=utilities-terminal
+Type=Application
