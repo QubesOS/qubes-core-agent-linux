@@ -1,3 +1,9 @@
+qubes-core-agent (3.2.28-1) unstable; urgency=medium
+
+  * qrexec: fix arguments handling
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 30 Mar 2018 23:20:46 +0200
+
 qubes-core-agent (3.2.27-1) unstable; urgency=medium
 
   [ unman ]
