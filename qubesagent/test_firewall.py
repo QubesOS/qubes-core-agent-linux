@@ -271,10 +271,14 @@ class TestIptablesWorker(TestCase):
 
     def test_006_init(self):
         self.obj.init()
-        self.assertEqual(self.obj.called_commands[4],
-            [['-F', 'QBS-FORWARD'], ['-A', 'QBS-FORWARD', '-j', 'DROP']])
-        self.assertEqual(self.obj.called_commands[6],
-            [['-F', 'QBS-FORWARD'], ['-A', 'QBS-FORWARD', '-j', 'DROP']])
+        self.assertEqual(self.obj.called_commands[4], [
+            ['-F', 'QBS-FORWARD'],
+            ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'],
+            ['-A', 'QBS-FORWARD', '-j', 'DROP']])
+        self.assertEqual(self.obj.called_commands[6], [
+            ['-F', 'QBS-FORWARD'],
+            ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'],
+            ['-A', 'QBS-FORWARD', '-j', 'DROP']])
 
     def test_007_cleanup(self):
         self.obj.init()
@@ -435,6 +439,7 @@ class TestNftablesWorker(TestCase):
             '    type filter hook forward priority 0;\n'
             '    policy drop;\n'
             '    ct state established,related accept\n'
+            '    meta iifname != "vif*" accept\n'
             '  }\n'
             '}\n'
             'table ip6 qubes-firewall {\n'
@@ -442,6 +447,7 @@ class TestNftablesWorker(TestCase):
             '    type filter hook forward priority 0;\n'
             '    policy drop;\n'
             '    ct state established,related accept\n'
+            '    meta iifname != "vif*" accept\n'
             '  }\n'
             '}\n'
         ])
