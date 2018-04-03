@@ -959,3 +959,6 @@ if [ "x$changed" != "x" ]
 then
     systemctl daemon-reload
 fi
+
+%changelog
+@CHANGELOG@
