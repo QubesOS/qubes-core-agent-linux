@@ -109,14 +109,9 @@ Group:		Qubes
 Vendor:		Invisible Things Lab
 License:	GPL
 URL:		http://www.qubes-os.org
-%if %{fedora} < 22
-Requires:   yum-plugin-post-transaction-actions
-%endif
-%if %{fedora} >= 18
-# Fedora >= 18 defaults to firewalld, which isn't supported nor needed by Qubes
+
 Conflicts:  firewalld
-%endif
-Requires:	xdg-utils
+Requires:   xdg-utils
 Requires:   qubes-utils >= 3.1.3
 Requires:   qubes-utils-libs >= 4.0.16
 Requires:   initscripts
@@ -137,7 +132,7 @@ Requires:   zenity
 Requires:   qubes-core-agent-qrexec
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
-%if 0%{fedora} >= 23
+%if 0%{?fedora} >= 23
 Requires:   python3-dnf-plugins-qubes-hooks
 %else
 Requires:   python2-dnf-plugins-qubes-hooks
@@ -172,7 +167,7 @@ DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
 
-%if 0%{fedora} >= 23
+%if 0%{?fedora} >= 23
 %package -n python3-dnf-plugins-qubes-hooks
 Summary:        DNF plugin for Qubes specific post-installation actions
 BuildRequires: python3-devel
@@ -679,7 +674,7 @@ rm -f %{name}-%{version}
 %files -n python2-dnf-plugins-qubes-hooks
 %{python2_sitelib}/dnf-plugins/*
 
-%if 0%{fedora} >= 23
+%if 0%{?fedora} >= 23
 %files -n python3-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 %endif
