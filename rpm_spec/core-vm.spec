@@ -112,14 +112,8 @@ Group:		Qubes
 Vendor:		Invisible Things Lab
 License:	GPL
 URL:		http://www.qubes-os.org
-%if %{fedora} < 22
-Requires:   yum-plugin-post-transaction-actions
-%endif
-Requires:   NetworkManager >= 0.8.1-1
-%if %{fedora} >= 18
-# Fedora >= 18 defaults to firewalld, which isn't supported nor needed by Qubes
+
 Conflicts:  firewalld
-%endif
 Requires:	xdg-utils
 Requires:   ethtool
 Requires:   iptables
@@ -150,7 +144,7 @@ Requires:   pygtk2
 Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
-%if 0%{fedora} >= 23
+%if 0%{?fedora} >= 23
 Requires:   python3-dnf-plugins-qubes-hooks
 %else
 Requires:   python2-dnf-plugins-qubes-hooks
@@ -593,7 +587,7 @@ rm -f %{name}-%{version}
 %files -n python2-dnf-plugins-qubes-hooks
 %{python2_sitelib}/dnf-plugins/*
 
-%if 0%{fedora} >= 23
+%if 0%{?fedora} >= 23
 %files -n python3-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 %endif
