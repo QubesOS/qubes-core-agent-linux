@@ -5,6 +5,7 @@ VERSION := $(shell cat version)
 DIST ?= fc18
 KDESERVICEDIR ?= /usr/share/kde4/services
 KDE5SERVICEDIR ?= /usr/share/kservices5/ServiceMenus/
+APPLICATIONSDIR ?= /usr/share/applications
 SBINDIR ?= /usr/sbin
 BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
@@ -227,6 +228,8 @@ install-common: install-doc
 	install -d $(DESTDIR)$(BINDIR)
 	install -m 0755 misc/qubes-session-autostart $(DESTDIR)$(BINDIR)/qubes-session-autostart
 	install -m 0755 misc/qvm-features-request $(DESTDIR)$(BINDIR)/qvm-features-request
+	install -m 0755 misc/qubes-run-terminal $(DESTDIR)/$(BINDIR)
+	install -D -m 0755 misc/qubes-run-terminal.desktop $(DESTDIR)/$(APPLICATIONSDIR)/qubes-run-terminal.desktop
 	install -m 0755 qubes-rpc/qvm-sync-clock $(DESTDIR)$(BINDIR)/qvm-sync-clock
 	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run-vm} $(DESTDIR)/usr/bin
 	install qubes-rpc/qvm-copy $(DESTDIR)/usr/bin

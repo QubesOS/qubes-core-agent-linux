@@ -1,0 +1,11 @@
+#!/bin/sh
+# Try to find a terminal emulator that's installed and run it.
+
+for terminal in x-terminal-emulator gnome-terminal xfce4-terminal konsole urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal mate-terminal terminology st xterm; do
+    if which $terminal >/dev/null 2>&1 ; then
+        exec "$terminal"
+    fi
+done
+
+echo "ERROR: No suitable terminal found." > /dev/stderr
+
