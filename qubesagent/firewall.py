@@ -370,8 +370,12 @@ class IptablesWorker(FirewallWorker):
         # starting qubes-firewall
         try:
             self.run_ipt(4, ['-F', 'QBS-FORWARD'])
+            self.run_ipt(4,
+                ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'])
             self.run_ipt(4, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
             self.run_ipt(6, ['-F', 'QBS-FORWARD'])
+            self.run_ipt(6,
+                ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'])
             self.run_ipt(6, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
         except subprocess.CalledProcessError:
             self.log_error('\'QBS-FORWARD\' chain not found, create it first')
@@ -579,6 +583,7 @@ class NftablesWorker(FirewallWorker):
             '    type filter hook forward priority 0;\n'
             '    policy drop;\n'
             '    ct state established,related accept\n'
+            '    meta iifname != "vif*" accept\n'
             '  }}\n'
             '}}\n'
         )

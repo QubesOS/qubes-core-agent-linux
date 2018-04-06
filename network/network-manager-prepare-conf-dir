@@ -16,4 +16,15 @@ unmanaged_devices=mac:fe:ff:ff:ff:ff:ff
 sed -r -i -e "s/^#?unmanaged-devices=.*/unmanaged-devices=$unmanaged_devices/" /etc/NetworkManager/NetworkManager.conf
 sed -r -i -e "s/^#?plugins=.*/plugins=keyfile/" /etc/NetworkManager/NetworkManager.conf
 
+# setup uplink configuration if applicable - this needs to be done before
+# starting NetworkManager, otherwise it will try default DHCP configuration
+# first and only after a timeout fallback to static one - introducing delay in
+# network connectivity
+export INTERFACE=eth0
+if qubesdb-read /qubes-ip >/dev/null 2>/dev/null &&
+        [ -e /sys/class/net/$INTERFACE ] &&
+        [ ! -r /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE ]; then
+    /usr/lib/qubes/setup-ip
+fi
+
 exit 0
