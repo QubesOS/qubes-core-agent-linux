@@ -23,9 +23,6 @@
 %define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
 
-%{!?version: %define version %(cat version)}
-%{!?backend_vmm: %define backend_vmm %(echo $BACKEND_VMM)}
-
 %define scriptletfuns is_static() { \
     [ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
 } \
@@ -104,7 +101,7 @@ restore_units() { \
 } \
 
 Name:		qubes-core-agent
-Version:	%{version}
+Version:	@VERSION@
 Release:	1%{dist}
 Summary:	The Qubes core files for VM
 
@@ -112,14 +109,9 @@ Group:		Qubes
 Vendor:		Invisible Things Lab
 License:	GPL
 URL:		http://www.qubes-os.org
-%if %{fedora} < 22
-Requires:   yum-plugin-post-transaction-actions
-%endif
-%if %{fedora} >= 18
-# Fedora >= 18 defaults to firewalld, which isn't supported nor needed by Qubes
+
 Conflicts:  firewalld
-%endif
-Requires:	xdg-utils
+Requires:   xdg-utils
 Requires:   qubes-utils >= 3.1.3
 Requires:   qubes-utils-libs >= 4.0.16
 Requires:   initscripts
@@ -140,7 +132,7 @@ Requires:   zenity
 Requires:   qubes-core-agent-qrexec
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
-%if 0%{fedora} >= 23
+%if 0%{?fedora} >= 23
 Requires:   python3-dnf-plugins-qubes-hooks
 %else
 Requires:   python2-dnf-plugins-qubes-hooks
@@ -158,8 +150,9 @@ BuildRequires: pandoc
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
-BuildRequires: qubes-libvchan-%{backend_vmm}-devel
+BuildRequires: qubes-libvchan-@BACKEND_VMM@-devel
 BuildRequires: pam-devel
+Source0: %{name}-%{version}.tar.gz
 
 %description
 The Qubes core files for installation inside a Qubes VM.
@@ -174,7 +167,7 @@ DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
 
-%if 0%{fedora} >= 23
+%if 0%{?fedora} >= 23
 %package -n python3-dnf-plugins-qubes-hooks
 Summary:        DNF plugin for Qubes specific post-installation actions
 BuildRequires: python3-devel
@@ -277,17 +270,11 @@ Requires: Thunar
 %description thunar
 Thunar support for Qubes VM tools
 
-%define _builddir %(pwd)
-
 %define kde_service_dir /usr/share/kde4/services
 %define kde5_service_dir /usr/share/kservices5/ServiceMenus
 
 %prep
-# we operate on the current directory, so no need to unpack anything
-# symlink is to generate useful debuginfo packages
-rm -f %{name}-%{version}
-ln -sf . %{name}-%{version}
-%setup -T -D
+%setup -q
 
 %build
 for dir in qubes-rpc qrexec misc; do
@@ -471,7 +458,7 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %post qrexec
 %systemd_post qubes-qrexec-agent.service
 
-%post thunar 
+%post thunar
 if [ "$1" = 1 ]; then
   # There is no system-wide Thunar custom actions. There is only a default
   # file and a user file created from the default one. Qubes actions need
@@ -508,7 +495,7 @@ fi
 %preun qrexec
 %systemd_preun qubes-qrexec-agent.service
 
-%postun thunar 
+%postun thunar
 if [ "$1" = 0 ]; then
   if [ -f /etc/xdg/Thunar/uca.xml ] ; then
     mv /etc/xdg/Thunar/uca.xml{,.uninstall}
@@ -689,7 +676,7 @@ rm -f %{name}-%{version}
 %files -n python2-dnf-plugins-qubes-hooks
 %{python2_sitelib}/dnf-plugins/*
 
-%if 0%{fedora} >= 23
+%if 0%{?fedora} >= 23
 %files -n python3-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 %endif
@@ -969,3 +956,6 @@ if [ "x$changed" != "x" ]
 then
     systemctl daemon-reload
 fi
+
+%changelog
+@CHANGELOG@
