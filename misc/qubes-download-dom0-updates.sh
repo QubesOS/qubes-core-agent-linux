@@ -53,6 +53,9 @@ fi
 YUM="yum"
 if type dnf >/dev/null 2>&1; then
     YUM="dnf --best --allowerasing --noplugins"
+else
+    # salt in dom0 thinks it's using dnf but we only have yum so need to remove extra options
+    OPTS="${OPTS/--best --allowerasing/}"
 fi
 
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
