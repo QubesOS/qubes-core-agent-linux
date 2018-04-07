@@ -185,7 +185,7 @@ int try_fork_server(int type, int connect_domain, int connect_port,
 
     remote.sun_family = AF_UNIX;
     strncpy(remote.sun_path, fork_server_socket_path,
-            sizeof(remote.sun_path));
+            sizeof(remote.sun_path) - 1);
     free(fork_server_socket_path);
 
     if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {

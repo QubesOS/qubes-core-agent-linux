@@ -55,7 +55,7 @@ int connect_unix_socket(char *path)
 
     remote.sun_family = AF_UNIX;
     strncpy(remote.sun_path, path,
-            sizeof(remote.sun_path));
+            sizeof(remote.sun_path) - 1);
     len = strlen(remote.sun_path) + sizeof(remote.sun_family);
     if (connect(s, (struct sockaddr *) &remote, len) == -1) {
         perror("connect");
@@ -135,11 +135,11 @@ int main(int argc, char **argv)
     trigger_fd = connect_unix_socket(QREXEC_AGENT_TRIGGER_PATH);
 
     memset(&params, 0, sizeof(params));
-    strncpy(params.service_name, argv[optind + 1], sizeof(params.service_name));
+    strncpy(params.service_name, argv[optind + 1], sizeof(params.service_name) - 1);
 
     convert_target_name_keyword(argv[optind]);
     strncpy(params.target_domain, argv[optind],
-            sizeof(params.target_domain));
+            sizeof(params.target_domain) - 1);
 
     snprintf(params.request_id.ident,
             sizeof(params.request_id.ident), "SOCKET");
