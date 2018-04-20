@@ -5,6 +5,7 @@ After=qubes-iptables.service
 Before=qubes-network.service
 
 [Service]
+Type=notify
 ExecStart=/usr/sbin/qubes-firewall
 
 [Install]

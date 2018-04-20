@@ -54,6 +54,22 @@ class FirewallWorker(object):
         '''Create appropriate chains/tables'''
         raise NotImplementedError
 
+    def sd_notify(self, state):
+        '''Send notification to systemd, if available'''
+        # based on sdnotify python module
+        if not 'NOTIFY_SOCKET' in os.environ:
+            return
+        addr = os.environ['NOTIFY_SOCKET']
+        if addr[0] == '@':
+            addr = '\0' + addr[1:]
+        try:
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+            sock.connect(addr)
+            sock.sendall(state.encode())
+        except:
+            # generally ignore error on systemd notification
+            pass
+
     def cleanup(self):
         '''Remove tables/chains - reverse work done by init'''
         raise NotImplementedError
@@ -155,6 +171,7 @@ class FirewallWorker(object):
         self.init()
         self.run_firewall_dir()
         self.run_user_script()
+        self.sd_notify('READY=1')
         # initial load
         for source_addr in self.list_targets():
             self.handle_addr(source_addr)
