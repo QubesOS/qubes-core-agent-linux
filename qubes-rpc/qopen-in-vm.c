@@ -26,7 +26,8 @@ void send_file(const char *fname)
 		base++;
 	if (strlen(base) >= DVM_FILENAME_SIZE)
 		base += strlen(base) - DVM_FILENAME_SIZE + 1;
-        strncpy(sendbuf,base,DVM_FILENAME_SIZE); /* fills out with NULs */
+        strncpy(sendbuf,base,DVM_FILENAME_SIZE - 1); /* fills out with NULs */
+        sendbuf[DVM_FILENAME_SIZE - 1] = '\0';
 	if (!write_all(1, sendbuf, DVM_FILENAME_SIZE))
 		gui_fatal("send filename to dispVM");
 	if (!copy_fd_all(1, fd))
