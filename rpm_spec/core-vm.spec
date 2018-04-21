@@ -164,6 +164,9 @@ BuildRequires: xen-devel
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
 BuildRequires: qubes-libvchan-%{backend_vmm}-devel
+%if 0%{?rhel} >= 7
+BuildRequires: python-setuptools
+%endif
 
 %package -n python2-dnf-plugins-qubes-hooks
 Summary:	DNF plugin for Qubes specific post-installation actions
