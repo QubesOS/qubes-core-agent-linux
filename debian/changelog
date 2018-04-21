@@ -1,3 +1,58 @@
+qubes-core-agent (4.0.25-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: don't call dconf if it isn't installed
+  * qrexec: add qrexec-client-vm --buffer-size option
+
+  [ unman ]
+  * Add missing services in Ubuntu templates.
+
+  [ Simon Gaiser ]
+  * qrexec-fork-server: Always initialize addrlen argument of accept()
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: fix arguments handling
+  * Move 'qubesxdg' into qubesagent python package
+  * Fix shell calls in Makefile
+  * Fix waiting for application exit in qubesagent.xdg.launch
+  * Load only test_* files when looking for tests (python)
+  * qubes-session-autostart: do not wait for applications exit
+  * Do not start dkms.service
+  * network: do not assume IPv6 gateway is a link-local address
+  * qubes-firewall: handle only traffic originating from VMs
+  * network: make sure static NM configuration is created before NM
+    start
+
+  [ Davíð Steinn Geirsson ]
+  * Add misc/qubes-run-terminal to launch any available terminal
+    emulator
+
+  [ Frédéric Pierret ]
+  * Create .spec.in and Source0
+  * Remove _builddir
+  * spec.in: add changelog placeholder
+  * spec.in: fix %if expressions and remove useless conditions
+
+  [ Vladimir Lushnikov ]
+  * Problem: Unable to use pkg.install with Salt in dom0 when using
+    UpdateVM that has only yum due to incorrect options passed by Salt
+    assuming dnf presence
+
+  [ Marek Marczykowski-Górecki ]
+  * Use only /etc/skel to provision user's home directory of new VM
+  * Update gitignore and make clean target
+  * qubes-firewall: signal service readiness only after initial scripts
+
+  [ Frédéric Pierret ]
+  * Fix GCC8 warnings
+  * Add missing python-setuptools dependency
+  * Use %{python3_pkgversion} instead of duplicating python3 targets
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: update Fedora versions
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 21 Apr 2018 15:10:20 +0200
+
 qubes-core-agent (4.0.24-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
