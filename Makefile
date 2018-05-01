@@ -284,8 +284,8 @@ install-common:
 
 ifeq ($(findstring CentOS,$(shell cat /etc/redhat-release)),)
 	install -D -m 0644 misc/dconf-profile-user $(DESTDIR)/etc/dconf/profile/user
-	install -D -m 0644 misc/dconf-db-local-dpi $(DESTDIR)/etc/dconf/db/local.d/dpi
 endif
+	install -D -m 0644 misc/dconf-db-local-dpi $(DESTDIR)/etc/dconf/db/local.d/dpi
 
 	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)/usr/bin/qubes-desktop-run
 
