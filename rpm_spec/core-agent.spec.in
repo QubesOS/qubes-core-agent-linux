@@ -267,7 +267,7 @@ Thunar support for Qubes VM tools
 
 %build
 for dir in qubes-rpc qrexec misc; do
-  (cd $dir; make)
+  make -C $dir BACKEND_VMM=@BACKEND_VMM@
 done
 make -C doc manpages
 
@@ -329,6 +329,7 @@ for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
 	fi
 done
 
+chgrp user /var/lib/qubes/dom0-updates
 
 # Remove old firmware updates link
 if [ -L /lib/firmware/updates ]; then

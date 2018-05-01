@@ -218,7 +218,7 @@ install-common: install-doc
 		misc/20_org.mate.NotificationDaemon.qubes.gschema.override \
 		misc/20_org.gnome.desktop.wm.preferences.qubes.gschema.override \
 		$(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
+	install -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc
 	install misc/resize-rootfs $(DESTDIR)$(LIBDIR)/qubes/
 
