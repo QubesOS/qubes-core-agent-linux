@@ -330,6 +330,16 @@ class IptablesWorker(FirewallWorker):
             if dsthosts is None:
                 dsthosts = [None]
 
+            if rule['action'] == 'accept':
+                action = 'ACCEPT'
+            elif rule['action'] == 'drop':
+                action = 'REJECT --reject-with {}'.format(
+                    'icmp6-adm-prohibited' if family == 6 else
+                    'icmp-admin-prohibited')
+            else:
+                raise RuleParseError(
+                    'Invalid rule action {}'.format(rule['action']))
+
             # sorting here is only to ease writing tests
             for proto in sorted(protos):
                 for dsthost in sorted(dsthosts):
@@ -342,8 +352,7 @@ class IptablesWorker(FirewallWorker):
                         ipt_rule += ' --dport {}'.format(dstports)
                     if icmptype is not None:
                         ipt_rule += ' --icmp-type {}'.format(icmptype)
-                    ipt_rule += ' -j {}\n'.format(
-                        str(rule['action']).upper())
+                    ipt_rule += ' -j {}\n'.format(action)
                     iptables += ipt_rule
 
         iptables += 'COMMIT\n'
@@ -491,6 +500,15 @@ class NftablesWorker(FirewallWorker):
 
             nft_rule = ""
 
+            if rule['action'] == 'accept':
+                action = 'accept'
+            elif rule['action'] == 'drop':
+                action = 'reject with icmp{} type admin-prohibited'.format(
+                    '6' if family == 6 else '')
+            else:
+                raise RuleParseError(
+                    'Invalid rule action {}'.format(rule['action']))
+
             if 'proto' in rule:
                 if family == 4:
                     nft_rule += ' ip protocol {}'.format(rule['proto'])
@@ -544,16 +562,16 @@ class NftablesWorker(FirewallWorker):
                 if 'proto' not in rule:
                     nft_rules.append(
                         nft_rule + ' tcp dport {} {}'.format(
-                            dstports, rule['action']))
+                            dstports, action))
                     nft_rules.append(
                         nft_rule + ' udp dport {} {}'.format(
-                            dstports, rule['action']))
+                            dstports, action))
                 else:
                     nft_rules.append(
                         nft_rule + ' {} dport {} {}'.format(
-                            rule['proto'], dstports, rule['action']))
+                            rule['proto'], dstports, action))
             else:
-                nft_rules.append(nft_rule + ' ' + rule['action'])
+                nft_rules.append(nft_rule + ' ' + action)
 
         return (
             'flush chain {family} {table} {chain}\n'

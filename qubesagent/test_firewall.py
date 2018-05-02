@@ -198,10 +198,14 @@ class TestIptablesWorker(TestCase):
             "-A chain -d 2.2.2.2/32 -p tcp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 1.1.1.1/32 -p udp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 2.2.2.2/32 -p udp --dport 53:53 -j ACCEPT\n"
-            "-A chain -d 1.1.1.1/32 -p udp --dport 53:53 -j DROP\n"
-            "-A chain -d 2.2.2.2/32 -p udp --dport 53:53 -j DROP\n"
-            "-A chain -p icmp -j DROP\n"
-            "-A chain -j DROP\n"
+            "-A chain -d 1.1.1.1/32 -p udp --dport 53:53 -j REJECT "
+            "--reject-with icmp-admin-prohibited\n"
+            "-A chain -d 2.2.2.2/32 -p udp --dport 53:53 -j REJECT "
+            "--reject-with icmp-admin-prohibited\n"
+            "-A chain -p icmp -j REJECT "
+            "--reject-with icmp-admin-prohibited\n"
+            "-A chain -j REJECT "
+            "--reject-with icmp-admin-prohibited\n"
             "COMMIT\n"
         )
         self.assertEqual(self.obj.prepare_rules('chain', rules, 4),
@@ -232,10 +236,14 @@ class TestIptablesWorker(TestCase):
             "-A chain -d 2001::2/128 -p tcp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 2001::1/128 -p udp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 2001::2/128 -p udp --dport 53:53 -j ACCEPT\n"
-            "-A chain -d 2001::1/128 -p udp --dport 53:53 -j DROP\n"
-            "-A chain -d 2001::2/128 -p udp --dport 53:53 -j DROP\n"
-            "-A chain -p icmpv6 -j DROP\n"
-            "-A chain -j DROP\n"
+            "-A chain -d 2001::1/128 -p udp --dport 53:53 -j REJECT "
+            "--reject-with icmp6-adm-prohibited\n"
+            "-A chain -d 2001::2/128 -p udp --dport 53:53 -j REJECT "
+            "--reject-with icmp6-adm-prohibited\n"
+            "-A chain -p icmpv6 -j REJECT "
+            "--reject-with icmp6-adm-prohibited\n"
+            "-A chain -j REJECT "
+            "--reject-with icmp6-adm-prohibited\n"
             "COMMIT\n"
         )
         self.assertEqual(self.obj.prepare_rules('chain', rules, 6),
@@ -367,9 +375,9 @@ class TestNftablesWorker(TestCase):
             '    ip daddr { 1.1.1.1/32, 2.2.2.2/32 } tcp dport 53 accept\n'
             '    ip daddr { 1.1.1.1/32, 2.2.2.2/32 } udp dport 53 accept\n'
             '    ip protocol udp ip daddr { 1.1.1.1/32, 2.2.2.2/32 } udp dport '
-            '53 drop\n'
-            '    ip protocol icmp drop\n'
-            '    drop\n'
+            '53 reject with icmp type admin-prohibited\n'
+            '    ip protocol icmp reject with icmp type admin-prohibited\n'
+            '    reject with icmp type admin-prohibited\n'
             '  }\n'
             '}\n'
         )
@@ -403,9 +411,10 @@ class TestNftablesWorker(TestCase):
             '    ip6 daddr { 2001::1/128, 2001::2/128 } tcp dport 53 accept\n'
             '    ip6 daddr { 2001::1/128, 2001::2/128 } udp dport 53 accept\n'
             '    ip6 nexthdr udp ip6 daddr { 2001::1/128, 2001::2/128 } '
-            'udp dport 53 drop\n'
-            '    ip6 nexthdr icmpv6 icmpv6 type 128 drop\n'
-            '    drop\n'
+            'udp dport 53 reject with icmp6 type admin-prohibited\n'
+            '    ip6 nexthdr icmpv6 icmpv6 type 128 reject with icmp6 type '
+            'admin-prohibited\n'
+            '    reject with icmp6 type admin-prohibited\n'
             '  }\n'
             '}\n'
         )
