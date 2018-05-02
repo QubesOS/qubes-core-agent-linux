@@ -52,6 +52,7 @@ clean:
 	rm -rf test-packages/__pycache__
 	rm -rf test-packages/qubesagent.egg-info
 	rm -rf __pycache__
+	rm -f .coverage
 
 all:
 	make -C misc
