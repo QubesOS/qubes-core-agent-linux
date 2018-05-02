@@ -3,7 +3,6 @@ etc/apt/apt.conf.d/00notify-hook
 etc/apt/apt.conf.d/70no-unattended
 etc/apt/sources.list.d/qubes-r4.list
 etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
-etc/dconf/profile/user
 etc/dconf/db/local.d/dpi
 etc/default/grub.d/30-qubes.cfg
 etc/fstab

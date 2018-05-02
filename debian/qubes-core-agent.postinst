@@ -181,6 +181,12 @@ case "${1}" in
 
         glib-compile-schemas /usr/share/glib-2.0/schemas || true
 
+        if ! [ -r /etc/dconf/profile/user ]; then
+            mkdir -p /etc/dconf/profile
+            echo "user-db:user" >> /etc/dconf/profile/user
+            echo "system-db:local" >> /etc/dconf/profile/user
+        fi
+
         if [ -x /usr/bin/dconf ]; then
             dconf update
         fi

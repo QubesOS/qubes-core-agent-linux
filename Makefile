@@ -299,9 +299,6 @@ install-common: install-doc
 	install -d $(DESTDIR)/usr/share/nautilus-python/extensions
 	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
 
-ifeq ($(findstring CentOS,$(shell cat /etc/redhat-release)),)
-	install -D -m 0644 misc/dconf-profile-user $(DESTDIR)/etc/dconf/profile/user
-endif
 	install -D -m 0644 misc/dconf-db-local-dpi $(DESTDIR)/etc/dconf/db/local.d/dpi
 
 	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)$(BINDIR)/qubes-desktop-run
