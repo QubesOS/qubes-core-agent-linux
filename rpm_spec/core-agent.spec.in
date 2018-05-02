@@ -129,6 +129,7 @@ Requires:   python2-qubesdb
 Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   zenity
+Requires:   dconf
 Requires:   qubes-core-agent-qrexec
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
