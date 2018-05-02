@@ -82,6 +82,14 @@ update_qubesconfig() {
     #/usr/lib/qubes/update-proxy-configs
     # Archlinux pacman configuration is handled in update_finalize
 
+    if ! [ -r /etc/dconf/profile/user ]; then
+        mkdir -p /etc/dconf/profile
+        echo "user-db:user" >> /etc/dconf/profile/user
+        echo "system-db:local" >> /etc/dconf/profile/user
+    fi
+
+    dconf update &> /dev/null || :
+
     # Location of files which contains list of protected files
     mkdir -p /etc/qubes/protected-files.d
     # shellcheck source=init/functions

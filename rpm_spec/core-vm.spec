@@ -282,6 +282,12 @@ if test -f /etc/yum.conf && ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc
   echo 'include=file:///etc/yum.conf.d/qubes-proxy.conf' >> /etc/yum.conf
 fi
 
+if ! [ -r /etc/dconf/profile/user ]; then
+    mkdir -p /etc/dconf/profile
+    echo "user-db:user" >> /etc/dconf/profile/user
+    echo "system-db:local" >> /etc/dconf/profile/user
+fi
+
 dconf update &> /dev/null || :
 
 # And actually setup the proxy usage in package managers
@@ -503,9 +509,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %if %{fedora} < 22
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
-%endif
-%if 0%{?fedora} >= 23
-%config(noreplace) /etc/dconf/profile/user
 %endif
 %config(noreplace) /etc/dconf/db/local.d/dpi
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
