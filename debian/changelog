@@ -1,3 +1,19 @@
+qubes-core-agent (4.0.27-1) unstable; urgency=medium
+
+  [ X4lldux ]
+  * Move/Copy many files in one step via nautilus extension
+
+  [ Marek Marczykowski-Górecki ]
+  * centos: exclude only dconf user profile, keep dpi config
+  * travis: add centos7
+  * Fix packaging: 'user' group, BACKEND_VMM var
+  * Create /etc/dconf/profile/user dynamically, if not present
+  * Require dconf utility to (re)build /etc/dconf/db/local
+  * Fix make clean
+  * qubes-firewall: reject packets instead of dropping
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 02 May 2018 05:05:33 +0200
+
 qubes-core-agent (4.0.26-1) unstable; urgency=medium
 
   * Change repository URLs to https
