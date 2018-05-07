@@ -4,7 +4,9 @@ ifeq ($(PACKAGE_SET),vm)
 
   ifneq ($(filter $(DISTRIBUTION), debian qubuntu),)
     DEBIAN_BUILD_DIRS := debian
-    SOURCE_COPY_IN := source-debian-quilt-copy-in
+    ifeq ($(DISTRIBUTION),qubuntu)
+	  SOURCE_COPY_IN := source-debian-quilt-copy-in
+    endif
   endif
 
   ARCH_BUILD_DIRS := archlinux
