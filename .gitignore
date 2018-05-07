@@ -4,3 +4,6 @@ deb/*
 *.pyo
 *~
 *.o
+.coverage
+*.egg-info
+__pycache__

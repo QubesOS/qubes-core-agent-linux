@@ -45,6 +45,8 @@ clean:
 	make -C misc clean
 	make -C qrexec clean
 	make -C qubes-rpc clean
+	make -C doc clean
+	rm -rf __pycache__
 
 all:
 	make -C misc
