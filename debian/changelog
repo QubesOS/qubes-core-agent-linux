@@ -1,3 +1,10 @@
+qubes-core-agent (3.2.30-1) unstable; urgency=medium
+
+  * Update gitignore and make clean target
+  * debian: use default archive command
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 07 May 2018 05:51:45 +0200
+
 qubes-core-agent (3.2.29-1) unstable; urgency=medium
 
   [ Frédéric Pierret ]
