@@ -1,3 +1,19 @@
+qubes-core-agent (3.2.29-1) unstable; urgency=medium
+
+  [ Frédéric Pierret ]
+  * Add missing python-setuptools dependency
+  * Use %{python3_pkgversion} instead of duplicating python3
+  * Fix GCC8 warnings
+  * centos: fix conflict with dconf
+
+  [ Marek Marczykowski-Górecki ]
+  * centos: exclude only dconf user profile, keep dpi config
+  * Create /etc/dconf/profile/user dynamically, if not present
+  * travis: add Fedora 27, 28, CentOS 7
+  * dom0-updates: do not modify yum.conf
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 07 May 2018 05:32:42 +0200
+
 qubes-core-agent (3.2.28-1) unstable; urgency=medium
 
   * qrexec: fix arguments handling
