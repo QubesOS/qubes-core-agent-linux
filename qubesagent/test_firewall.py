@@ -411,10 +411,10 @@ class TestNftablesWorker(TestCase):
             '    ip6 daddr { 2001::1/128, 2001::2/128 } tcp dport 53 accept\n'
             '    ip6 daddr { 2001::1/128, 2001::2/128 } udp dport 53 accept\n'
             '    ip6 nexthdr udp ip6 daddr { 2001::1/128, 2001::2/128 } '
-            'udp dport 53 reject with icmp6 type admin-prohibited\n'
-            '    ip6 nexthdr icmpv6 icmpv6 type 128 reject with icmp6 type '
+            'udp dport 53 reject with icmpv6 type admin-prohibited\n'
+            '    ip6 nexthdr icmpv6 icmpv6 type 128 reject with icmpv6 type '
             'admin-prohibited\n'
-            '    reject with icmp6 type admin-prohibited\n'
+            '    reject with icmpv6 type admin-prohibited\n'
             '  }\n'
             '}\n'
         )

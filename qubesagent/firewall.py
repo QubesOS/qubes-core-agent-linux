@@ -504,7 +504,7 @@ class NftablesWorker(FirewallWorker):
                 action = 'accept'
             elif rule['action'] == 'drop':
                 action = 'reject with icmp{} type admin-prohibited'.format(
-                    '6' if family == 6 else '')
+                    'v6' if family == 6 else '')
             else:
                 raise RuleParseError(
                     'Invalid rule action {}'.format(rule['action']))
