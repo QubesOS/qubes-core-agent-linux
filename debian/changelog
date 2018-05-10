@@ -1,3 +1,10 @@
+qubes-core-agent (4.0.28-1) wheezy; urgency=medium
+
+  [ Peter Gerber ]
+  * Qubes firewall: correct syntax for icmpv6 rejects
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 10 May 2018 12:21:39 +0200
+
 qubes-core-agent (4.0.27-1) unstable; urgency=medium
 
   [ X4lldux ]
