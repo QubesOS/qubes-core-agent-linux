@@ -800,9 +800,6 @@ for svc in %qubes_services ; do
     fi
 done
 
-# dropped services
-chkconfig qubes-netwatcher off || :
-
 # TODO: make this not display the silly message about security context...
 sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
 
