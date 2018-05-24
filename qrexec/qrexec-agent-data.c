@@ -295,6 +295,7 @@ int process_child_io(libvchan_t *data_vchan,
     int remote_process_status = -1;
     int ret, max_fd;
     struct timespec zero_timeout = { 0, 0 };
+    struct timespec normal_timeout = { 10, 0 };
     struct buffer stdin_buf;
 
     sigemptyset(&selectmask);
@@ -386,7 +387,7 @@ int process_child_io(libvchan_t *data_vchan,
             /* check for other FDs, but exit immediately */
             ret = pselect(max_fd + 1, &rdset, &wrset, NULL, &zero_timeout, &selectmask);
         } else
-            ret = pselect(max_fd + 1, &rdset, &wrset, NULL, NULL, &selectmask);
+            ret = pselect(max_fd + 1, &rdset, &wrset, NULL, &normal_timeout, &selectmask);
         if (ret < 0) {
             if (errno == EINTR)
                 continue;
