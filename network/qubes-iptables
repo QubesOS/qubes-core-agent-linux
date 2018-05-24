@@ -42,9 +42,14 @@ start() {
     # Do not start if there is no config file.
     [ ! -f "$IPTABLES_DATA" ] && return 6
 
+    CMD_ARGS=
+    if "$CMD-restore" --help 2>&1 | grep -q wait=; then
+        CMD_ARGS=--wait
+    fi
+
     echo -n $"${CMD}: Applying firewall rules: "
 
-    "$CMD-restore" "$IPTABLES_DATA"
+    "$CMD-restore" $CMD_ARGS "$IPTABLES_DATA"
     ret="$?"
     if [ "$ret" -eq 0 ]; then
         echo OK
