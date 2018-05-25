@@ -20,9 +20,10 @@
 #
 #
 
-if ! [ $# = 1 ] ; then
-	echo "Usage: $0 filename"
+if ! [ $# = 1 ] && ! [ $# = 2 ]; then
+	echo "Usage: $0 [--view-only] filename"
 	exit 1
 fi
 
-exec qvm-open-in-vm '$dispvm' "$1"
+# shellcheck disable=SC2016
+exec qvm-open-in-vm '$dispvm' "$@"

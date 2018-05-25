@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <libqubes-rpc-filecopy.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <gui-fatal.h>
 #include "dvm2.h"
 
@@ -92,17 +93,35 @@ void recv_file(const char *fname)
         actually_recv_file(fname, tempfile, tmpfd);
 }
 
-void talk_to_daemon(const char *fname)
-{
-    send_file(fname);
-    recv_file(fname);
-}
-
 int main(int argc, char ** argv)
 {
+    char *fname;
+    int view_only = 0;
+    int ret;
+    const struct option opts[] = {
+        {"view-only", no_argument, &view_only, 1},
+        {0}
+    };
+
+    while ((ret=getopt_long(argc, argv, "", opts, NULL)) != -1) {
+        if (ret == '?') {
+            exit(2);
+        }
+    }
+
     signal(SIGPIPE, SIG_IGN);
-    if (argc!=2)
+
+    if (optind >= argc)
         gui_fatal("OpenInVM - no file given?");
-    talk_to_daemon(argv[1]);
+    fname = argv[optind];
+    send_file(fname);
+    if (!view_only) {
+        recv_file(fname);
+    } else {
+        /* discard received data */
+        int null_fd = open("/dev/null", O_WRONLY);
+        copy_fd_all(null_fd, 0);
+        close(null_fd);
+    }
     return 0;
 }
