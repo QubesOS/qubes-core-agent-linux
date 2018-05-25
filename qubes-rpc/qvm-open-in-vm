@@ -20,16 +20,37 @@
 #
 #
 
-if ! [ $# = 2 ] ; then
-	echo "Usage: $0 vmname filename"
-	exit 1
+usage() {
+	echo "Usage: $0 [--view-only] vmname filename"
+	exit 2
+}
+
+qopen_opts=
+target=
+filename=
+
+while [ $# -gt 0 ]; do
+    if [ "x$1" = "x--view-only" ]; then
+        qopen_opts=--view-only
+    elif [ -z "$target" ]; then
+        target="$1"
+    elif [ -z "$filename" ]; then
+        filename="$1"
+    else
+        usage
+    fi
+    shift
+done
+
+if [ -z "$target" ] || [ -z "$filename" ]; then
+    usage
 fi
 
-case "$2" in
+case "$filename" in
 	*://*)
-        exec /usr/lib/qubes/qrexec-client-vm "$1" qubes.OpenURL /bin/echo "$2"
+        exec /usr/lib/qubes/qrexec-client-vm "$target" qubes.OpenURL /bin/echo "$filename"
         ;;
     *)
-        exec /usr/lib/qubes/qrexec-client-vm "$1" qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" "$2"
+        exec /usr/lib/qubes/qrexec-client-vm "$target" qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" $qopen_opts "$filename"
         ;;
 esac
