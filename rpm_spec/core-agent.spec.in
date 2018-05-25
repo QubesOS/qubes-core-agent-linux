@@ -156,6 +156,7 @@ BuildRequires: pam-devel
 %if 0%{?rhel} >= 7
 BuildRequires: python-setuptools
 %endif
+BuildRequires: systemd
 Source0: %{name}-%{version}.tar.gz
 
 %description
