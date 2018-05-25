@@ -13,22 +13,27 @@
 #include <gui-fatal.h>
 #include "dvm2.h"
 
-void send_file(const char *fname)
+void send_file(const char *fname, int view_only)
 {
     const char *base;
-    char sendbuf[DVM_FILENAME_SIZE];
+    char sendbuf[DVM_FILENAME_SIZE] = {0};
+    size_t sendbuf_size = DVM_FILENAME_SIZE;
     int fd = open(fname, O_RDONLY);
     if (fd < 0)
         gui_fatal("open %s", fname);
+    if (view_only) {
+        strncpy(sendbuf, DVM_VIEW_ONLY_PREFIX, sendbuf_size);
+        sendbuf_size -= strlen(DVM_VIEW_ONLY_PREFIX);
+    }
     base = rindex(fname, '/');
     if (!base)
         base = fname;
     else
         base++;
-    if (strlen(base) >= DVM_FILENAME_SIZE)
-        base += strlen(base) - DVM_FILENAME_SIZE + 1;
-        strncpy(sendbuf,base,DVM_FILENAME_SIZE - 1); /* fills out with NULs */
-        sendbuf[DVM_FILENAME_SIZE - 1] = '\0';
+    if (strlen(base) >= sendbuf_size)
+        base += strlen(base) - sendbuf_size + 1;
+    strncat(sendbuf,base,sendbuf_size - 1); /* fills out with NULs */
+    sendbuf[DVM_FILENAME_SIZE - 1] = '\0';
     if (!write_all(1, sendbuf, DVM_FILENAME_SIZE))
         gui_fatal("send filename to dispVM");
     if (!copy_fd_all(1, fd))
@@ -114,7 +119,7 @@ int main(int argc, char ** argv)
     if (optind >= argc)
         gui_fatal("OpenInVM - no file given?");
     fname = argv[optind];
-    send_file(fname);
+    send_file(fname, view_only);
     if (!view_only) {
         recv_file(fname);
     } else {

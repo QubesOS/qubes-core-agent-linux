@@ -79,9 +79,10 @@ fail:
     exit(1);
 }
 
-char *get_filename(void)
+char *get_filename(int *view_only)
 {
     char buf[DVM_FILENAME_SIZE];
+    char *fname = buf;
     static char *retname;
     int i;
     char *directory;
@@ -100,13 +101,17 @@ char *get_filename(void)
         if (index(" !?\"#$%^&*()[]<>;`~|", buf[i]))
             buf[i]='_';
     }
-    len = strlen(directory)+1+strlen(buf)+1;
+    if (strncmp(buf, DVM_VIEW_ONLY_PREFIX, strlen(DVM_VIEW_ONLY_PREFIX)) == 0) {
+        *view_only = 1;
+        fname += strlen(DVM_VIEW_ONLY_PREFIX);
+    }
+    len = strlen(directory)+1+strlen(fname)+1;
     retname = malloc(len);
     if (!retname) {
         fprintf(stderr, "Cannot allocate memory\n");
         exit(1);
     }
-    snprintf(retname, len, "%s/%s", directory, buf);
+    snprintf(retname, len, "%s/%s", directory, fname);
     free(directory);
     return retname;
 }
@@ -143,11 +148,16 @@ int
 main()
 {
     struct stat stat_pre, stat_post, session_stat;
-    char *filename = get_filename();
+    int view_only = 0;
+    char *filename = get_filename(&view_only);
     int child, status, log_fd, null_fd;
     FILE *waiter_pidfile;
 
     copy_file_by_name(filename);
+    if (view_only) {
+        // mark file as read-only so applications will signal it to the user
+        chmod(filename, 0400);
+    }
     if (stat(filename, &stat_pre)) {
         perror("stat pre");
         exit(1);
