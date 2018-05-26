@@ -59,9 +59,22 @@
 </action>
 <action>
 	<icon>document-open</icon>
-	<name>Open in DisposableVM</name>
+	<name>Edit in DisposableVM</name>
 	<unique-id>1507455559234996-8</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh opendvm %F</command>
+	<description></description>
+	<patterns>*</patterns>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>document-open</icon>
+	<name>View in DisposableVM</name>
+	<unique-id>1507455559234997-9</unique-id>
+	<command>/usr/lib/qubes/qvm-actions.sh viewdvm %F</command>
 	<description></description>
 	<patterns>*</patterns>
 	<audio-files/>
