@@ -21,6 +21,10 @@ void send_file(const char *fname, int view_only)
     int fd = open(fname, O_RDONLY);
     if (fd < 0)
         gui_fatal("open %s", fname);
+
+    _Static_assert(DVM_FILENAME_SIZE > sizeof(DVM_VIEW_ONLY_PREFIX),
+            "DVM_FILENAME_SIZE > sizeof(DVM_VIEW_ONLY_PREFIX)");
+
     if (view_only) {
         strncpy(sendbuf, DVM_VIEW_ONLY_PREFIX, sendbuf_size);
         sendbuf_size -= strlen(DVM_VIEW_ONLY_PREFIX);
