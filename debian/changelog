@@ -1,3 +1,17 @@
+qubes-core-agent (4.0.29-1) unstable; urgency=medium
+
+  * Drop leftovers of qubes-netwatcher service
+  * qrexec: fix handling remote domain death
+  * network: use iptables-restore --wait if available
+  * rpm: add BR: systemd for pre/post install macros
+  * qubes-rpc: fix code style - indent with spaces
+  * qvm-open-in-vm: implement --view-only option
+  * qvm-open-in-vm: mark file as read-only if opened with --view-only
+  * Add file managers integration for qvm-open-in-dvm --view-only
+  * Add build-time assert for filename buffer size
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 May 2018 00:40:11 +0200
+
 qubes-core-agent (4.0.28-1) wheezy; urgency=medium
 
   [ Peter Gerber ]
