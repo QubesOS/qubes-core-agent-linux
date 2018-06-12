@@ -130,7 +130,7 @@ Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   zenity
 Requires:   dconf
-Requires:   qubes-core-agent-qrexec
+Requires:   qubes-qrexec-vm
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 %if 0%{?fedora} >= 23
@@ -180,16 +180,6 @@ BuildRequires: python%{python3_pkgversion}-devel
 DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
-
-%package qrexec
-Summary:    Qubes qrexec agent
-Requires:   qubes-core-agent
-Requires:   nautilus-python
-Conflicts:  qubes-core-vm < 4.0.0
-
-%description qrexec
-Agent part of Qubes RPC system. A daemon responsible for starting processes as
-requested by dom0 or other VMs, according to dom0-enforced policy.
 
 %package nautilus
 Summary:    Qubes integration for Nautilus
@@ -267,7 +257,7 @@ Thunar support for Qubes VM tools
 %setup -q
 
 %build
-for dir in qubes-rpc qrexec misc; do
+for dir in qubes-rpc misc; do
   make -C $dir BACKEND_VMM=@BACKEND_VMM@
 done
 make -C doc manpages
@@ -298,7 +288,6 @@ usermod -p '' root
 
 %install
 
-(cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
 
 %if 0%{?rhel} >= 7
@@ -452,9 +441,6 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %systemd_post qubes-network.service
 %systemd_post qubes-updates-proxy.service
 
-%post qrexec
-%systemd_post qubes-qrexec-agent.service
-
 %post thunar
 if [ "$1" = 1 ]; then
   # There is no system-wide Thunar custom actions. There is only a default
@@ -488,9 +474,6 @@ fi
 %systemd_preun qubes-iptables.service
 %systemd_preun qubes-network.service
 %systemd_preun qubes-updates-proxy.service
-
-%preun qrexec
-%systemd_preun qubes-qrexec-agent.service
 
 %postun thunar
 if [ "$1" = 0 ]; then
@@ -679,17 +662,6 @@ rm -f %{name}-%{version}
 %files -n python34-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 %endif
-
-%files qrexec
-%config(noreplace) /etc/pam.d/qrexec
-/usr/bin/qrexec-fork-server
-/usr/bin/qrexec-client-vm
-/usr/lib/qubes/qrexec-agent
-/usr/lib/qubes/qrexec-client-vm
-/usr/lib/qubes/qrexec_client_vm
-/usr/lib/qubes/qubes-rpc-multiplexer
-/lib/systemd/system/qubes-qrexec-agent.service
-%{_mandir}/man1/qrexec-client-vm.1*
 
 %files nautilus
 /usr/lib/qubes/qvm-copy-to-vm.gnome
