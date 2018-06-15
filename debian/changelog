@@ -1,3 +1,9 @@
+qubes-core-agent (4.0.31-1) unstable; urgency=medium
+
+  * debian: add Depends: qubesdb-vm
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 Jun 2018 14:32:23 +0200
+
 qubes-core-agent (4.0.30-1) wheezy; urgency=medium
 
   [ Christopher Laprise ]
