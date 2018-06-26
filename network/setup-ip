@@ -91,6 +91,9 @@ __EOF__
         fi
         /sbin/ifconfig "$INTERFACE" up
         /sbin/route add -host "$gateway" dev "$INTERFACE"
+        if [ -n "$gateway6" ] && ! echo "$gateway6" | grep -q "^fe80:"; then
+            /sbin/route -6 add "$gateway6/128" dev "$INTERFACE"
+        fi
         if ! qsvc disable-default-route ; then
             /sbin/route add default gw "$gateway"
             if [ -n "$gateway6" ]; then

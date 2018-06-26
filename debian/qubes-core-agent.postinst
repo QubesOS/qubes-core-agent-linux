@@ -145,6 +145,8 @@ case "${1}" in
         fi
         systemctl reenable haveged
 
+        chgrp user /var/lib/qubes/dom0-updates
+
         debug "UPDATE..."
         # disable some Upstart services
         for init in plymouth-shutdown \
@@ -179,7 +181,15 @@ case "${1}" in
 
         glib-compile-schemas /usr/share/glib-2.0/schemas || true
 
-        dconf update || true
+        if ! [ -r /etc/dconf/profile/user ]; then
+            mkdir -p /etc/dconf/profile
+            echo "user-db:user" >> /etc/dconf/profile/user
+            echo "system-db:local" >> /etc/dconf/profile/user
+        fi
+
+        if [ -x /usr/bin/dconf ]; then
+            dconf update
+        fi
 
         # tell dom0 about installed updates (applications, features etc)
         /etc/qubes-rpc/qubes.PostInstall || true

@@ -295,6 +295,7 @@ int process_child_io(libvchan_t *data_vchan,
     int remote_process_status = -1;
     int ret, max_fd;
     struct timespec zero_timeout = { 0, 0 };
+    struct timespec normal_timeout = { 10, 0 };
     struct buffer stdin_buf;
 
     sigemptyset(&selectmask);
@@ -386,7 +387,7 @@ int process_child_io(libvchan_t *data_vchan,
             /* check for other FDs, but exit immediately */
             ret = pselect(max_fd + 1, &rdset, &wrset, NULL, &zero_timeout, &selectmask);
         } else
-            ret = pselect(max_fd + 1, &rdset, &wrset, NULL, NULL, &selectmask);
+            ret = pselect(max_fd + 1, &rdset, &wrset, NULL, &normal_timeout, &selectmask);
         if (ret < 0) {
             if (errno == EINTR)
                 continue;
@@ -490,10 +491,14 @@ int process_child_io(libvchan_t *data_vchan,
  *  MSG_EXEC_CMDLINE - connect to vchan server, fork+exec process given by
  *    cmdline parameter, pass the data to/from that process, then return local
  *    process exit code
+ *
+ *  buffer_size is about vchan buffer allocated (only for vchan server cases),
+ *  use 0 to use built-in default (64k); needs to be power of 2
  */
 int handle_new_process_common(int type, int connect_domain, int connect_port,
                 char *cmdline, int cmdline_len, /* MSG_JUST_EXEC and MSG_EXEC_CMDLINE */
-                int stdin_fd, int stdout_fd, int stderr_fd /* MSG_SERVICE_CONNECT */)
+                int stdin_fd, int stdout_fd, int stderr_fd /* MSG_SERVICE_CONNECT */,
+                int buffer_size)
 {
     libvchan_t *data_vchan;
     int exit_code = 0;
@@ -504,9 +509,12 @@ int handle_new_process_common(int type, int connect_domain, int connect_port,
         cmdline[cmdline_len-1] = 0;
     }
 
+    if (buffer_size == 0)
+        buffer_size = VCHAN_BUFFER_SIZE;
+
     if (type == MSG_SERVICE_CONNECT) {
         data_vchan = libvchan_server_init(connect_domain, connect_port,
-                VCHAN_BUFFER_SIZE, VCHAN_BUFFER_SIZE);
+                buffer_size, buffer_size);
         if (data_vchan)
             libvchan_wait(data_vchan);
     } else {
@@ -563,7 +571,7 @@ pid_t handle_new_process(int type, int connect_domain, int connect_port,
     /* child process */
     exit_code = handle_new_process_common(type, connect_domain, connect_port,
             cmdline, cmdline_len,
-            -1, -1, -1);
+            -1, -1, -1, 0);
 
     exit(exit_code);
     /* suppress warning */
@@ -572,13 +580,13 @@ pid_t handle_new_process(int type, int connect_domain, int connect_port,
 
 /* Returns exit code of remote process */
 int handle_data_client(int type, int connect_domain, int connect_port,
-                int stdin_fd, int stdout_fd, int stderr_fd)
+                int stdin_fd, int stdout_fd, int stderr_fd, int buffer_size)
 {
     int exit_code;
 
     assert(type == MSG_SERVICE_CONNECT);
 
     exit_code = handle_new_process_common(type, connect_domain, connect_port,
-            NULL, 0, stdin_fd, stdout_fd, stderr_fd);
+            NULL, 0, stdin_fd, stdout_fd, stderr_fd, buffer_size);
     return exit_code;
 }

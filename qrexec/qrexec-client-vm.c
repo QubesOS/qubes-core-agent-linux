@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <getopt.h>
 #include "libqrexec-utils.h"
 #include "qrexec.h"
 #include "qrexec-agent.h"
@@ -54,7 +55,7 @@ int connect_unix_socket(char *path)
 
     remote.sun_family = AF_UNIX;
     strncpy(remote.sun_path, path,
-            sizeof(remote.sun_path));
+            sizeof(remote.sun_path) - 1);
     len = strlen(remote.sun_path) + sizeof(remote.sun_family);
     if (connect(s, (struct sockaddr *) &remote, len) == -1) {
         perror("connect");
@@ -85,6 +86,19 @@ void convert_target_name_keyword(char *target)
             target[i] = '@';
 }
 
+struct option longopts[] = {
+    { "buffer-size", required_argument, 0,  'b' },
+    { NULL, 0, 0, 0},
+};
+
+_Noreturn void usage(const char *argv0) {
+    fprintf(stderr,
+            "usage: %s [--buffer-size=BUFFER_SIZE] target_vmname program_ident [local_program [local program arguments]]\n",
+            argv0);
+    fprintf(stderr, "BUFFER_SIZE is minimum vchan buffer size (default: 64k)\n");
+    exit(2);
+}
+
 int main(int argc, char **argv)
 {
     int trigger_fd;
@@ -95,25 +109,37 @@ int main(int argc, char **argv)
     char *abs_exec_path;
     pid_t child_pid = 0;
     int inpipe[2], outpipe[2];
+    int buffer_size = 0;
+    int opt;
 
-    if (argc < 3) {
-        fprintf(stderr,
-                "usage: %s target_vmname program_ident [local_program [local program arguments]]\n",
-                argv[0]);
-        exit(1);
+    while (1) {
+        opt = getopt_long(argc, argv, "+", longopts, NULL);
+        if (opt == -1)
+            break;
+        switch (opt) {
+            case 'b':
+                buffer_size = atoi(optarg);
+                break;
+            case '?':
+                usage(argv[0]);
+        }
     }
-    if (argc > 3) {
+
+    if (argc - optind < 2) {
+        usage(argv[0]);
+    }
+    if (argc - optind > 2) {
         start_local_process = 1;
     }
 
     trigger_fd = connect_unix_socket(QREXEC_AGENT_TRIGGER_PATH);
 
     memset(&params, 0, sizeof(params));
-    strncpy(params.service_name, argv[2], sizeof(params.service_name));
+    strncpy(params.service_name, argv[optind + 1], sizeof(params.service_name) - 1);
 
-    convert_target_name_keyword(argv[1]);
-    strncpy(params.target_domain, argv[1],
-            sizeof(params.target_domain));
+    convert_target_name_keyword(argv[optind]);
+    strncpy(params.target_domain, argv[optind],
+            sizeof(params.target_domain) - 1);
 
     snprintf(params.request_id.ident,
             sizeof(params.request_id.ident), "SOCKET");
@@ -164,9 +190,9 @@ int main(int argc, char **argv)
                 close(inpipe[0]);
                 close(outpipe[1]);
 
-                abs_exec_path = strdup(argv[3]);
-                argv[3] = get_program_name(argv[3]);
-                execv(abs_exec_path, argv + 3);
+                abs_exec_path = strdup(argv[optind + 2]);
+                argv[optind + 2] = get_program_name(argv[optind + 2]);
+                execv(abs_exec_path, argv + optind + 2);
                 perror("execv");
                 exit(-1);
         }
@@ -175,11 +201,11 @@ int main(int argc, char **argv)
 
         ret = handle_data_client(MSG_SERVICE_CONNECT,
                 exec_params.connect_domain, exec_params.connect_port,
-                inpipe[1], outpipe[0], -1);
+                inpipe[1], outpipe[0], -1, buffer_size);
     } else {
         ret = handle_data_client(MSG_SERVICE_CONNECT,
                 exec_params.connect_domain, exec_params.connect_port,
-                1, 0, -1);
+                1, 0, -1, buffer_size);
     }
 
     close(trigger_fd);

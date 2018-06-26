@@ -40,10 +40,12 @@ if [ "${ip}" ]; then
     # IPs as seen by this VM
     netvm_ip="$ip4"
     netvm_gw_ip=$(qubesdb-read /qubes-netvm-gateway)
+    netvm_gw_ip6=$(qubesdb-read /qubes-netvm-gateway6 || :)
     netvm_dns1_ip=$(qubesdb-read /qubes-netvm-primary-dns)
     netvm_dns2_ip=$(qubesdb-read /qubes-netvm-secondary-dns)
 
     back_ip="$netvm_gw_ip"
+    back_ip6="$netvm_gw_ip6"
 
     # IPs as seen by the VM - if other than $netvm_ip
     appvm_gw_ip="$(qubesdb-read "/mapped-ip/$ip4/visible-gateway" 2>/dev/null || :)"
@@ -106,7 +108,10 @@ if [ "${ip}" ] ; then
         echo -e "*raw\n$iptables_cmd -i ${vif} -j DROP\nCOMMIT" | \
             ${cmdprefix} flock $lockfile ip6tables-restore --noflush
     fi
-	${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
+    ${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
+    if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]]; then
+        ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
+    fi
 fi
 
 log debug "Successful vif-route-qubes $command for $vif."

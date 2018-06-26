@@ -54,6 +54,22 @@ class FirewallWorker(object):
         '''Create appropriate chains/tables'''
         raise NotImplementedError
 
+    def sd_notify(self, state):
+        '''Send notification to systemd, if available'''
+        # based on sdnotify python module
+        if not 'NOTIFY_SOCKET' in os.environ:
+            return
+        addr = os.environ['NOTIFY_SOCKET']
+        if addr[0] == '@':
+            addr = '\0' + addr[1:]
+        try:
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+            sock.connect(addr)
+            sock.sendall(state.encode())
+        except:
+            # generally ignore error on systemd notification
+            pass
+
     def cleanup(self):
         '''Remove tables/chains - reverse work done by init'''
         raise NotImplementedError
@@ -155,6 +171,7 @@ class FirewallWorker(object):
         self.init()
         self.run_firewall_dir()
         self.run_user_script()
+        self.sd_notify('READY=1')
         # initial load
         for source_addr in self.list_targets():
             self.handle_addr(source_addr)
@@ -313,6 +330,16 @@ class IptablesWorker(FirewallWorker):
             if dsthosts is None:
                 dsthosts = [None]
 
+            if rule['action'] == 'accept':
+                action = 'ACCEPT'
+            elif rule['action'] == 'drop':
+                action = 'REJECT --reject-with {}'.format(
+                    'icmp6-adm-prohibited' if family == 6 else
+                    'icmp-admin-prohibited')
+            else:
+                raise RuleParseError(
+                    'Invalid rule action {}'.format(rule['action']))
+
             # sorting here is only to ease writing tests
             for proto in sorted(protos):
                 for dsthost in sorted(dsthosts):
@@ -325,8 +352,7 @@ class IptablesWorker(FirewallWorker):
                         ipt_rule += ' --dport {}'.format(dstports)
                     if icmptype is not None:
                         ipt_rule += ' --icmp-type {}'.format(icmptype)
-                    ipt_rule += ' -j {}\n'.format(
-                        str(rule['action']).upper())
+                    ipt_rule += ' -j {}\n'.format(action)
                     iptables += ipt_rule
 
         iptables += 'COMMIT\n'
@@ -370,8 +396,12 @@ class IptablesWorker(FirewallWorker):
         # starting qubes-firewall
         try:
             self.run_ipt(4, ['-F', 'QBS-FORWARD'])
+            self.run_ipt(4,
+                ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'])
             self.run_ipt(4, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
             self.run_ipt(6, ['-F', 'QBS-FORWARD'])
+            self.run_ipt(6,
+                ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'])
             self.run_ipt(6, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
         except subprocess.CalledProcessError:
             self.log_error('\'QBS-FORWARD\' chain not found, create it first')
@@ -470,6 +500,15 @@ class NftablesWorker(FirewallWorker):
 
             nft_rule = ""
 
+            if rule['action'] == 'accept':
+                action = 'accept'
+            elif rule['action'] == 'drop':
+                action = 'reject with icmp{} type admin-prohibited'.format(
+                    'v6' if family == 6 else '')
+            else:
+                raise RuleParseError(
+                    'Invalid rule action {}'.format(rule['action']))
+
             if 'proto' in rule:
                 if family == 4:
                     nft_rule += ' ip protocol {}'.format(rule['proto'])
@@ -523,16 +562,16 @@ class NftablesWorker(FirewallWorker):
                 if 'proto' not in rule:
                     nft_rules.append(
                         nft_rule + ' tcp dport {} {}'.format(
-                            dstports, rule['action']))
+                            dstports, action))
                     nft_rules.append(
                         nft_rule + ' udp dport {} {}'.format(
-                            dstports, rule['action']))
+                            dstports, action))
                 else:
                     nft_rules.append(
                         nft_rule + ' {} dport {} {}'.format(
-                            rule['proto'], dstports, rule['action']))
+                            rule['proto'], dstports, action))
             else:
-                nft_rules.append(nft_rule + ' ' + rule['action'])
+                nft_rules.append(nft_rule + ' ' + action)
 
         return (
             'flush chain {family} {table} {chain}\n'
@@ -579,6 +618,7 @@ class NftablesWorker(FirewallWorker):
             '    type filter hook forward priority 0;\n'
             '    policy drop;\n'
             '    ct state established,related accept\n'
+            '    meta iifname != "vif*" accept\n'
             '  }}\n'
             '}}\n'
         )

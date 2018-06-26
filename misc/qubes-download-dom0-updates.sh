@@ -53,6 +53,9 @@ fi
 YUM="yum"
 if type dnf >/dev/null 2>&1; then
     YUM="dnf --best --allowerasing --noplugins"
+else
+    # salt in dom0 thinks it's using dnf but we only have yum so need to remove extra options
+    OPTS="${OPTS/--best --allowerasing/}"
 fi
 
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
@@ -126,7 +129,7 @@ if ! $YUM --help | grep -q downloadonly; then
     elif [ "$YUM_ACTION" == "list" ] || [ "$YUM_ACTION" == "search" ]; then
         # those actions do not download any package, so lack of --downloadonly is irrelevant
         YUM_COMMAND="$YUM $YUM_ACTION -y"
-    elif [ "$YUM_ACTION" == "reinstal" ]; then
+    elif [ "$YUM_ACTION" == "reinstall" ]; then
         # this is just approximation of 'reinstall' action...
         # shellcheck disable=SC2086
         PKGLIST=$(rpm --root=$DOM0_UPDATES_DIR -q $PKGLIST)

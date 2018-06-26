@@ -26,11 +26,9 @@ class CopyToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
     def on_menu_item_clicked(self, menu, files):
         '''Called when user chooses files though Nautilus context menu.
         '''
-        for file_obj in files:
-
-            # Check if file still exists
-            if file_obj.is_gone():
-                return
-
-            gio_file = file_obj.get_location()
-            subprocess.call(['/usr/lib/qubes/qvm-copy-to-vm.gnome', gio_file.get_path()])
+        cmd = [file_obj.get_location().get_path()
+               for file_obj in files
+               # Check if file is not gone
+               if not file_obj.is_gone()]
+        cmd.insert(0, '/usr/lib/qubes/qvm-copy-to-vm.gnome')
+        subprocess.call(cmd)

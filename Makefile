@@ -5,15 +5,16 @@ VERSION := $(shell cat version)
 DIST ?= fc18
 KDESERVICEDIR ?= /usr/share/kde4/services
 KDE5SERVICEDIR ?= /usr/share/kservices5/ServiceMenus/
+APPLICATIONSDIR ?= /usr/share/applications
 SBINDIR ?= /usr/sbin
 BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
 PYTHON ?= /usr/bin/python2
-PYTHON_SITEARCH = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)'`
-PYTHON2_SITELIB = `python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()'`
-PYTHON3_SITELIB = `python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())'`
+PYTHON_SITEARCH = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)')
+PYTHON2_SITELIB = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()')
+PYTHON3_SITELIB = $(shell python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
 
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
@@ -46,6 +47,12 @@ clean:
 	make -C misc clean
 	make -C qrexec clean
 	make -C qubes-rpc clean
+	make -C doc clean
+	rm -rf qubesagent/*.pyc qubesagent/__pycache__
+	rm -rf test-packages/__pycache__
+	rm -rf test-packages/qubesagent.egg-info
+	rm -rf __pycache__
+	rm -f .coverage
 
 all:
 	make -C misc
@@ -77,6 +84,10 @@ ifeq ($(shell lsb_release -is), Ubuntu)
     SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
     SYSTEM_DROPINS += anacron.service
     SYSTEM_DROPINS += anacron-resume.service
+    SYSTEM_DROPINS += netfilter-persistent.service
+    SYSTEM_DROPINS += exim4.service
+    SYSTEM_DROPINS += avahi-daemon.service
+
 endif
 
 # Debian Dropins
@@ -208,7 +219,7 @@ install-common: install-doc
 		misc/20_org.mate.NotificationDaemon.qubes.gschema.override \
 		misc/20_org.gnome.desktop.wm.preferences.qubes.gschema.override \
 		$(DESTDIR)/usr/share/glib-2.0/schemas/
-	install -g user -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
+	install -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc
 	install misc/resize-rootfs $(DESTDIR)$(LIBDIR)/qubes/
 
@@ -223,6 +234,8 @@ install-common: install-doc
 	install -d $(DESTDIR)$(BINDIR)
 	install -m 0755 misc/qubes-session-autostart $(DESTDIR)$(BINDIR)/qubes-session-autostart
 	install -m 0755 misc/qvm-features-request $(DESTDIR)$(BINDIR)/qvm-features-request
+	install -m 0755 misc/qubes-run-terminal $(DESTDIR)/$(BINDIR)
+	install -D -m 0755 misc/qubes-run-terminal.desktop $(DESTDIR)/$(APPLICATIONSDIR)/qubes-run-terminal.desktop
 	install -m 0755 qubes-rpc/qvm-sync-clock $(DESTDIR)$(BINDIR)/qvm-sync-clock
 	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run-vm} $(DESTDIR)/usr/bin
 	install qubes-rpc/qvm-copy $(DESTDIR)/usr/bin
@@ -287,22 +300,9 @@ install-common: install-doc
 	install -d $(DESTDIR)/usr/share/nautilus-python/extensions
 	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
 
-ifeq ($(findstring CentOS,$(shell cat /etc/redhat-release)),)
-	install -D -m 0644 misc/dconf-profile-user $(DESTDIR)/etc/dconf/profile/user
 	install -D -m 0644 misc/dconf-db-local-dpi $(DESTDIR)/etc/dconf/db/local.d/dpi
-endif
 
 	install -D -m 0755 misc/qubes-desktop-run $(DESTDIR)$(BINDIR)/qubes-desktop-run
-
-	mkdir -p $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
-
-ifeq ($(shell lsb_release -is), Debian)
-	install -m 0644 misc/qubesxdg.py $(DESTDIR)/$(PYTHON2_SITELIB)/
-else ifeq ($(shell lsb_release -is), Ubuntu)
-	install -m 0644 misc/qubesxdg.py $(DESTDIR)/$(PYTHON2_SITELIB)/
-else
-	install -m 0644 misc/py2/qubesxdg.py* $(DESTDIR)/$(PYTHON2_SITELIB)/
-endif
 
 	install -d $(DESTDIR)/mnt/removable
 

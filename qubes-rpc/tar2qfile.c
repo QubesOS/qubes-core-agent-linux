@@ -708,6 +708,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
         // Split the path in directories and recompose it incrementally
 	char * last_token = strtok(dirbuf,"/");
 	char * token = strtok(NULL, "/");
+	size_t len_last_token = 0;
 	while (token != NULL) {
 
 #ifdef DEBUG
@@ -715,21 +716,22 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 #endif
 
 		// Recompose the path based on last discovered directory
+		len_last_token = strlen(last_token);
 		if (path == NULL) {
-			path = malloc(sizeof (char) * (strlen(last_token)+1));
+			path = malloc(sizeof (char) * (len_last_token+1));
 			if (path == NULL)
 				return MEMORY_ALLOC_FAILED;
-			path = strncpy(path, last_token, strlen(last_token));
-			path[strlen(last_token)] = '\0';
+			path = memcpy(path, last_token, len_last_token);
+			path[len_last_token] = '\0';
 		} else {
 			pathsize = strlen(path);
-			path = realloc(path, sizeof (char) * (strlen(path)+1+strlen(last_token)+1));
+			path = realloc(path, sizeof (char) * (strlen(path)+1+len_last_token+1));
 			if (path == NULL)
 				return MEMORY_ALLOC_FAILED;
 			path[pathsize] = '/';
 
-			strncpy(path+pathsize+1, last_token, strlen(last_token));
-			path[pathsize+strlen(last_token)+1] = '\0';
+			memcpy(path+pathsize+1, last_token, len_last_token);
+			path[pathsize+len_last_token+1] = '\0';
 		}
 #ifdef DEBUG
 		fprintf(stderr,"Path is %s\n",path);
@@ -762,7 +764,8 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 			dirs_headers_sent[n_dirs-1] = malloc(sizeof (char) * (strlen(path)+1));
 			if (dirs_headers_sent[n_dirs-1] == NULL)
 				return MEMORY_ALLOC_FAILED;
-			strncpy(dirs_headers_sent[n_dirs-1], path, strlen(path)+1);
+
+			memcpy(dirs_headers_sent[n_dirs-1], path, strlen(path)+1);
 
                         // Initialize the qfile headers for the current directory path
 			dir_header.namelen = strlen(path)+1;

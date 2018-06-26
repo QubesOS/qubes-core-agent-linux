@@ -1,3 +1,139 @@
+qubes-core-agent (4.0.31-1) unstable; urgency=medium
+
+  * debian: add Depends: qubesdb-vm
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 Jun 2018 14:32:23 +0200
+
+qubes-core-agent (4.0.30-1) wheezy; urgency=medium
+
+  [ Christopher Laprise ]
+  * Fixes issue #3939
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 05 Jun 2018 01:39:04 +0200
+
+qubes-core-agent (4.0.29-1) unstable; urgency=medium
+
+  * Drop leftovers of qubes-netwatcher service
+  * qrexec: fix handling remote domain death
+  * network: use iptables-restore --wait if available
+  * rpm: add BR: systemd for pre/post install macros
+  * qubes-rpc: fix code style - indent with spaces
+  * qvm-open-in-vm: implement --view-only option
+  * qvm-open-in-vm: mark file as read-only if opened with --view-only
+  * Add file managers integration for qvm-open-in-dvm --view-only
+  * Add build-time assert for filename buffer size
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 May 2018 00:40:11 +0200
+
+qubes-core-agent (4.0.28-1) wheezy; urgency=medium
+
+  [ Peter Gerber ]
+  * Qubes firewall: correct syntax for icmpv6 rejects
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 10 May 2018 12:21:39 +0200
+
+qubes-core-agent (4.0.27-1) unstable; urgency=medium
+
+  [ X4lldux ]
+  * Move/Copy many files in one step via nautilus extension
+
+  [ Marek Marczykowski-Górecki ]
+  * centos: exclude only dconf user profile, keep dpi config
+  * travis: add centos7
+  * Fix packaging: 'user' group, BACKEND_VMM var
+  * Create /etc/dconf/profile/user dynamically, if not present
+  * Require dconf utility to (re)build /etc/dconf/db/local
+  * Fix make clean
+  * qubes-firewall: reject packets instead of dropping
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 02 May 2018 05:05:33 +0200
+
+qubes-core-agent (4.0.26-1) unstable; urgency=medium
+
+  * Change repository URLs to https
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 22 Apr 2018 00:29:02 +0200
+
+qubes-core-agent (4.0.25-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: don't call dconf if it isn't installed
+  * qrexec: add qrexec-client-vm --buffer-size option
+
+  [ unman ]
+  * Add missing services in Ubuntu templates.
+
+  [ Simon Gaiser ]
+  * qrexec-fork-server: Always initialize addrlen argument of accept()
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: fix arguments handling
+  * Move 'qubesxdg' into qubesagent python package
+  * Fix shell calls in Makefile
+  * Fix waiting for application exit in qubesagent.xdg.launch
+  * Load only test_* files when looking for tests (python)
+  * qubes-session-autostart: do not wait for applications exit
+  * Do not start dkms.service
+  * network: do not assume IPv6 gateway is a link-local address
+  * qubes-firewall: handle only traffic originating from VMs
+  * network: make sure static NM configuration is created before NM
+    start
+
+  [ Davíð Steinn Geirsson ]
+  * Add misc/qubes-run-terminal to launch any available terminal
+    emulator
+
+  [ Frédéric Pierret ]
+  * Create .spec.in and Source0
+  * Remove _builddir
+  * spec.in: add changelog placeholder
+  * spec.in: fix %if expressions and remove useless conditions
+
+  [ Vladimir Lushnikov ]
+  * Problem: Unable to use pkg.install with Salt in dom0 when using
+    UpdateVM that has only yum due to incorrect options passed by Salt
+    assuming dnf presence
+
+  [ Marek Marczykowski-Górecki ]
+  * Use only /etc/skel to provision user's home directory of new VM
+  * Update gitignore and make clean target
+  * qubes-firewall: signal service readiness only after initial scripts
+
+  [ Frédéric Pierret ]
+  * Fix GCC8 warnings
+  * Add missing python-setuptools dependency
+  * Use %{python3_pkgversion} instead of duplicating python3 targets
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: update Fedora versions
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 21 Apr 2018 15:10:20 +0200
+
+qubes-core-agent (4.0.24-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Drop Fedora < 22 support
+  * Call qubes.PostInstall service to notify dom0 about all
+    apps/features
+  * dom0-updates: refactor for ease adding new actions with old yum
+  * dom0-update: add some approximation of 'list', 'search' and
+    'reinstall'
+  * Drop fakeroot for list/search actions on Debian
+
+  [ Rusty Bird ]
+  * Really enable qubes-sync-time.timer
+
+  [ Frédéric Pierret ]
+  * centos: fix conflict with dconf
+
+  [ Marek Marczykowski-Górecki ]
+  * Speed up initial /rw setup
+
+  [ awokd ]
+  * reinstal -> reinstall
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 27 Feb 2018 15:17:51 +0100
+
 qubes-core-agent (4.0.23-1) unstable; urgency=medium
 
   * qrexec: launch services in login shell

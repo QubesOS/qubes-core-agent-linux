@@ -82,6 +82,14 @@ update_qubesconfig() {
     #/usr/lib/qubes/update-proxy-configs
     # Archlinux pacman configuration is handled in update_finalize
 
+    if ! [ -r /etc/dconf/profile/user ]; then
+        mkdir -p /etc/dconf/profile
+        echo "user-db:user" >> /etc/dconf/profile/user
+        echo "system-db:local" >> /etc/dconf/profile/user
+    fi
+
+    dconf update &> /dev/null || :
+
     # Location of files which contains list of protected files
     mkdir -p /etc/qubes/protected-files.d
     # shellcheck source=init/functions
@@ -323,6 +331,8 @@ post_install() {
     if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
         cp /etc/init/serial.conf /var/lib/qubes/serial.orig
     fi
+
+    chgrp user /var/lib/qubes/dom0-updates
 
     # Remove most of the udev scripts to speed up the VM boot time
     # Just leave the xen* scripts, that are needed if this VM was

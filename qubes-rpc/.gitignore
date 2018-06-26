@@ -1,6 +1,5 @@
 qubes_add_pendrive_script
 qubes_penctl
-qvm-open-in-dvm
 dvm_file_editor
 qfile-agent
 qfile-agent-dvm

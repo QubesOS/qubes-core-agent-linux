@@ -10,58 +10,58 @@
 
 static void fix_display(void)
 {
-	setenv("DISPLAY", ":0", 1);
+    setenv("DISPLAY", ":0", 1);
 }
 
 static void produce_message(const char * type, const char *fmt, va_list args)
 {
-	char *dialog_msg;
-	char buf[1024];
-	(void) vsnprintf(buf, sizeof(buf), fmt, args);
-	if (asprintf(&dialog_msg, "%s: %s: %s (error type: %s)",
-		 program_invocation_short_name, type, buf, strerror(errno)) < 0) {
-		fprintf(stderr, "Failed to allocate memory for error message :(\n");
-		return;
-	}
-	fprintf(stderr, "%s\n", dialog_msg);
-	switch (fork()) {
-	case -1:
-		exit(1);	//what else
-	case 0:
-		if (geteuid() == 0)
-			if (setuid(getuid()) != 0)
-				perror("setuid failed, calling kdialog/zenity as root");
-		fix_display();
+    char *dialog_msg;
+    char buf[1024];
+    (void) vsnprintf(buf, sizeof(buf), fmt, args);
+    if (asprintf(&dialog_msg, "%s: %s: %s (error type: %s)",
+         program_invocation_short_name, type, buf, strerror(errno)) < 0) {
+        fprintf(stderr, "Failed to allocate memory for error message :(\n");
+        return;
+    }
+    fprintf(stderr, "%s\n", dialog_msg);
+    switch (fork()) {
+    case -1:
+        exit(1);    //what else
+    case 0:
+        if (geteuid() == 0)
+            if (setuid(getuid()) != 0)
+                perror("setuid failed, calling kdialog/zenity as root");
+        fix_display();
 #ifdef USE_KDIALOG
-		execlp("/usr/bin/kdialog", "kdialog", "--sorry", dialog_msg, NULL);
+        execlp("/usr/bin/kdialog", "kdialog", "--sorry", dialog_msg, NULL);
 #else
 
-		execlp("/usr/bin/zenity", "zenity", "--error",  "--text", dialog_msg, NULL);
+        execlp("/usr/bin/zenity", "zenity", "--error",  "--text", dialog_msg, NULL);
 #endif
-		exit(1);
-	default:;
-	}
-	free(dialog_msg);
+        exit(1);
+    default:;
+    }
+    free(dialog_msg);
 }
 
 void gui_fatal(const char *fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
-	produce_message("Fatal error", fmt, args);
-	va_end(args);
-	exit(1);
+    va_list args;
+    va_start(args, fmt);
+    produce_message("Fatal error", fmt, args);
+    va_end(args);
+    exit(1);
 }
 
 void qfile_gui_fatal(const char *fmt, va_list args) {
-	produce_message("Fatal error", fmt, args);
+    produce_message("Fatal error", fmt, args);
     exit(1);
 }
 
 void gui_nonfatal(const char *fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
-	produce_message("Information", fmt, args);
-	va_end(args);
+    va_list args;
+    va_start(args, fmt);
+    produce_message("Information", fmt, args);
+    va_end(args);
 }

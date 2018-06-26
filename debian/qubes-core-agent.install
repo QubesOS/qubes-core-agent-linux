@@ -3,7 +3,6 @@ etc/apt/apt.conf.d/00notify-hook
 etc/apt/apt.conf.d/70no-unattended
 etc/apt/sources.list.d/qubes-r4.list
 etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
-etc/dconf/profile/user
 etc/dconf/db/local.d/dpi
 etc/default/grub.d/30-qubes.cfg
 etc/fstab
@@ -92,6 +91,7 @@ lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 usr/bin/qubes-desktop-run
 usr/bin/qubes-open
 usr/bin/qubes-session-autostart
+usr/bin/qubes-run-terminal
 usr/bin/qvm-copy
 usr/bin/qvm-copy-to-vm
 usr/bin/qvm-features-request
@@ -102,7 +102,6 @@ usr/bin/qvm-open-in-vm
 usr/bin/qvm-run-vm
 usr/bin/qvm-sync-clock
 usr/bin/xenstore-watch-qubes
-usr/lib/python2.7/dist-packages/qubesxdg.py
 usr/lib/python2.7/dist-packages/qubesagent-*.egg-info/*
 usr/lib/python2.7/dist-packages/qubesagent/*
 usr/lib/qubes-bind-dirs.d/30_cron.conf
@@ -142,6 +141,7 @@ usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
 usr/share/glib-2.0/schemas/*
 usr/share/kde4/services/*.desktop
 usr/share/kservices5/ServiceMenus/*.desktop
+usr/share/applications/*.desktop
 usr/share/man/man1/qvm-*
 usr/share/qubes/mime-override/globs
 usr/share/qubes/qubes-master-key.asc

@@ -158,15 +158,9 @@ initialize_home() {
         homedir=$(echo "$pair" | awk -F : ' { print $4 } ')
         homedirwithouthome=${homedir#/home/}
         if ! test -d "$home_root/$homedirwithouthome" || [ "$mode" = "unconditionally" ] ; then
-            if [ "$homedir" == "/home/user" ] && [ -d "/home.orig/$homedirwithouthome" ] ; then
-                echo "initialize_home: populating $mode $home_root/$homedirwithouthome from /home.orig/$homedirwithouthome" >&2
-                mkdir -p "$home_root/$homedirwithouthome"
-                cp -af -T "/home.orig/$homedirwithouthome" "$home_root/$homedirwithouthome"
-            else
-                echo "initialize_home: populating $mode $home_root/$homedirwithouthome from /etc/skel" >&2
-                mkdir -p "$home_root/$homedirwithouthome"
-                cp -af -T /etc/skel "$home_root/$homedirwithouthome"
-            fi
+            echo "initialize_home: populating $mode $home_root/$homedirwithouthome from /etc/skel" >&2
+            mkdir -p "$home_root/$homedirwithouthome"
+            cp -af -T /etc/skel "$home_root/$homedirwithouthome"
             echo "initialize_home: adjusting permissions $mode on $home_root/$homedirwithouthome" >&2
             chown -R "$uid" "$home_root/$homedirwithouthome" &
             waitpids="$!"

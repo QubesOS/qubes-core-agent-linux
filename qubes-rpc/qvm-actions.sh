@@ -45,6 +45,12 @@ case "$action" in
             qvm-open-in-dvm "$file" | zenity --notification --text "Opening $file in DisposableVM..." --timeout 3 &
         done
         ;;
+    viewdvm)
+        for file in "$@"
+        do
+            qvm-open-in-dvm --view-only "$file" | zenity --notification --text "Opening $file in DisposableVM..." --timeout 3 &
+        done
+        ;;
     *)
         echo "Unknown action. Aborting..."
         exit 1

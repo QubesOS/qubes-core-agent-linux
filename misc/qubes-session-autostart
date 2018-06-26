@@ -25,7 +25,7 @@ import subprocess
 import sys
 
 from xdg.DesktopEntry import DesktopEntry
-from qubesxdg import launch
+from qubesagent.xdg import launch
 import xdg.BaseDirectory
 import os
 
@@ -76,7 +76,7 @@ def process_autostart(environments):
                 else:
                     entry = DesktopEntry(entry_path)
                 if entry_should_be_started(entry, environments):
-                    launch(entry_path)
+                    launch(entry_path, wait=False)
             except Exception as e:
                 print >>sys.stderr, "Failed to process '{}': {}".format(
                     entry_name, str(e)
