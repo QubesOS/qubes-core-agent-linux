@@ -144,6 +144,7 @@ Requires:   pygtk2
 Requires:   zenity
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
+Requires:   tar
 %if 0%{?fedora} >= 23
 Requires:   python3-dnf-plugins-qubes-hooks
 %else
