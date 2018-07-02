@@ -206,6 +206,7 @@ Summary:    Scripts required to handle dom0 updates
 Requires:   qubes-core-agent
 Requires:   fakeroot
 Conflicts:  qubes-core-vm < 4.0.0
+Requires:   tar
 
 %description dom0-updates
 Scripts required to handle dom0 updates.
