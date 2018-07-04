@@ -3,13 +3,17 @@
 set -e
 
 dev=/dev/xvdb
+max_size=1073741824  # check at most 1 GiB
 
 if [ -e "$dev" ] ; then
     # The private /dev/xvdb device is present.
 
     # check if private.img (xvdb) is empty - all zeros
-    private_size_512=$(blockdev --getsz "$dev")
-    if head -c $(( private_size_512 * 512 )) /dev/zero | diff "$dev" - >/dev/null; then
+    private_size=$(( $(blockdev --getsz "$dev") * 512))
+    if [ $private_size -gt $max_size ]; then
+        private_size=$max_size
+    fi
+    if cmp --bytes $private_size "$dev" /dev/zero >/dev/null && { blkid -p "$dev" >/dev/null; [ $? -eq 2 ]; }; then
         # the device is empty, create filesystem
         echo "Virgin boot of the VM: creating private.img filesystem on $dev" >&2
         if ! content=$(mkfs.ext4 -m 0 -q "$dev" 2>&1) ; then
