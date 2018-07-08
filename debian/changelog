@@ -1,3 +1,18 @@
+qubes-core-agent (4.0.32-1) unstable; urgency=medium
+
+  [ awokd ]
+  * grub: add noresume to kernel cmdline Under R4.0, when Debian HVMs
+    are created from the debian-9 template, they hang on boot for 30
+    seconds without this option.
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: add R: tar, for qubes-dom0-update
+
+  [ Peter Gerber ]
+  * setup-rwdev.sh: Only check first 1 GiB for zeros
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 08 Jul 2018 03:48:51 +0200
+
 qubes-core-agent (4.0.31-1) unstable; urgency=medium
 
   * debian: add Depends: qubesdb-vm
