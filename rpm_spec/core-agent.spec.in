@@ -339,6 +339,13 @@ if [ -L /lib/firmware/updates ]; then
   rm -f /lib/firmware/updates
 fi
 
+# convert /usr/local symlink to a mount point
+if [ -L /usr/local ]; then
+    rm -f /usr/local
+    mkdir /usr/local
+    mount /usr/local || :
+fi
+
 if test -f /etc/yum.conf && ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
   echo >> /etc/yum.conf
   echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
