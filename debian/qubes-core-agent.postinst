@@ -175,6 +175,13 @@ case "${1}" in
             rm -f /lib/firmware/updates
         fi
 
+        # convert /usr/local symlink to a mount point
+        if [ -L /usr/local ]; then
+            rm -f /usr/local
+            mkdir /usr/local
+            mount /usr/local || :
+        fi
+
         # remove old symlinks
         if [ -L /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service ]; then
             rm /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service
