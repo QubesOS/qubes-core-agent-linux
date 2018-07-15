@@ -22,23 +22,23 @@ set -e
 #
 
 if [ $# -lt 2 ] ; then
-	
+
 	if [ "${0##*/}" = "qvm-move-to-vm" ] || [ "${0##*/}" = "qvm-copy-to-vm" ]; then
-		echo "usage: $0 [--without-progress] destination_vmname FILE [FILE ...]"
+		echo "usage: $0 [--without-progress] destination_qube_name FILE [FILE ...]"
 	else
 		echo "usage: $0 [--without-progress] FILE [FILE ...]"
 	fi
-	
+
 	echo
 
 	if [ "${0##*/}" = "qvm-move-to-vm" ] || [ "${0##*/}" = "qvm-move" ] ; then
-		echo "Move FILE to ~/QubesIncoming/$(hostname)/ in the destination qube."
+		echo "Move FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
 	else
-		echo "Copy FILE to ~/QubesIncoming/$(hostname)/ in the destination qube."
+		echo "Copy FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
 	fi
-	
-	echo 
-	echo "You will be prompted to select the destination qube. If FILE is a directory, it will be copied recursively."	
+
+	echo
+	echo "You will be prompted to select the destination qube. If FILE is a directory, it will be copied recursively."
 	exit 1
 fi
 
