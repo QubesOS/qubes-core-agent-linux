@@ -1,3 +1,13 @@
+qubes-core-agent (4.0.33-1) unstable; urgency=medium
+
+  [ Reynir Björnsson ]
+  * bind mount /usr/local
+
+  [ Marek Marczykowski-Górecki ]
+  * Convert /usr/local from a symlink to a mount point on upgrade
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 17 Jul 2018 11:37:35 +0200
+
 qubes-core-agent (4.0.32-1) unstable; urgency=medium
 
   [ awokd ]
