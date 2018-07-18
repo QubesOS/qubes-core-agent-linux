@@ -1,3 +1,24 @@
+qubes-core-agent (3.2.31-1) unstable; urgency=medium
+
+  [ Reynir Björnsson ]
+  * bind mount /usr/local
+
+  [ Marek Marczykowski-Górecki ]
+  * Convert /usr/local from a symlink to a mount point on upgrade
+  * qrexec: fix handling remote domain death
+  * network: use iptables-restore --wait if available
+
+  [ Christopher Laprise ]
+  * Fixes issue #3939
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: add Depends: qubesdb-vm
+
+  [ Peter Gerber ]
+  * setup-rwdev.sh: Only check first 1 GiB for zeros
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 18 Jul 2018 18:00:16 +0200
+
 qubes-core-agent (3.2.30-1) unstable; urgency=medium
 
   * Update gitignore and make clean target
