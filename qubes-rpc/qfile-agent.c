@@ -33,15 +33,16 @@ void do_notify_progress(long long total, int flag)
         ignore = write(2, msg, strlen(msg));
         if (flag == PROGRESS_FLAG_DONE)
             ignore = write(2, "\n", 1);
+        if (ignore < 0) {
+            /* silence gcc warning */
+        }
     }
     if (!strcmp(progress_type_env, "gui") && saved_stdout_env) {
         char msg[256];
         snprintf(msg, sizeof(msg), "%lld\n", total);
-        ignore = write(strtoul(saved_stdout_env, NULL, 0), msg,
-                strlen(msg));
-    }
-    if (ignore < 0) {
-        /* silence gcc warning */
+        if (write(strtoul(saved_stdout_env, NULL, 0), msg, strlen(msg)) == -1
+            && errno == EPIPE)
+            exit(32);
     }
 }
 
