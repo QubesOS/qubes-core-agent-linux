@@ -241,10 +241,10 @@ install-common: install-doc
 	install qubes-rpc/qvm-copy $(DESTDIR)/usr/bin
 	ln -s qvm-copy-to-vm $(DESTDIR)/usr/bin/qvm-move-to-vm
 	ln -s qvm-copy $(DESTDIR)/usr/bin/qvm-move
-	install qubes-rpc/qvm-copy-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
 	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/qvm-move-to-vm.kde $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/qvm-move-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
+	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes/qvm-move-to-vm.gnome
+	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes/qvm-copy-to-vm.kde
+	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes/qvm-move-to-vm.kde
 	install qubes-rpc/qvm-actions.sh $(DESTDIR)$(LIBDIR)/qubes
 	install -m 0644 misc/uca_qubes.xml $(DESTDIR)$(LIBDIR)/qubes
 	mkdir -p $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
