@@ -1,3 +1,22 @@
+qubes-core-agent (3.2.32-1) unstable; urgency=medium
+
+  [ Frédéric Pierret ]
+  * spec.in: fix %if expressions and remove useless conditions
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes-rpc: fix code style - indent with spaces
+
+  [ Rusty Bird ]
+  * qfile-agent.c: exit on EPIPE after gui progress write
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: add buster
+  * qvm-open-in-vm: implement --view-only option
+  * qvm-open-in-vm: mark file as read-only if opened with --view-only
+  * Add build-time assert for filename buffer size
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 26 Jul 2018 23:39:44 +0200
+
 qubes-core-agent (3.2.31-1) unstable; urgency=medium
 
   [ Reynir Björnsson ]
