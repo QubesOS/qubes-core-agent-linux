@@ -235,7 +235,7 @@ usermod -L user
 (cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
 
-%if %{fedora} >= 22
+%if 0%{?fedora} >= 22
 rm -f $RPM_BUILD_ROOT/etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 %endif
 
@@ -321,7 +321,7 @@ if ! is_protected_file /etc/hostname ; then
     done
 fi
 
-%if %{fedora} >= 20
+%if 0%{?fedora} >= 20
 # Make sure there is a default locale set so gnome-terminal will start
 if [ ! -e /etc/locale.conf ] || ! grep -q LANG /etc/locale.conf; then
     touch /etc/locale.conf
@@ -508,7 +508,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes-r3.repo
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
-%if %{fedora} < 22
+%if 0%{?fedora} < 22
 /etc/yum/post-actions/qubes-trigger-sync-appmenus.action
 %endif
 %config(noreplace) /etc/dconf/db/local.d/dpi
