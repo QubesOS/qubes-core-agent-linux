@@ -205,6 +205,7 @@ ln -sf . %{name}-%{version}
 %setup -T -D
 
 %build
+%{?set_build_flags}
 for dir in qubes-rpc qrexec misc; do
   (cd $dir; make)
 done
