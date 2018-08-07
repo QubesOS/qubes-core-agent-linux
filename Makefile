@@ -161,7 +161,8 @@ install-sysvinit: install-init
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
 
 install-rh: install-systemd install-systemd-dropins install-sysvinit
-	install -D -m 0644 misc/qubes-r4.repo $(DESTDIR)/etc/yum.repos.d/qubes-r4.repo
+	install -D -m 0644 misc/qubes-r4.repo.in $(DESTDIR)/etc/yum.repos.d/qubes-r4.repo
+	DIST='$(DIST)'; sed -i "s/@DIST@/$$(echo $${DIST%%[0-9]*})/g" $(DESTDIR)/etc/yum.repos.d/qubes-r4.repo
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)$(LIBDIR)/yum-plugins/
 	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
