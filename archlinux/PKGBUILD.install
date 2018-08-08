@@ -86,6 +86,9 @@ update_qubesconfig() {
         mount /usr/local || :
     fi
 
+    # Fix fstab update to core-agent-linux 4.0.33
+    grep -F -q "/rw/usrlocal" /etc/fstab || sed "/\/rw\/home/a\/rw\/usrlocal    \/usr\/local  none    noauto,bind,defaults 0 0" -i /etc/fstab
+
     #/usr/lib/qubes/update-proxy-configs
     # Archlinux pacman configuration is handled in update_finalize
 
