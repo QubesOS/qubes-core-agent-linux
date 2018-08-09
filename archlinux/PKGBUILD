@@ -3,7 +3,7 @@
 # shellcheck disable=SC2034
 pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring)
 pkgver=$(cat version)
-pkgrel=14
+pkgrel=15
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
