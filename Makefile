@@ -73,6 +73,7 @@ ifeq ($(shell lsb_release -is), Ubuntu)
 
     # 'crond.service' is named 'cron.service in Debian
     SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
+    SYSTEM_DROPINS := $(strip $(filter-out ntpd.service, $(SYSTEM_DROPINS)))
     SYSTEM_DROPINS += anacron.service
     SYSTEM_DROPINS += anacron-resume.service
     SYSTEM_DROPINS += netfilter-persistent.service
@@ -291,6 +292,8 @@ install-common:
 	mkdir -p $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 
 ifeq ($(shell lsb_release -is), Debian)
+	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
+else ifeq ($(shell lsb_release -is), Ubuntu)
 	install -m 0644 misc/xdg.py $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
 else
 	install -m 0644 misc/py2/xdg.py* $(DESTDIR)/$(PYTHON_SITEARCH)/qubes/
