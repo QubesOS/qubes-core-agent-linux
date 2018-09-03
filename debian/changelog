@@ -1,3 +1,46 @@
+qubes-core-agent (4.0.34-1) unstable; urgency=medium
+
+  [ Marta Marczykowska-Górecka ]
+  * Add proper help text to qvm-copy tools and fix incorrect behavior
+    for qvm-move
+  * Avoid leaking VM name in qvm-copy usage text
+
+  [ Rusty Bird ]
+  * qfile-agent.c: exit on EPIPE after gui progress write
+  * Unify qvm-{copy,move}-to-vm.{gnome,kde} and fix some bugs
+
+  [ unman ]
+  * Install qubes control files for services in Ubuntu templates
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: use build flags provided by the distribution
+  * travis: add fc28 and buster
+
+  [ Olivier MEDOC ]
+  * archlinux: ensure /usr/local is present in fstab (fix issue
+    https://github.com/QubesOS/qubes-issues/issues/4196)
+
+  [ fepitre ]
+  * Handle CentOS vm repo
+
+  [ unman ]
+  * Add bionic, remove old Ubuntu versions
+  * Remove user from sudo group on removing passwordless-root.
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: do not add user to sudo group, lock root account
+
+  [ Rusty Bird ]
+  * misc/qubes-run-terminal: which -> type
+
+  [ unman ]
+  * Install debian version of qrexec pam in Ubuntu templates
+
+  [ Marek Marczykowski-Górecki ]
+  * Slightly simplify @DIST@ substitution in repository definition
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 03 Sep 2018 11:17:14 +0200
+
 qubes-core-agent (4.0.33-1) unstable; urgency=medium
 
   [ Reynir Björnsson ]
