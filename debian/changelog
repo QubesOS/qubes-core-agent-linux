@@ -1,3 +1,16 @@
+qubes-core-agent (3.2.33-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: fix remaining %if
+
+  [ unman ]
+  * Fix Ubuntu build in 3.2
+
+  [ Rusty Bird ]
+  * qvm-{copy,move}-to-vm.kde: '-inputbox' -> '--inputbox'
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 03 Sep 2018 11:16:02 +0200
+
 qubes-core-agent (3.2.32-1) unstable; urgency=medium
 
   [ Frédéric Pierret ]
