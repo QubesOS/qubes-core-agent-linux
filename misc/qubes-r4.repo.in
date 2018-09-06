@@ -1,7 +1,7 @@
 [qubes-vm-r4.0-current]
 name = Qubes OS Repository for VM (updates)
 baseurl = https://yum.qubes-os.org/r4.0/current/vm/@DIST@$releasever
-#baseurl = https://yum.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/current/vm/@DIST@$releasever
+#baseurl = http://yum.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/current/vm/@DIST@$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-4-primary
 skip_if_unavailable=False
 gpgcheck = 1
@@ -10,7 +10,7 @@ enabled=1
 [qubes-vm-r4.0-current-testing]
 name = Qubes OS Repository for VM (updates-testing)
 baseurl = https://yum.qubes-os.org/r4.0/current-testing/vm/@DIST@$releasever
-#baseurl = https://yum.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/current-testing/vm/@DIST@$releasever
+#baseurl = http://yum.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/current-testing/vm/@DIST@$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-4-primary
 skip_if_unavailable=False
 gpgcheck = 1
@@ -19,7 +19,7 @@ enabled=0
 [qubes-vm-r4.0-security-testing]
 name = Qubes OS Repository for VM (security-testing)
 baseurl = https://yum.qubes-os.org/r4.0/security-testing/vm/@DIST@$releasever
-#baseurl = https://yum.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/security-testing/vm/@DIST@$releasever
+#baseurl = http://yum.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/security-testing/vm/@DIST@$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-4-primary
 skip_if_unavailable=False
 gpgcheck = 1
@@ -28,7 +28,7 @@ enabled=0
 [qubes-vm-r4.0-unstable]
 name = Qubes OS Repository for VM (unstable)
 baseurl = https://yum.qubes-os.org/r4.0/unstable/vm/@DIST@$releasever
-#baseurl = https://yum.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/unstable/vm/@DIST@$releasever
+#baseurl = http://yum.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/unstable/vm/@DIST@$releasever
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-4-unstable
 gpgcheck = 1
 enabled=0
