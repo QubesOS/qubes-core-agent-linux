@@ -1,3 +1,15 @@
+qubes-core-agent (4.0.35-1) unstable; urgency=medium
+
+  [ 0brand ]
+  * Comments to use qubes onion repository
+  * Comments to use qubes onion repository
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix detection of root device resize
+  * Drop https from onion update repository urls
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 12 Sep 2018 04:04:14 +0200
+
 qubes-core-agent (4.0.34-1) unstable; urgency=medium
 
   [ Marta Marczykowska-Górecka ]
