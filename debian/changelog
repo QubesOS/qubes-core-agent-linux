@@ -1,3 +1,9 @@
+qubes-core-agent (4.0.36-1) unstable; urgency=medium
+
+  * rpm: add workaround for Fedora's systemd package bug
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 13 Sep 2018 14:32:02 +0200
+
 qubes-core-agent (4.0.35-1) unstable; urgency=medium
 
   [ 0brand ]
