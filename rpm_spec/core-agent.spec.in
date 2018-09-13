@@ -347,6 +347,12 @@ if [ -L /usr/local ]; then
     mount /usr/local || :
 fi
 
+# workaround for Fedora's systemd package bug
+# https://bugzilla.redhat.com/1559286
+if [ -d /var/lib/private ]; then
+    chmod 700 /var/lib/private
+fi
+
 if test -f /etc/yum.conf && ! grep -q '/etc/yum\.conf\.d/qubes-proxy\.conf' /etc/yum.conf; then
   echo >> /etc/yum.conf
   echo '# Yum does not support inclusion of config dir...' >> /etc/yum.conf
