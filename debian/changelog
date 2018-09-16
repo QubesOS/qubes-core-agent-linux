@@ -1,3 +1,10 @@
+qubes-core-agent (3.2.34-1) unstable; urgency=medium
+
+  * rpm: use build flags provided by the distribution
+  * rpm: add R: tar, for qubes-dom0-update
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 16 Sep 2018 05:34:20 +0200
+
 qubes-core-agent (3.2.33-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
