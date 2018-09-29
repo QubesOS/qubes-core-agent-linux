@@ -1,6 +1,46 @@
-#!/bin/sh
+#!/bin/bash
 # shellcheck disable=SC2016
-find /usr/share/applications/ /usr/local/share/applications/ -name '*.desktop' -print0 2>/dev/null | \
+
+# send .desktop files from directories persisting across VM restarts, specifically:
+#  - any directory in case of "full" persistence
+#  - directories stored on /rw in case of "rw-only" persistence
+#  - nothing, otherwise
+
+if [ -z "$XDG_DATA_HOME" ]; then
+    XDG_DATA_HOME="$HOME/.local/share"
+fi
+if [ -z "$XDG_DATA_DIRS" ]; then
+    XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
+fi
+
+# if read fails for some reason, default to full
+persistence=$(qubesdb-read /qubes-vm-persistence || echo full)
+rw_devno=$(stat -c %D /rw)
+
+apps_dirs_to_consider=( "$XDG_DATA_HOME" )
+old_IFS="$IFS"
+IFS=:
+# shellcheck disable=SC2206
+apps_dirs_to_consider+=( $XDG_DATA_DIRS )
+IFS="$old_IFS"
+
+apps_dirs=()
+for dir in "${apps_dirs_to_consider[@]}"; do
+    if [ "$persistence" = "full" ]; then
+        apps_dirs+=( "$dir/applications" )
+    elif [ "$persistence" = "rw-only" ] && \
+            [ "$(stat -c %D "$dir")" = "$rw_devno" ]; then
+        apps_dirs+=( "$dir/applications" )
+    fi
+done
+
+if [ "${#apps_dirs[@]}" -eq "0" ]; then
+    # nothing to send, exit early to not let `find` browse the current
+    # directory
+    exit 0
+fi
+
+find "${apps_dirs[@]}" -name '*.desktop' -print0 2>/dev/null | \
          xargs -0 awk '
          BEGINFILE { entry="" }
          /^\[/ { if (tolower($0) != "\[desktop entry\]") nextfile } 
