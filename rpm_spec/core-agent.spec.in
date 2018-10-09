@@ -147,6 +147,7 @@ Provides:   qubes-core-vm = %{version}-%{release}
 Obsoletes:  qubes-core-vm < 4.0.0
 Provides:	qubes-core-vm-doc = %{version}-%{release}
 Obsoletes:	qubes-core-vm-doc < 4.0.0
+BuildRequires: gcc
 BuildRequires: pandoc
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
@@ -670,13 +671,13 @@ rm -f %{name}-%{version}
 /usr/share/glib-2.0/schemas/20_org.gnome.desktop.wm.preferences.qubes.gschema.override
 %{_mandir}/man1/qvm-*.1*
 
-%dir %{python_sitelib}/qubesagent-*-py2.7.egg-info
-%{python_sitelib}/qubesagent-*-py2.7.egg-info/*
-%dir %{python_sitelib}/qubesagent
-%{python_sitelib}/qubesagent/__init__.py*
-%{python_sitelib}/qubesagent/firewall.py*
-%{python_sitelib}/qubesagent/test_firewall.py*
-%{python_sitelib}/qubesagent/xdg.py*
+%dir %{python2_sitelib}/qubesagent-*-py2.7.egg-info
+%{python2_sitelib}/qubesagent-*-py2.7.egg-info/*
+%dir %{python2_sitelib}/qubesagent
+%{python2_sitelib}/qubesagent/__init__.py*
+%{python2_sitelib}/qubesagent/firewall.py*
+%{python2_sitelib}/qubesagent/test_firewall.py*
+%{python2_sitelib}/qubesagent/xdg.py*
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc
