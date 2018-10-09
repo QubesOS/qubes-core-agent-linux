@@ -31,7 +31,7 @@ source /usr/lib/qubes/init/functions
 
 prerequisite() {
    if ! is_rwonly_persistent ; then
-      true "No TemplateBasedVM detected. Exiting."
+      echo "No TemplateBasedVM detected. Exiting."
       exit 0
    fi
 }
@@ -68,7 +68,7 @@ bind_dirs() {
             fso_real_location="$(realpath "$fso_ro")"
             fso_ro="$fso_real_location"
          else
-            true "$fso_ro is not a symlink"
+            echo "$fso_ro is not a symlink"
             break
          fi
          if [ "$symlink_level_counter" -ge "$symlink_level_max" ]; then
@@ -99,7 +99,7 @@ bind_dirs() {
             echo "Initializing $rw_dest_dir with files from $fso_ro" >&2
             cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
          else
-            true "$fso_ro is neither a directory nor a file and the path does not exist below /rw, skipping."
+            echo "$fso_ro is neither a directory nor a file and the path does not exist below /rw, skipping."
             continue
          fi
       fi
