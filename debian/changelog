@@ -1,3 +1,17 @@
+qubes-core-agent (4.0.37-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix qubes-run-terminal.desktop permissions
+  * tests: update yum.qubes-os.org IP address
+  * appmenus: send only persistent appmenus entries, use $XDG_DATA_*
+  * rpm: fix building on fc29
+  * travis: add fc29
+
+  [ lvh ]
+  * Voice informational messages in bind-dirs.sh
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 10 Oct 2018 02:44:11 +0200
+
 qubes-core-agent (4.0.36-1) unstable; urgency=medium
 
   * rpm: add workaround for Fedora's systemd package bug
