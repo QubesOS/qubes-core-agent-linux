@@ -16,6 +16,5 @@ source-debian-quilt-copy-in:
 		sed -i /initscripts/d $(CHROOT_DIR)/$(DIST_SRC)/debian/control ;\
 	fi
 	-$(shell $(ORIG_SRC)/debian-quilt $(ORIG_SRC)/series-debian-vm.conf $(CHROOT_DIR)/$(DIST_SRC)/debian/patches)
-	tar cfz $(ORIG_FILE) --exclude-vcs --exclude=rpm --exclude=pkgs --exclude=deb --exclude=debian -C $(CHROOT_DIR)/$(DIST_SRC) .
 
 # vim: filetype=make
