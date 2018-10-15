@@ -1,3 +1,14 @@
+qubes-core-agent (3.2.35-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes-firewall: use iptables-restore --wait if supported
+  * debian: don't create orig.tar.gz manually
+
+  [ lvh ]
+  * Voice informational messages in bind-dirs.sh
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 15 Oct 2018 06:30:36 +0200
+
 qubes-core-agent (3.2.34-1) unstable; urgency=medium
 
   * rpm: use build flags provided by the distribution
