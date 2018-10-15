@@ -12,6 +12,12 @@ echo $$ >$PIDFILE
 
 trap 'exit 0' TERM
 
+IPT_ARGS=
+if "iptables-restore" --help 2>&1 | grep -q wait=; then
+    # 'wait' must be last on command line if secs not specified
+    IPT_ARGS=--wait
+fi
+
 FIRST_TIME=yes
 
 while true; do
@@ -36,11 +42,11 @@ while true; do
 
 	RULES=$(qubesdb-read $XENSTORE_IPTABLES_HEADER)
 	IPTABLES_SAVE=$(iptables-save | sed '/^\*filter/,/^COMMIT/d')
-	OUT=$(printf '%s\n%s\n' "$RULES" "$IPTABLES_SAVE" | sed 's/\\n\|\\x0a/\n/g' | iptables-restore 2>&1 || true)
+	OUT=$(printf '%s\n%s\n' "$RULES" "$IPTABLES_SAVE" | sed 's/\\n\|\\x0a/\n/g' | iptables-restore $IPT_ARGS 2>&1 || true)
 
 	for i in $(qubesdb-list -f /qubes-iptables-domainrules) ; do
 		RULES=$(qubesdb-read "$i")
-		ERRS=$(printf '%s\n' "$RULES" | sed 's/\\n\|\\x0a/\n/g' | /sbin/iptables-restore -n 2>&1 || true)
+		ERRS=$(printf '%s\n' "$RULES" | sed 's/\\n\|\\x0a/\n/g' | /sbin/iptables-restore -n $IPT_ARGS 2>&1 || true)
 		if [ -n "$ERRS" ]; then
 			echo "Failed applying rules for $i: $ERRS" >&2
 			OUT="$OUT$ERRS"
