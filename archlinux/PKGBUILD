@@ -45,12 +45,6 @@ build() {
     sed 's:/sbin/ip:ip:g' -i network/*
     sed 's:/bin/grep:grep:g' -i network/*
 
-    # Force running all scripts with python2
-    sed 's:^#!/usr/bin/python.*:#!/usr/bin/python2:' -i misc/*
-    sed 's:^#!/usr/bin/env python.*:#!/usr/bin/env python2:' -i misc/*
-    sed 's:^#!/usr/bin/python.*:#!/usr/bin/python2:' -i qubes-rpc/*
-    sed 's:^#!/usr/bin/env python.*:#!/usr/bin/env python2:' -i qubes-rpc/*
-
     # Fix for archlinux sbindir
     sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
     sed 's:/usr/sbin/qubes-firewall:/usr/bin/qubes-firewall:g' -i vm-systemd/qubes-firewall.service

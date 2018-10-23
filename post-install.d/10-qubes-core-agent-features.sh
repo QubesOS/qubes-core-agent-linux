@@ -3,6 +3,7 @@
 # announce features supported by this template
 
 qvm-features-request qrexec=1
+qvm-features-request os=Linux
 
 if [ -x /usr/bin/qubes-gui ]; then
     qvm-features-request gui=1
