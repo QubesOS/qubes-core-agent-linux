@@ -48,13 +48,10 @@ Depends:
     qubes-core-agent-qrexec,
     qubesdb-vm,
     systemd,
-    x11-xserver-utils,
     xdg-user-dirs,
     xdg-utils,
     xen-utils-common,
     xenstore-utils,
-    xinit,
-    xserver-xorg-core,
     ${python:Depends},
     ${shlibs:Depends},
     ${misc:Depends}
@@ -71,6 +68,9 @@ Recommends:
     qubes-core-agent-nautilus,
     qubes-core-agent-networking,
     qubes-core-agent-network-manager,
+    x11-xserver-utils,
+    xinit,
+    xserver-xorg-core,
     xsettingsd
 Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
