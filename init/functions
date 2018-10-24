@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Location of files which contains list of protected files
-PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
+PROTECTED_FILE_LIST='/etc/qubes/protected-files.d /rw/qubes/protected-files.d'
 
 qsvc() {
     # Returns whether a service is enabled.
@@ -100,7 +100,7 @@ reload_random_seed() {
 }
 
 is_protected_file() {
-    grep -Fxrq --exclude='*.rpmsave' --exclude='*~' --exclude='*.rpmnew' --exclude='*.rpmold' -- "${1}" "$PROTECTED_FILE_LIST" 2>/dev/null
+    grep -Fxrq --exclude='*.rpmsave' --exclude='*~' --exclude='*.rpmnew' --exclude='*.rpmold' -- "${1}" $PROTECTED_FILE_LIST 2>/dev/null
 }
 
 umount_retry() {
