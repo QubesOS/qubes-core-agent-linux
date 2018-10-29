@@ -1,3 +1,27 @@
+qubes-core-agent (4.0.38-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: don't create orig.tar.gz manually
+  * Fix iptables-restore race condition in vif-route-qubes
+  * vif-route-qubes: n -> \n
+  * Do not force /bin/sh for /etc/qubes-rpc/qubes.GetAppmenus
+  * Advertise supported qubes-services
+
+  [ unman ]
+  * Remove qubes-core-agent Debian dependency on xserver Mark xserver,
+    xinit and x11-xserver-utils as Recommends
+
+  [ Frédéric Pierret ]
+  * spec: require 'hostname' as newer Fedora as moved out the dependency
+    of initscripts into its network subpackage
+
+  [ Marek Marczykowski-Górecki ]
+  * Tell dom0 that VM is running Linux
+  * Make shebang explicit /usr/bin/python2 where it's still there
+  * archlinux: no longer need to mangle shebang for python scripts
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 29 Oct 2018 01:32:11 +0100
+
 qubes-core-agent (4.0.37-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
