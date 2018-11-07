@@ -21,6 +21,10 @@
 #
 #
 
+if ischroot --default-false ; then
+   exit 0
+fi
+
 for script in /etc/qubes/post-install.d/*.sh; do
     if [ -x "$script" ]; then
         "$script"
