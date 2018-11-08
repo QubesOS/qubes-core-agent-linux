@@ -132,6 +132,7 @@ Depends:
     ethtool,
     socat,
     tinyproxy,
+    iproute2,
     ${python:Depends},
     ${misc:Depends}
 Suggests:
