@@ -186,8 +186,6 @@ DNF plugin for Qubes specific post-installation actions:
 
 %package qrexec
 Summary:    Qubes qrexec agent
-Requires:   qubes-core-agent
-Requires:   nautilus-python
 Conflicts:  qubes-core-vm < 4.0.0
 
 %description qrexec
