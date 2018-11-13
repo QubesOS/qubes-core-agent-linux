@@ -196,7 +196,7 @@ requested by dom0 or other VMs, according to dom0-enforced policy.
 
 %package nautilus
 Summary:    Qubes integration for Nautilus
-Requires:   qubes-core-agent
+Requires:   qubes-core-agent = %{version}
 Requires:   nautilus-python
 Conflicts:  qubes-core-vm < 4.0.0
 
@@ -205,7 +205,7 @@ Nautilus addons for inter-VM file copy/move/open.
 
 %package dom0-updates
 Summary:    Scripts required to handle dom0 updates
-Requires:   qubes-core-agent
+Requires:   qubes-core-agent = %{version}
 Requires:   fakeroot
 Conflicts:  qubes-core-vm < 4.0.0
 Requires:   tar
@@ -220,7 +220,7 @@ Requires:   iptables
 Requires:   net-tools
 Requires:   nftables
 Requires:   socat
-Requires:   qubes-core-agent
+Requires:   qubes-core-agent = %{version}
 Requires:   tinyproxy
 Conflicts:  qubes-core-vm < 4.0.0
 
@@ -238,7 +238,7 @@ Summary:    NetworkManager integration for Qubes VM
 # to show/hide nm-applet
 Requires:   NetworkManager >= 0.8.1-1
 Requires:   glib2
-Requires:   qubes-core-agent-networking
+Requires:   qubes-core-agent-networking = %{version}
 Conflicts:  qubes-core-vm < 4.0.0
 
 %description network-manager
@@ -767,9 +767,9 @@ Summary:        Qubes unit files for SysV init style or upstart
 License:        GPL v2 only
 Group:          Qubes
 Requires:       upstart
-Requires:       qubes-core-agent
-Requires:       qubes-core-agent-qrexec
-Requires:       qubes-core-agent-networking
+Requires:       qubes-core-agent = %{version}
+Requires:       qubes-core-agent-qrexec = %{version}
+Requires:       qubes-core-agent-networking = %{version}
 Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-systemd
 Provides:       qubes-core-vm-sysvinit = %{version}-%{release}
@@ -837,7 +837,7 @@ Requires:       systemd
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
-Requires:       qubes-core-agent
+Requires:       qubes-core-agent = %{version}
 Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-sysvinit
 Provides:       qubes-core-vm-systemd = %{version}-%{release}

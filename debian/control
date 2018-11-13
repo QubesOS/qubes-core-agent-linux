@@ -125,7 +125,7 @@ Description: Scripts required to handle dom0 updates.
 Package: qubes-core-agent-networking
 Architecture: any
 Depends:
-    qubes-core-agent,
+    qubes-core-agent (= ${binary:Version}),
     tinyproxy,
     iptables,
     net-tools,
@@ -151,7 +151,7 @@ Description: Networking support for Qubes VM
 Package: qubes-core-agent-network-manager
 Architecture: any
 Depends:
-    qubes-core-agent-networking,
+    qubes-core-agent-networking (= ${binary:Version}),
     libglib2.0-bin,
     network-manager (>= 0.8.1-1),
     network-manager-gnome,
