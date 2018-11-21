@@ -1,3 +1,15 @@
+qubes-core-agent (4.0.39-1) unstable; urgency=medium
+
+  [ unman ]
+  * make iproute2 a dependency for Debian core-networking
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm, deb: add strict version dependency between qubes-core-agent-*
+    pkgs
+  * rpm: drop useless circular dependency
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 21 Nov 2018 03:06:24 +0100
+
 qubes-core-agent (4.0.38-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
