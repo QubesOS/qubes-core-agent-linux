@@ -13,7 +13,7 @@ fi
 
 sysfs_xvda="/sys/class/block/xvda"
 
-# if root filesystem use already (almost) the whole dis
+# if root filesystem is already using (almost) the whole disk
 non_rootfs_data=$(( 250 * 1024 * 2 ))
 rootfs_size=$(df --output=size / | tail -n 1)
 # convert to 512-byte blocks
