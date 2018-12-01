@@ -16,7 +16,7 @@ sysfs_xvda="/sys/class/block/xvda"
 # if root filesystem use already (almost) the whole dis
 size_margin=$(( 250 * 1024 * 2 ))
 rootfs_size=$(df --block-size=512 --output=size / | tail -n 1 | tr -d ' ')
-if [ $(cat $sysfs_xvda/size) -gt \
+if [ $(cat $sysfs_xvda/size) -lt \
        $(( size_margin + rootfs_size )) ]; then
    echo "root filesystem already at $rootfs_size blocks" >&2
    exit 0
