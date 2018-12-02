@@ -13,7 +13,7 @@ fi
 
 sysfs_xvda="/sys/class/block/xvda"
 
-# if root filesystem use already (almost) the whole dis
+# if root filesystem is already using (almost) the whole disk
 # 203M for BIOS and /boot data, 222 for ext4 filesystem overhead
 # See QubesOS/qubes-core-agent-linux#146 for more details
 size_margin=$(((222 + 203) * 2 * 1024))
