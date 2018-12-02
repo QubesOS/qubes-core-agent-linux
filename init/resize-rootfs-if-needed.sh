@@ -18,7 +18,7 @@ sysfs_xvda="/sys/class/block/xvda"
 # See QubesOS/qubes-core-agent-linux#146 for more details
 size_margin=$(((222 + 203) * 2 * 1024))
 rootfs_size=$(df --block-size=512 --output=size / | tail -n 1 | tr -d ' ')
-if [ $(cat $sysfs_xvda/size) -lt \
+if [ "$(cat $sysfs_xvda/size)" -lt \
        $(( size_margin + rootfs_size )) ]; then
    echo "root filesystem already at $rootfs_size blocks" >&2
    exit 0
