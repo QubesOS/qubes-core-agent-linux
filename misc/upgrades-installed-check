@@ -8,21 +8,21 @@
 ## Forwards the exit code of the package manager.
 
 if [ -e /etc/system-release ]; then
-   ## Fedora
-   # shellcheck disable=SC2034
-   yum_output="$(yum -q check-update 2>&1)"
-   exit_code="$?"
-   [ "$exit_code" -eq 100 ] && echo "false" && exit 0
-   [ "$exit_code" -eq 0 ] && echo "true"
+    ## Fedora
+    # shellcheck disable=SC2034
+    yum_output="$(yum -q check-update 2>&1)"
+    exit_code="$?"
+    [ "$exit_code" -eq 100 ] && echo "false" && exit 0
+    [ "$exit_code" -eq 0 ] && echo "true"
 elif [ -e /etc/debian_version ]; then
-   ## Debian
-   set -e
-   set -o pipefail
-   # shellcheck disable=SC2034
-   apt_get_update_output="$(apt-get -q update 2>&1)"
-   apt_get_upgrade_output="$(LANG="C" apt-get -s upgrade 2>&1)"
-   exit_code="$?"
-   echo "$apt_get_upgrade_output" | awk "/^Inst/{ print $2 }" | [ "$(wc -L)" -eq 0 ] && echo "true" || echo "false"
+    ## Debian
+    set -e
+    set -o pipefail
+    # shellcheck disable=SC2034
+    apt_get_update_output="$(apt-get -q update 2>&1)"
+    apt_get_upgrade_output="$(LANG="C" apt-get -s upgrade 2>&1)"
+    exit_code="$?"
+    echo "$apt_get_upgrade_output" | awk "/^Inst/{ print $2 }" | [ "$(wc -L)" -eq 0 ] && echo "true" || echo "false"
 elif [ -e /etc/arch-release ]; then
     ## Archlinux
     set -e
@@ -31,8 +31,8 @@ elif [ -e /etc/arch-release ]; then
     exit_code="$?"
     echo "$checkupdates_output" | grep -qF -- '->' && echo "false" || echo "true"
 else
-   echo "Check not implemented for this distribution" >&2
-   exit 1
+    echo "Check not implemented for this distribution" >&2
+    exit 1
 fi
 
 exit "$exit_code"
