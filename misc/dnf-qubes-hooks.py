@@ -43,16 +43,28 @@ class QubesHooks(dnf.Plugin):
             config = self.read_config(self.base.conf)
 
         if config.getboolean('main', 'notify-updates'):
-            # Get all updates available _before_ this transaction
-            query = self.base.sack.query()
-            query = query.upgrades()
-            updates = set(query.run())
-            # Get packages installed in this transaction...
-            just_installed = self.base.transaction
-            # ...and filter them out of available updates
-            for item in just_installed:
-                for pkg in item.installs():
-                    updates.discard(pkg)
+            if LooseVersion(dnf.const.VERSION) > '4.0.0':
+                # self.base.transaction empty at this point in dnf4
+                # https://bugzilla.redhat.com/1650446
+                # until fixed, load the repositories again and again check for
+                # updates
+                base = dnf.Base()
+                base.read_all_repos()
+                base.fill_sack()
+                query = base.sack.query()
+                query = query.upgrades()
+                updates = set(query.run())
+            else:
+                # Get all updates available _before_ this transaction
+                query = self.base.sack.query()
+                query = query.upgrades()
+                updates = set(query.run())
+                # Get packages installed in this transaction...
+                just_installed = self.base.transaction
+                # ...and filter them out of available updates
+                for item in just_installed:
+                    for pkg in item.installs():
+                        updates.discard(pkg)
             subprocess.call([
                 '/usr/lib/qubes/qrexec-client-vm',
                 'dom0',
