@@ -9,8 +9,13 @@
 
 if [ -e /etc/system-release ]; then
     ## Fedora
+    if command -v dnf >/dev/null; then
+        yum=dnf
+    else
+        yum=yum
+    fi
     # shellcheck disable=SC2034
-    yum_output="$(yum -q check-update 2>&1)"
+    yum_output="$($yum -q check-update 2>&1)"
     exit_code="$?"
     [ "$exit_code" -eq 100 ] && echo "false" && exit 0
     [ "$exit_code" -eq 0 ] && echo "true"
