@@ -101,7 +101,7 @@ reload_random_seed() {
 }
 
 is_protected_file() {
-    local ret=0
+    local ret=1
     local pfilelist
     for pfilelist in "$PROTECTED_FILE_LIST" "$PER_VM_PROTECTED_FILE_LIST" ; do
         if test -d "$pfilelist" ; then
