@@ -2,6 +2,7 @@
 
 # Location of files which contains list of protected files
 PROTECTED_FILE_LIST='/etc/qubes/protected-files.d'
+PER_VM_PROTECTED_FILE_LIST='/rw/config/protected-files.d'
 
 qsvc() {
     # Returns whether a service is enabled.
@@ -100,7 +101,16 @@ reload_random_seed() {
 }
 
 is_protected_file() {
-    grep -Fxrq --exclude='*.rpmsave' --exclude='*~' --exclude='*.rpmnew' --exclude='*.rpmold' -- "${1}" "$PROTECTED_FILE_LIST" 2>/dev/null
+    local ret=1
+    local pfilelist
+    for pfilelist in "$PROTECTED_FILE_LIST" "$PER_VM_PROTECTED_FILE_LIST" ; do
+        if test -d "$pfilelist" ; then
+            # If this succeeds, we return immediately to the caller.
+            # If not, we let the loop continue.
+            grep -Fxrq --exclude='*.rpmsave' --exclude='*~' --exclude='*.rpmnew' --exclude='*.rpmold' -- "${1}" "$pfilelist" 2>/dev/null && return 0 || ret="$?"
+        fi
+    done
+    return "$ret"
 }
 
 umount_retry() {
