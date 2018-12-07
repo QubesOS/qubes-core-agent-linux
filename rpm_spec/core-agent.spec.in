@@ -119,6 +119,8 @@ Requires:   gawk
 Requires:   sed
 Requires:   util-linux
 Requires:   hostname
+# for Qubes Manager VM updater
+Requires:   xterm
 # for qubes-desktop-run
 Requires:   pygobject3-base
 Requires:   dbus-python

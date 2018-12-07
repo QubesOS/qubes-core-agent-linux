@@ -71,7 +71,8 @@ Recommends:
     x11-xserver-utils,
     xinit,
     xserver-xorg-core,
-    xsettingsd
+    xsettingsd,
+    xterm
 Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
