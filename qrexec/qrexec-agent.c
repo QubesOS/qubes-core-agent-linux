@@ -309,6 +309,42 @@ void handle_vchan_error(const char *op)
     exit(1);
 }
 
+int my_sd_notify(int unset_environment, const char *state) {
+    struct sockaddr_un addr;
+    int fd;
+    int ret = -1;
+
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, getenv("NOTIFY_SOCKET"), sizeof(addr.sun_path)-1);
+    addr.sun_path[sizeof(addr.sun_path)-1] = '\0';
+    if (addr.sun_path[0] == '@')
+        addr.sun_path[0] = '\0';
+
+    if (unset_environment)
+        unsetenv("NOTIFY_SOCKET");
+
+    fd = socket(AF_UNIX, SOCK_DGRAM, 0);
+    if (fd == -1) {
+        perror("sd_notify socket");
+        return -1;
+    }
+
+    if (connect(fd, &addr, sizeof(addr)) == -1) {
+        perror("sd_notify connect");
+        goto out;
+    }
+
+    if (send(fd, state, strlen(state), 0) == -1) {
+        perror("sd_notify send");
+        goto out;
+    }
+
+    ret = 0;
+out:
+    close(fd);
+    return ret;
+}
+
 void init()
 {
     mode_t old_umask;
@@ -326,6 +362,10 @@ void init()
     /* wait for qrexec daemon */
     while (!libvchan_is_open(ctrl_vchan))
         libvchan_wait(ctrl_vchan);
+
+    if (getenv("NOTIFY_SOCKET")) {
+        my_sd_notify(1, "READY=1");
+    }
 }
 
 void wake_meminfo_writer()
