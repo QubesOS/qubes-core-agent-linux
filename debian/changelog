@@ -1,3 +1,38 @@
+qubes-core-agent (4.0.40-1) unstable; urgency=medium
+
+  [ AJ Jordan ]
+  * Simplify block number calculation
+  * Remove unnecessary quotes
+  * Fix root volume size comparison
+  * Remove weird spaces from script output
+  * Rename variable to be more clear
+  * Revert "Fix root volume size comparison"
+  * Correct size_margin for rootfs resizes
+  * Add quotes to placate ShellCheck
+  * Rephrase comment
+
+  [ Marek Marczykowski-Górecki ]
+  * code style fix
+  * Fix updates checking on Fedora with dnf
+  * Fix updates notification on Fedora 29
+
+  [ Rudd-O ]
+  * Allow per-VM protected file list
+  * Fix logic bug.
+  * /rw/config
+
+  [ Marek Marczykowski-Górecki ]
+  * is_protected_file: if no config dir is present, assume the file is
+    _not_ protected
+
+  [ AJ Jordan ]
+  * Add XTerm as a dependency
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: add startup notification
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 08 Dec 2018 22:44:06 +0100
+
 qubes-core-agent (4.0.39-1) unstable; urgency=medium
 
   [ unman ]
