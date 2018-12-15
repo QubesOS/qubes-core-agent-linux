@@ -30,7 +30,7 @@ if [ "$m" = SVG ]; then
     rsvg-convert -o "$tmpfile2" "$filename"
     # downscale the image if necessary
     if [ -n "$forcemaxsize" ] && \
-            ( [ "$w" -gt "$forcemaxsize" ] || [ "$h" -gt "$forcemaxsize" ] ); then
+            { [ "$w" -gt "$forcemaxsize" ] || [ "$h" -gt "$forcemaxsize" ]; }; then
         convert "$tmpfile2" -scale "${forcemaxsize}x${forcemaxsize}" "$tmpfile2"
         # read the size again, because icon may not be a square
         s="$(identify -format '%w %h' "$tmpfile2")"
