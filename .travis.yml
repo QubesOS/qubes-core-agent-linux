@@ -21,7 +21,7 @@ jobs:
       env: TESTS_ONLY=1
       script:
        - ./run-tests
-       - shellcheck  $(grep -l '^#!/bin/\(ba\)\?sh' $(git ls-files))
+       - shellcheck -e SC1117 $(grep -l '^#!/bin/\(ba\)\?sh' $(git ls-files))
       after_success:
        - codecov
     - stage: deploy
