@@ -38,6 +38,7 @@ Depends:
     psmisc,
     procps,
     util-linux,
+    e2fsprogs,
     python2.7,
     python-daemon,
     python-qubesdb,

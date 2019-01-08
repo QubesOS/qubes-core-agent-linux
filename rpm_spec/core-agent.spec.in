@@ -118,6 +118,7 @@ Requires:   initscripts
 Requires:   gawk
 Requires:   sed
 Requires:   util-linux
+Requires:   e2fsprogs
 Requires:   hostname
 # for Qubes Manager VM updater
 Requires:   xterm
