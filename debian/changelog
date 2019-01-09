@@ -1,3 +1,16 @@
+qubes-core-agent (4.0.41-1) unstable; urgency=medium
+
+  [ Bo Rydberg ]
+  * Update spelling in setup-rw.sh
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: switch to xenial
+  * travis: disable "Prefer explicit escaping" shellcheck warning
+  * Make shellcheck happy
+  * Add dependency on e2fsprogs
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 09 Jan 2019 16:15:57 +0100
+
 qubes-core-agent (4.0.40-1) unstable; urgency=medium
 
   [ AJ Jordan ]
