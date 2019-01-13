@@ -219,6 +219,7 @@ Summary:    Networking support for Qubes VM
 Requires:   ethtool
 Requires:   iptables
 Requires:   net-tools
+Requires:   iproute
 Requires:   nftables
 Requires:   socat
 Requires:   qubes-core-agent = %{version}
