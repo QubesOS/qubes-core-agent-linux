@@ -65,7 +65,7 @@ preset_units() {
             continue
         fi
         echo "$action $unit_name" | grep -q '^[[:space:]]*[^#;]' || continue
-        if ! [ -n "$action" ] || ! [ -n "$unit_name" ]; then
+        if [ -z "$action" ] || [ -z "$unit_name" ]; then
             continue
         fi
         if [ "$2" = "initial" ] || [ "$represet" = "1" ]
