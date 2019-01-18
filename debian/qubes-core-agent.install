@@ -145,3 +145,4 @@ usr/share/applications/*.desktop
 usr/share/man/man1/qvm-*
 usr/share/qubes/mime-override/globs
 usr/share/qubes/qubes-master-key.asc
+usr/share/qubes/marker-vm
