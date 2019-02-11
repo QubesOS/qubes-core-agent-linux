@@ -313,6 +313,7 @@ install-common: install-doc
 	install -D -m 0644 misc/30_cron.conf $(DESTDIR)/usr/lib/qubes-bind-dirs.d/30_cron.conf
 
 	install -D -m 0644 misc/marker-vm $(DESTDIR)/usr/share/qubes/marker-vm
+	cut -f 1,2 -d . version >> $(DESTDIR)/usr/share/qubes/marker-vm
 
 
 	install -d $(DESTDIR)/var/run/qubes
