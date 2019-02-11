@@ -14,12 +14,20 @@ fi
 sysfs_xvda="/sys/class/block/xvda"
 
 # if root filesystem is already using (almost) the whole disk
-# 203M for BIOS and /boot data, 222 for ext4 filesystem overhead
-# See QubesOS/qubes-core-agent-linux#146 for more details
-size_margin=$(((222 + 203) * 2 * 1024))
-rootfs_size=$(df --block-size=512 --output=size / | tail -n 1 | tr -d ' ')
+# 203M for BIOS and /boot data
+boot_data_size=$((203 * 2 * 1024))
+# rootfs size is calculated on-the-fly. `df` doesn't work because it doesn't
+# include fs overhead, and calculating a static size for overhead doesn't work
+# because that can change dynamically over the filesystem's lifetime.
+# See QubesOS/qubes-core-agent-linux#146 and QubesOS/qubes-core-agent-linux#152
+# for more details
+ext4_block_count=$(dumpe2fs /dev/mapper/dmroot | grep '^Block count:' | sed -E 's/Block count:[[:space:]]+//')
+ext4_block_size=$(dumpe2fs /dev/mapper/dmroot | grep '^Block size:' | sed -E 's/Block size:[[:space:]]+//')
+rootfs_size=$((ext4_block_count * ext4_block_size / 512))
+# 5 MB in 512-byte units for some random extra bits
+size_margin=$((5 * 1024 * 2))
 if [ "$(cat $sysfs_xvda/size)" -lt \
-       $(( size_margin + rootfs_size )) ]; then
+       $(( rootfs_size + boot_data_size + size_margin )) ]; then
    echo "root filesystem already at $rootfs_size blocks" >&2
    exit 0
 fi
