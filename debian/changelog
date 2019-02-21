@@ -1,3 +1,24 @@
+qubes-core-agent (4.0.42-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: -networking package should depend on iproute
+  * debian: make ShellCheck happy
+
+  [ Lunar ]
+  * Switch to HTTPS
+  * Add apt-transport-https dependency
+
+  [ Marek Marczykowski-Górecki ]
+  * Introduce /usr/share/qubes/marker-vm
+
+  [ AJ Jordan ]
+  * Use dumpe2fs for filesystem size calculations
+
+  [ Marek Marczykowski-Górecki ]
+  * Add qubes version to marker-vm file
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 21 Feb 2019 05:12:59 +0100
+
 qubes-core-agent (4.0.41-1) unstable; urgency=medium
 
   [ Bo Rydberg ]
