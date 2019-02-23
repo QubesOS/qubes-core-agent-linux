@@ -8,13 +8,8 @@ case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
         # nothing needed, xvda used directly
         ;;
     ca:3)
-        # resize partition table itself
-        # use undocumented ---pretend-input-tty (yes, three '-') to
-        # force unattended operation, otherwise it aborts on first
-        # prompt, even with '-s' option
-        echo fix | parted ---pretend-input-tty /dev/xvda print >/dev/null
-        # then resize 3rd partition, even though it is mounted
-        echo yes 100% | parted ---pretend-input-tty /dev/xvda resizepart 3
+        # resize partition table itself and xda3 partition
+        echo ',+' | sfdisk --no-reread -q -N 3 /dev/xvda
         # and reload partition table; prefer partprobe over blockdev
         # --rereadpt, as it works on mounted partitions
         partprobe /dev/xvda
