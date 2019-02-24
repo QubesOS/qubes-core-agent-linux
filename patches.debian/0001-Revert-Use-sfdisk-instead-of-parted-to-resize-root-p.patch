@@ -1,0 +1,41 @@
+From f372cd46df94d5a67286aee923b9908d1326e040 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Sun, 24 Feb 2019 03:58:11 +0100
+Subject: [PATCH] Revert "Use sfdisk instead of parted to resize root partition
+ table"
+Organization: Invisible Things Lab
+Cc: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+
+util-linux in Debian is too old for this, because the bug
+karelzak/util-linux#532, which is fixed only in util-linux 2.31.1+
+(Debian stretch has 2.29.2).
+
+This reverts commit 9792438b3f02161e03d89dfd527ca2459092b478.
+---
+ misc/resize-rootfs | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/misc/resize-rootfs b/misc/resize-rootfs
+index 1c2fca3c..bebf1011 100755
+--- a/misc/resize-rootfs
++++ b/misc/resize-rootfs
+@@ -8,8 +8,13 @@ case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
+         # nothing needed, xvda used directly
+         ;;
+     ca:3)
+-        # resize partition table itself and xda3 partition
+-        echo ',+' | sfdisk --no-reread -q -N 3 /dev/xvda
++        # resize partition table itself
++        # use undocumented ---pretend-input-tty (yes, three '-') to
++        # force unattended operation, otherwise it aborts on first
++        # prompt, even with '-s' option
++        echo fix | parted ---pretend-input-tty /dev/xvda print >/dev/null
++        # then resize 3rd partition, even though it is mounted
++        echo yes 100% | parted ---pretend-input-tty /dev/xvda resizepart 3
+         # and reload partition table; prefer partprobe over blockdev
+         # --rereadpt, as it works on mounted partitions
+         partprobe /dev/xvda
+-- 
+2.17.2
+
