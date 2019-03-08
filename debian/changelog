@@ -1,3 +1,10 @@
+qubes-core-agent (4.0.43-1) unstable; urgency=medium
+
+  * Use sfdisk instead of parted to resize root partition table
+  * Revert "Use sfdisk instead of parted to ..." on stretch and jessie
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 08 Mar 2019 03:07:40 +0100
+
 qubes-core-agent (4.0.42-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
