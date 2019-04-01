@@ -69,6 +69,7 @@ int handle_handshake(libvchan_t *ctrl)
 {
     struct msg_header hdr;
     struct peer_info info;
+    int actual_version;
 
     /* send own HELLO */
     hdr.type = MSG_HELLO;
@@ -101,13 +102,14 @@ int handle_handshake(libvchan_t *ctrl)
         return -1;
     }
 
-    if (info.version != QREXEC_PROTOCOL_VERSION) {
+    actual_version = info.version < QREXEC_PROTOCOL_VERSION ? info.version : QREXEC_PROTOCOL_VERSION;
+
+    if (actual_version != QREXEC_PROTOCOL_VERSION) {
         fprintf(stderr, "Incompatible agent protocol version (remote %d, local %d)\n", info.version, QREXEC_PROTOCOL_VERSION);
         return -1;
     }
 
-
-    return 0;
+    return actual_version;
 }
 
 
