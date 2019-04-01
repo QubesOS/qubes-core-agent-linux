@@ -5,7 +5,12 @@ DOM0_UPDATES_DIR=/var/lib/qubes/dom0-updates
 GUI=1
 CLEAN=0
 CHECK_ONLY=0
-OPTS="--installroot $DOM0_UPDATES_DIR --config=$DOM0_UPDATES_DIR/etc/yum.conf"
+OPTS="--installroot $DOM0_UPDATES_DIR"
+if [ -f "$DOM0_UPDATES_DIR/etc/dnf/dnf.conf" ]; then
+    OPTS="$OPTS --config=$DOM0_UPDATES_DIR/etc/yum.conf"
+elif [ -f "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
+    OPTS="$OPTS --config=$DOM0_UPDATES_DIR/etc/yum.conf"
+fi
 # DNF uses /etc/yum.repos.d, even when --installroot is specified
 OPTS="$OPTS --setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d"
 PKGLIST=
@@ -159,7 +164,7 @@ else
     $YUM_COMMAND $OPTS $PKGLIST
 fi
 
-find "$DOM0_UPDATES_DIR/var/cache/yum" -name '*.rpm' -print0 |\
+find "$DOM0_UPDATES_DIR/var/cache" -name '*.rpm' -print0 |\
     xargs -0 -r ln -f -t "$DOM0_UPDATES_DIR/packages/"
 
 if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
