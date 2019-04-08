@@ -45,7 +45,6 @@ rpms-dom0:
 
 clean:
 	make -C misc clean
-	make -C qrexec clean
 	make -C qubes-rpc clean
 	make -C doc clean
 	rm -rf qubesagent/*.pyc qubesagent/__pycache__
@@ -56,7 +55,6 @@ clean:
 
 all:
 	make -C misc
-	make -C qrexec
 	make -C qubes-rpc
 
 # Dropin Directory
@@ -154,7 +152,6 @@ install-sysvinit: install-init
 	install vm-init.d/qubes-core $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-core-netvm $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-firewall $(DESTDIR)/etc/init.d/
-	install vm-init.d/qubes-qrexec-agent $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-updates-proxy $(DESTDIR)/etc/init.d/
 	install vm-init.d/qubes-updates-proxy-forwarder $(DESTDIR)/etc/init.d/
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
@@ -284,7 +281,6 @@ install-common: install-doc
 	install -m 0755 qubes-rpc/qubes.GetDate $(DESTDIR)/etc/qubes-rpc
 
 	install -d $(DESTDIR)/etc/qubes/rpc-config
-	install -m 0644 qubes-rpc/rpc-config.README $(DESTDIR)/etc/qubes/rpc-config/README
 	for config in qubes-rpc/*.config; do \
 		install -m 0644 $$config $(DESTDIR)/etc/qubes/rpc-config/`basename $$config .config`; \
 	done

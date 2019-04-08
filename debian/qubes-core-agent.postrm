@@ -43,7 +43,7 @@ if [ "${1}" = "remove" ] ; then
         rm /lib/firmware/updates
     fi
 
-    for srv in qubes-sysinit qubes-misc-post qubes-network qubes-qrexec-agent; do
+    for srv in qubes-sysinit qubes-misc-post qubes-network; do
         systemctl disable ${srv}.service
     done
 fi

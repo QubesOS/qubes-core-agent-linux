@@ -20,7 +20,7 @@
 #
 #
 
-%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-updates-proxy-forwarder
+%define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
 
 %define scriptletfuns is_static() { \
@@ -134,7 +134,7 @@ Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   zenity
 Requires:   dconf
-Requires:   qubes-core-agent-qrexec
+Requires:   qubes-core-qrexec-vm
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 %if 0%{?fedora} >= 23
@@ -183,14 +183,6 @@ BuildRequires: python%{python3_pkgversion}-devel
 DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
-
-%package qrexec
-Summary:    Qubes qrexec agent
-Conflicts:  qubes-core-vm < 4.0.0
-
-%description qrexec
-Agent part of Qubes RPC system. A daemon responsible for starting processes as
-requested by dom0 or other VMs, according to dom0-enforced policy.
 
 %package nautilus
 Summary:    Qubes integration for Nautilus
@@ -271,7 +263,7 @@ Thunar support for Qubes VM tools
 
 %build
 %{?set_build_flags}
-for dir in qubes-rpc qrexec misc; do
+for dir in qubes-rpc misc; do
   make -C $dir BACKEND_VMM=@BACKEND_VMM@
 done
 make -C doc manpages
@@ -302,7 +294,6 @@ usermod -p '' root
 
 %install
 
-(cd qrexec; make install DESTDIR=$RPM_BUILD_ROOT)
 make install-vm DESTDIR=$RPM_BUILD_ROOT
 
 %if 0%{?rhel} >= 7
@@ -469,9 +460,6 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %systemd_post qubes-network.service
 %systemd_post qubes-updates-proxy.service
 
-%post qrexec
-%systemd_post qubes-qrexec-agent.service
-
 %post thunar
 if [ "$1" = 1 ]; then
   # There is no system-wide Thunar custom actions. There is only a default
@@ -505,9 +493,6 @@ fi
 %systemd_preun qubes-iptables.service
 %systemd_preun qubes-network.service
 %systemd_preun qubes-updates-proxy.service
-
-%preun qrexec
-%systemd_preun qubes-qrexec-agent.service
 
 %postun thunar
 if [ "$1" = 0 ]; then
@@ -581,8 +566,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
-%dir /etc/qubes/rpc-config
-/etc/qubes/rpc-config/README
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenInVM
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenURL
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectFile
@@ -691,17 +674,6 @@ rm -f %{name}-%{version}
 %files -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 
-%files qrexec
-%config(noreplace) /etc/pam.d/qrexec
-/usr/bin/qrexec-fork-server
-/usr/bin/qrexec-client-vm
-/usr/lib/qubes/qrexec-agent
-/usr/lib/qubes/qrexec-client-vm
-/usr/lib/qubes/qrexec_client_vm
-/usr/lib/qubes/qubes-rpc-multiplexer
-/lib/systemd/system/qubes-qrexec-agent.service
-%{_mandir}/man1/qrexec-client-vm.1*
-
 %files nautilus
 /usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-move-to-vm.gnome
@@ -761,7 +733,7 @@ License:        GPL v2 only
 Group:          Qubes
 Requires:       upstart
 Requires:       qubes-core-agent = %{version}
-Requires:       qubes-core-agent-qrexec = %{version}
+Requires:       qubes-core-qrexec-vm
 Requires:       qubes-core-agent-networking = %{version}
 Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-systemd
@@ -779,7 +751,6 @@ The Qubes core startup configuration for SysV init (or upstart).
 /etc/init.d/qubes-firewall
 /etc/init.d/qubes-iptables
 /etc/init.d/qubes-updates-proxy
-/etc/init.d/qubes-qrexec-agent
 /etc/init.d/qubes-updates-proxy-forwarder
 /etc/sysconfig/modules/qubes-core.modules
 
