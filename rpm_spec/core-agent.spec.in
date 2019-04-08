@@ -138,12 +138,9 @@ Requires:   qubes-core-agent-qrexec
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 %if 0%{?fedora} >= 23
-Requires:   python3-dnf-plugins-qubes-hooks
+Requires:   python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 %else
 Requires:   python2-dnf-plugins-qubes-hooks
-%endif
-%if 0%{?rhel} >= 7
-Requires:   python34-dnf-plugins-qubes-hooks
 %endif
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
@@ -691,15 +688,8 @@ rm -f %{name}-%{version}
 %files -n python2-dnf-plugins-qubes-hooks
 %{python2_sitelib}/dnf-plugins/*
 
-%if 0%{?fedora} >= 23
-%files -n python3-dnf-plugins-qubes-hooks
+%files -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
-%endif
-
-%if 0%{?rhel} >= 7
-%files -n python34-dnf-plugins-qubes-hooks
-%{python3_sitelib}/dnf-plugins/*
-%endif
 
 %files qrexec
 %config(noreplace) /etc/pam.d/qrexec
