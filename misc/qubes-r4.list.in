@@ -17,17 +17,18 @@ deb [arch=amd64] https://deb.qubes-os.org/r4.0/vm @DIST@ main
 
 # Qubes Tor updates repositories
 # Main qubes updates repository
-#deb [arch=amd64] http://deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/vm @DIST@ main
-#deb-src http://deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/vm @DIST@ main
+#deb [arch=amd64] http://deb.qubesosfasa4zl44o4tws22di6kepyzfeqv3tg4e3ztknltfxqrymdad.onion/r4.0/vm @DIST@ main
+#deb-src http://deb.qubesosfasa4zl44o4tws22di6kepyzfeqv3tg4e3ztknltfxqrymdad.onion/r4.0/vm @DIST@ main
 
 # Qubes updates candidates repository
-#deb [arch=amd64] http://deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/vm @DIST@-testing main
-#deb-src http://deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/vm @DIST@-testing main
+#deb [arch=amd64] http://deb.qubesosfasa4zl44o4tws22di6kepyzfeqv3tg4e3ztknltfxqrymdad.onion/r4.0/vm @DIST@-testing main
+#deb-src http://deb.qubesosfasa4zl44o4tws22di6kepyzfeqv3tg4e3ztknltfxqrymdad.onion/r4.0/vm @DIST@-testing main
 
 # Qubes security updates testing repository
-#deb [arch=amd64] http://deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/vm @DIST@-securitytesting main
-#deb-src http://deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/vm @DIST@-securitytesting main
+#deb [arch=amd64] http://deb.qubesosfasa4zl44o4tws22di6kepyzfeqv3tg4e3ztknltfxqrymdad.onion/r4.0/vm @DIST@-securitytesting main
+#deb-src http://deb.qubesosfasa4zl44o4tws22di6kepyzfeqv3tg4e3ztknltfxqrymdad.onion/r4.0/vm @DIST@-securitytesting main
 
 # Qubes experimental/unstable repository
-#deb [arch=amd64] http://deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/vm @DIST@-unstable main
-#deb-src http://deb.sik5nlgfc5qylnnsr57qrbm64zbdx6t4lreyhpon3ychmxmiem7tioad.onion/r4.0/vm @DIST@-unstable main
+#deb [arch=amd64] http://deb.qubesosfasa4zl44o4tws22di6kepyzfeqv3tg4e3ztknltfxqrymdad.onion/r4.0/vm @DIST@-unstable main
+#deb-src http://deb.qubesosfasa4zl44o4tws22di6kepyzfeqv3tg4e3ztknltfxqrymdad.onion/r4.0/vm @DIST@-unstable main
+
