@@ -1,3 +1,19 @@
+qubes-core-agent (4.0.44-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: add version negotiation
+  * dom0-updates: improve dnf config handling
+  * travis: update Fedora versions
+  * rpm: fix python3-* packaging
+
+  [ unman ]
+  * Add new onion addresses to repo lists
+
+  [ Marek Marczykowski-Górecki ]
+  * Implement D-Bus Activation of desktop files manually
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 13 Apr 2019 05:26:00 +0200
+
 qubes-core-agent (4.0.43-1) unstable; urgency=medium
 
   * Use sfdisk instead of parted to resize root partition table
