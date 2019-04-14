@@ -312,6 +312,11 @@ sed -i \
         $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
 %endif
 
+%if 0%{?fedora} >= 30
+sed -i 's#^ExecStart=/usr/sbin/tinyproxy#ExecStart=/usr/bin/tinyproxy#' \
+        $RPM_BUILD_ROOT/lib/systemd/system/qubes-updates-proxy.service
+%endif
+
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
 	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
