@@ -98,3 +98,7 @@ enable xendriverdomain.service
 enable systemd-timesyncd.service
 enable qubes-sync-time.service
 enable qubes-sync-time.timer
+
+# Disable useless Xen services in Qubes VM
+disable xenstored.service
+disable xenconsoled.service
