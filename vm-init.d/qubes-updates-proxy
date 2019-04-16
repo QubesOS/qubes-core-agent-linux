@@ -28,7 +28,7 @@
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0
 
-exec="/usr/sbin/tinyproxy"
+exec="$(command -v tinyproxy)"
 prog=$(basename $exec)
 config="/etc/tinyproxy/tinyproxy-updates.conf"
 pidfile="/var/run/tinyproxy-updates/tinyproxy.pid"
