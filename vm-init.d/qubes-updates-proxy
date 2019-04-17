@@ -29,7 +29,7 @@
 [ "$NETWORKING" = "no" ] && exit 0
 
 exec="$(command -v tinyproxy)"
-prog=$(basename $exec)
+prog=$(basename "$exec")
 config="/etc/tinyproxy/tinyproxy-updates.conf"
 pidfile="/var/run/tinyproxy-updates/tinyproxy.pid"
 
@@ -46,14 +46,14 @@ start() {
         exit 0
     fi
 
-    [ -x $exec ] || exit 5
+    [ -x "$exec" ] || exit 5
     [ -f $config ] || exit 6
     # setup network redirection
     /sbin/iptables -I INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
     /sbin/iptables -t nat -A PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
 
     echo -n $"Starting $prog (as Qubes updates proxy): "
-    daemon $exec -c $config
+    daemon "$exec" -c $config
     retval=$?
     echo
     [ $retval -eq 0 ] && touch $lockfile
