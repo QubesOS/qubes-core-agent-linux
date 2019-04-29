@@ -314,7 +314,8 @@ install-common: install-doc
 
 	install -D -m 0644 misc/marker-vm $(DESTDIR)/usr/share/qubes/marker-vm
 	cut -f 1,2 -d . version >> $(DESTDIR)/usr/share/qubes/marker-vm
-
+	
+	install -m 0755 misc/tinyproxy-wrapper $(DESTDIR)/usr/lib/qubes/tinyproxy-wrapper
 
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/rw

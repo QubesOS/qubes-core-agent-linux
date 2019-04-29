@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ -e /usr/sbin/tinyproxy ]; then
+    echo "Found tinyproxy at /usr/sbin/tinyproxy"
+    exec /usr/sbin/tinyproxy "$@"
+elif [ -e /usr/bin/tinyproxy ]; then
+    echo "Found tinyproxy at /usr/bin/tinyproxy"
+    exec /usr/bin/tinyproxy "$@"
+else
+    echo "tinyproxy not found"
+    exit 1
+fi
