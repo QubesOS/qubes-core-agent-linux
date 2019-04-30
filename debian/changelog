@@ -1,3 +1,12 @@
+qubes-core-agent (4.0.45-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Handle tinyproxy path changed in upstream
+  * Use exec to ease systemd handling the tinyproxy process
+  * qubes-updates-proxy: make ShellCheck happy
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 30 Apr 2019 03:46:05 +0200
+
 qubes-core-agent (4.0.44-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
