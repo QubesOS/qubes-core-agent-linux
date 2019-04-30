@@ -1,12 +1,25 @@
 #!/bin/bash
+
+print_usage() {
+cat >&2 <<USAGE
+Usage: $0 vmname
+Connects to another VM console using the admin.vm.Terminal RPC service.
+USAGE
+}
+
+if [ $# -lt 1 ] ; then
+    print_usage
+    exit 1
+fi
+
 QREXEC_REQUESTED_TARGET="$1"
 
 qrexec_console() {
     QREXEC_REQUESTED_TARGET="$1"
 
-    qrexec-client-vm "$QREXEC_REQUESTED_TARGET" qubes.ShowTerminal 2>/dev/null
+    qrexec-client-vm "$QREXEC_REQUESTED_TARGET" admin.vm.Terminal
 
-    # exit code 200 is flock exit code in qubes.ShowTerminal
+    # exit code 200 is flock exit code in admin.vm.Terminal
     exit_code=$?
     if [ $exit_code -gt 0 ]; then
         if [ $exit_code -ne 200 ]; then
@@ -20,5 +33,6 @@ qrexec_console() {
 
 export -f qrexec_console
 
+printf 'Use "Control-Shift-o" to exit remote console\n'
 socat file:/dev/tty,rawer,escape=0x0f SYSTEM:"qrexec_console $QREXEC_REQUESTED_TARGET" 2>/dev/null
 printf '\n'
