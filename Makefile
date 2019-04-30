@@ -317,7 +317,7 @@ install-common: install-doc
 	
 	install -m 0755 misc/tinyproxy-wrapper $(DESTDIR)/usr/lib/qubes/tinyproxy-wrapper
 
-	install -m 0755 misc/qvm-showterminal $(DESTDIR)$(BINDIR)/qvm-showterminal
+	install -m 0755 misc/qvm-terminal $(DESTDIR)$(BINDIR)/qvm-terminal
 
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/rw

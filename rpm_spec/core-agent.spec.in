@@ -627,7 +627,7 @@ rm -f %{name}-%{version}
 /usr/bin/qubes-run-terminal
 /usr/bin/qubes-open
 /usr/bin/qubes-session-autostart
-/usr/bin/qvm-showterminal
+/usr/bin/qvm-terminal
 %dir /usr/lib/qubes
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent
