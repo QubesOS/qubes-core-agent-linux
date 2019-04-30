@@ -1,0 +1,24 @@
+#!/bin/bash
+QREXEC_REQUESTED_TARGET="$1"
+
+qrexec_console() {
+    QREXEC_REQUESTED_TARGET="$1"
+
+    qrexec-client-vm "$QREXEC_REQUESTED_TARGET" qubes.ShowTerminal 2>/dev/null
+
+    # exit code 200 is flock exit code in qubes.ShowTerminal
+    exit_code=$?
+    if [ $exit_code -gt 0 ]; then
+        if [ $exit_code -ne 200 ]; then
+            printf "Cannot connect to %s" "$QREXEC_REQUESTED_TARGET"
+        else
+            printf "A qube is already connected to %s" "$QREXEC_REQUESTED_TARGET"
+        fi
+        exit 1
+    fi
+}
+
+export -f qrexec_console
+
+socat file:/dev/tty,rawer,escape=0x0f SYSTEM:"qrexec_console $QREXEC_REQUESTED_TARGET" 2>/dev/null
+printf '\n'
