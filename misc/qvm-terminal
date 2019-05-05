@@ -33,6 +33,6 @@ qrexec_console() {
 
 export -f qrexec_console
 
-printf 'Use "Control-Shift-o" to exit remote console\n'
-socat file:/dev/tty,rawer,escape=0x0f SYSTEM:"qrexec_console $QREXEC_REQUESTED_TARGET" 2>/dev/null
+printf "Use '^]' to exit remote console\n"
+socat file:/dev/tty,rawer,escape=0x1d SYSTEM:"qrexec_console $QREXEC_REQUESTED_TARGET" 2>/dev/null
 printf '\n'
