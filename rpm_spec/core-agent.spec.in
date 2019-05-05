@@ -558,6 +558,7 @@ rm -f %{name}-%{version}
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 %dir /etc/qubes-rpc
+%config(noreplace) /etc/qubes-rpc/admin.vm.TerminalDispVM
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
 %config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
 %config(noreplace) /etc/qubes-rpc/qubes.OpenURL

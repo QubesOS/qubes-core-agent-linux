@@ -8,6 +8,7 @@ etc/default/grub.d/30-qubes.cfg
 etc/fstab
 etc/needrestart/conf.d/50_qubes.conf
 etc/profile.d/qt_x11_no_mitshm.sh
+etc/qubes-rpc/admin.vm.TerminalDispVM
 etc/qubes-rpc/qubes.Backup
 etc/qubes-rpc/qubes.DetachPciDevice
 etc/qubes-rpc/qubes.Filecopy

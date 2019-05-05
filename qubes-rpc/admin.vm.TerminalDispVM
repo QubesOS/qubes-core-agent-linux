@@ -1,0 +1,17 @@
+#!/bin/bash --
+
+set -eu
+sock_name="$(mktemp -u XXXXXX)"
+if [[ "$sock_name" =~ [^a-zA-Z0-9] ]]; then
+  echo "Invalid internal sock name provided."
+  exit 1
+fi
+sock="/var/run/qubes/$sock_name.terminal.sock"
+
+xterm -geometry 80x24 -e /bin/sh -c "
+until [ -S $sock ]; do sleep 1; done || true
+exec socat file:/dev/tty,rawer,escape=0x0f UNIX-CONNECT:$sock" &
+
+trap 'rm -rf -- "$sock"' EXIT
+socat "UNIX-LISTEN:\"$sock\"" -
+wait
