@@ -558,7 +558,7 @@ rm -f %{name}-%{version}
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 %dir /etc/qubes-rpc
-%config(noreplace) /etc/qubes-rpc/admin.vm.TerminalDispVM
+%config(noreplace) /etc/qubes-rpc/qubes.ShowInTerminal
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
 %config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
 %config(noreplace) /etc/qubes-rpc/qubes.OpenURL
@@ -628,7 +628,7 @@ rm -f %{name}-%{version}
 /usr/bin/qubes-run-terminal
 /usr/bin/qubes-open
 /usr/bin/qubes-session-autostart
-/usr/bin/qvm-terminal
+/usr/bin/qvm-console
 %dir /usr/lib/qubes
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent

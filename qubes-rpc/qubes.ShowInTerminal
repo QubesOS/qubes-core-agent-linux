@@ -1,0 +1,13 @@
+#!/bin/bash --
+
+set -eu
+tmpdir="$(mktemp -d)"
+sock="${tmpdir//\"/\"\\\"\"/}/terminal.sock"
+
+xterm -geometry 80x24 -e /bin/sh -c "
+until [ -S $sock ]; do sleep 0.1; done || true
+exec socat file:/dev/tty,rawer,escape=0x0f UNIX-CONNECT:$sock" &
+
+trap 'rm -rf -- "$tmpdir"' EXIT
+socat "UNIX-LISTEN:\"$sock\"" -
+wait

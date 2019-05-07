@@ -282,7 +282,7 @@ install-common: install-doc
 	install -m 0755 qubes-rpc/qubes.StartApp $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.PostInstall $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.GetDate $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/admin.vm.TerminalDispVM $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/qubes.ShowInTerminal $(DESTDIR)/etc/qubes-rpc
 	install -d $(DESTDIR)/etc/qubes/rpc-config
 	install -m 0644 qubes-rpc/rpc-config.README $(DESTDIR)/etc/qubes/rpc-config/README
 	for config in qubes-rpc/*.config; do \
@@ -317,7 +317,7 @@ install-common: install-doc
 	
 	install -m 0755 misc/tinyproxy-wrapper $(DESTDIR)/usr/lib/qubes/tinyproxy-wrapper
 
-	install -m 0755 misc/qvm-terminal $(DESTDIR)$(BINDIR)/qvm-terminal
+	install -m 0755 misc/qvm-console $(DESTDIR)$(BINDIR)/qvm-console
 
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/rw
