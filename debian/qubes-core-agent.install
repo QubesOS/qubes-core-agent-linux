@@ -8,7 +8,7 @@ etc/default/grub.d/30-qubes.cfg
 etc/fstab
 etc/needrestart/conf.d/50_qubes.conf
 etc/profile.d/qt_x11_no_mitshm.sh
-etc/qubes-rpc/admin.vm.TerminalDispVM
+etc/qubes-rpc/qubes.ShowInTerminal
 etc/qubes-rpc/qubes.Backup
 etc/qubes-rpc/qubes.DetachPciDevice
 etc/qubes-rpc/qubes.Filecopy
@@ -101,7 +101,7 @@ usr/bin/qvm-move-to-vm
 usr/bin/qvm-open-in-dvm
 usr/bin/qvm-open-in-vm
 usr/bin/qvm-run-vm
-usr/bin/qvm-terminal
+usr/bin/qvm-console
 usr/bin/qvm-sync-clock
 usr/bin/xenstore-watch-qubes
 usr/lib/python2.7/dist-packages/qubesagent-*.egg-info/*
