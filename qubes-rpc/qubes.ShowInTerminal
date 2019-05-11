@@ -2,7 +2,13 @@
 
 set -eu
 tmpdir="$(mktemp -d)"
-sock="${tmpdir//\"/\"\\\"\"/}/terminal.sock"
+
+if [[ $tmpdir =~ \" ]]; then
+    echo 'Error: non admissible character detected in sock path.'
+    exit 1
+fi
+
+sock="$tmpdir/terminal.sock"
 
 xterm -geometry 80x24 -e /bin/sh -c "
 until [ -S $sock ]; do sleep 0.1; done || true
