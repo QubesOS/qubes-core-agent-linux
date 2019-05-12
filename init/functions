@@ -128,6 +128,21 @@ umount_retry() {
     return 0
 }
 
+get_iface_from_mac() {
+    local mac="$1"
+    local iface
+    iface="$(ip -o link | grep -i "$mac" | awk '{print $2}' | cut -d ':' -f1)"
+    echo "$iface"
+}
+
+get_qubes_managed_iface() {
+    local mac
+    local qubes_iface
+    mac="$(qubesdb-read /qubes-mac)"
+    qubes_iface="$(get_iface_from_mac "$mac")"
+    echo "$qubes_iface"
+}
+
 initialize_home() {
     local home_root
     local mode

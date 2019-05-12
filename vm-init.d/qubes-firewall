@@ -19,7 +19,7 @@ start()
 
     if qsvc qubes-firewall ; then
         echo -n $"Starting Qubes Firewall monitor:"
-        /sbin/ethtool -K eth0 sg off
+        /sbin/ethtool -K "$(get_qubes_managed_iface)" sg off
         /usr/sbin/qubes-firewall &
         success
         echo ""
