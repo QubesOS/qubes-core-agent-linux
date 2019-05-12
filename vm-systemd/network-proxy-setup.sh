@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Source Qubes library.
+# shellcheck source=init/functions
+. /usr/lib/qubes/init/functions
+
 # Setup gateway for all the VMs this netVM is serviceing...
 network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
 if [ "x$network" != "x" ]; then
@@ -24,5 +28,5 @@ if [ "x$network" != "x" ]; then
     if [ -n "$gateway6" ]; then
         echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
     fi
-    /sbin/ethtool -K eth0 sg off || true
+    /sbin/ethtool -K "$(get_qubes_managed_iface)" sg off || true
 fi
