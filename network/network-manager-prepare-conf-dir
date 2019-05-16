@@ -24,10 +24,11 @@ sed -r -i -e "s/^#?plugins=.*/plugins=keyfile/" /etc/NetworkManager/NetworkManag
 # starting NetworkManager, otherwise it will try default DHCP configuration
 # first and only after a timeout fallback to static one - introducing delay in
 # network connectivity
-export INTERFACE="$(get_qubes_managed_iface)"
+INTERFACE="$(get_qubes_managed_iface)"
+export INTERFACE
 if qubesdb-read /qubes-ip >/dev/null 2>/dev/null &&
-        [ -e /sys/class/net/$INTERFACE ] &&
-        [ ! -r /etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE ]; then
+        [ -e "/sys/class/net/$INTERFACE" ] &&
+        [ ! -r "/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE" ]; then
     /usr/lib/qubes/setup-ip
 fi
 
