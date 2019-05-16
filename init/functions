@@ -140,7 +140,11 @@ get_qubes_managed_iface() {
     local qubes_iface
     mac="$(qubesdb-read /qubes-mac)"
     qubes_iface="$(get_iface_from_mac "$mac")"
-    echo "$qubes_iface"
+    if [ "x$qubes_iface" != "x" ]; then
+        echo "$qubes_iface"
+    else
+        echo eth0
+    fi
 }
 
 initialize_home() {
