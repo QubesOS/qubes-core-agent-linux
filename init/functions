@@ -131,7 +131,9 @@ umount_retry() {
 get_iface_from_mac() {
     local mac="$1"
     local iface
-    iface="$(ip -o link | grep -i "$mac" | awk '{print $2}' | cut -d ':' -f1)"
+    if [ "x$mac" != "x" ]; then
+        iface="$(ip -o link | grep -i "$mac" | awk '{print $2}' | cut -d ':' -f1)"
+    fi
     echo "$iface"
 }
 
