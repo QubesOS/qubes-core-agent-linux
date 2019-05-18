@@ -128,6 +128,15 @@ umount_retry() {
     return 0
 }
 
+get_mac_from_iface() {
+    local iface="$1"
+    local mac
+    if [ "x$iface" != "x" ]; then
+        mac="$(cat "/sys/class/net/$iface/address")"
+    fi
+    echo "$mac"
+}
+
 get_iface_from_mac() {
     local mac="$1"
     local iface
