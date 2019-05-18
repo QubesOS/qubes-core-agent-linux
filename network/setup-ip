@@ -6,20 +6,24 @@
 
 have_qubesdb || exit 0
 
-ip=$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)
-ip6=$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)
-if [ "x$ip" != x ]; then
-    #netmask=$(/usr/bin/qubesdb-read /qubes-netmask)
-    gateway=$(/usr/bin/qubesdb-read /qubes-gateway)
-    gateway6=$(/usr/bin/qubesdb-read /qubes-gateway6)
-    primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null || echo "$gateway")
-    secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns)
-    /sbin/ethtool -K "$INTERFACE" sg off
-    /sbin/ethtool -K "$INTERFACE" tx off
-    # If NetworkManager is enabled, let it configure the network
-    if qsvc network-manager ; then
-        nm_config=/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE
-        cat > "$nm_config" <<__EOF__
+mac="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)"
+current_mac="$(get_mac_from_iface "$INTERFACE")"
+
+if [ "$mac" = "$current_mac" ]; then
+    ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)"
+    ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)"
+    if [ "x$ip" != x ]; then
+        #netmask=$(/usr/bin/qubesdb-read /qubes-netmask)
+        gateway=$(/usr/bin/qubesdb-read /qubes-gateway)
+        gateway6=$(/usr/bin/qubesdb-read /qubes-gateway6)
+        primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null || echo "$gateway")
+        secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns)
+        /sbin/ethtool -K "$INTERFACE" sg off
+        /sbin/ethtool -K "$INTERFACE" tx off
+        # If NetworkManager is enabled, let it configure the network
+        if qsvc network-manager ; then
+            nm_config="/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE"
+            cat > "$nm_config" <<__EOF__
 [802-3-ethernet]
 duplex=full
 
@@ -31,100 +35,101 @@ id=VM uplink $INTERFACE
 uuid=de85f79b-8c3d-405f-a652-cb4c10b4f9ef
 type=802-3-ethernet
 __EOF__
-        ip4_nm_config=""
-        ip6_nm_config=""
-        if ! qsvc disable-dns-server ; then
-            ip4_nm_config="${ip4_nm_config}
+            ip4_nm_config=""
+            ip6_nm_config=""
+            if ! qsvc disable-dns-server ; then
+                ip4_nm_config="${ip4_nm_config}
 dns=${primary_dns};${secondary_dns}"
-        fi
-        if ! qsvc disable-default-route ; then
-            ip4_nm_config="${ip4_nm_config}
+            fi
+            if ! qsvc disable-default-route ; then
+                ip4_nm_config="${ip4_nm_config}
 addresses1=$ip;32;$gateway"
-            if [ -n "$ip6" ]; then
-                ip6_nm_config="${ip6_nm_config}
+                if [ -n "$ip6" ]; then
+                    ip6_nm_config="${ip6_nm_config}
 addresses1=$ip6;128;$gateway6"
-            fi
-        else
-            ip4_nm_config="${ip4_nm_config}
+                fi
+            else
+                ip4_nm_config="${ip4_nm_config}
 addresses1=$ip;32"
-            if [ -n "$ip6" ]; then
-                ip6_nm_config="${ip6_nm_config}
+                if [ -n "$ip6" ]; then
+                    ip6_nm_config="${ip6_nm_config}
 addresses1=$ip6;128"
+                fi
             fi
-        fi
-        if [ -n "$ip4_nm_config" ]; then
-            cat >> "$nm_config" <<__EOF__
+            if [ -n "$ip4_nm_config" ]; then
+                cat >> "$nm_config" <<__EOF__
 [ipv4]
 method=manual
 may-fail=false
 $ip4_nm_config
 __EOF__
-        else
-            cat >> "$nm_config" <<__EOF__
+            else
+                cat >> "$nm_config" <<__EOF__
 [ipv4]
 method=ignore
 __EOF__
-        fi
+            fi
 
-        if [ -n "$ip6_nm_config" ]; then
-            cat >> "$nm_config" <<__EOF__
+            if [ -n "$ip6_nm_config" ]; then
+                cat >> "$nm_config" <<__EOF__
 [ipv6]
 method=manual
 may-fail=false
 $ip6_nm_config
 __EOF__
-        else
-            cat >> "$nm_config" <<__EOF__
+            else
+                cat >> "$nm_config" <<__EOF__
 [ipv6]
 method=ignore
 __EOF__
-        fi
+            fi
 
-        chmod 600 "$nm_config"
-        # reload connection
-        nmcli connection load "$nm_config" || :
-    else
-        # No NetworkManager enabled, configure the network manually
-        /sbin/ifconfig "$INTERFACE" "$ip" netmask 255.255.255.255
-        if [ -n "$ip6" ]; then
-            /sbin/ifconfig "$INTERFACE" add "$ip6"/128
-        fi
-        /sbin/ifconfig "$INTERFACE" up
-        /sbin/route add -host "$gateway" dev "$INTERFACE"
-        if [ -n "$gateway6" ] && ! echo "$gateway6" | grep -q "^fe80:"; then
-            /sbin/route -6 add "$gateway6/128" dev "$INTERFACE"
-        fi
-        if ! qsvc disable-default-route ; then
-            /sbin/route add default gw "$gateway"
-            if [ -n "$gateway6" ]; then
-                /sbin/route -6 add default gw "$gateway6" dev "$INTERFACE"
+            chmod 600 "$nm_config"
+            # reload connection
+            nmcli connection load "$nm_config" || :
+        else
+            # No NetworkManager enabled, configure the network manually
+            /sbin/ifconfig "$INTERFACE" "$ip" netmask 255.255.255.255
+            if [ -n "$ip6" ]; then
+                /sbin/ifconfig "$INTERFACE" add "$ip6"/128
+            fi
+            /sbin/ifconfig "$INTERFACE" up
+            /sbin/route add -host "$gateway" dev "$INTERFACE"
+            if [ -n "$gateway6" ] && ! echo "$gateway6" | grep -q "^fe80:"; then
+                /sbin/route -6 add "$gateway6/128" dev "$INTERFACE"
+            fi
+            if ! qsvc disable-default-route ; then
+                /sbin/route add default gw "$gateway"
+                if [ -n "$gateway6" ]; then
+                    /sbin/route -6 add default gw "$gateway6" dev "$INTERFACE"
+                fi
+            fi
+            if ! is_protected_file /etc/resolv.conf ; then
+                echo > /etc/resolv.conf
+                if ! qsvc disable-dns-server ; then
+                    echo "nameserver $primary_dns" > /etc/resolv.conf
+                    echo "nameserver $secondary_dns" >> /etc/resolv.conf
+                fi
             fi
         fi
-        if ! is_protected_file /etc/resolv.conf ; then
-            echo > /etc/resolv.conf
-            if ! qsvc disable-dns-server ; then
-                echo "nameserver $primary_dns" > /etc/resolv.conf
-                echo "nameserver $secondary_dns" >> /etc/resolv.conf
+        network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
+        if [ "x$network" != "x" ] && ! qsvc disable-dns-server ; then
+            gateway=$(qubesdb-read /qubes-netvm-gateway)
+            #netmask=$(qubesdb-read /qubes-netvm-netmask)
+            primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
+            secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
+            echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
+            echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
+            /usr/lib/qubes/qubes-setup-dnat-to-ns
+        fi
+        if [ "x$network" != "x" ]; then
+            if [ -x /rw/config/qubes-ip-change-hook ]; then
+                /rw/config/qubes-ip-change-hook
             fi
-        fi
-    fi
-    network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
-    if [ "x$network" != "x" ] && ! qsvc disable-dns-server ; then
-        gateway=$(qubesdb-read /qubes-netvm-gateway)
-        #netmask=$(qubesdb-read /qubes-netvm-netmask)
-        primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
-        secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
-        echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
-        echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
-        /usr/lib/qubes/qubes-setup-dnat-to-ns
-    fi
-    if [ "x$network" != "x" ]; then
-        if [ -x /rw/config/qubes-ip-change-hook ]; then
-            /rw/config/qubes-ip-change-hook
-        fi
-        # XXX: Backward compatibility
-        if [ -x /rw/config/qubes_ip_change_hook ]; then
-            /rw/config/qubes_ip_change_hook
+            # XXX: Backward compatibility
+            if [ -x /rw/config/qubes_ip_change_hook ]; then
+                /rw/config/qubes_ip_change_hook
+            fi
         fi
     fi
 fi
