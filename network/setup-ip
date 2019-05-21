@@ -9,7 +9,7 @@ have_qubesdb || exit 0
 mac="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)"
 current_mac="$(get_mac_from_iface "$INTERFACE")"
 
-if [ "$mac" = "$current_mac" ]; then
+if [ "$mac" = "$current_mac" ] || [ "x$mac" = "x" ] ; then
     ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)"
     ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)"
     if [ "x$ip" != x ]; then
