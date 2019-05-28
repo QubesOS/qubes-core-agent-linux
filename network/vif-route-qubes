@@ -74,19 +74,19 @@ fi
 
 # shellcheck disable=SC2154
 case "$command" in
-	online)
-		ifconfig "${vif}" up
-		echo 1 >"/proc/sys/net/ipv4/conf/${vif}/proxy_arp"
-		ipcmd='add'
-		iptables_cmd='-I PREROUTING 1'
-		cmdprefix=''
-		;;
-	offline)
-		do_without_error ifdown "${vif}"
-		ipcmd='del'
-		iptables_cmd='-D PREROUTING'
-		cmdprefix='do_without_error'
-		;;
+    online)
+        ifconfig "${vif}" up
+        echo 1 >"/proc/sys/net/ipv4/conf/${vif}/proxy_arp"
+        ipcmd='add'
+        iptables_cmd='-I PREROUTING 1'
+        cmdprefix=''
+        ;;
+    offline)
+        do_without_error ifdown "${vif}"
+        ipcmd='del'
+        iptables_cmd='-D PREROUTING'
+        cmdprefix='do_without_error'
+        ;;
 esac
 
 domid=${vif/vif/}
@@ -95,11 +95,12 @@ domid=${domid/.*/}
 #  32752 is max XID aka domid
 metric=$(( 32752 - domid ))
 
-if [ "${ip}" ] ; then
-	# If we've been given a list of IP addresses, then add routes from dom0 to
-	# the guest using those addresses.
-	for addr in ${ip} ; do
-		${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
+if [ "${ip}" ]; then
+    # If we've been given a list of IP addresses, then add routes from dom0 to
+    # the guest using those addresses.
+    for addr in ${ip};
+    do
+        ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
         if [[ "$addr" = *:* ]]; then
             ipt=ip6tables-restore
         else
@@ -107,7 +108,16 @@ if [ "${ip}" ] ; then
         fi
         echo -e "*raw\\n$iptables_cmd -i ${vif} ! -s ${addr} -j DROP\\nCOMMIT" | \
             ${cmdprefix} $ipt --noflush $ipt_arg
-	done
+
+        # Network Hooks for triggering supplementary actions on AppVM connect
+        if [ -d /rw/config/network-hooks.d ]; then
+            for hook in /rw/config/network-hooks.d/*
+            do
+                log debug "Executing network-hook $(basename "$hook")..."
+                do_without_error "${hook}" "${command}" "${vif}" "${addr}"
+            done
+        fi
+    done
     # if no IPv6 is assigned, block all IPv6 traffic on that interface
     if ! [[ "$ip" = *:* ]]; then
         echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" | \
@@ -120,8 +130,7 @@ if [ "${ip}" ] ; then
 fi
 
 log debug "Successful vif-route-qubes $command for $vif."
-if [ "$command" = "online" ]
-then
+if [ "$command" = "online" ]; then
   # disable tx checksumming offload, apparently it doesn't work with our ancient qemu in stubdom
   do_without_error ethtool -K "$vif" tx off
   success
