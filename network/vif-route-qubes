@@ -26,6 +26,26 @@ dir=$(dirname "$0")
 
 #main_ip=$(dom0_ip)
 
+# Network Hooks for triggering supplementary actions on AppVM connect
+network_hooks() {
+    local command="$1"
+    local vif="$2"
+    local addr="$3"
+
+    local vif_type
+    vif_type="$(xenstore-read "${XENBUS_PATH}/type")"
+
+    if [ -d /rw/config/network-hooks.d ]; then
+        for hook in /rw/config/network-hooks.d/*
+        do
+            if [ -x "$hook" ]; then
+                log debug "Executing network-hook $(basename "$hook")..."
+                do_without_error "${hook}" "${command}" "${vif}" "${vif_type}" "${addr}"
+            fi
+        done
+    fi
+}
+
 ipt_arg=
 if "iptables-restore" --help 2>&1 | grep -q wait=; then
     # 'wait' must be last on command line if secs not specified
@@ -109,14 +129,7 @@ if [ "${ip}" ]; then
         echo -e "*raw\\n$iptables_cmd -i ${vif} ! -s ${addr} -j DROP\\nCOMMIT" | \
             ${cmdprefix} $ipt --noflush $ipt_arg
 
-        # Network Hooks for triggering supplementary actions on AppVM connect
-        if [ -d /rw/config/network-hooks.d ]; then
-            for hook in /rw/config/network-hooks.d/*
-            do
-                log debug "Executing network-hook $(basename "$hook")..."
-                do_without_error "${hook}" "${command}" "${vif}" "${addr}"
-            done
-        fi
+        network_hooks "${command}" "${vif}" "${addr}"
     done
     # if no IPv6 is assigned, block all IPv6 traffic on that interface
     if ! [[ "$ip" = *:* ]]; then
@@ -127,6 +140,8 @@ if [ "${ip}" ]; then
     if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]]; then
         ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
     fi
+else
+    network_hooks "${command}" "${vif}"
 fi
 
 log debug "Successful vif-route-qubes $command for $vif."
