@@ -1,3 +1,23 @@
+qubes-core-agent (4.0.46-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Add qvm-showterminal
+  * Rename qvm-showterminal to qvm-terminal and add print_usage
+  * qvm-terminal: use usual '^]' as escape character
+  * Add admin.vm.TerminalDispVM qubes-rpc
+  * Rename and fix from Marek's comments
+  * qubes.ShowInTerminal: simply exit if mktemp generate " character
+  * Handle non-default 'eth0' Qubes managed interface
+  * Handle default value for get_qubes_managed_iface
+  * Handle default value for get_iface_from_mac
+  * setup-ip: only assign IP configuration of Qubes managed iface
+  * setup-ip: handle default conf if /qubes-mac returns empty value
+  * Handle network hooks located in /rw/config/network-hooks.d
+  * Handle empty ip and vif_type
+  * Make ShellCheck happy
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 04 Jun 2019 22:30:06 +0200
+
 qubes-core-agent (4.0.45-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
