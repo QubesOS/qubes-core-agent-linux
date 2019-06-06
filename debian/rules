@@ -16,7 +16,6 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	make install-deb
-	make -C qrexec install
 
 override_dh_fixperms:
 	dh_fixperms -a -Xqfile-unpacker

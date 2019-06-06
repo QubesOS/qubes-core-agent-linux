@@ -4,7 +4,6 @@ Priority: extra
 Maintainer: unman <unman@thirdeyesecurity.org>
 Build-Depends:
     libpam0g-dev,
-    libqrexec-utils-dev,
     libqubes-rpc-filecopy-dev (>= 3.1.3),
     libvchan-xen-dev,
     python,
@@ -47,7 +46,7 @@ Depends:
     python-xdg,
     python-dbus,
     qubes-utils (>= 3.1.3),
-    qubes-core-agent-qrexec,
+    qubes-core-qrexec,
     qubesdb-vm,
     systemd,
     xdg-user-dirs,
@@ -78,25 +77,13 @@ Recommends:
 Conflicts: qubes-core-agent-linux, firewalld, qubes-core-vm-sysvinit
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
- such as qrexec.
-
-Package: qubes-core-agent-qrexec
-Architecture: any
-Depends:
-    libvchan-xen,
-    ${shlibs:Depends},
-    ${misc:Depends}
-Replaces: qubes-core-agent (<< 4.0.0-1)
-Breaks: qubes-core-agent (<< 4.0.0-1)
-Description: Qubes qrexec agent
- Agent part of Qubes RPC system. A daemon responsible for starting processes as
- requested by dom0 or other VMs, according to dom0-enforced policy.
+ such as qrexec services.
 
 Package: qubes-core-agent-nautilus
 Architecture: any
 Depends:
     python-nautilus,
-    qubes-core-agent-qrexec,
+    qubes-core-qrexec,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for Nautilus
@@ -106,7 +93,7 @@ Package: qubes-core-agent-thunar
 Architecture: any
 Depends:
     thunar,
-    qubes-core-agent-qrexec,
+    qubes-core-qrexec,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for Thunar
@@ -118,7 +105,7 @@ Depends:
     fakeroot,
     yum,
     yum-utils,
-    qubes-core-agent-qrexec,
+    qubes-core-qrexec,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Scripts required to handle dom0 updates.
