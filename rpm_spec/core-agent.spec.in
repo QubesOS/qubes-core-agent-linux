@@ -148,6 +148,7 @@ Provides:   qubes-core-vm = %{version}-%{release}
 Obsoletes:  qubes-core-vm < 4.0.0
 Provides:	qubes-core-vm-doc = %{version}-%{release}
 Obsoletes:	qubes-core-vm-doc < 4.0.0
+Conflicts:	qubes-gui-agent < 4.1.0
 BuildRequires: gcc
 BuildRequires: pandoc
 BuildRequires: xen-devel
@@ -809,6 +810,7 @@ Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-sysvinit
 Provides:       qubes-core-vm-systemd = %{version}-%{release}
 Obsoletes:      qubes-core-vm-systemd < 4.0.0
+Conflicts:      qubes-gui-agent < 4.1.0
 
 %description systemd
 The Qubes core startup configuration for SystemD init.
