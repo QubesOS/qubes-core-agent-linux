@@ -1,3 +1,38 @@
+qubes-core-agent (4.1.0-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Disable useless Xen services in Qubes VM since we use upstream
+    package
+  * Handle tinyproxy path changed in upstream
+  * Use exec to ease systemd handling the tinyproxy process
+  * qubes-updates-proxy: make ShellCheck happy
+  * Add qvm-showterminal
+  * Rename qvm-showterminal to qvm-terminal and add print_usage
+  * qvm-terminal: use usual '^]' as escape character
+  * Add admin.vm.TerminalDispVM qubes-rpc
+  * Rename and fix from Marek's comments
+  * qubes.ShowInTerminal: simply exit if mktemp generate " character
+  * Handle non-default 'eth0' Qubes managed interface
+  * Make ShellCheck happy
+  * Handle default value for get_qubes_managed_iface
+  * Handle default value for get_iface_from_mac
+  * setup-ip: only assign IP configuration of Qubes managed iface
+  * setup-ip: handle default conf if /qubes-mac returns empty value
+  * Handle network hooks located in /rw/config/network-hooks.d
+  * Handle empty ip and vif_type
+
+  [ Marek Marczykowski-Górecki ]
+  * Remove qrexec-agent related files
+  * travis: update for R4.1
+
+  [ Simon Gaiser ]
+  * Pass GUI domain id to GUI agent
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm,deb: add Conflicts: qubes-gui-agent < 4.1.0
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 08 Jun 2019 05:45:54 +0200
+
 qubes-core-agent (4.0.44-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
