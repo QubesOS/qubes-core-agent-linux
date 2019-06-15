@@ -34,5 +34,5 @@ qrexec_console() {
 export -f qrexec_console
 
 printf "Use '^]' to exit remote console\n"
-socat file:/dev/tty,rawer,escape=0x1d SYSTEM:"qrexec_console $QREXEC_REQUESTED_TARGET" 2>/dev/null
+socat file:/dev/tty,rawer,escape=0x1d EXEC:"/bin/bash -c \'qrexec_console $QREXEC_REQUESTED_TARGET 2>/dev/null\'"
 printf '\n'
