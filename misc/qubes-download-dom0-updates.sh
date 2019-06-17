@@ -84,7 +84,7 @@ if [ "$CLEAN" = "1" ]; then
     # shellcheck disable=SC2086
     $YUM $OPTS clean all
     rm -f "$DOM0_UPDATES_DIR"/packages/*
-    rm -rf "$DOM0_UPDATES_DIR"/var/cache/yum/*
+    rm -rf "$DOM0_UPDATES_DIR"/var/cache/*
 fi
 
 # just check for updates, but don't download any package
