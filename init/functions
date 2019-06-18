@@ -158,6 +158,17 @@ get_qubes_managed_iface() {
     fi
 }
 
+get_prefix_from_subnet() {
+    local subnet="$1"
+    prefix="$(ipcalc -p 0.0.0.0 "$subnet" | sed 's/PREFIX=//')"
+
+    if [ "x$prefix" != "x" ]; then
+        echo "$prefix"
+    else
+        echo "32"
+    fi
+}
+
 initialize_home() {
     local home_root
     local mode

@@ -17,7 +17,7 @@ fi
 # qubesdb-read fails
 QUBES_MANAGED_IFACE="$(get_qubes_managed_iface)"
 if [ "x$QUBES_MANAGED_IFACE" != "x" ]; then
-INTERFACE="$QUBES_MANAGED_IFACE" /usr/lib/qubes/setup-ip
+INTERFACE="$QUBES_MANAGED_IFACE" ACTION="add" /usr/lib/qubes/setup-ip
 fi
 
 if [ -x /rw/config/rc.local ] ; then
