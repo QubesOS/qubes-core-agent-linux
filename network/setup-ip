@@ -178,7 +178,7 @@ if [ -n "$INTERFACE" ]; then
 
             # Handle legacy values
             LEGACY_MAC="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)"
-            if [ "$MAC" == "$LEGACY_MAC" ]; then
+            if [ "$MAC" == "$LEGACY_MAC" ] || [ "x$LEGACY_MAC" == "x" ]; then
                 if [ "x$ip" == "x" ]; then
                     ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)"
                 fi
