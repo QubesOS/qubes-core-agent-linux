@@ -5,19 +5,16 @@
 . /usr/lib/qubes/init/functions
 
 configure_network() {
-    local IFS=','
-    read -r -a args <<< "$@"
-
-    local MAC="${args[0]}"
-    local INTERFACE="${args[1]}"
-    local ip="${args[2]}"
-    local ip6="${args[3]}"
-    local netmask="${args[4]}"
-    local netmask6="${args[5]}"
-    local gateway="${args[6]}"
-    local gateway6="${args[7]}"
-    local primary_dns="${args[8]}"
-    local secondary_dns="${args[9]}"
+    local MAC="$1"
+    local INTERFACE="$2"
+    local ip="$3"
+    local ip6="$4"
+    local netmask="$5"
+    local netmask6="$6"
+    local gateway="$7"
+    local gateway6="$8"
+    local primary_dns="$9"
+    local secondary_dns="${10}"
 
     /sbin/ifconfig "$INTERFACE" "$ip" netmask "$netmask"
     if [ -n "$ip6" ]; then
@@ -52,19 +49,16 @@ configure_network() {
 }
 
 configure_network_nm() {
-    local IFS=','
-    read -r -a args <<< "$@"
-
-    local MAC="${args[0]}"
-    local INTERFACE="${args[1]}"
-    local ip="${args[2]}"
-    local ip6="${args[3]}"
-    local netmask="${args[4]}"
-    local netmask6="${args[5]}"
-    local gateway="${args[6]}"
-    local gateway6="${args[7]}"
-    local primary_dns="${args[8]}"
-    local secondary_dns="${args[9]}"
+    local MAC="$1"
+    local INTERFACE="$2"
+    local ip="$3"
+    local ip6="$4"
+    local netmask="$5"
+    local netmask6="$6"
+    local gateway="$7"
+    local gateway6="$8"
+    local primary_dns="$9"
+    local secondary_dns="${10}"
 
     local prefix
     local prefix6
@@ -209,9 +203,9 @@ if [ -n "$INTERFACE" ]; then
 
                 # If NetworkManager is enabled, let it configure the network
                 if qsvc network-manager ; then
-                    configure_network_nm "$MAC","$INTERFACE","$ip","$ip6","$netmask","$netmask6","$gateway","$gateway6","$primary_dns","$secondary_dns"
+                    configure_network_nm "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
                 else
-                    configure_network "$MAC","$INTERFACE","$ip","$ip6","$netmask","$netmask6","$gateway","$gateway6","$primary_dns","$secondary_dns"
+                    configure_network "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
                 fi
 
                 network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
