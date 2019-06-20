@@ -172,25 +172,25 @@ if [ -n "$INTERFACE" ]; then
 
             # Handle legacy values
             LEGACY_MAC="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)"
-            if [ "$MAC" == "$LEGACY_MAC" ] || [ "x$LEGACY_MAC" == "x" ]; then
-                if [ "x$ip" == "x" ]; then
+            if [ "$MAC" == "$LEGACY_MAC" ] || [ -z "$LEGACY_MAC" ]; then
+                if [ -z "$ip" ]; then
                     ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)"
                 fi
-                if [ "$ip6" == "x" ]; then
+                if [ -z "$ip6" ]; then
                     ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)"
                 fi
-                if [ "$gateway" == "x" ]; then
+                if [ -z "$gateway" ]; then
                     gateway="$(/usr/bin/qubesdb-read /qubes-gateway)"
                 fi
-                if [ "x$gateway6" == "x" ]; then
+                if [ -z "$gateway6" ]; then
                     gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6)"
                 fi
             fi
 
-            if [ "x$netmask" == "x" ]; then
+            if [ -z "$netmask" ]; then
                 netmask="255.255.255.255"
             fi
-            if [ "x$netmask6" == "x" ]; then
+            if [ -z "$netmask6" ]; then
                 netmask6="128"
             fi
 
@@ -209,7 +209,7 @@ if [ -n "$INTERFACE" ]; then
                 fi
 
                 network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
-                if [ "x$network" != "x" ]; then
+                if [ -n "$network" ]; then
                     if ! qsvc disable-dns-server; then
                         configure_qubes_ns
                     fi
