@@ -61,6 +61,7 @@ Recommends:
     gnome-terminal,
     gnome-themes-standard,
     haveged,
+    jitterentropy-rngd,
     libnotify-bin,
     locales-all,
     mate-notification-daemon,
