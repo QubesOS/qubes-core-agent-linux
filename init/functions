@@ -131,7 +131,7 @@ umount_retry() {
 get_mac_from_iface() {
     local iface="$1"
     local mac
-    if [ "x$iface" != "x" ]; then
+    if [ "x$iface" != "x" ] && [ -e "/sys/class/net/$iface" ]; then
         mac="$(cat "/sys/class/net/$iface/address")"
     fi
     echo "$mac"
@@ -149,7 +149,7 @@ get_iface_from_mac() {
 get_qubes_managed_iface() {
     local mac
     local qubes_iface
-    mac="$(qubesdb-read /qubes-mac)"
+    mac="$(qubesdb-read /qubes-mac 2> /dev/null)"
     qubes_iface="$(get_iface_from_mac "$mac")"
     if [ "x$qubes_iface" != "x" ]; then
         echo "$qubes_iface"
