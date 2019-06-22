@@ -158,9 +158,13 @@ get_qubes_managed_iface() {
     fi
 }
 
+# Based on: https://forums.gentoo.org/viewtopic-t-888736-start-0.html
 get_prefix_from_subnet() {
     local subnet="$1"
-    prefix="$(ipcalc -p 0.0.0.0 "$subnet" | sed 's/PREFIX=//')"
+    local x=${subnet##*255.}
+    set -- 0^^^128^192^224^240^248^252^254^ $(( (${#1} - ${#x})*2 )) "${x%%.*}"
+    x=${1%%$3*}
+    prefix=$(( $2 + (${#x}/4) ))
 
     if [ "x$prefix" != "x" ]; then
         echo "$prefix"
