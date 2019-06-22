@@ -180,10 +180,10 @@ if [ -n "$INTERFACE" ]; then
                     ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)"
                 fi
                 if [ -z "$gateway" ]; then
-                    gateway="$(/usr/bin/qubesdb-read /qubes-gateway)"
+                    gateway="$(/usr/bin/qubesdb-read /qubes-gateway 2> /dev/null)"
                 fi
                 if [ -z "$gateway6" ]; then
-                    gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6)"
+                    gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6 2> /dev/null)"
                 fi
             fi
 
