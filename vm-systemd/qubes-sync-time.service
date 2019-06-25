@@ -1,5 +1,6 @@
 [Unit]
 Description=Update time from ClockVM
+After=qubes-qrexec-agent.service
 ConditionPathExists=!/var/run/qubes-service/clocksync
 
 [Service]
