@@ -1,135 +1,225 @@
-#!/bin/sh
+#!/bin/bash
 
 # Source Qubes library.
 # shellcheck disable=SC1091
 . /usr/lib/qubes/init/functions
 
-have_qubesdb || exit 0
+configure_network() {
+    local MAC="$1"
+    local INTERFACE="$2"
+    local ip="$3"
+    local ip6="$4"
+    local netmask="$5"
+    local netmask6="$6"
+    local gateway="$7"
+    local gateway6="$8"
+    local primary_dns="$9"
+    local secondary_dns="${10}"
 
-mac="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)"
-current_mac="$(get_mac_from_iface "$INTERFACE")"
+    /sbin/ifconfig "$INTERFACE" "$ip" netmask "$netmask"
+    if [ -n "$ip6" ]; then
+        /sbin/ifconfig "$INTERFACE" add "$ip6/$netmask6"
+    fi
+    /sbin/ifconfig "$INTERFACE" up
 
-if [ "$mac" = "$current_mac" ] || [ "x$mac" = "x" ] ; then
-    ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)"
-    ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)"
-    if [ "x$ip" != x ]; then
-        #netmask=$(/usr/bin/qubesdb-read /qubes-netmask)
-        gateway=$(/usr/bin/qubesdb-read /qubes-gateway)
-        gateway6=$(/usr/bin/qubesdb-read /qubes-gateway6)
-        primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null || echo "$gateway")
-        secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns)
-        /sbin/ethtool -K "$INTERFACE" sg off
-        /sbin/ethtool -K "$INTERFACE" tx off
-        # If NetworkManager is enabled, let it configure the network
-        if qsvc network-manager ; then
-            nm_config="/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE"
-            cat > "$nm_config" <<__EOF__
+    if [ -n "$gateway" ]; then
+        /sbin/route add -host "$gateway" dev "$INTERFACE"
+        if [ -n "$gateway6" ] && ! echo "$gateway6" | grep -q "^fe80:"; then
+            /sbin/route -6 add "$gateway6/$netmask6" dev "$INTERFACE"
+        fi
+        if ! qsvc disable-default-route ; then
+            /sbin/route add default gw "$gateway"
+            if [ -n "$gateway6" ]; then
+                /sbin/route -6 add default gw "$gateway6" dev "$INTERFACE"
+            fi
+        fi
+    fi
+
+    if [ -z "$primary_dns" ] && [ -n "$gateway" ]; then
+        primary_dns="$gateway"
+    fi
+
+    if ! is_protected_file /etc/resolv.conf ; then
+        echo > /etc/resolv.conf
+        if ! qsvc disable-dns-server ; then
+            echo "nameserver $primary_dns" > /etc/resolv.conf
+            echo "nameserver $secondary_dns" >> /etc/resolv.conf
+        fi
+    fi
+}
+
+configure_network_nm() {
+    local MAC="$1"
+    local INTERFACE="$2"
+    local ip="$3"
+    local ip6="$4"
+    local netmask="$5"
+    local netmask6="$6"
+    local gateway="$7"
+    local gateway6="$8"
+    local primary_dns="$9"
+    local secondary_dns="${10}"
+
+    local prefix
+    local prefix6
+    local nm_config
+    local ip4_nm_config
+    local ip6_nm_config
+    local uuid
+
+    prefix="$(get_prefix_from_subnet "$netmask")"
+    prefix6="$netmask6"
+    uuid="de85f79b-8c3d-405f-a652-${MAC//:/}"
+    nm_config="/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE"
+    cat > "$nm_config" <<__EOF__
 [802-3-ethernet]
 duplex=full
 
 [ethernet]
-mac-address=$(ip l show dev "$INTERFACE" |grep link|awk '{print $2}')
+mac-address=$MAC
 
 [connection]
 id=VM uplink $INTERFACE
-uuid=de85f79b-8c3d-405f-a652-cb4c10b4f9ef
+uuid=$uuid
 type=802-3-ethernet
 __EOF__
-            ip4_nm_config=""
-            ip6_nm_config=""
-            if ! qsvc disable-dns-server ; then
-                ip4_nm_config="${ip4_nm_config}
+    ip4_nm_config=""
+    ip6_nm_config=""
+    if ! qsvc disable-dns-server ; then
+        ip4_nm_config="${ip4_nm_config}
 dns=${primary_dns};${secondary_dns}"
-            fi
-            if ! qsvc disable-default-route ; then
-                ip4_nm_config="${ip4_nm_config}
-addresses1=$ip;32;$gateway"
-                if [ -n "$ip6" ]; then
-                    ip6_nm_config="${ip6_nm_config}
-addresses1=$ip6;128;$gateway6"
-                fi
-            else
-                ip4_nm_config="${ip4_nm_config}
-addresses1=$ip;32"
-                if [ -n "$ip6" ]; then
-                    ip6_nm_config="${ip6_nm_config}
-addresses1=$ip6;128"
-                fi
-            fi
-            if [ -n "$ip4_nm_config" ]; then
-                cat >> "$nm_config" <<__EOF__
+    fi
+    if ! qsvc disable-default-route ; then
+        ip4_nm_config="${ip4_nm_config}
+addresses1=$ip;$prefix;$gateway"
+        if [ -n "$ip6" ]; then
+            ip6_nm_config="${ip6_nm_config}
+addresses1=$ip6;$prefix6;$gateway6"
+        fi
+    else
+        ip4_nm_config="${ip4_nm_config}
+addresses1=$ip;$prefix"
+        if [ -n "$ip6" ]; then
+            ip6_nm_config="${ip6_nm_config}
+addresses1=$ip6;$prefix6"
+        fi
+    fi
+    if [ -n "$ip4_nm_config" ]; then
+        cat >> "$nm_config" <<__EOF__
 [ipv4]
 method=manual
 may-fail=false
 $ip4_nm_config
 __EOF__
-            else
-                cat >> "$nm_config" <<__EOF__
+    else
+        cat >> "$nm_config" <<__EOF__
 [ipv4]
 method=ignore
 __EOF__
-            fi
+    fi
 
-            if [ -n "$ip6_nm_config" ]; then
-                cat >> "$nm_config" <<__EOF__
+    if [ -n "$ip6_nm_config" ]; then
+        cat >> "$nm_config" <<__EOF__
 [ipv6]
 method=manual
 may-fail=false
 $ip6_nm_config
 __EOF__
-            else
-                cat >> "$nm_config" <<__EOF__
+    else
+        cat >> "$nm_config" <<__EOF__
 [ipv6]
 method=ignore
 __EOF__
+    fi
+
+    chmod 600 "$nm_config"
+    # reload connection
+    nmcli connection load "$nm_config" || :
+}
+
+configure_qubes_ns() {
+    gateway=$(qubesdb-read /qubes-netvm-gateway)
+    #netmask=$(qubesdb-read /qubes-netvm-netmask)
+    primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
+    secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
+    echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
+    echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
+    /usr/lib/qubes/qubes-setup-dnat-to-ns
+}
+
+qubes_ip_change_hook() {
+    if [ -x /rw/config/qubes-ip-change-hook ]; then
+        /rw/config/qubes-ip-change-hook
+    fi
+    # XXX: Backward compatibility
+    if [ -x /rw/config/qubes_ip_change_hook ]; then
+        /rw/config/qubes_ip_change_hook
+    fi
+}
+
+have_qubesdb || exit 0
+
+if [ -n "$INTERFACE" ]; then
+    if [ "$ACTION" == "add" ]; then
+        MAC="$(get_mac_from_iface "$INTERFACE")"
+        if [ -n "$MAC" ]; then
+            ip="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip" 2> /dev/null)"
+            ip6="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip6" 2> /dev/null)"
+            netmask="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask" 2> /dev/null)"
+            netmask6="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask6" 2> /dev/null)"
+            gateway="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway" 2> /dev/null)"
+            gateway6="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway6" 2> /dev/null)"
+
+            # Handle legacy values
+            LEGACY_MAC="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)"
+            if [ "$MAC" == "$LEGACY_MAC" ] || [ -z "$LEGACY_MAC" ]; then
+                if [ -z "$ip" ]; then
+                    ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)"
+                fi
+                if [ -z "$ip6" ]; then
+                    ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)"
+                fi
+                if [ -z "$gateway" ]; then
+                    gateway="$(/usr/bin/qubesdb-read /qubes-gateway 2> /dev/null)"
+                fi
+                if [ -z "$gateway6" ]; then
+                    gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6 2> /dev/null)"
+                fi
             fi
 
-            chmod 600 "$nm_config"
-            # reload connection
-            nmcli connection load "$nm_config" || :
-        else
-            # No NetworkManager enabled, configure the network manually
-            /sbin/ifconfig "$INTERFACE" "$ip" netmask 255.255.255.255
-            if [ -n "$ip6" ]; then
-                /sbin/ifconfig "$INTERFACE" add "$ip6"/128
+            if [ -z "$netmask" ]; then
+                netmask="255.255.255.255"
             fi
-            /sbin/ifconfig "$INTERFACE" up
-            /sbin/route add -host "$gateway" dev "$INTERFACE"
-            if [ -n "$gateway6" ] && ! echo "$gateway6" | grep -q "^fe80:"; then
-                /sbin/route -6 add "$gateway6/128" dev "$INTERFACE"
+            if [ -z "$netmask6" ]; then
+                netmask6="128"
             fi
-            if ! qsvc disable-default-route ; then
-                /sbin/route add default gw "$gateway"
-                if [ -n "$gateway6" ]; then
-                    /sbin/route -6 add default gw "$gateway6" dev "$INTERFACE"
+
+            primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null)
+            secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null)
+
+            if [ -n "$ip" ]; then
+                /sbin/ethtool -K "$INTERFACE" sg off
+                /sbin/ethtool -K "$INTERFACE" tx off
+
+                # If NetworkManager is enabled, let it configure the network
+                if qsvc network-manager ; then
+                    configure_network_nm "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
+                else
+                    configure_network "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
+                fi
+
+                network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
+                if [ -n "$network" ]; then
+                    if ! qsvc disable-dns-server; then
+                        configure_qubes_ns
+                    fi
+                    qubes_ip_change_hook
                 fi
             fi
-            if ! is_protected_file /etc/resolv.conf ; then
-                echo > /etc/resolv.conf
-                if ! qsvc disable-dns-server ; then
-                    echo "nameserver $primary_dns" > /etc/resolv.conf
-                    echo "nameserver $secondary_dns" >> /etc/resolv.conf
-                fi
-            fi
         fi
-        network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
-        if [ "x$network" != "x" ] && ! qsvc disable-dns-server ; then
-            gateway=$(qubesdb-read /qubes-netvm-gateway)
-            #netmask=$(qubesdb-read /qubes-netvm-netmask)
-            primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
-            secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
-            echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
-            echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
-            /usr/lib/qubes/qubes-setup-dnat-to-ns
-        fi
-        if [ "x$network" != "x" ]; then
-            if [ -x /rw/config/qubes-ip-change-hook ]; then
-                /rw/config/qubes-ip-change-hook
-            fi
-            # XXX: Backward compatibility
-            if [ -x /rw/config/qubes_ip_change_hook ]; then
-                /rw/config/qubes_ip_change_hook
-            fi
-        fi
+    elif [ "$ACTION" == "remove" ]; then
+        # If exists, we delete NetworkManager configuration file to prevent duplicate entries
+        nm_config="/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE"
+        rm -rf "$nm_config"
     fi
 fi
