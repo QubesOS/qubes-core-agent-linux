@@ -1,3 +1,25 @@
+qubes-core-agent (4.1.2-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * qvm-console: handle non-default bash shell (Debian)
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: fix cleaning downloaded packages
+  * Delay qubes-sync-time service after qrexec is started
+
+  [ Frédéric Pierret (fepitre) ]
+  * Refactor and handle new network qubesdb configuration
+  * Handle legacy non-present /qubes-mac qubesdb entry
+  * configure_network: use classical function parsing
+  * init/functions: handle non-present /qubes-mac qubesdb and check if
+    iface exists
+  * Better use '-z' and '-n' for readibility
+  * Handle errors for non-present ip gateways
+  * init/functions: better not use ipcalc which is not present on
+    minimal distro
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 27 Jun 2019 01:07:20 +0200
+
 qubes-core-agent (4.1.1-1) unstable; urgency=medium
 
   * Update repositories to R4.1
