@@ -35,18 +35,6 @@ systemd_version_changed() {
     return 0
 }
 
-possibly_run_save_script() {
-    ENCODED_SCRIPT=$(qubesdb-read /qubes-save-script)
-    if [ -z "$ENCODED_SCRIPT" ] ; then return ; fi
-    tmpfile=$(mktemp /tmp/qubes-save-script.XXXXXXXXX)
-    echo "$ENCODED_SCRIPT"|base64 -d >"$tmpfile"
-    chmod 755 "$tmpfile"
-    DISPLAY=:0 su - user -c "$tmpfile"
-    ret=$?
-    rm -f "$tmpfile"
-    return $ret
-}
-
 have_qubesdb() {
     # Tests whether qubesdb-read exists and can be executed.
     type qubesdb-read >/dev/null 2>&1
