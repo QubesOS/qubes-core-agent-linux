@@ -17,7 +17,7 @@ elif [ -e /etc/arch-release ]; then
 else
     update_cmd='echo Unsupported distribution, install updates manually; bash -i'
 fi
-xterm -title update -e su -l -c "$update_cmd; echo Done.; test -f /var/run/qubes/this-is-templatevm && { echo Press Enter to shutdown the template, or Ctrl-C to just close this window; read x && poweroff; } ;"
+xterm -title update -e su -s /bin/sh -l -c "$update_cmd; echo Done.; test -f /var/run/qubes/this-is-templatevm && { echo Press Enter to shutdown the template, or Ctrl-C to just close this window; read x && poweroff; } ;"
 
 # Notify dom0 about installed updates
-su -c 'service qubes-update-check start'
+su -s /bin/sh -c 'service qubes-update-check start'

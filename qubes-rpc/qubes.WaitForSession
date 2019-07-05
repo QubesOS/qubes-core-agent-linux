@@ -10,7 +10,7 @@ cmd='echo $$ >> /tmp/qubes-session-waiter; [ ! -f /tmp/qubes-session-env ] && ex
 if [ "$(id -un)" = "$USERNAME" ]; then
     sh -c "$cmd" 2>/dev/null
 else
-    su -c "$cmd" - "$USERNAME" 2> /dev/null
+    su -s /bin/sh -c "$cmd" - "$USERNAME" 2> /dev/null
 fi
 # the above line is _expected_ to be terminated by a signal, don't treat this as a failure
 exit 0
