@@ -127,10 +127,9 @@ Depends:
     socat,
     tinyproxy,
     iproute2,
+    nftables,
     ${python:Depends},
     ${misc:Depends}
-Suggests:
-    nftables,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Networking support for Qubes VM
