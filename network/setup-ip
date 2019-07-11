@@ -202,7 +202,7 @@ if [ -n "$INTERFACE" ]; then
                 /sbin/ethtool -K "$INTERFACE" tx off
 
                 # If NetworkManager is enabled, let it configure the network
-                if qsvc network-manager ; then
+                if qsvc network-manager && [ -e /usr/bin/nmcli ]; then
                     configure_network_nm "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
                 else
                     configure_network "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
