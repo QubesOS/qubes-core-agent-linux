@@ -47,9 +47,9 @@ if [ "$1" = "install" ] ; then
         useradd --user-group --create-home --shell /bin/bash user
     }
     id -u 'tinyproxy' >/dev/null 2>&1 || {
-        useradd --user-group --system -M --home /run/tinyproxy --shell /bin/false tinyproxy
+        useradd --user-group --system --no-create-home --home /run/tinyproxy --shell /bin/false tinyproxy
     }
-    usermod -L -a --groups qubes user
+    usermod --lock --append --groups qubes user
 
     # --------------------------------------------------------------------------
     # Remove `mesg` from root/.profile?
@@ -72,7 +72,7 @@ if [ "$1" = "upgrade" ] ; then
     ## Allow passwordless login for user "user" (when using 'sudo xl console').
     ## https://github.com/QubesOS/qubes-issues/issues/1130
     if grep -q '^user:\!:' /etc/shadow ; then
-        passwd user -d >/dev/null || true
+        passwd user --delete >/dev/null || true
     fi
 fi
 
