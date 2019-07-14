@@ -310,7 +310,7 @@ install-common: install-doc
 
 	install -D -m 0644 misc/marker-vm $(DESTDIR)/usr/share/qubes/marker-vm
 	cut -f 1,2 -d . version >> $(DESTDIR)/usr/share/qubes/marker-vm
-	
+
 	install -m 0755 misc/tinyproxy-wrapper $(DESTDIR)/usr/lib/qubes/tinyproxy-wrapper
 
 	install -m 0755 misc/qvm-console $(DESTDIR)$(BINDIR)/qvm-console
@@ -391,8 +391,8 @@ install-deb: install-common install-systemd install-systemd-dropins install-syst
 	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/
 	install -D -m 644 misc/profile.d_qt_x11_no_mitshm.sh $(DESTDIR)/etc/profile.d/qt_x11_no_mitshm.sh
 	install -D -m 440 misc/sudoers.d_umask $(DESTDIR)/etc/sudoers.d/umask
-	install -d $(DESTDIR)/etc/pam.d
-	install -m 0644 misc/pam.d_su.qubes $(DESTDIR)/etc/pam.d/su.qubes
+	install -d $(DESTDIR)/usr/share/pam-configs
+	install -m 0644 misc/passwordless $(DESTDIR)/usr/share/pam-configs/passwordless
 	install -d $(DESTDIR)/etc/needrestart/conf.d
 	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
 	install -D -m 0644 misc/grub.qubes $(DESTDIR)/etc/default/grub.d/30-qubes.cfg
