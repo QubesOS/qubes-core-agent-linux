@@ -51,6 +51,10 @@ if [ "$1" = "install" ] ; then
     }
     usermod -L -a --groups qubes user
 
+    ## Allow passwordless login for user "user" (when using 'sudo xl console').
+    ## https://github.com/QubesOS/qubes-issues/issues/1130
+    usermod --password '' user
+
     # --------------------------------------------------------------------------
     # Remove `mesg` from root/.profile?
     # --------------------------------------------------------------------------
