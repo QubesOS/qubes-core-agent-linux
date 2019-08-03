@@ -36,6 +36,22 @@ class QubesHooks(dnf.Plugin):
         self.base = base
         self.log = logging.getLogger('dnf')
 
+    def resolved(self):
+        # in case of no action to do, transaction() hook won't be called;
+        # report updates availability here - especially when everything is up
+        # to date - to clear updates-available flag
+        if not self.base.transaction:
+            query = self.base.sack.query()
+            query = query.upgrades()
+            updates = set(query.run())
+            subprocess.call([
+                '/usr/lib/qubes/qrexec-client-vm',
+                'dom0',
+                'qubes.NotifyUpdates',
+                '/bin/echo',
+                str(len(updates))
+            ])
+
     def transaction(self):
         if LooseVersion(dnf.const.VERSION) < '2.0.0':
             config = self.read_config(self.base.conf, PLUGIN_CONF)
