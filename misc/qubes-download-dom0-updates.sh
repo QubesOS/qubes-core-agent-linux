@@ -116,6 +116,10 @@ YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y --downloadonly"
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
 if ! $YUM --help | grep -q downloadonly; then
+    # setup environment for yumdownloader to be happy
+    if [ ! -e "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
+        ln -nsf dnf/dnf.conf "$DOM0_UPDATES_DIR/etc/yum.conf"
+    fi
     if [ "$YUM_ACTION" = "install" ]; then
         YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
     elif [ "$YUM_ACTION" = "upgrade" ]; then
@@ -162,7 +166,7 @@ else
     $YUM_COMMAND $OPTS "${PKGLIST[@]}"
 fi
 
-find "$DOM0_UPDATES_DIR/var/cache" -name '*.rpm' -print0 |\
+find "$DOM0_UPDATES_DIR/var/cache" -name '*.rpm' -print0 2>/dev/null |\
     xargs -0 -r ln -f -t "$DOM0_UPDATES_DIR/packages/"
 
 if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
