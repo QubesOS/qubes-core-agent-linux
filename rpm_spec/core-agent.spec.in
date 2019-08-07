@@ -609,7 +609,10 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-suspend-module-blacklist
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo
+%if 0%{?rhel} == 7
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
+/usr/lib/yum-plugins/yum-qubes-hooks.py*
+%endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %config(noreplace) /etc/dconf/db/local.d/dpi
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
@@ -648,7 +651,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qubes-sync-clock
 /usr/lib/qubes/resize-rootfs
 /usr/lib/qubes/tinyproxy-wrapper
-/usr/lib/yum-plugins/yum-qubes-hooks.py*
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/bind-dirs.sh
