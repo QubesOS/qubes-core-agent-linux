@@ -1,0 +1,39 @@
+#!/bin/bash --
+set -e
+[[ "$DEBUG" == "1" ]] && set -x
+
+LOCALPORT="$(echo "$1" | cut -d ':' -f1)"
+DOMAIN="$(echo "$1" | cut -d ':' -f2)"
+PORT="$(echo "$1" | cut -d ':' -f3)"
+
+print_usage() {
+cat >&2 <<USAGE
+Usage: $0 [localport]:[vmname]:[port]
+Bind localport to another VM port using the qubes.ConnectTCP RPC service.
+USAGE
+}
+
+check_port() {
+[[ "$1" -ge 1 ]] && [[ "$1" -le 65535 ]]
+}
+
+if [ $# -lt 1 ] ; then
+    print_usage
+    exit 1
+fi
+
+[[ -z "$PORT" ]] && { echo "Please provide PORT"; exit 1; };
+[[ -z "$LOCALPORT" ]] && LOCALPORT="$PORT"
+
+if check_port "$PORT" && check_port "$LOCALPORT"; then
+    if [ -n "$DOMAIN" ]; then
+        msg="Binding TCP '$DOMAIN:$PORT' to 'localhost:$LOCALPORT'..."
+    else
+        msg="Binding TCP '@default:$PORT' to 'localhost:$LOCALPORT'..."
+    fi
+    echo "$msg"
+    sudo socat TCP-LISTEN:"$LOCALPORT",reuseaddr,fork EXEC:"qrexec-client-vm \'$DOMAIN\' qubes.ConnectTCP+$PORT" &
+else
+    echo "Invalid port provided"
+    exit 1
+fi
