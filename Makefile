@@ -284,6 +284,7 @@ install-common: install-doc
 	install -m 0755 qubes-rpc/qubes.PostInstall $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.GetDate $(DESTDIR)/etc/qubes-rpc
 	install -m 0755 qubes-rpc/qubes.ShowInTerminal $(DESTDIR)/etc/qubes-rpc
+	install -m 0755 qubes-rpc/qubes.ConnectTCP $(DESTDIR)/etc/qubes-rpc
 	install -d $(DESTDIR)/etc/qubes/rpc-config
 	install -m 0644 qubes-rpc/rpc-config.README $(DESTDIR)/etc/qubes/rpc-config/README
 	for config in qubes-rpc/*.config; do \
