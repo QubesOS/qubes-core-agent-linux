@@ -22,21 +22,26 @@
 
 
 from yum.plugins import TYPE_CORE
-from yum.constants import *
 import subprocess
 
 requires_api_version = '2.4'
 plugin_type = (TYPE_CORE,)
 
+
 def posttrans_hook(conduit):
-    # Get all updates available _before_ this transaction
-    pkg_list = conduit._base.doPackageLists(pkgnarrow='updates')
-
-    # Get packages installed in this transaction...
-    ts = conduit.getTsInfo()
-    all = ts.getMembers()
-    # ...and filter them out of available updates
-    filtered_updates = filter(lambda x: x not in all, pkg_list.updates)
-
-    # Notify dom0 about left updates count
-    subprocess.call(['/usr/lib/qubes/qrexec-client-vm', 'dom0', 'qubes.NotifyUpdates', '/bin/echo', str(len(filtered_updates))])
+    if conduit.confBool('main', 'notify-updates', default=True):
+        # Get all updates available _before_ this transaction
+        pkg_list = conduit._base.doPackageLists(pkgnarrow='updates')
+        # Get packages installed in this transaction...
+        ts = conduit.getTsInfo()
+        all_transactions = ts.getMembers()
+        # ...and filter them out of available updates
+        filtered_updates = list(
+            filter(lambda x: x not in all_transactions, pkg_list.updates))
+        # Notify dom0 about left updates count
+        subprocess.call(
+            ['/usr/lib/qubes/qrexec-client-vm', 'dom0', 'qubes.NotifyUpdates',
+             '/bin/echo', str(len(filtered_updates))])
+    conduit.info(1, "Notifying dom0 about installed/removed applications")
+    # Notify and add app to app-menus
+    subprocess.call(['/etc/qubes-rpc/qubes.PostInstall'])

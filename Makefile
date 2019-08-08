@@ -161,8 +161,6 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -D -m 0644 misc/qubes-r4.repo.in $(DESTDIR)/etc/yum.repos.d/qubes-r4.repo
 	DIST='$(DIST)'; sed -i "s/@DIST@/$${DIST%%[0-9]*}/g" $(DESTDIR)/etc/yum.repos.d/qubes-r4.repo
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins/
-	install -m 0644 misc/yum-qubes-hooks.py* $(DESTDIR)$(LIBDIR)/yum-plugins/
-	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
 	install -d -m 755 $(DESTDIR)/etc/pki/rpm-gpg
 	install -m 644 misc/RPM-GPG-KEY-qubes* $(DESTDIR)/etc/pki/rpm-gpg/
 	install -D -m 644 misc/session-stop-timeout.conf $(DESTDIR)$(LIBDIR)/systemd/system/user@.service.d/90-session-stop-timeout.conf
@@ -175,7 +173,10 @@ install-rh: install-systemd install-systemd-dropins install-sysvinit
 	install -D misc/qubes-serial-login $(DESTDIR)/$(SBINDIR)/qubes-serial-login
 	install -D -m 0644 misc/dracut-qubes.conf \
 		$(DESTDIR)/usr/lib/dracut/dracut.conf.d/30-qubes.conf
-
+ifeq ($(shell rpm --eval %{centos_ver}),7)
+	install -D -m 0644 misc/yum-qubes-hooks.py $(DESTDIR)$(LIBDIR)/yum-plugins/
+	install -D -m 0644 misc/yum-qubes-hooks.conf $(DESTDIR)/etc/yum/pluginconf.d/yum-qubes-hooks.conf
+endif
 	install -D -m 0644 misc/dnf-qubes-hooks.py \
 		$(DESTDIR)$(PYTHON2_SITELIB)/dnf-plugins/qubes-hooks.py
 	install -D -m 0644 misc/dnf-qubes-hooks.py \
