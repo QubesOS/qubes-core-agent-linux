@@ -320,6 +320,7 @@ install-common: install-doc
 	install -m 0755 misc/tinyproxy-wrapper $(DESTDIR)/usr/lib/qubes/tinyproxy-wrapper
 
 	install -m 0755 misc/qvm-console $(DESTDIR)$(BINDIR)/qvm-console
+	install -m 0755 misc/qvm-connect-tcp $(DESTDIR)$(BINDIR)/qvm-connect-tcp
 
 	install -d $(DESTDIR)/var/run/qubes
 	install -d $(DESTDIR)/rw

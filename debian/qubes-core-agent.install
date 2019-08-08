@@ -102,6 +102,7 @@ usr/bin/qvm-move-to-vm
 usr/bin/qvm-open-in-dvm
 usr/bin/qvm-open-in-vm
 usr/bin/qvm-run-vm
+usr/bin/qvm-connect-tcp
 usr/bin/qvm-console
 usr/bin/qvm-sync-clock
 usr/bin/xenstore-watch-qubes

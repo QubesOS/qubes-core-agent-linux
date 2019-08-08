@@ -633,6 +633,7 @@ rm -f %{name}-%{version}
 /usr/bin/qubes-open
 /usr/bin/qubes-session-autostart
 /usr/bin/qvm-console
+/usr/bin/qvm-connect-tcp
 %dir /usr/lib/qubes
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent
