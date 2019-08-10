@@ -884,12 +884,11 @@ void handle_trigger_io()
             handle_vchan_error("write hdr");
         if (libvchan_send(ctrl_vchan, &params, sizeof(params)) < 0)
             handle_vchan_error("write params");
-    }
-    if (ret <= 0) {
+        /* do not close client_fd - we'll need it to send the connection details
+         * later (when dom0 accepts the request) */
+    } else {
         close(client_fd);
     }
-    /* do not close client_fd - we'll need it to send the connection details
-     * later (when dom0 accepts the request) */
 }
 
 void handle_terminated_fork_client(fd_set *rdset) {
