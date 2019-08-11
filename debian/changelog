@@ -1,3 +1,34 @@
+qubes-core-agent (4.1.3-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Remove dead code
+  * Specify expected shell in su calls
+
+  [ Patrick Schleizer ]
+  * use long options rather than short options
+  * use long rather than short option names;
+
+  [ M. Vefa Bicakci ]
+  * dom0-updates: Quote arguments
+
+  [ Patrick Schleizer ]
+  * use tor+http for onion
+
+  [ Anastasia Cotorobai ]
+  * yum-qubes-hooks: update with respect to dnf-qubes-hooks
+
+  [ Frédéric Pierret (fepitre) ]
+  * yum-plugin-hooks: package only for CentOS 7
+  * Allow creating TCP sockets between qubes
+  * Add qvm-connect-tool to ease creating ad-hoc connections
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: depend on xen-utils-guest
+  * dnf: clear updates-available flag when dnf update yields no updates
+  * Fix downloading dom0 updates on Debian
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 11 Aug 2019 07:26:02 +0200
+
 qubes-core-agent (4.1.2-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
