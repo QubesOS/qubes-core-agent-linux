@@ -52,6 +52,7 @@ Depends:
     xdg-user-dirs,
     xdg-utils,
     xen-utils-common,
+    xen-utils-guest,
     xenstore-utils,
     ${python:Depends},
     ${shlibs:Depends},
