@@ -55,6 +55,7 @@ etc/systemd/system/haveged.service
 etc/udev/rules.d/50-qubes-misc.rules
 lib/modules-load.d/qubes-core.conf
 lib/systemd/system-preset/75-qubes-vm.preset
+lib/systemd/system/boot.automount.d/30_qubes.conf
 lib/systemd/system/ModemManager.service.d/30_qubes.conf
 lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
 lib/systemd/system/NetworkManager.service.d/30_qubes.conf
