@@ -1,3 +1,9 @@
+qubes-core-agent (4.1.4-1) unstable; urgency=medium
+
+  * Disable boot.automount which is created by systemd automatically
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 21 Aug 2019 10:34:49 +0200
+
 qubes-core-agent (4.1.3-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
