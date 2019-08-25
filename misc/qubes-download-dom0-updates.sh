@@ -7,7 +7,7 @@ CLEAN=0
 CHECK_ONLY=0
 OPTS="--installroot $DOM0_UPDATES_DIR"
 if [ -f "$DOM0_UPDATES_DIR/etc/dnf/dnf.conf" ]; then
-    OPTS="$OPTS --config=$DOM0_UPDATES_DIR/etc/yum.conf"
+    OPTS="$OPTS --config=$DOM0_UPDATES_DIR/etc/dnf/dnf.conf"
 elif [ -f "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
     OPTS="$OPTS --config=$DOM0_UPDATES_DIR/etc/yum.conf"
 fi
