@@ -1,0 +1,3 @@
+## Disable caching of packages in all apt operations
+
+APT::Keep-Downloaded-Packages "0";
