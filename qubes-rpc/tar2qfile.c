@@ -957,7 +957,6 @@ void tar_file_processor(int fd, struct filters *filters)
 
 int main(int argc, char **argv)
 {
-	int i;
 	char *entry;
 	int fd = -1;
 	int use_stdin = 1;
@@ -967,18 +966,15 @@ int main(int argc, char **argv)
 	/* when extracting backup header, dom0 will terminate the transfer with
 	 * EDQUOT just after getting qubes.xml */
 	set_ignore_quota_error(1);
-	for (i = 1; i < argc; i++) {
-		set_nonblock(0);
-		if (strcmp(argv[i], "-")==0) {
+	set_nonblock(0);
+	if (argc > 1) {
+		if (strcmp(argv[1], "-")==0) {
 			use_stdin = 1;
-			i++;
-			break;
 		} else {
-			// Parse tar file
 			use_stdin = 0;
-			entry = argv[i];
+			entry = argv[1];
 #ifdef DEBUG
-			fprintf(stderr,"Parsing file %s\n",entry);
+			fprintf(stderr, "Parsing file %s\n",entry);
 #endif
 
 			fd = open(entry, O_RDONLY);
@@ -986,12 +982,14 @@ int main(int argc, char **argv)
 				fprintf(stderr,"Error opening file %s\n",entry);
 				exit(2);
 			}
-			i++;
-			break;
 		}
 	}
-	filters.filters_count = argc-i;
-	filters.filters = argv+i;
+	// Parse tar file
+	if (argc > 2)
+		filters.filters_count = argc-2;
+	else
+		filters.filters_count = 0;
+	filters.filters = argv+2;
 	filters.filters_matches = calloc(filters.filters_count, sizeof(int));
 	if (filters.filters_matches == NULL) {
 	    perror("calloc");
