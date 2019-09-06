@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 #
-# The Qubes OS Project, https://www.qubes-os.org
+# The Qubes OS Project, https://www.qubes-os.org#
 #
 # Copyright (C) 2017 Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
 #
@@ -21,5 +21,68 @@ set -e
 #
 #
 
-# shellcheck disable=SC2016
-exec "$0-to-vm" '$default' "$@"
+PROGRAM_NAME=${0##*/}
+
+if [ "$PROGRAM_NAME" = "qvm-move-to-vm" ] || [ "$PROGRAM_NAME" = "qvm-move" ]; then
+  OPERATION_TYPE="move"
+else
+  OPERATION_TYPE="copy"
+fi
+
+if [ "$PROGRAM_NAME" = "qvm-move-to-vm" ] || [ "$PROGRAM_NAME" = "qvm-copy-to-vm" ]; then
+  TARGET_TYPE="vm"
+else
+  TARGET_TYPE="default"
+fi
+
+
+if { [ $# -lt 2 ] && [ "$TARGET_TYPE" = "vm" ];} || { [ $# -lt 1 ] && [ "$TARGET_TYPE" = "default" ];} ; then
+
+	if [ $TARGET_TYPE = "vm" ]; then
+		echo "usage: $0 [--without-progress] destination_qube_name FILE [FILE ...]"
+	else
+		echo "usage: $0 [--without-progress] FILE [FILE ...]"
+	fi
+
+	echo
+
+	if [ $OPERATION_TYPE = "move" ] ; then
+		echo "Move FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
+	else
+		echo "Copy FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
+	fi
+
+	echo
+	echo "You will be prompted to select the destination qube. If FILE is a directory, it will be copied recursively."
+	exit 1
+fi
+
+if [ "$1" = "--without-progress" ] ; then
+	export PROGRESS_TYPE=none
+	shift
+else
+	export PROGRESS_TYPE=console
+fi
+
+if [ "$TARGET_TYPE" = "vm" ]; then
+  VM="$1"
+  shift
+else
+  VM="@default"
+fi
+
+if [ $PROGRESS_TYPE = console ] ; then
+    FILECOPY_TOTAL_SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
+    export FILECOPY_TOTAL_SIZE
+fi
+
+if [ "$TARGET_TYPE" = "vm" ]; then
+    echo "qvm-copy-to-vm/qvm-move-to-vm tools are deprecated," >&2
+    echo "use qvm-copy/qvm-move to avoid typing target qube name twice" >&2
+fi
+
+/usr/lib/qubes/qrexec-client-vm "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
+
+if [ "$OPERATION_TYPE" = "move" ] ; then
+	rm -rf -- "$@"
+fi
