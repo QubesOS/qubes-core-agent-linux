@@ -75,6 +75,12 @@ int main(int argc, char ** argv)
     for (i = 3; i < argc; i++) {
         if (strcmp(argv[i], "-v") == 0)
             set_verbose(1);
+        else if (strcmp(argv[i], "-w") == 0)
+            if (i+1 < argc && argv[i+1][0] != '-') {
+                set_wait_for_space(atoi(argv[i+1]));
+                i++;
+            } else
+                set_wait_for_space(1);
         else
             gui_fatal("Invalid option %s", argv[i]);
     }
