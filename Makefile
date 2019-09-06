@@ -236,10 +236,10 @@ install-common: install-doc
 	install -m 0755 misc/qubes-run-terminal $(DESTDIR)/$(BINDIR)
 	install -D -m 0644 misc/qubes-run-terminal.desktop $(DESTDIR)/$(APPLICATIONSDIR)/qubes-run-terminal.desktop
 	install -m 0755 qubes-rpc/qvm-sync-clock $(DESTDIR)$(BINDIR)/qvm-sync-clock
-	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy-to-vm,qvm-run-vm} $(DESTDIR)/usr/bin
-	install qubes-rpc/qvm-copy $(DESTDIR)/usr/bin
-	ln -s qvm-copy-to-vm $(DESTDIR)/usr/bin/qvm-move-to-vm
+	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy,qvm-run-vm} $(DESTDIR)/usr/bin
+	ln -s qvm-copy $(DESTDIR)/usr/bin/qvm-move-to-vm
 	ln -s qvm-copy $(DESTDIR)/usr/bin/qvm-move
+	ln -s qvm-copy $(DESTDIR)/usr/bin/qvm-copy-to-vm
 	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
 	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes/qvm-move-to-vm.gnome
 	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes/qvm-copy-to-vm.kde
