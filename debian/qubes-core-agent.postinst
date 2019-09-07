@@ -27,7 +27,7 @@ debug() {
 }
 
 is_static() {
-    [ -f "/lib/sytemd/system/$1" ] && ! grep -q '^[[].nstall]' "/lib/systemd/system/$1"
+    [ -f "/lib/systemd/system/$1" ] && ! grep -q '^[[].nstall]' "/lib/systemd/system/$1"
 }
 
 is_masked() {
