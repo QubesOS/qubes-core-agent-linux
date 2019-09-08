@@ -142,6 +142,11 @@ Requires:   python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 %else
 Requires:   python2-dnf-plugins-qubes-hooks
 %endif
+%if 0%{?rhel} == 7
+Requires: python-setuptools
+%else
+Requires: python2-setuptools
+%endif
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
 Provides:   qubes-core-vm = %{version}-%{release}
