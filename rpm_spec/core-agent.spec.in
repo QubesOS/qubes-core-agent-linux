@@ -138,6 +138,11 @@ Requires:   qubes-core-qrexec-vm
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 Requires:   python%{python3_pkgversion}-dnf-plugins-qubes-hooks
+%if 0%{?rhel} == 7
+Requires: python-setuptools
+%else
+Requires: python%{python3_pkgversion}-setuptools
+%endif
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
 Provides:   qubes-core-vm = %{version}-%{release}
