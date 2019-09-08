@@ -590,6 +590,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.DetachPciDevice
 %config(noreplace) /etc/qubes-rpc/qubes.Backup
 %config(noreplace) /etc/qubes-rpc/qubes.Restore
+%config(noreplace) /etc/qubes-rpc/qubes.RegisterBackupLocation
+%config(noreplace) /etc/qubes-rpc/qubes.RestoreById
 %config(noreplace) /etc/qubes-rpc/qubes.SelectFile
 %config(noreplace) /etc/qubes-rpc/qubes.SelectDirectory
 %config(noreplace) /etc/qubes-rpc/qubes.GetImageRGBA
