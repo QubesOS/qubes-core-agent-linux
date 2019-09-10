@@ -1,3 +1,42 @@
+qubes-core-agent (4.0.48-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * qrexec: close socket if qrexec-client-vm sent too short request
+  * Remove dead code
+  * Specify expected shell in su calls
+
+  [ Patrick Schleizer ]
+  * use long options rather than short options
+  * use long rather than short option names;
+
+  [ M. Vefa Bicakci ]
+  * dom0-updates: Quote arguments
+
+  [ Patrick Schleizer ]
+  * use tor+http for onion
+
+  [ Marek Marczykowski-Górecki ]
+  * dnf: clear updates-available flag when dnf update yields no updates
+
+  [ Anastasia Cotorobai ]
+  * yum-qubes-hooks: update with respect to dnf-qubes-hooks
+
+  [ Frédéric Pierret (fepitre) ]
+  * yum-plugin-hooks: package only for CentOS 7
+  * Allow creating TCP sockets between qubes
+  * Add qvm-connect-tool to ease creating ad-hoc connections
+
+  [ Marek Marczykowski-Górecki ]
+  * Disable boot.automount which is created by systemd automatically
+
+  [ unman ]
+  * Fix typo
+
+  [ Marta Marczykowska-Górecka ]
+  * Make qvm-copy/move[-to-vm] one script
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 10 Sep 2019 03:32:50 +0200
+
 qubes-core-agent (4.0.47-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
