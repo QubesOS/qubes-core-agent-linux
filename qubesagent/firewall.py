@@ -1,4 +1,3 @@
-#!/usr/bin/python2 -O
 # vim: fileencoding=utf-8
 
 #
@@ -103,7 +102,8 @@ class FirewallWorker(object):
         entries = self.qdb.multiread('/qubes-firewall/{}/'.format(target))
         assert isinstance(entries, dict)
         # drop full path
-        entries = dict(((k.split('/')[3], v) for k, v in entries.items()))
+        entries = dict(((k.split('/')[3], v.decode())
+                        for k, v in entries.items()))
         if 'policy' not in entries:
             raise RuleParseError('No \'policy\' defined')
         policy = entries.pop('policy')
@@ -377,7 +377,7 @@ class IptablesWorker(FirewallWorker):
         try:
             self.run_ipt(family, ['-F', chain])
             p = self.run_ipt_restore(family, ['-n'])
-            (output, _) = p.communicate(iptables)
+            (output, _) = p.communicate(iptables.encode())
             if p.returncode != 0:
                 raise RuleApplyError(
                     'iptables-restore failed: {}'.format(output))
@@ -437,7 +437,7 @@ class NftablesWorker(FirewallWorker):
                              stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT)
-        stdout, _ = p.communicate(nft_input)
+        stdout, _ = p.communicate(nft_input.encode())
         if p.returncode != 0:
             raise RuleApplyError('nft failed: {}'.format(stdout))
 
