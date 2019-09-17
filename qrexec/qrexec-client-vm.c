@@ -86,16 +86,30 @@ void convert_target_name_keyword(char *target)
             target[i] = '@';
 }
 
+enum {
+    opt_no_filter_stdout = 't'+128,
+    opt_no_filter_stderr = 'T'+128,
+};
+
 struct option longopts[] = {
     { "buffer-size", required_argument, 0,  'b' },
+    { "filter-escape-chars-stdout", no_argument, 0, 't'},
+    { "filter-escape-chars-stderr", no_argument, 0, 'T'},
+    { "no-filter-escape-chars-stdout", no_argument, 0, opt_no_filter_stdout},
+    { "no-filter-escape-chars-stderr", no_argument, 0, opt_no_filter_stderr},
     { NULL, 0, 0, 0},
 };
 
 _Noreturn void usage(const char *argv0) {
     fprintf(stderr,
-            "usage: %s [--buffer-size=BUFFER_SIZE] target_vmname program_ident [local_program [local program arguments]]\n",
+            "usage: %s [options] target_vmname program_ident [local_program [local program arguments]]\n",
             argv0);
-    fprintf(stderr, "BUFFER_SIZE is minimum vchan buffer size (default: 64k)\n");
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "  --buffer-size=BUFFER_SIZE - minimum vchan buffer size (default: 64k)\n");
+    fprintf(stderr, "  -t, --filter-escape-chars-stdout - filter non-ASCII and control characters on stdout (default if stdout is a terminal)\n");
+    fprintf(stderr, "  -T, --filter-escape-chars-stderr - filter non-ASCII and control characters on stderr (default if stderr is a terminal)\n");
+    fprintf(stderr, "  --no-filter-escape-chars-stdout - opposite to --filter-escape-chars-stdout\n");
+    fprintf(stderr, "  --no-filter-escape-chars-stderr - opposite to --filter-escape-chars-stderr\n");
     exit(2);
 }
 
@@ -113,12 +127,24 @@ int main(int argc, char **argv)
     int opt;
 
     while (1) {
-        opt = getopt_long(argc, argv, "+", longopts, NULL);
+        opt = getopt_long(argc, argv, "+tT", longopts, NULL);
         if (opt == -1)
             break;
         switch (opt) {
             case 'b':
                 buffer_size = atoi(optarg);
+                break;
+            case 't':
+                replace_chars_stdout = 1;
+                break;
+            case 'T':
+                replace_chars_stderr = 1;
+                break;
+            case opt_no_filter_stdout:
+                replace_chars_stdout = 0;
+                break;
+            case opt_no_filter_stderr:
+                replace_chars_stderr = 0;
                 break;
             case '?':
                 usage(argv[0]);
@@ -131,6 +157,13 @@ int main(int argc, char **argv)
     if (argc - optind > 2) {
         start_local_process = 1;
     }
+
+    if (!start_local_process) {
+        if (replace_chars_stdout == -1 && isatty(1))
+            replace_chars_stdout = 1;
+    }
+    if (replace_chars_stderr == -1 && isatty(2))
+        replace_chars_stderr = 1;
 
     trigger_fd = connect_unix_socket(QREXEC_AGENT_TRIGGER_PATH);
 
