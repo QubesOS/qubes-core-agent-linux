@@ -14,7 +14,7 @@ class DummyIptablesRestore(object):
         self.returncode = 0
 
     def communicate(self, stdin=None):
-        self._worker_mock.loaded_iptables[self._family] = stdin
+        self._worker_mock.loaded_iptables[self._family] = stdin.decode()
         return ("", None)
 
 class DummyQubesDB(object):
@@ -480,18 +480,18 @@ class TestFirewallWorker(TestCase):
         self.obj = FirewallWorker()
         rules = {
             '10.137.0.1': {
-                'policy': 'accept',
-                '0000': 'proto=tcp dstports=80-80 action=drop',
-                '0001': 'proto=udp specialtarget=dns action=accept',
-                '0002': 'proto=udp action=drop',
+                'policy': b'accept',
+                '0000': b'proto=tcp dstports=80-80 action=drop',
+                '0001': b'proto=udp specialtarget=dns action=accept',
+                '0002': b'proto=udp action=drop',
             },
-            '10.137.0.2': {'policy': 'accept'},
+            '10.137.0.2': {'policy': b'accept'},
             # no policy
-            '10.137.0.3': {'0000': 'proto=tcp action=accept'},
+            '10.137.0.3': {'0000': b'proto=tcp action=accept'},
             # no action
             '10.137.0.4': {
-                'policy': 'drop',
-                '0000': 'proto=tcp'
+                'policy': b'drop',
+                '0000': b'proto=tcp'
             },
         }
         for addr, entries in rules.items():

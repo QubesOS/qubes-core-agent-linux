@@ -124,9 +124,9 @@ Requires:   hostname
 Requires:   xterm
 # for qubes-desktop-run
 Requires:   pygobject3-base
-Requires:   dbus-python
+Requires:   python3-dbus
 # for qubes-session-autostart, xdg-icon
-Requires:   pyxdg
+Requires:   python3-pyxdg
 Requires:   python3-daemon
 # for qvm-feature-request
 Requires:   python3-qubesdb
@@ -669,7 +669,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/resize-rootfs-if-needed.sh
 /usr/lib/qubes/init/setup-rw.sh
 /usr/lib/qubes/init/setup-rwdev.sh
-/usr/lib/qubes/init/functions
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
 /usr/share/applications/qubes-run-terminal.desktop
@@ -681,13 +680,14 @@ rm -f %{name}-%{version}
 /usr/share/glib-2.0/schemas/20_org.gnome.desktop.wm.preferences.qubes.gschema.override
 %{_mandir}/man1/qvm-*.1*
 
-%dir %{python2_sitelib}/qubesagent-*-py2.7.egg-info
-%{python2_sitelib}/qubesagent-*-py2.7.egg-info/*
-%dir %{python2_sitelib}/qubesagent
-%{python2_sitelib}/qubesagent/__init__.py*
-%{python2_sitelib}/qubesagent/firewall.py*
-%{python2_sitelib}/qubesagent/test_firewall.py*
-%{python2_sitelib}/qubesagent/xdg.py*
+%dir %{python3_sitelib}/qubesagent-*-py*.egg-info
+%{python3_sitelib}/qubesagent-*-py*.egg-info/*
+%{python3_sitelib}/qubesagent/__pycache__
+%dir %{python3_sitelib}/qubesagent
+%{python3_sitelib}/qubesagent/__init__.py*
+%{python3_sitelib}/qubesagent/firewall.py*
+%{python3_sitelib}/qubesagent/test_firewall.py*
+%{python3_sitelib}/qubesagent/xdg.py*
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc
