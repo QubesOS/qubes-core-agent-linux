@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # Send the command to the remote side, and then transfer stdin from local to
 # remote and stdout from remote to local.
 #

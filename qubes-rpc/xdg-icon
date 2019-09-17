@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 import xdg.IconTheme
 import sys
 import os
@@ -7,7 +7,7 @@ themes = ['Humanity', 'Adwaita', 'gnome', 'oxygen']
 themes = themes + sorted([d for d in os.listdir("/usr/share/icons") if d not in themes and os.path.isdir("/usr/share/icons/" + d)])
 
 if len(sys.argv) < 3:
-	print "Usage:", sys.argv[0], "ICON SIZE"
+	print("Usage:", sys.argv[0], "ICON SIZE")
 	sys.exit(1)
 
 for theme in themes:
@@ -18,4 +18,4 @@ for theme in themes:
 if icon is None:
 	sys.exit(1)
 
-print icon
+print(icon)
