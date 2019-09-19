@@ -40,8 +40,8 @@ Depends:
     procps,
     util-linux,
     e2fsprogs,
-    python2.7,
     python3-daemon,
+    python3-distutils,
     python3-qubesdb,
     python3-gi,
     python3-xdg,
@@ -54,7 +54,7 @@ Depends:
     xdg-utils,
     xen-utils-common,
     xenstore-utils,
-    ${python:Depends},
+    ${python3:Depends},
     ${shlibs:Depends},
     ${misc:Depends}
 Recommends:
@@ -136,7 +136,7 @@ Depends:
     socat,
     tinyproxy,
     iproute2,
-    ${python:Depends},
+    ${python3:Depends},
     ${misc:Depends}
 Suggests:
     nftables,
