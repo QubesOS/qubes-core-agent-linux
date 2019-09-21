@@ -296,6 +296,10 @@ usermod -p '' root
 %install
 
 make install-vm DESTDIR=$RPM_BUILD_ROOT
+make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
+make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
+make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
+make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
 
 %if 0%{?rhel} >= 7
 sed -i \

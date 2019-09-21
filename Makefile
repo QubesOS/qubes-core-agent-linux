@@ -3,8 +3,6 @@ RPMS_DIR=rpm/
 VERSION := $(shell cat version)
 
 DIST ?= fc18
-KDESERVICEDIR ?= /usr/share/kde4/services
-KDE5SERVICEDIR ?= /usr/share/kservices5/ServiceMenus/
 APPLICATIONSDIR ?= /usr/share/applications
 SBINDIR ?= /usr/sbin
 BINDIR ?= /usr/bin
@@ -235,69 +233,6 @@ install-common: install-doc
 	install -m 0755 misc/qvm-features-request $(DESTDIR)$(BINDIR)/qvm-features-request
 	install -m 0755 misc/qubes-run-terminal $(DESTDIR)/$(BINDIR)
 	install -D -m 0644 misc/qubes-run-terminal.desktop $(DESTDIR)/$(APPLICATIONSDIR)/qubes-run-terminal.desktop
-	install -m 0755 qubes-rpc/qvm-sync-clock $(DESTDIR)$(BINDIR)/qvm-sync-clock
-	install qubes-rpc/{qvm-open-in-dvm,qvm-open-in-vm,qvm-copy,qvm-run-vm} $(DESTDIR)/usr/bin
-	ln -s qvm-copy $(DESTDIR)/usr/bin/qvm-move-to-vm
-	ln -s qvm-copy $(DESTDIR)/usr/bin/qvm-move
-	ln -s qvm-copy $(DESTDIR)/usr/bin/qvm-copy-to-vm
-	install qubes-rpc/qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes
-	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes/qvm-move-to-vm.gnome
-	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes/qvm-copy-to-vm.kde
-	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(LIBDIR)/qubes/qvm-move-to-vm.kde
-	install qubes-rpc/qvm-actions.sh $(DESTDIR)$(LIBDIR)/qubes
-	install -m 0644 misc/uca_qubes.xml $(DESTDIR)$(LIBDIR)/qubes
-	mkdir -p $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
-	install -m 0644 misc/thunar.xml $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
-	install qubes-rpc/xdg-icon $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/{vm-file-editor,qfile-agent,qopen-in-vm} $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/qubes-open $(DESTDIR)$(BINDIR)
-	install qubes-rpc/tar2qfile $(DESTDIR)$(LIBDIR)/qubes
-	# Install qfile-unpacker as SUID - because it will fail to receive files from other vm
-	install -m 4755  qubes-rpc/qfile-unpacker $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/qrun-in-vm $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/prepare-suspend $(DESTDIR)$(LIBDIR)/qubes
-	install qubes-rpc/qubes-sync-clock $(DESTDIR)$(LIBDIR)/qubes
-	install -m 0644 misc/qubes-suspend-module-blacklist $(DESTDIR)/etc/qubes-suspend-module-blacklist
-	install -d $(DESTDIR)/$(KDESERVICEDIR)
-	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-move.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDESERVICEDIR)
-	install -d $(DESTDIR)/$(KDE5SERVICEDIR)
-	install -m 0644 qubes-rpc/{qvm-copy.desktop,qvm-move.desktop,qvm-dvm.desktop} $(DESTDIR)/$(KDE5SERVICEDIR)
-	install -d $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/{qubes.Filecopy,qubes.OpenInVM,qubes.VMShell} $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.VMRootShell $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.OpenURL $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/{qubes.SuspendPre,qubes.SuspendPost,qubes.GetAppmenus} $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.SuspendPreAll $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.SuspendPostAll $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.WaitForSession $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.DetachPciDevice $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.{Backup,Restore} $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.Select{File,Directory} $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.GetImageRGBA $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.SetDateTime $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.InstallUpdatesGUI $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.ResizeDisk $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.StartApp $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.PostInstall $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.GetDate $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.ShowInTerminal $(DESTDIR)/etc/qubes-rpc
-	install -m 0755 qubes-rpc/qubes.ConnectTCP $(DESTDIR)/etc/qubes-rpc
-	install -d $(DESTDIR)/etc/qubes/rpc-config
-	for config in qubes-rpc/*.config; do \
-		install -m 0644 $$config $(DESTDIR)/etc/qubes/rpc-config/`basename $$config .config`; \
-	done
-
-	install -d $(DESTDIR)/etc/qubes/suspend-pre.d
-	install -m 0644 qubes-rpc/suspend-pre.README $(DESTDIR)/etc/qubes/suspend-pre.d/README
-	install -d $(DESTDIR)/etc/qubes/suspend-post.d
-	install -m 0644 qubes-rpc/suspend-post.README $(DESTDIR)/etc/qubes/suspend-post.d/README
-	install -m 0755 qubes-rpc/suspend-post-qvm-sync-clock.sh \
-		$(DESTDIR)/etc/qubes/suspend-post.d/qvm-sync-clock.sh
-	install -d $(DESTDIR)/etc/qubes/post-install.d
-	install -m 0644 post-install.d/README $(DESTDIR)/etc/qubes/post-install.d/
-	install -m 0755 post-install.d/*.sh $(DESTDIR)/etc/qubes/post-install.d/
-	install -d $(DESTDIR)/usr/share/nautilus-python/extensions
-	install -m 0644 qubes-rpc/*_nautilus.py $(DESTDIR)/usr/share/nautilus-python/extensions
 
 	install -D -m 0644 misc/dconf-db-local-dpi $(DESTDIR)/etc/dconf/db/local.d/dpi
 
