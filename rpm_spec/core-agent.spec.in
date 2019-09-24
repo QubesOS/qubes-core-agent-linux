@@ -554,7 +554,6 @@ rm -f %{name}-%{version}
 %{kde5_service_dir}/qvm-copy.desktop
 %{kde5_service_dir}/qvm-move.desktop
 %{kde5_service_dir}/qvm-dvm.desktop
-%config(noreplace) /etc/X11/xorg-preload-apps.conf
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 %dir /etc/qubes-rpc
