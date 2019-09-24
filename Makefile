@@ -240,8 +240,6 @@ install-common: install-doc
 
 	install -d $(DESTDIR)/mnt/removable
 
-	install -D -m 0644 misc/xorg-preload-apps.conf $(DESTDIR)/etc/X11/xorg-preload-apps.conf
-
 	install -d $(DESTDIR)/usr/lib/qubes-bind-dirs.d
 	install -D -m 0644 misc/30_cron.conf $(DESTDIR)/usr/lib/qubes-bind-dirs.d/30_cron.conf
 
