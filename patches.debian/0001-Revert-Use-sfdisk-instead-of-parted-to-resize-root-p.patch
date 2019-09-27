@@ -25,7 +25,7 @@ index 1c2fca3c..bebf1011 100755
          ;;
      ca:3)
 -        # resize partition table itself and xda3 partition
--        echo ',+' | sfdisk --no-reread -q -N 3 /dev/xvda
+-        echo ',+' | sfdisk --no-reread --no-tell-kernel -q -N 3 /dev/xvda
 +        # resize partition table itself
 +        # use undocumented ---pretend-input-tty (yes, three '-') to
 +        # force unattended operation, otherwise it aborts on first

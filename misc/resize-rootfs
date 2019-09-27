@@ -9,7 +9,7 @@ case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
         ;;
     ca:3)
         # resize partition table itself and xda3 partition
-        echo ',+' | sfdisk --no-reread -q -N 3 /dev/xvda
+        echo ',+' | sfdisk --no-reread --no-tell-kernel -q -N 3 /dev/xvda
         # and reload partition table; prefer partprobe over blockdev
         # --rereadpt, as it works on mounted partitions
         partprobe /dev/xvda
