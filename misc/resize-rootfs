@@ -13,6 +13,7 @@ case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
         # and reload partition table; prefer partprobe over blockdev
         # --rereadpt, as it works on mounted partitions
         partprobe /dev/xvda
+        udevadm settle
         ;;
     ca:*)
         echo "Unsupported partition layout, resize it manually" >&2
