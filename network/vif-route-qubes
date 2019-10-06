@@ -100,12 +100,15 @@ case "$command" in
         ipcmd='add'
         iptables_cmd='-I PREROUTING 1'
         cmdprefix=''
+        ipv6_disabled=$(cat /proc/sys/net/ipv6/conf/"${vif}"/disable_ipv6 || echo 1)
         ;;
     offline)
         do_without_error ifdown "${vif}"
         ipcmd='del'
         iptables_cmd='-D PREROUTING'
         cmdprefix='do_without_error'
+        # cleanup IPv6 config even if _now_ it is disabled
+        ipv6_disabled=0
         ;;
 esac
 
@@ -115,11 +118,16 @@ domid=${domid/.*/}
 #  32752 is max XID aka domid
 metric=$(( 32752 - domid ))
 
+
 if [ "${ip}" ]; then
     # If we've been given a list of IP addresses, then add routes from dom0 to
     # the guest using those addresses.
     for addr in ${ip};
     do
+        if [[ "$addr" = *:* ]] && [[ "$ipv6_disabled" = 1 ]]; then
+            log error "Cannot set IPv6 route to ${addr}, IPv6 disabled in the kernel"
+            continue
+        fi
         ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
         if [[ "$addr" = *:* ]]; then
             ipt=ip6tables-restore
@@ -137,7 +145,7 @@ if [ "${ip}" ]; then
             ${cmdprefix} ip6tables-restore --noflush $ipt_arg
     fi
     ${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
-    if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]]; then
+    if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]] && [[ "$ipv6_disabled" != 1 ]]; then
         ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
     fi
 else
