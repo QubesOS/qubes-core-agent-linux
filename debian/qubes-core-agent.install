@@ -107,8 +107,8 @@ usr/bin/qvm-connect-tcp
 usr/bin/qvm-console
 usr/bin/qvm-sync-clock
 usr/bin/xenstore-watch-qubes
-usr/lib/python2.7/dist-packages/qubesagent-*.egg-info/*
-usr/lib/python2.7/dist-packages/qubesagent/*
+usr/lib/python3/dist-packages/qubesagent-*.egg-info/*
+usr/lib/python3/dist-packages/qubesagent/*
 usr/lib/qubes-bind-dirs.d/30_cron.conf
 usr/lib/qubes/close-window
 usr/lib/qubes/init/bind-dirs.sh

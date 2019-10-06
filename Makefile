@@ -11,7 +11,7 @@ BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
-PYTHON ?= /usr/bin/python2
+PYTHON ?= /usr/bin/python3
 PYTHON_SITEARCH = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)')
 PYTHON2_SITELIB = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()')
 PYTHON3_SITELIB = $(shell python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')

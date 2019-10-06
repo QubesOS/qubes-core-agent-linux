@@ -1,9 +1,9 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # The Qubes OS Project, http://www.qubes-os.org
 #
-# Copyright (C) 2015  Marek Marczykowski-Górecki
+# Copyright (C) 2015-2019  Marek Marczykowski-Górecki
 #                                        <marmarek@invisiblethingslab.com>
 #
 # This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 #
-import subprocess
 import sys
 
 from xdg.DesktopEntry import DesktopEntry
@@ -78,8 +77,9 @@ def process_autostart(environments):
                 if entry_should_be_started(entry, environments):
                     launch(entry_path, wait=False)
             except Exception as e:
-                print >>sys.stderr, "Failed to process '{}': {}".format(
-                    entry_name, str(e)
+                print("Failed to process '{}': {}".format(
+                    entry_name, str(e)),
+                    file=sys.stderr
                 )
 
 def main():
