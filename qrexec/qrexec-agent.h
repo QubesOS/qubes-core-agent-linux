@@ -32,6 +32,10 @@ void do_exec(char *cmd);
 /* call before fork() for service handling process (either end) */
 void prepare_child_env();
 
+// whether qrexec-client should replace problematic bytes with _ before printing the output
+extern int replace_chars_stdout;
+extern int replace_chars_stderr;
+
 pid_t handle_new_process(int type,
         int connect_domain, int connect_port,
         char *cmdline, int cmdline_len);
