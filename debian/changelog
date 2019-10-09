@@ -1,3 +1,38 @@
+qubes-core-agent (4.1.5-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: fix dnf.conf path
+
+  [ unman ]
+  * Fix typo
+  * NetworkManager config - Add dns=default
+
+  [ Patrick Schleizer ]
+  * Mount /rw and /home with nosuid + nodev
+
+  [ Marta Marczykowska-Górecka ]
+  * Make qvm-copy/move[-to-vm] one script
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix misleading error message on rootfs resize
+  * resize-rootfs: wait for partition table to reload
+  * network: don't fail the whole vif setup if IPv6 is disabled
+
+  [ Frédéric Pierret (fepitre) ]
+  * Update python2 dependencies to python3 and clean deprecated
+    requirements
+  * Require python setuptools
+
+  [ Marek Marczykowski-Górecki ]
+  * Minor codestyle fix in qubesadmin/firewall.py
+  * Convert qubesagent module to python3
+  * Convert other scripts to python3
+  * Use spaces in xdg-icon script
+  * debian: switch to python3
+  * rpm: switch deps to python3-setuptools on CentOS too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 09 Oct 2019 04:15:20 +0200
+
 qubes-core-agent (4.1.4-1) unstable; urgency=medium
 
   * Disable boot.automount which is created by systemd automatically
