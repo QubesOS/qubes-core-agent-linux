@@ -1,3 +1,10 @@
+qubes-core-agent (4.0.50-1) unstable; urgency=medium
+
+  * qrexec-client-vm: add option to replace control characters on
+    stdout/err
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 09 Oct 2019 05:22:01 +0200
+
 qubes-core-agent (4.0.49-1) unstable; urgency=medium
 
   [ unman ]
