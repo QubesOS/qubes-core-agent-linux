@@ -1,3 +1,15 @@
+qubes-core-agent (4.0.49-1) unstable; urgency=medium
+
+  [ unman ]
+  * NetworkManager config - Add dns=default
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix misleading error message on rootfs resize
+  * resize-rootfs: wait for partition table to reload
+  * network: don't fail the whole vif setup if IPv6 is disabled
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 09 Oct 2019 04:54:24 +0200
+
 qubes-core-agent (4.0.48-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
