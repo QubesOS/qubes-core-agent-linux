@@ -13,6 +13,8 @@ elif [ -f "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
 fi
 # DNF uses /etc/yum.repos.d, even when --installroot is specified
 OPTS="$OPTS --setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d"
+# DNF verifies signatures implicitly, but yumdownloader does not.
+SIGNATURE_REGEX=""
 PKGLIST=()
 YUM_ACTION=
 
@@ -116,6 +118,13 @@ YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y --downloadonly"
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
 if ! $YUM --help | grep -q downloadonly; then
+    if dpkg --compare-versions \
+            "$(dpkg-query --show --showformat='${version}' rpm)" gt 4.14; then
+        SIGNATURE_REGEX="^[A-Za-z0-9._+-/]{1,128}\.rpm: digests signatures OK$"
+    else
+        SIGNATURE_REGEX="^[A-Za-z0-9._+-/]{1,128}\.rpm: [a-z0-9() ]* (pgp|gpg) [a-z0-9 ]* OK$"
+    fi
+
     # setup environment for yumdownloader to be happy
     if [ ! -e "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
         ln -nsf dnf/dnf.conf "$DOM0_UPDATES_DIR/etc/yum.conf"
@@ -170,6 +179,30 @@ find "$DOM0_UPDATES_DIR/var/cache" -name '*.rpm' -print0 2>/dev/null |\
     xargs -0 -r ln -f -t "$DOM0_UPDATES_DIR/packages/"
 
 if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
+    if [ -n "$SIGNATURE_REGEX" ]; then
+        rpmkeys_error=0
+        for pkg in "$DOM0_UPDATES_DIR"/packages/*.rpm; do
+            rpmkeys_exit_code=0
+            output="$(rpmkeys --root "$DOM0_UPDATES_DIR" --checksig "$pkg")" \
+                || rpmkeys_exit_code="$?"
+            if [ ! "$rpmkeys_exit_code" = "0" ]; then
+                echo "ERROR: could not verify $pkg" >&2
+                rpmkeys_error=1
+                rm "$pkg"
+            elif ! echo "$output" |grep -Pq "$SIGNATURE_REGEX"; then
+                echo "ERROR: missing or invalid signature for $pkg" >&2
+                rpmkeys_error=1
+                rm "$pkg"
+            else
+                echo "Successfully verified $pkg"
+            fi
+        done
+        if [ ! "$rpmkeys_error" = "0" ]; then
+            echo "ERROR: could not verify one or more packages" >&2
+            exit 1
+        fi
+    fi
+
     cmd="/usr/lib/qubes/qrexec-client-vm dom0 qubes.ReceiveUpdates /usr/lib/qubes/qfile-agent"
     qrexec_exit_code=0
     $cmd "$DOM0_UPDATES_DIR"/packages/*.rpm || { qrexec_exit_code=$? ; true; };
