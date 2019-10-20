@@ -291,6 +291,10 @@ usermod -p '' root
 %install
 
 make install-vm DESTDIR=$RPM_BUILD_ROOT
+make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
+make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
+make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
+make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
 
 %if 0%{?rhel} >= 7
 sed -i \
@@ -535,7 +539,6 @@ rm -f %{name}-%{version}
 %{kde5_service_dir}/qvm-copy.desktop
 %{kde5_service_dir}/qvm-move.desktop
 %{kde5_service_dir}/qvm-dvm.desktop
-%config(noreplace) /etc/X11/xorg-preload-apps.conf
 /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 %dir /etc/qubes-rpc

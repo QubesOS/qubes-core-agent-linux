@@ -1,4 +1,3 @@
-etc/X11/xorg-preload-apps.conf
 etc/apt/apt.conf.d/00notify-hook
 etc/apt/apt.conf.d/70no-unattended
 etc/apt/sources.list.d/qubes-r4.list
