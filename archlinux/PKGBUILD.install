@@ -355,7 +355,7 @@ post_install() {
             continue
         fi
 
-        if [ "$(basename "$f")" == "50-qubes-misc.rules" ] ; then
+        if [ "$(basename "$f")" == "50-qubes-mem-hotplug.rules" ] ; then
             continue
         fi
 

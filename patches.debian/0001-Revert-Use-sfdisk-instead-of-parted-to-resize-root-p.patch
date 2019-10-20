@@ -13,13 +13,13 @@ karelzak/util-linux#532, which is fixed only in util-linux 2.31.1+
 
 This reverts commit 9792438b3f02161e03d89dfd527ca2459092b478.
 ---
- misc/resize-rootfs | 9 +++++++--
+ qubes-rpc/resize-rootfs | 9 +++++++--
  1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/misc/resize-rootfs b/misc/resize-rootfs
+diff --git a/qubes-rpc/resize-rootfs b/qubes-rpc/resize-rootfs
 index 1c2fca3c..bebf1011 100755
---- a/misc/resize-rootfs
-+++ b/misc/resize-rootfs
+--- a/qubes-rpc/resize-rootfs
++++ b/qubes-rpc/resize-rootfs
 @@ -8,8 +8,13 @@ case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
          # nothing needed, xvda used directly
          ;;

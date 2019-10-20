@@ -16,10 +16,21 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	make install-deb
+	make -C app-defaults install
+	make -C app-menu install
+	make -C filesystem install
+	make -C misc install
+	make -C network install
+	make -C package-managers install
+	make -C package-managers install-apt
+	make -C passwordless-root install
+	make -C passwordless-root/debian install
+	make -C sys-defaults install
 	make -C qubes-rpc install
 	make -C qubes-rpc/kde install
 	make -C qubes-rpc/nautilus install
 	make -C qubes-rpc/thunar install
+	install -D -m 0644 boot/grub.qubes $(DESTDIR)/etc/default/grub.d/30-qubes.cfg
 
 override_dh_fixperms:
 	dh_fixperms -a -Xqfile-unpacker

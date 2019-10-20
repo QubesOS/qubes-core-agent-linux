@@ -42,7 +42,7 @@ install:
 	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-copy-to-vm.kde
 	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-move-to-vm.kde
 	install -t $(DESTDIR)$(QUBESLIBDIR) \
-		prepare-suspend \
+		prepare-suspend resize-rootfs \
 		qfile-agent qopen-in-vm qrun-in-vm qubes-sync-clock \
 		tar2qfile vm-file-editor xdg-icon
 	# Install qfile-unpacker as SUID, because it will fail to receive

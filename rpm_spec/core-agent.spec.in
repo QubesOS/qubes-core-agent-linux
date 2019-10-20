@@ -291,10 +291,23 @@ usermod -p '' root
 %install
 
 make install-vm DESTDIR=$RPM_BUILD_ROOT
+make -C app-defaults DESTDIR=$RPM_BUILD_ROOT install
+make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
+make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
+make -C filesystem DESTDIR=$RPM_BUILD_ROOT install
+make -C misc DESTDIR=$RPM_BUILD_ROOT install
+make -C network DESTDIR=$RPM_BUILD_ROOT install
+make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install
+make -C sys-defaults DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
+
+make -C package-managers DESTDIR=$RPM_BUILD_ROOT install install-dnf
+%if 0%{?rhel} == 7
+make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
+%endif
 
 %if 0%{?rhel} >= 7
 sed -i \
@@ -302,6 +315,9 @@ sed -i \
         -e 's:/fc:/centos:' \
         $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
 %endif
+
+install -D -m 0644 boot/dracut-qubes.conf $RPM_BUILD_ROOT/usr/lib/dracut/dracut.conf.d/30-qubes.conf
+install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
 
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
@@ -409,7 +425,7 @@ do
         continue
     fi
 
-    if [ $(basename $f) == "50-qubes-misc.rules" ] ; then
+    if [ $(basename $f) == "50-qubes-mem-hotplug.rules" ] ; then
         continue
     fi
 
@@ -592,9 +608,11 @@ rm -f %{name}-%{version}
 %dir /etc/qubes/post-install.d
 /etc/qubes/post-install.d/README
 /etc/qubes/post-install.d/*.sh
+%config(noreplace) /etc/profile.d/qt_x11_no_mitshm.sh
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
+%config(noreplace) /etc/sudoers.d/umask
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
-%config(noreplace) /etc/udev/rules.d/50-qubes-misc.rules
+%config(noreplace) /etc/udev/rules.d/50-qubes-mem-hotplug.rules
 %config(noreplace) /etc/qubes-suspend-module-blacklist
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo

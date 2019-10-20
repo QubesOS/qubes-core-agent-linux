@@ -1,19 +1,25 @@
-all:	python
-python: python2 python3
-python2:
-	rm -rf py2
-	mkdir -p py2
-	cp *.py py2/
-	python2 -m compileall py2
-	python2 -O -m compileall py2
+BINDIR ?= /usr/bin
+SYSCONFDIR ?= /etc
+UDEVRULESDIR = $(SYSCONFDIR)/udev/rules.d
+QUBESDATADIR = /usr/share/qubes
 
-# Only some scripts does support python3 for now
-python3:
-	rm -rf py3
-	mkdir -p py3
-	cp dnf-qubes-hooks.py py3/
-	python3 -m compileall py3
-	python3 -O -m compileall py3
+.PHONY: all clean install
+
+all: marker-vm
 
 clean:
-	rm -f *~ *.pyc *.pyo
+	-$(RM) marker-vm
+
+install:
+	install -d $(DESTDIR)$(UDEVRULESDIR)
+	install -t $(DESTDIR)$(UDEVRULESDIR) -m 0644 50-qubes-mem-hotplug.rules
+	install -d $(DESTDIR)$(QUBESDATADIR)
+	install -D -t $(DESTDIR)$(QUBESDATADIR) -m 0644 \
+	    marker-vm \
+	    qubes-master-key.asc
+	install -D -m 0644 mime-globs $(DESTDIR)$(QUBESDATADIR)/mime-override/globs
+	install -d $(DESTDIR)$(BINDIR)
+	install -t $(DESTDIR)$(BINDIR) qvm-features-request
+
+marker-vm: marker-vm.in
+	printf "$(VERSION)" | cut -f 1,2 -d . | cat $< - > marker-vm
