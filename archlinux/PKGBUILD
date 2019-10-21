@@ -75,6 +75,10 @@ package_qubes-vm-core() {
     make -C qrexec install DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
 
     make install-corevm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
+    make -C qubes-rpc DESTDIR="$pkgdir" install
+    make -C qubes-rpc/kde DESTDIR="$pkgdir" install
+    make -C qubes-rpc/nautilus DESTDIR="$pkgdir" install
+    make -C qubes-rpc/thunar DESTDIR="$pkgdir" install
 
     # Remove things non wanted in archlinux
     rm -r "$pkgdir/etc/yum"*
