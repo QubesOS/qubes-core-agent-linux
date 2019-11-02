@@ -1,16 +1,8 @@
 #!/bin/sh
 
-# old API - get the user from caller
-#read -r IGNORE_USERNAME
+USERNAME="$(qubesdb-read /default-user || echo 'user')"
 
-# use default user provided in QubesDB, or hardcoded 'user' - this must be the
-# same as the X session owner
-USERNAME=$(qubesdb-read /default-user || echo 'user')
-cmd='echo $$ >> /tmp/qubes-session-waiter; [ ! -f /tmp/qubes-session-env ] && exec sleep inf'
-if [ "$(id -un)" = "$USERNAME" ]; then
-    sh -c "$cmd" 2>/dev/null
-else
-    su -s /bin/sh -c "$cmd" - "$USERNAME" 2> /dev/null
-fi
-# the above line is _expected_ to be terminated by a signal, don't treat this as a failure
-exit 0
+while ! [ -e "/var/run/qubes/qrexec-server.$USERNAME.sock" ]
+do
+    sleep 0.1
+done
