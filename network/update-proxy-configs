@@ -123,7 +123,7 @@ if [ -d /etc/pacman.d ]; then
 ### If you want to override some of this settings, create another file under 
 ### /etc/pacman.d
 [options]
-XferCommand = ALL_PROXY=$PROXY_ADDR /usr/bin/curl -C - -f %u > %o
+XferCommand = /usr/bin/env ALL_PROXY=$PROXY_ADDR /usr/bin/curl -C - -f -o %o %u
 EOF
     else
         rm -r /etc/pacman.d/01-qubes-proxy.conf
