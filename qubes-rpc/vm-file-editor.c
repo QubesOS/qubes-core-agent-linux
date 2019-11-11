@@ -147,11 +147,10 @@ void send_file_back(const char * filename)
 int
 main()
 {
-    struct stat stat_pre, stat_post, session_stat;
+    struct stat stat_pre, stat_post;
     int view_only = 0;
     char *filename = get_filename(&view_only);
     int child, status, log_fd, null_fd;
-    FILE *waiter_pidfile;
 
     copy_file_by_name(filename);
     if (view_only) {
@@ -162,37 +161,7 @@ main()
         perror("stat pre");
         exit(1);
     }
-#ifdef DEBUG
-    fprintf(stderr, "time=%s, waiting for qubes-session\n", gettime());
-#endif
-    // wait for X server to starts (especially in DispVM)
-    if (stat("/tmp/qubes-session-env", &session_stat)) {
-        switch (child = fork()) {
-            case -1:
-                perror("fork");
-                exit(1);
-            case 0:
-                waiter_pidfile = fopen("/tmp/qubes-session-waiter", "a");
-                if (waiter_pidfile == NULL) {
-                    perror("fopen waiter_pidfile");
-                    exit(1);
-                }
-                fprintf(waiter_pidfile, "%d\n", getpid());
-                fclose(waiter_pidfile);
-                // check the second time, to prevent race
-                if (stat("/tmp/qubes-session-env", &session_stat)) {
-                    // wait for qubes-session notify
-                    pause();
-                }
-                exit(0);
-            default:
-                waitpid(child, &status, 0);
-                if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
-                    //propagate exit code from child
-                    exit(WEXITSTATUS(status));
-                }
-        }
-    }
+
 #ifdef DEBUG
     fprintf(stderr, "time=%s, starting editor\n", gettime());
 #endif
