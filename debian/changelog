@@ -1,3 +1,30 @@
+qubes-core-agent (4.1.6-1) unstable; urgency=medium
+
+  [ Hans Jerry Illikainen ]
+  * qubes-download-dom0-updates: verify package signatures
+
+  [ Frédéric Pierret (fepitre) ]
+  * travis: switch to bionic
+
+  [ Amadeusz Piotr Żołnowski ]
+  * Move qubes-rpc installation from the root Makefile to qubes-rpc
+    Makefile
+  * Remove no longer needed xorg-preload-apps.conf
+  * Ignore build result: tar2qfile
+  * Use built-in rules in qubes-rpc makefile
+  * Don't clean tilda files in qubes-rpc
+  * Install qubes-rpc files in Archlinux
+
+  [ Otto Sabart ]
+  * archlinux: fix proxy setting in XferCommand
+
+  [ Frédéric Pierret (fepitre) ]
+  * qubes.WaitForSession: refactor by waiting for qrexec-fork-server
+    socket
+  * vm-file-editor: drop old wait-for-session mechanism
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 13 Nov 2019 06:06:40 +0100
+
 qubes-core-agent (4.1.5-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
