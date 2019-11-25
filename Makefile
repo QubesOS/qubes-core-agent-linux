@@ -2,8 +2,6 @@ RPMS_DIR=rpm/
 
 VERSION := $(shell cat version)
 
-SBINDIR ?= /usr/sbin
-BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
@@ -161,7 +159,6 @@ install-common: install-doc
 
 	# force /usr/bin before /bin to have /usr/bin/python instead of /bin/python
 	PATH="/usr/bin:$(PATH)" $(PYTHON) setup.py install $(PYTHON_PREFIX_ARG) -O1 --root $(DESTDIR)
-	mkdir -p $(DESTDIR)$(SBINDIR)
 
 
 # Networking install target includes:
@@ -182,12 +179,6 @@ install-netvm:
 
 	install -D -m 0644 vm-systemd/qubes-core-agent-linux.tmpfiles \
 		$(DESTDIR)/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
-
-	mkdir -p $(DESTDIR)$(SBINDIR)
-
-ifneq ($(SBINDIR),/usr/bin)
-	mv $(DESTDIR)/usr/bin/qubes-firewall $(DESTDIR)$(SBINDIR)/qubes-firewall
-endif
 
 	install -D network/qubes-setup-dnat-to-ns $(DESTDIR)$(LIBDIR)/qubes/qubes-setup-dnat-to-ns
 

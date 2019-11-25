@@ -6,7 +6,7 @@ Before=qubes-network.service
 
 [Service]
 Type=notify
-ExecStart=/usr/sbin/qubes-firewall
+ExecStart=/usr/bin/qubes-firewall
 
 [Install]
 WantedBy=multi-user.target

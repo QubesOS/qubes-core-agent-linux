@@ -18,4 +18,4 @@ usr/lib/qubes/iptables-updates-proxy
 usr/lib/qubes/qubes-setup-dnat-to-ns
 usr/lib/qubes/setup-ip
 usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
-usr/sbin/qubes-firewall
+usr/bin/qubes-firewall
