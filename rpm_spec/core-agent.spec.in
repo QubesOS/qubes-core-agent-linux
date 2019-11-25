@@ -548,7 +548,6 @@ rm -f %{name}-%{version}
 %files
 %defattr(-,root,root,-)
 %dir /var/lib/qubes
-%dir /var/run/qubes
 %{kde_service_dir}/qvm-copy.desktop
 %{kde_service_dir}/qvm-move.desktop
 %{kde_service_dir}/qvm-dvm.desktop
