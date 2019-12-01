@@ -94,6 +94,7 @@ if [ -d /etc/apt/apt.conf.d ]; then
 ### If you want to override some of this settings, create another file under 
 ### /etc/apt/apt.conf.d.
 
+# Use Qubes Update Proxy
 Acquire::http::Proxy "$PROXY_ADDR";
 Acquire::tor::proxy "$PROXY_ADDR";
 EOF
@@ -122,7 +123,9 @@ if [ -d /etc/pacman.d ]; then
 ### All modifications here will be lost.
 ### If you want to override some of this settings, create another file under 
 ### /etc/pacman.d
+
 [options]
+# Use Qubes Update Proxy
 XferCommand = /usr/bin/env ALL_PROXY=$PROXY_ADDR /usr/bin/curl -C - -f -o %o %u
 EOF
     else
