@@ -36,10 +36,6 @@ chmod 666 /proc/xen/xenbus
 chmod 660 /proc/xen/privcmd
 chgrp qubes /proc/xen/privcmd
 
-[ -e /proc/u2mfn ] || modprobe u2mfn
-# Set permissions to files needed by gui-agent
-chmod 666 /proc/u2mfn
-
 # Set default services depending on VM type
 is_appvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM && touch /var/run/qubes/this-is-appvm
 is_netvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM && touch /var/run/qubes/this-is-netvm
