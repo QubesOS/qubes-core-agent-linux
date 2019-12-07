@@ -638,7 +638,6 @@ rm -f %{name}-%{version}
 /usr/bin/qubes-run-gnome-terminal
 /usr/bin/qubes-open
 /usr/bin/qubes-session-autostart
-/usr/bin/qvm-console
 /usr/bin/qvm-connect-tcp
 /usr/bin/qubes-vmexec
 %dir /usr/lib/qubes
