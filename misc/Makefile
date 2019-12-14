@@ -1,7 +1,8 @@
 BINDIR ?= /usr/bin
+DATADIR ?= /usr/share
 SYSCONFDIR ?= /etc
 UDEVRULESDIR = $(SYSCONFDIR)/udev/rules.d
-QUBESDATADIR = /usr/share/qubes
+QUBESDATADIR = $(DATADIR)/qubes
 
 .PHONY: all clean install
 

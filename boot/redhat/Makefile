@@ -1,7 +1,8 @@
+DATADIR ?= /usr/share
 LIBDIR ?= /usr/lib
 SBINDIR ?= /usr/sbin
 SYSCONFDIR ?= /etc
-QUBESDATADIR = /usr/share/qubes
+QUBESDATADIR = $(DATADIR)/qubes
 
 .PHONY: install
 

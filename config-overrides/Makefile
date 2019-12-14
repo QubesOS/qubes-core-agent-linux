@@ -1,3 +1,5 @@
+DATADIR ?= /usr/share
+GLIBSCHEMAS ?= $(DATADIR)/glib-2.0/schemas
 SYSCONFDIR ?= /etc
 SUDOERSDIR = $(SYSCONFDIR)/sudoers.d
 
@@ -10,3 +12,9 @@ install:
 	install -D -m 0440 sudoers.d_umask $(DESTDIR)$(SUDOERSDIR)/umask
 	install -D -m 0644 20_tcp_timestamps.conf $(DESTDIR)$(SYSCONFDIR)/sysctl.d/20_tcp_timestamps.conf
 	install -D -m 0644 dconf-db-local-dpi $(DESTDIR)$(SYSCONFDIR)/dconf/db/local.d/dpi
+	install -d $(DESTDIR)$(GLIBSCHEMAS)
+	install -t $(DESTDIR)$(GLIBSCHEMAS) -m 0644 \
+		20_org.gnome.desktop.wm.preferences.qubes.gschema.override \
+		20_org.gnome.nautilus.qubes.gschema.override \
+		20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override \
+		20_org.mate.NotificationDaemon.qubes.gschema.override

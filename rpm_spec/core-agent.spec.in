@@ -291,14 +291,13 @@ usermod -p '' root
 %install
 
 make install-vm DESTDIR=$RPM_BUILD_ROOT
-make -C app-defaults DESTDIR=$RPM_BUILD_ROOT install
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
+make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
 make -C filesystem DESTDIR=$RPM_BUILD_ROOT install
 make -C misc DESTDIR=$RPM_BUILD_ROOT install
 make -C network DESTDIR=$RPM_BUILD_ROOT install
 make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install
-make -C sys-defaults DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
