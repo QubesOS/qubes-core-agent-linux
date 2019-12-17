@@ -424,10 +424,6 @@ do
         continue
     fi
 
-    if [ $(basename $f) == "50-qubes-mem-hotplug.rules" ] ; then
-        continue
-    fi
-
     if echo $f | grep -q qubes; then
         continue
     fi
@@ -610,7 +606,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
 %config(noreplace) /etc/sudoers.d/umask
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
-%config(noreplace) /etc/udev/rules.d/50-qubes-mem-hotplug.rules
 %config(noreplace) /etc/qubes-suspend-module-blacklist
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo
@@ -620,6 +615,7 @@ rm -f %{name}-%{version}
 %endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %config(noreplace) /etc/dconf/db/local.d/dpi
+/lib/udev/rules.d/50-qubes-mem-hotplug.rules
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
 /usr/bin/qvm-copy-to-vm

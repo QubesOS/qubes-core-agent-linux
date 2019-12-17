@@ -355,10 +355,6 @@ post_install() {
             continue
         fi
 
-        if [ "$(basename "$f")" == "50-qubes-mem-hotplug.rules" ] ; then
-            continue
-        fi
-
         if echo "$f" | grep -q qubes; then
             continue
         fi
