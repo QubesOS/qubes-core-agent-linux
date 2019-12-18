@@ -129,7 +129,10 @@ if [ "${ip}" ]; then
         else
             ipt=iptables-restore
         fi
-        echo -e "*raw\\n$iptables_cmd -i ${vif} ! -s ${addr} -j DROP\\nCOMMIT" | \
+        printf '%s\n' "*raw" \
+            "$iptables_cmd -i ${vif} ! -s ${addr} -j DROP" \
+            "$iptables_cmd ! -i vif+ -s ${addr} -j DROP" \
+            "COMMIT" | \
             ${cmdprefix} $ipt --noflush $ipt_arg
     done
     # if no IPv6 is assigned, block all IPv6 traffic on that interface
