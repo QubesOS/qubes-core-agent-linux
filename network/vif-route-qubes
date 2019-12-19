@@ -24,6 +24,7 @@ dir=$(dirname "$0")
 # shellcheck disable=SC1091,SC1090
 . "$dir/vif-common.sh"
 
+set -o pipefail
 #main_ip=$(dom0_ip)
 
 # Network Hooks for triggering supplementary actions on AppVM connect
@@ -95,7 +96,6 @@ fi
 # shellcheck disable=SC2154
 case "$command" in
     online)
-        ifconfig "${vif}" up
         echo 1 >"/proc/sys/net/ipv4/conf/${vif}/proxy_arp"
         ipcmd='add'
         iptables_cmd='-I PREROUTING 1'
@@ -118,6 +118,30 @@ domid=${domid/.*/}
 #  32752 is max XID aka domid
 metric=$(( 32752 - domid ))
 
+# add anti-spoofing rules before enabling the interface
+if [ "${ip}" ]; then
+    # If we've been given a list of IP addresses, then add routes from dom0 to
+    # the guest using those addresses.
+    for addr in ${ip};
+    do
+        if [[ "$addr" = *:* ]]; then
+            ipt=ip6tables-restore
+        else
+            ipt=iptables-restore
+        fi
+        echo -e "*raw\\n$iptables_cmd -i ${vif} ! -s ${addr} -j DROP\\nCOMMIT" | \
+            ${cmdprefix} $ipt --noflush $ipt_arg
+    done
+    # if no IPv6 is assigned, block all IPv6 traffic on that interface
+    if ! [[ "$ip" = *:* ]]; then
+        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" | \
+            ${cmdprefix} ip6tables-restore --noflush $ipt_arg
+    fi
+fi
+
+if [ "$command" = "online" ]; then
+    ifconfig "${vif}" up
+fi
 
 if [ "${ip}" ]; then
     # If we've been given a list of IP addresses, then add routes from dom0 to
@@ -129,21 +153,9 @@ if [ "${ip}" ]; then
             continue
         fi
         ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
-        if [[ "$addr" = *:* ]]; then
-            ipt=ip6tables-restore
-        else
-            ipt=iptables-restore
-        fi
-        echo -e "*raw\\n$iptables_cmd -i ${vif} ! -s ${addr} -j DROP\\nCOMMIT" | \
-            ${cmdprefix} $ipt --noflush $ipt_arg
 
         network_hooks "${command}" "${vif}" "${addr}"
     done
-    # if no IPv6 is assigned, block all IPv6 traffic on that interface
-    if ! [[ "$ip" = *:* ]]; then
-        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" | \
-            ${cmdprefix} ip6tables-restore --noflush $ipt_arg
-    fi
     ${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
     if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]] && [[ "$ipv6_disabled" != 1 ]]; then
         ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
