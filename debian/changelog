@@ -1,3 +1,31 @@
+qubes-core-agent (4.0.51-1) wheezy; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * travis: switch to bionic
+
+  [ Amadeusz Piotr Żołnowski ]
+  * Remove no longer needed xorg-preload-apps.conf
+  * Ignore build result: tar2qfile
+
+  [ Otto Sabart ]
+  * archlinux: fix proxy setting in XferCommand
+
+  [ Jonas DOREL ]
+  * Mention Update Proxy in configuration
+
+  [ Frédéric Pierret (fepitre) ]
+  * Require python setuptools
+
+  [ Patrick Schleizer ]
+  * console=hvc0 must be last
+
+  [ Marek Marczykowski-Górecki ]
+  * network: setup anti-spoofing firewall rules before enabling the
+    interface
+  * network: prevent IP spoofing on upstream (eth0) interface
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 20 Dec 2019 17:35:03 +0100
+
 qubes-core-agent (4.0.50-1) unstable; urgency=medium
 
   * qrexec-client-vm: add option to replace control characters on
