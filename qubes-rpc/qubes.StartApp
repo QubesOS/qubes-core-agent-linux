@@ -5,8 +5,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-# make sure it has .desktop suffix, and only one of it
-app_basename="${1%.desktop}.desktop"
+app_basename="$1.desktop"
 
 # Based on XDG Base Directory Specification, Version 0.7
 [ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
