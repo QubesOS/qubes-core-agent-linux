@@ -14,28 +14,32 @@
 #include <gui-fatal.h>
 #include <errno.h>
 #include <libqubes-rpc-filecopy.h>
-#define INCOMING_DIR_ROOT "/home/user/QubesIncoming"
-int prepare_creds_return_uid(const char *username)
+
+#define INCOMING_DIR_NAME "QubesIncoming"
+
+char *prepare_creds_return_dir(int uid)
 {
     const struct passwd *pwd;
-    pwd = getpwnam(username);
+    pwd = getpwuid(uid);
     if (!pwd) {
-        perror("getpwnam");
+        perror("getpwuid");
         exit(1);
     }
     setenv("HOME", pwd->pw_dir, 1);
-    setenv("USER", username, 1);
+    setenv("USER", pwd->pw_name, 1);
     if (setgid(pwd->pw_gid) < 0)
         gui_fatal("Error setting group permissions");
-    if (initgroups(username, pwd->pw_gid) < 0)
+    if (initgroups(pwd->pw_name, pwd->pw_gid) < 0)
         gui_fatal("Error initializing groups");
     if (setfsuid(pwd->pw_uid) < 0)
         gui_fatal("Error setting filesystem level permissions");
-    return pwd->pw_uid;
+    return pwd->pw_dir;
 }
 
 int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unused__)))
 {
+    char *home_dir;
+    char *incoming_dir_root;
     char *incoming_dir;
     int uid, ret;
     pid_t pid;
@@ -43,15 +47,19 @@ int main(int argc __attribute((__unused__)), char ** argv __attribute__((__unuse
     char *procdir_path;
     int procfs_fd;
 
-    uid = prepare_creds_return_uid("user");
+    uid = getuid();
+    home_dir = prepare_creds_return_dir(uid);
 
     remote_domain = getenv("QREXEC_REMOTE_DOMAIN");
     if (!remote_domain) {
         gui_fatal("Cannot get remote domain name");
-        exit(1);
     }
-    mkdir(INCOMING_DIR_ROOT, 0700);
-    if (asprintf(&incoming_dir, "%s/%s", INCOMING_DIR_ROOT, remote_domain) < 0)
+
+    if (asprintf(&incoming_dir_root, "%s/%s", home_dir, INCOMING_DIR_NAME) < 0) {
+	gui_fatal("Error allocating memory");
+    }
+    mkdir(incoming_dir_root, 0700);
+    if (asprintf(&incoming_dir, "%s/%s", incoming_dir_root, remote_domain) < 0)
         gui_fatal("Error allocating memory");
     mkdir(incoming_dir, 0700);
     if (chdir(incoming_dir))
