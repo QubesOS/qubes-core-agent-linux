@@ -6,6 +6,15 @@
 #  - directories stored on /rw in case of "rw-only" persistence
 #  - nothing, otherwise
 
+# Reload scripts in /etc/profile.d/, in case they register additional
+# directories in XDG_DATA_DIRS and we forgot them
+# (e.g. because we are running under sudo).
+for i in /etc/profile.d/*.sh ; do
+    if [ -r "$i" ]; then
+        . "$i" >/dev/null
+    fi
+done
+
 if [ -z "$XDG_DATA_HOME" ]; then
     XDG_DATA_HOME="$HOME/.local/share"
 fi
