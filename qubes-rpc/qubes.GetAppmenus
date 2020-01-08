@@ -17,7 +17,13 @@ for i in /etc/profile.d/*.sh ; do
 done
 
 if [ -z "$XDG_DATA_HOME" ]; then
-    XDG_DATA_HOME="$HOME/.local/share"
+    user="$(whoami)"
+    # In case we are running under sudo, use default-user.
+    if [ "$user" = "root" ]; then
+        user="$(qubesdb-read /default-user || echo user)"
+    fi
+    home="$(eval echo "~$user")"
+    XDG_DATA_HOME="$home/.local/share"
 fi
 if [ -z "$XDG_DATA_DIRS" ]; then
     XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
