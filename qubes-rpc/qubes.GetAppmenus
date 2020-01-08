@@ -11,6 +11,7 @@
 # (e.g. because we are running under sudo).
 for i in /etc/profile.d/*.sh ; do
     if [ -r "$i" ]; then
+        # shellcheck disable=SC1090
         . "$i" >/dev/null
     fi
 done
