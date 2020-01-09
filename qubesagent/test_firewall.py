@@ -64,6 +64,7 @@ class FirewallWorker(qubesagent.firewall.FirewallWorker):
         self.init_called = False
         self.cleanup_called = False
         self.user_script_called = False
+        self.update_connected_ips_called_with = []
         self.rules = {}
 
     def apply_rules(self, source_addr, rules):
@@ -77,6 +78,9 @@ class FirewallWorker(qubesagent.firewall.FirewallWorker):
 
     def run_user_script(self):
         self.user_script_called = True
+
+    def update_connected_ips(self, family):
+        self.update_connected_ips_called_with.append(family)
 
 
 class IptablesWorker(qubesagent.firewall.IptablesWorker):
@@ -282,11 +286,17 @@ class TestIptablesWorker(TestCase):
         self.assertEqual(self.obj.called_commands[4], [
             ['-F', 'QBS-FORWARD'],
             ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'],
-            ['-A', 'QBS-FORWARD', '-j', 'DROP']])
+            ['-A', 'QBS-FORWARD', '-j', 'DROP'],
+            ['-t', 'mangle', '-F', 'QBS-PREROUTING'],
+            ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+        ])
         self.assertEqual(self.obj.called_commands[6], [
             ['-F', 'QBS-FORWARD'],
             ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'],
-            ['-A', 'QBS-FORWARD', '-j', 'DROP']])
+            ['-A', 'QBS-FORWARD', '-j', 'DROP'],
+            ['-t', 'mangle', '-F', 'QBS-PREROUTING'],
+            ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+        ])
 
     def test_007_cleanup(self):
         self.obj.init()
@@ -300,18 +310,26 @@ class TestIptablesWorker(TestCase):
         self.obj.cleanup()
         self.assertEqual([self.obj.called_commands[4][0]] +
                 sorted(self.obj.called_commands[4][1:], key=operator.itemgetter(1)),
-            [['-F', 'QBS-FORWARD'],
+            [
+                ['-F', 'QBS-FORWARD'],
                 ['-F', 'chain-ip4-1'],
                 ['-X', 'chain-ip4-1'],
                 ['-F', 'chain-ip4-2'],
-                ['-X', 'chain-ip4-2']])
+                ['-X', 'chain-ip4-2'],
+                ['-t', 'mangle', '-F', 'QBS-PREROUTING'],
+                ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+            ])
         self.assertEqual([self.obj.called_commands[6][0]] +
                 sorted(self.obj.called_commands[6][1:], key=operator.itemgetter(1)),
-            [['-F', 'QBS-FORWARD'],
+            [
+                ['-F', 'QBS-FORWARD'],
                 ['-F', 'chain-ip6-1'],
                 ['-X', 'chain-ip6-1'],
                 ['-F', 'chain-ip6-2'],
-                ['-X', 'chain-ip6-2']])
+                ['-X', 'chain-ip6-2'],
+                ['-t', 'mangle', '-F', 'QBS-PREROUTING'],
+                ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+            ])
 
 
 class TestNftablesWorker(TestCase):
@@ -450,6 +468,14 @@ class TestNftablesWorker(TestCase):
             '    ct state established,related accept\n'
             '    meta iifname != "vif*" accept\n'
             '  }\n'
+            '  chain prerouting {\n'
+            '    type filter hook prerouting priority 0;\n'
+            '    policy accept;\n'
+            '  }\n'
+            '  chain postrouting {\n'
+            '    type filter hook postrouting priority 0;\n'
+            '    policy accept;\n'
+            '  }\n'
             '}\n'
             'table ip6 qubes-firewall {\n'
             '  chain forward {\n'
@@ -457,6 +483,14 @@ class TestNftablesWorker(TestCase):
             '    policy drop;\n'
             '    ct state established,related accept\n'
             '    meta iifname != "vif*" accept\n'
+            '  }\n'
+            '  chain prerouting {\n'
+            '    type filter hook prerouting priority 0;\n'
+            '    policy accept;\n'
+            '  }\n'
+            '  chain postrouting {\n'
+            '    type filter hook postrouting priority 0;\n'
+            '    policy accept;\n'
             '  }\n'
             '}\n'
         ])
@@ -567,5 +601,6 @@ class TestFirewallWorker(TestCase):
         self.assertTrue(self.obj.init_called)
         self.assertTrue(self.obj.cleanup_called)
         self.assertTrue(self.obj.user_script_called)
+        self.assertEqual(self.obj.update_connected_ips_called_with, [4, 6])
         self.assertEqual(set(self.obj.rules.keys()), self.obj.list_targets())
         # rules content were already tested
