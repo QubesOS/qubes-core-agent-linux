@@ -77,6 +77,15 @@ class FirewallWorker(object):
         """Apply rules in given source address"""
         raise NotImplementedError
 
+    def update_connected_ips(self, family):
+        raise NotImplementedError
+
+    def get_connected_ips(self, family):
+        if family == 6:
+            return self.qdb.read('/connected-ips6').split()
+        else:
+            return self.qdb.read('/connected-ips').split()
+
     def run_firewall_dir(self):
         """Run scripts dir contents, before user script"""
         script_dir_paths = ['/etc/qubes/qubes-firewall.d',
@@ -175,15 +184,25 @@ class FirewallWorker(object):
         # initial load
         for source_addr in self.list_targets():
             self.handle_addr(source_addr)
+        self.update_connected_ips(4)
+        self.update_connected_ips(6)
         self.qdb.watch('/qubes-firewall/')
+        self.qdb.watch('/connected-ips')
+        self.qdb.watch('/connected-ips6')
         try:
             for watch_path in iter(self.qdb.read_watch, None):
+                if watch_path == '/connected-ips':
+                    self.update_connected_ips(4)
+
+                if watch_path == '/connected-ips6':
+                    self.update_connected_ips(6)
+
                 # ignore writing rules itself - wait for final write at
                 # source_addr level empty write (/qubes-firewall/SOURCE_ADDR)
-                if watch_path.count('/') > 2:
-                    continue
-                source_addr = watch_path.split('/')[2]
-                self.handle_addr(source_addr)
+                if watch_path.startswith('/qubes-firewall/') and watch_path.count('/') == 2:
+                    source_addr = watch_path.split('/')[2]
+                    self.handle_addr(source_addr)
+
         except OSError:  # EINTR
             # signal received, don't continue the loop
             pass
@@ -391,25 +410,49 @@ class IptablesWorker(FirewallWorker):
         else:
             self.apply_rules_family(source, rules, 4)
 
+    def update_connected_ips(self, family):
+        self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-PREROUTING'])
+        self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
+
+        for ip in self.get_connected_ips(family):
+            self.run_ipt(family, [
+                '-t', 'mangle', '-A', 'QBS-PREROUTING',
+                '!', '-i', 'vif+', '-s', ip, '-j', 'DROP'])
+            self.run_ipt(family, [
+                '-t', 'mangle', '-A', 'QBS-POSTROUTING',
+                '!', '-o', 'vif+', '-d', ip, '-j', 'DROP'])
+
+
     def init(self):
-        # make sure 'QBS_FORWARD' chain exists - should be created before
-        # starting qubes-firewall
+        # Chains QBS-FORWARD, QBS-PREROUTING, QBS-POSTROUTING
+        # need to be created before running this.
         try:
             self.run_ipt(4, ['-F', 'QBS-FORWARD'])
             self.run_ipt(4,
                 ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'])
             self.run_ipt(4, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
+            self.run_ipt(4, ['-t', 'mangle', '-F', 'QBS-PREROUTING'])
+            self.run_ipt(4, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
+
             self.run_ipt(6, ['-F', 'QBS-FORWARD'])
             self.run_ipt(6,
                 ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'])
             self.run_ipt(6, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
+            self.run_ipt(6, ['-t', 'mangle', '-F', 'QBS-PREROUTING'])
+            self.run_ipt(6, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
         except subprocess.CalledProcessError:
-            self.log_error('\'QBS-FORWARD\' chain not found, create it first')
+            self.log_error(
+                'Error initializing iptables. '
+                'You probably need to create QBS-FORWARD, QBS-PREROUTING and '
+                'QBS-POSTROUTING chains first.'
+            )
             sys.exit(1)
 
     def cleanup(self):
         for family in (4, 6):
             self.run_ipt(family, ['-F', 'QBS-FORWARD'])
+            self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-PREROUTING'])
+            self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
             for chain in self.chains[family]:
                 self.run_ipt(family, ['-F', chain])
                 self.run_ipt(family, ['-X', chain])
@@ -467,6 +510,27 @@ class NftablesWorker(FirewallWorker):
         )
         self.run_nft(nft_input)
         self.chains[family].add(chain)
+
+    def update_connected_ips(self, family):
+        addr = '{' + ', '.join(self.get_connected_ips(family)) + '}'
+
+        nft_input = (
+            'flush chain {family} {table} prerouting\n'
+            'flush chain {family} {table} postrouting\n'
+            'table {family} {table} {{\n'
+            '  chain prerouting {{\n'
+            '    iifname != "vif*" {family} saddr {addr} drop\n'
+            '  }}\n'
+            '  chain postrouting {{\n'
+            '    oifname != "vif*" {family} daddr {addr} drop\n'
+            '  }}\n'
+            '}}\n'
+        ).format(
+            family=('ip6' if family == 6 else 'ip'),
+            table='qubes-firewall',
+            addr=addr,
+        )
+        self.run_nft(nft_input)
 
     def prepare_rules(self, chain, rules, family):
         """
@@ -609,8 +673,6 @@ class NftablesWorker(FirewallWorker):
             self.apply_rules_family(source, rules, 4)
 
     def init(self):
-        # make sure 'QBS_FORWARD' chain exists - should be created before
-        # starting qubes-firewall
         nft_init = (
             'table {family} qubes-firewall {{\n'
             '  chain forward {{\n'
@@ -618,6 +680,14 @@ class NftablesWorker(FirewallWorker):
             '    policy drop;\n'
             '    ct state established,related accept\n'
             '    meta iifname != "vif*" accept\n'
+            '  }}\n'
+            '  chain prerouting {{\n'
+            '    type filter hook prerouting priority 0;\n'
+            '    policy accept;\n'
+            '  }}\n'
+            '  chain postrouting {{\n'
+            '    type filter hook postrouting priority 0;\n'
+            '    policy accept;\n'
             '  }}\n'
             '}}\n'
         )
