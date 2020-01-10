@@ -287,14 +287,14 @@ class TestIptablesWorker(TestCase):
             ['-F', 'QBS-FORWARD'],
             ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'],
             ['-A', 'QBS-FORWARD', '-j', 'DROP'],
-            ['-t', 'mangle', '-F', 'QBS-PREROUTING'],
+            ['-t', 'raw', '-F', 'QBS-PREROUTING'],
             ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
         ])
         self.assertEqual(self.obj.called_commands[6], [
             ['-F', 'QBS-FORWARD'],
             ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'],
             ['-A', 'QBS-FORWARD', '-j', 'DROP'],
-            ['-t', 'mangle', '-F', 'QBS-PREROUTING'],
+            ['-t', 'raw', '-F', 'QBS-PREROUTING'],
             ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
         ])
 
@@ -316,8 +316,8 @@ class TestIptablesWorker(TestCase):
                 ['-X', 'chain-ip4-1'],
                 ['-F', 'chain-ip4-2'],
                 ['-X', 'chain-ip4-2'],
-                ['-t', 'mangle', '-F', 'QBS-PREROUTING'],
                 ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+                ['-t', 'raw', '-F', 'QBS-PREROUTING'],
             ])
         self.assertEqual([self.obj.called_commands[6][0]] +
                 sorted(self.obj.called_commands[6][1:], key=operator.itemgetter(1)),
@@ -327,9 +327,28 @@ class TestIptablesWorker(TestCase):
                 ['-X', 'chain-ip6-1'],
                 ['-F', 'chain-ip6-2'],
                 ['-X', 'chain-ip6-2'],
-                ['-t', 'mangle', '-F', 'QBS-PREROUTING'],
                 ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+                ['-t', 'raw', '-F', 'QBS-PREROUTING'],
             ])
+
+    def test_008_update_connected_ips(self):
+        with patch.object(self.obj, 'get_connected_ips') as get_connected_ips:
+            get_connected_ips.return_value = ['10.137.0.1', '10.137.0.2']
+            self.obj.called_commands[4] = []
+            self.obj.update_connected_ips(4)
+
+        self.assertEqual(self.obj.called_commands[4], [
+            ['-t', 'raw', '-F', 'QBS-PREROUTING'],
+            ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+            ['-t', 'raw', '-A', 'QBS-PREROUTING',
+             '!', '-i', 'vif+', '-s', '10.137.0.1', '-j', 'DROP'],
+            ['-t', 'mangle', '-A', 'QBS-POSTROUTING',
+             '!', '-o', 'vif+', '-d', '10.137.0.1', '-j', 'DROP'],
+            ['-t', 'raw', '-A', 'QBS-PREROUTING',
+             '!', '-i', 'vif+', '-s', '10.137.0.2', '-j', 'DROP'],
+            ['-t', 'mangle', '-A', 'QBS-POSTROUTING',
+             '!', '-o', 'vif+', '-d', '10.137.0.2', '-j', 'DROP']
+        ])
 
 
 class TestNftablesWorker(TestCase):
@@ -469,11 +488,11 @@ class TestNftablesWorker(TestCase):
             '    meta iifname != "vif*" accept\n'
             '  }\n'
             '  chain prerouting {\n'
-            '    type filter hook prerouting priority 0;\n'
+            '    type filter hook prerouting priority -300;\n'
             '    policy accept;\n'
             '  }\n'
             '  chain postrouting {\n'
-            '    type filter hook postrouting priority 0;\n'
+            '    type filter hook postrouting priority -300;\n'
             '    policy accept;\n'
             '  }\n'
             '}\n'
@@ -485,11 +504,11 @@ class TestNftablesWorker(TestCase):
             '    meta iifname != "vif*" accept\n'
             '  }\n'
             '  chain prerouting {\n'
-            '    type filter hook prerouting priority 0;\n'
+            '    type filter hook prerouting priority -300;\n'
             '    policy accept;\n'
             '  }\n'
             '  chain postrouting {\n'
-            '    type filter hook postrouting priority 0;\n'
+            '    type filter hook postrouting priority -300;\n'
             '    policy accept;\n'
             '  }\n'
             '}\n'
@@ -507,7 +526,26 @@ class TestNftablesWorker(TestCase):
         self.assertEqual(self.obj.loaded_rules,
             ['delete table ip qubes-firewall\n'
              'delete table ip6 qubes-firewall\n',
-             ])
+            ])
+
+    def test_008_update_connected_ips(self):
+        with patch.object(self.obj, 'get_connected_ips') as get_connected_ips:
+            get_connected_ips.return_value = ['10.137.0.1', '10.137.0.2']
+            self.obj.loaded_rules = []
+            self.obj.update_connected_ips(4)
+
+        self.assertEqual(self.obj.loaded_rules, [
+            'flush chain ip qubes-firewall prerouting\n'
+            'flush chain ip qubes-firewall postrouting\n'
+            'table ip qubes-firewall {\n'
+            '  chain prerouting {\n'
+            '    iifname != "vif*" ip saddr {10.137.0.1, 10.137.0.2} drop\n'
+            '  }\n'
+            '  chain postrouting {\n'
+            '    oifname != "vif*" ip daddr {10.137.0.1, 10.137.0.2} drop\n'
+            '  }\n'
+            '}\n'
+        ])
 
 class TestFirewallWorker(TestCase):
     def setUp(self):
