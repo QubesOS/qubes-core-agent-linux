@@ -411,12 +411,12 @@ class IptablesWorker(FirewallWorker):
             self.apply_rules_family(source, rules, 4)
 
     def update_connected_ips(self, family):
-        self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-PREROUTING'])
+        self.run_ipt(family, ['-t', 'raw', '-F', 'QBS-PREROUTING'])
         self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
 
         for ip in self.get_connected_ips(family):
             self.run_ipt(family, [
-                '-t', 'mangle', '-A', 'QBS-PREROUTING',
+                '-t', 'raw', '-A', 'QBS-PREROUTING',
                 '!', '-i', 'vif+', '-s', ip, '-j', 'DROP'])
             self.run_ipt(family, [
                 '-t', 'mangle', '-A', 'QBS-POSTROUTING',
@@ -431,14 +431,14 @@ class IptablesWorker(FirewallWorker):
             self.run_ipt(4,
                 ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'])
             self.run_ipt(4, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
-            self.run_ipt(4, ['-t', 'mangle', '-F', 'QBS-PREROUTING'])
+            self.run_ipt(4, ['-t', 'raw', '-F', 'QBS-PREROUTING'])
             self.run_ipt(4, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
 
             self.run_ipt(6, ['-F', 'QBS-FORWARD'])
             self.run_ipt(6,
                 ['-A', 'QBS-FORWARD', '!', '-i', 'vif+', '-j', 'RETURN'])
             self.run_ipt(6, ['-A', 'QBS-FORWARD', '-j', 'DROP'])
-            self.run_ipt(6, ['-t', 'mangle', '-F', 'QBS-PREROUTING'])
+            self.run_ipt(6, ['-t', 'raw', '-F', 'QBS-PREROUTING'])
             self.run_ipt(6, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
         except subprocess.CalledProcessError:
             self.log_error(
@@ -451,7 +451,7 @@ class IptablesWorker(FirewallWorker):
     def cleanup(self):
         for family in (4, 6):
             self.run_ipt(family, ['-F', 'QBS-FORWARD'])
-            self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-PREROUTING'])
+            self.run_ipt(family, ['-t', 'raw', '-F', 'QBS-PREROUTING'])
             self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
             for chain in self.chains[family]:
                 self.run_ipt(family, ['-F', chain])
@@ -682,11 +682,11 @@ class NftablesWorker(FirewallWorker):
             '    meta iifname != "vif*" accept\n'
             '  }}\n'
             '  chain prerouting {{\n'
-            '    type filter hook prerouting priority 0;\n'
+            '    type filter hook prerouting priority -300;\n'
             '    policy accept;\n'
             '  }}\n'
             '  chain postrouting {{\n'
-            '    type filter hook postrouting priority 0;\n'
+            '    type filter hook postrouting priority -300;\n'
             '    policy accept;\n'
             '  }}\n'
             '}}\n'
