@@ -23,7 +23,7 @@ jobs:
        - codecov
     - stage: deploy
       python: '3.5'
-      env: DIST_DOM0=fc29 TESTS_ONLY=
+      env: DIST_DOM0=fc31 TESTS_ONLY=
       script: ~/qubes-builder/scripts/travis-deploy
 
 
