@@ -512,19 +512,22 @@ class NftablesWorker(FirewallWorker):
         self.chains[family].add(chain)
 
     def update_connected_ips(self, family):
+        family_name = ('ip6' if family == 6 else 'ip')
         ips = self.get_connected_ips(family)
         if ips:
             addr = '{' + ', '.join(ips) + '}'
-            irule = 'iifname != "vif*" {family} saddr {addr} drop\n'.format(addr)
-            orule = 'oifname != "vif*" {family} daddr {addr} drop\n'.format(addr)
+            irule = 'iifname != "vif*" {family_name} saddr {addr} drop\n'.format(
+                family_name=family_name, addr=addr)
+            orule = 'oifname != "vif*" {family_name} daddr {addr} drop\n'.format(
+                family_name=family_name, addr=addr)
         else:
             irule = ''
             orule = ''
 
         nft_input = (
-            'flush chain {family} {table} prerouting\n'
-            'flush chain {family} {table} postrouting\n'
-            'table {family} {table} {{\n'
+            'flush chain {family_name} {table} prerouting\n'
+            'flush chain {family_name} {table} postrouting\n'
+            'table {family_name} {table} {{\n'
             '  chain prerouting {{\n'
             '    {irule}'
             '  }}\n'
@@ -533,7 +536,7 @@ class NftablesWorker(FirewallWorker):
             '  }}\n'
             '}}\n'
         ).format(
-            family=('ip6' if family == 6 else 'ip'),
+            family_name=family_name,
             table='qubes-firewall',
             irule=irule,
             orule=orule,
