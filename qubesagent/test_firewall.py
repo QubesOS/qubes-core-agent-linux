@@ -553,8 +553,7 @@ class TestNftablesWorker(TestCase):
 
         self.assertEqual(self.obj.loaded_rules, [
             'flush chain ip qubes-firewall prerouting\n'
-            'flush chain ip qubes-firewall postrouting\n',
-
+            'flush chain ip qubes-firewall postrouting\n'
             'table ip qubes-firewall {\n'
             '  chain prerouting {\n'
             '    iifname != "vif*" ip saddr {10.137.0.1, 10.137.0.2} drop\n'

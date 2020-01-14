@@ -515,36 +515,35 @@ class NftablesWorker(FirewallWorker):
         family_name = ('ip6' if family == 6 else 'ip')
         table = 'qubes-firewall'
 
-        self.run_nft((
+        nft_input = (
             'flush chain {family_name} {table} prerouting\n'
             'flush chain {family_name} {table} postrouting\n'
-        ).format(family_name=family_name, table=table))
+        ).format(family_name=family_name, table=table)
 
         ips = self.get_connected_ips(family)
-        if not ips:
-            return
+        if ips:
+            addr = '{' + ', '.join(ips) + '}'
+            irule = 'iifname != "vif*" {family_name} saddr {addr} drop\n'.format(
+                family_name=family_name, addr=addr)
+            orule = 'oifname != "vif*" {family_name} daddr {addr} drop\n'.format(
+                family_name=family_name, addr=addr)
 
-        addr = '{' + ', '.join(ips) + '}'
-        irule = 'iifname != "vif*" {family_name} saddr {addr} drop\n'.format(
-            family_name=family_name, addr=addr)
-        orule = 'oifname != "vif*" {family_name} daddr {addr} drop\n'.format(
-            family_name=family_name, addr=addr)
+            nft_input += (
+                'table {family_name} {table} {{\n'
+                '  chain prerouting {{\n'
+                '    {irule}'
+                '  }}\n'
+                '  chain postrouting {{\n'
+                '    {orule}'
+                '  }}\n'
+                '}}\n'
+            ).format(
+                family_name=family_name,
+                table=table,
+                irule=irule,
+                orule=orule,
+            )
 
-        nft_input = (
-            'table {family_name} {table} {{\n'
-            '  chain prerouting {{\n'
-            '    {irule}'
-            '  }}\n'
-            '  chain postrouting {{\n'
-            '    {orule}'
-            '  }}\n'
-            '}}\n'
-        ).format(
-            family_name=family_name,
-            table=table,
-            irule=irule,
-            orule=orule,
-        )
         self.run_nft(nft_input)
 
     def prepare_rules(self, chain, rules, family):
