@@ -337,6 +337,8 @@ class TestIptablesWorker(TestCase):
         self.obj.update_connected_ips(4)
 
         self.assertEqual(self.obj.called_commands[4], [
+            ['-t', 'raw', '-P', 'PREROUTING', 'DROP'],
+            ['-t', 'mangle', '-P', 'POSTROUTING', 'DROP'],
             ['-t', 'raw', '-F', 'QBS-PREROUTING'],
             ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
             ['-t', 'raw', '-A', 'QBS-PREROUTING',
@@ -346,7 +348,9 @@ class TestIptablesWorker(TestCase):
             ['-t', 'raw', '-A', 'QBS-PREROUTING',
              '!', '-i', 'vif+', '-s', '10.137.0.2', '-j', 'DROP'],
             ['-t', 'mangle', '-A', 'QBS-POSTROUTING',
-             '!', '-o', 'vif+', '-d', '10.137.0.2', '-j', 'DROP']
+             '!', '-o', 'vif+', '-d', '10.137.0.2', '-j', 'DROP'],
+            ['-t', 'raw', '-P', 'PREROUTING', 'ACCEPT'],
+            ['-t', 'mangle', '-P', 'POSTROUTING', 'ACCEPT'],
         ])
 
     def test_009_update_connected_ips_empty(self):

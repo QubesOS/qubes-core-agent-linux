@@ -411,10 +411,22 @@ class IptablesWorker(FirewallWorker):
             self.apply_rules_family(source, rules, 4)
 
     def update_connected_ips(self, family):
+        ips = self.get_connected_ips(family)
+
+        if not ips:
+            # Just flush.
+            self.run_ipt(family, ['-t', 'raw', '-F', 'QBS-PREROUTING'])
+            self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
+            return
+
+        # Temporarily set policy to DROP while updating the rules.
+        self.run_ipt(family, ['-t', 'raw', '-P', 'PREROUTING', 'DROP'])
+        self.run_ipt(family, ['-t', 'mangle', '-P', 'POSTROUTING', 'DROP'])
+
         self.run_ipt(family, ['-t', 'raw', '-F', 'QBS-PREROUTING'])
         self.run_ipt(family, ['-t', 'mangle', '-F', 'QBS-POSTROUTING'])
 
-        for ip in self.get_connected_ips(family):
+        for ip in ips:
             self.run_ipt(family, [
                 '-t', 'raw', '-A', 'QBS-PREROUTING',
                 '!', '-i', 'vif+', '-s', ip, '-j', 'DROP'])
@@ -422,6 +434,8 @@ class IptablesWorker(FirewallWorker):
                 '-t', 'mangle', '-A', 'QBS-POSTROUTING',
                 '!', '-o', 'vif+', '-d', ip, '-j', 'DROP'])
 
+        self.run_ipt(family, ['-t', 'raw', '-P', 'PREROUTING', 'ACCEPT'])
+        self.run_ipt(family, ['-t', 'mangle', '-P', 'POSTROUTING', 'ACCEPT'])
 
     def init(self):
         # Chains QBS-FORWARD, QBS-PREROUTING, QBS-POSTROUTING
