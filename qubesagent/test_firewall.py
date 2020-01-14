@@ -349,6 +349,25 @@ class TestIptablesWorker(TestCase):
              '!', '-o', 'vif+', '-d', '10.137.0.2', '-j', 'DROP']
         ])
 
+    def test_009_update_connected_ips_empty(self):
+        self.obj.qdb.entries['/connected-ips'] = b''
+        self.obj.called_commands[4] = []
+        self.obj.update_connected_ips(4)
+
+        self.assertEqual(self.obj.called_commands[4], [
+            ['-t', 'raw', '-F', 'QBS-PREROUTING'],
+            ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+        ])
+
+    def test_010_update_connected_ips_missing(self):
+        self.obj.called_commands[4] = []
+        self.obj.update_connected_ips(4)
+
+        self.assertEqual(self.obj.called_commands[4], [
+            ['-t', 'raw', '-F', 'QBS-PREROUTING'],
+            ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
+        ])
+
 
 class TestNftablesWorker(TestCase):
     def setUp(self):
@@ -534,7 +553,8 @@ class TestNftablesWorker(TestCase):
 
         self.assertEqual(self.obj.loaded_rules, [
             'flush chain ip qubes-firewall prerouting\n'
-            'flush chain ip qubes-firewall postrouting\n'
+            'flush chain ip qubes-firewall postrouting\n',
+
             'table ip qubes-firewall {\n'
             '  chain prerouting {\n'
             '    iifname != "vif*" ip saddr {10.137.0.1, 10.137.0.2} drop\n'
@@ -543,6 +563,25 @@ class TestNftablesWorker(TestCase):
             '    oifname != "vif*" ip daddr {10.137.0.1, 10.137.0.2} drop\n'
             '  }\n'
             '}\n'
+        ])
+
+    def test_009_update_connected_ips_empty(self):
+        self.obj.qdb.entries['/connected-ips'] = b''
+        self.obj.loaded_rules = []
+        self.obj.update_connected_ips(4)
+
+        self.assertEqual(self.obj.loaded_rules, [
+            'flush chain ip qubes-firewall prerouting\n'
+            'flush chain ip qubes-firewall postrouting\n'
+        ])
+
+    def test_010_update_connected_ips_missing(self):
+        self.obj.loaded_rules = []
+        self.obj.update_connected_ips(4)
+
+        self.assertEqual(self.obj.loaded_rules, [
+            'flush chain ip qubes-firewall prerouting\n'
+            'flush chain ip qubes-firewall postrouting\n'
         ])
 
 class TestFirewallWorker(TestCase):

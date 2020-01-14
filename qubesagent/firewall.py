@@ -82,6 +82,8 @@ class FirewallWorker(object):
 
     def get_connected_ips(self, family):
         ips = self.qdb.read('/connected-ips6' if family == 6 else '/connected-ips')
+        if ips is None:
+            return []
         return ips.decode().split()
 
     def run_firewall_dir(self):
@@ -511,20 +513,24 @@ class NftablesWorker(FirewallWorker):
 
     def update_connected_ips(self, family):
         family_name = ('ip6' if family == 6 else 'ip')
-        ips = self.get_connected_ips(family)
-        if ips:
-            addr = '{' + ', '.join(ips) + '}'
-            irule = 'iifname != "vif*" {family_name} saddr {addr} drop\n'.format(
-                family_name=family_name, addr=addr)
-            orule = 'oifname != "vif*" {family_name} daddr {addr} drop\n'.format(
-                family_name=family_name, addr=addr)
-        else:
-            irule = ''
-            orule = ''
+        table = 'qubes-firewall'
 
-        nft_input = (
+        self.run_nft((
             'flush chain {family_name} {table} prerouting\n'
             'flush chain {family_name} {table} postrouting\n'
+        ).format(family_name=family_name, table=table))
+
+        ips = self.get_connected_ips(family)
+        if not ips:
+            return
+
+        addr = '{' + ', '.join(ips) + '}'
+        irule = 'iifname != "vif*" {family_name} saddr {addr} drop\n'.format(
+            family_name=family_name, addr=addr)
+        orule = 'oifname != "vif*" {family_name} daddr {addr} drop\n'.format(
+            family_name=family_name, addr=addr)
+
+        nft_input = (
             'table {family_name} {table} {{\n'
             '  chain prerouting {{\n'
             '    {irule}'
@@ -535,7 +541,7 @@ class NftablesWorker(FirewallWorker):
             '}}\n'
         ).format(
             family_name=family_name,
-            table='qubes-firewall',
+            table=table,
             irule=irule,
             orule=orule,
         )
