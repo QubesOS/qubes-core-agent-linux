@@ -332,10 +332,9 @@ class TestIptablesWorker(TestCase):
             ])
 
     def test_008_update_connected_ips(self):
-        with patch.object(self.obj, 'get_connected_ips') as get_connected_ips:
-            get_connected_ips.return_value = ['10.137.0.1', '10.137.0.2']
-            self.obj.called_commands[4] = []
-            self.obj.update_connected_ips(4)
+        self.obj.qdb.entries['/connected-ips'] = b'10.137.0.1 10.137.0.2'
+        self.obj.called_commands[4] = []
+        self.obj.update_connected_ips(4)
 
         self.assertEqual(self.obj.called_commands[4], [
             ['-t', 'raw', '-F', 'QBS-PREROUTING'],
@@ -529,10 +528,9 @@ class TestNftablesWorker(TestCase):
             ])
 
     def test_008_update_connected_ips(self):
-        with patch.object(self.obj, 'get_connected_ips') as get_connected_ips:
-            get_connected_ips.return_value = ['10.137.0.1', '10.137.0.2']
-            self.obj.loaded_rules = []
-            self.obj.update_connected_ips(4)
+        self.obj.qdb.entries['/connected-ips'] = b'10.137.0.1 10.137.0.2'
+        self.obj.loaded_rules = []
+        self.obj.update_connected_ips(4)
 
         self.assertEqual(self.obj.loaded_rules, [
             'flush chain ip qubes-firewall prerouting\n'

@@ -81,10 +81,8 @@ class FirewallWorker(object):
         raise NotImplementedError
 
     def get_connected_ips(self, family):
-        if family == 6:
-            return self.qdb.read('/connected-ips6').split()
-        else:
-            return self.qdb.read('/connected-ips').split()
+        ips = self.qdb.read('/connected-ips6' if family == 6 else '/connected-ips')
+        return ips.decode().split()
 
     def run_firewall_dir(self):
         """Run scripts dir contents, before user script"""
