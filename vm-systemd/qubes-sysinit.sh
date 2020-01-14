@@ -60,13 +60,4 @@ done
 # Prepare environment for other services
 echo > /var/run/qubes-service-environment
 
-gui_opts="-d $(qubesdb-read /qubes-gui-domain-xid || echo 0)"
-
-debug_mode=$(qubesdb-read /qubes-debug-mode 2> /dev/null)
-if [ -n "$debug_mode" ] && [ "$debug_mode" -gt 0 ]; then
-    gui_opts="$gui_opts -vv"
-fi
-
-echo "GUI_OPTS=$gui_opts" >> /var/run/qubes-service-environment
-
 exit 0
