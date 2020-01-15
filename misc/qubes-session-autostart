@@ -61,7 +61,16 @@ def process_autostart(environments):
     # handle only "most important" entry
     processed_entries = {}
     for path in xdg.BaseDirectory.load_config_paths('autostart'):
-        for entry_name in os.listdir(path):
+        try:
+            entries = os.listdir(path)
+        except Exception as e:
+            print(
+                "Failed to process path '{}': {}".format(path, str(e)),
+                file=sys.stderr
+            )
+            continue
+
+        for entry_name in entries:
             if entry_name in processed_entries:
                 continue
 
