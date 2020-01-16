@@ -686,6 +686,7 @@ rm -f %{name}-%{version}
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
+/usr/lib/qubes/qvm_nautilus_bookmark.sh
 
 %files thunar
 /usr/lib/qubes/qvm-actions.sh
