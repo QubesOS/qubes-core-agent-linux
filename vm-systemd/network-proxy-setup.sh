@@ -4,7 +4,7 @@
 # shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
-# Setup gateway for all the VMs this netVM is serviceing...
+# Setup gateway for all the VMs this NetVM is servicing...
 network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
 if [ "x$network" != "x" ]; then
 
