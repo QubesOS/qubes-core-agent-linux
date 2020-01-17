@@ -1,3 +1,47 @@
+qubes-core-agent (4.1.7-1) unstable; urgency=medium
+
+  [ Jonas DOREL ]
+  * Mention Update Proxy in configuration
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not load u2mfn module anymore
+
+  [ Patrick Schleizer ]
+  * console=hvc0 must be last
+
+  [ Pawel Marczewski ]
+  * StartApp: remove workaround for .desktop suffix
+  * Make the file copy operation respect default_user
+  * GetAppmenus: ensure right app directories
+  * Silence shellcheck
+  * qubes.GetAppmenus: handle home directory properly in case of sudo
+
+  [ Frédéric Pierret (fepitre) ]
+  * travis: switch to dom0 Fedora 31
+
+  [ Pawel Marczewski ]
+  * qubes-firewall: add anti-spoofing rules for connected machines
+  * Update firewall tests
+  * Update rule priorities for anti-spoofing
+  * Update tests for anti-spoofing, add test for the method itself
+  * qubes-firewall: correctly handle empty connected-ips list
+  * firewall: fix family / family_name
+  * update_connected_ips: correctly handle byte-string
+  * get_connected_ips: handle empty and missing keys, add tests
+  * update_connected_ips: reload nftables using one command
+  * update_connected_ips: set iptables policy to drop while updating
+
+  [ Marta Marczykowska-Górecka ]
+  * Added "QubesIncoming" shortcut to Nautilus
+
+  [ Pawel Marczewski ]
+  * qubes-session-autostart: handle error when reading a directory
+
+  [ AJ Jordan ]
+  * Fix typo
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 17 Jan 2020 05:12:04 +0100
+
 qubes-core-agent (4.1.6-1) unstable; urgency=medium
 
   [ Hans Jerry Illikainen ]
