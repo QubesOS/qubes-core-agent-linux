@@ -1,10 +1,29 @@
 #!/bin/sh
 # Try to find a terminal emulator that's installed and run it.
 
-for terminal in x-terminal-emulator gnome-terminal xfce4-terminal konsole urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal mate-terminal terminology st xterm; do
+is_command() {
     # bogus warning from ShellCheck < 0.5.0
     # shellcheck disable=SC2039
-    if type "$terminal" >/dev/null 2>&1 ; then
+    type "$1" >/dev/null 2>&1
+}
+
+if is_command x-terminal-emulator; then
+    exec x-terminal-emulator
+fi
+
+if is_command gnome-terminal; then
+    # Check if our gnome-terminal version supports --wait
+    # (we can't just run it and check exit code, because if it works, it will
+    # return the exit code of the child process)
+    if gnome-terminal --help-terminal-options | grep --silent -- --wait; then
+        exec gnome-terminal --wait
+    else
+        exec gnome-terminal
+    fi
+fi
+
+for terminal in xfce4-terminal konsole urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal mate-terminal terminology st xterm; do
+    if is_command "$terminal" ; then
         exec "$terminal"
     fi
 done
