@@ -1,6 +1,40 @@
 # vim: fileencoding=utf-8
 
+import os
+
 import setuptools
+import setuptools.command.install
+import re
+
+
+CONSOLE_SCRIPTS = [
+    ('qubes-firewall', 'qubesagent.firewall'),
+    ('qubes-vmexec', 'qubesagent.vmexec'),
+]
+
+
+# create simple scripts that run much faster than "console entry points"
+class CustomInstall(setuptools.command.install.install):
+    def run(self):
+        bin = os.path.join(self.root, "usr/bin")
+        try:
+            os.makedirs(bin)
+        except:
+            pass
+        for file, pkg in CONSOLE_SCRIPTS:
+            path = os.path.join(bin, file)
+            with open(path, "w") as f:
+                f.write(
+"""#!/usr/bin/python3
+from {} import main
+import sys
+if __name__ == '__main__':
+	sys.exit(main())
+""".format(pkg))
+
+            os.chmod(path, 0o755)
+        setuptools.command.install.install.run(self)
+
 
 if __name__ == '__main__':
     setuptools.setup(
@@ -14,10 +48,7 @@ if __name__ == '__main__':
 
         packages=('qubesagent',),
 
-        entry_points={
-            'console_scripts': [
-                'qubes-firewall = qubesagent.firewall:main',
-                'qubes-vmexec = qubesagent.vmexec:main',
-            ],
-        }
+        cmdclass={
+            'install': CustomInstall,
+        },
     )
