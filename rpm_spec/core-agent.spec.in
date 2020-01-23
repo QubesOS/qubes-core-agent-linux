@@ -549,6 +549,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
 %config(noreplace) /etc/qubes-rpc/qubes.ConnectTCP
 %config(noreplace) /etc/qubes-rpc/qubes.VMShell
+%config(noreplace) /etc/qubes-rpc/qubes.VMExec
+%config(noreplace) /etc/qubes-rpc/qubes.VMExecGUI
 %config(noreplace) /etc/qubes-rpc/qubes.VMRootShell
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPre
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPreAll
@@ -574,6 +576,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/rpc-config/qubes.StartApp
 %config(noreplace) /etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 %config(noreplace) /etc/qubes/rpc-config/qubes.VMShell+WaitForSession
+%config(noreplace) /etc/qubes/rpc-config/qubes.VMExecGUI
 %dir /etc/qubes/autostart
 %config(noreplace) /etc/default/grub.qubes
 /etc/qubes/autostart/README.txt
@@ -616,6 +619,7 @@ rm -f %{name}-%{version}
 /usr/bin/qubes-session-autostart
 /usr/bin/qvm-console
 /usr/bin/qvm-connect-tcp
+/usr/bin/qubes-vmexec
 %dir /usr/lib/qubes
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent
@@ -667,6 +671,8 @@ rm -f %{name}-%{version}
 %{python3_sitelib}/qubesagent/__init__.py*
 %{python3_sitelib}/qubesagent/firewall.py*
 %{python3_sitelib}/qubesagent/test_firewall.py*
+%{python3_sitelib}/qubesagent/vmexec.py*
+%{python3_sitelib}/qubesagent/test_vmexec.py*
 %{python3_sitelib}/qubesagent/xdg.py*
 
 /usr/share/qubes/mime-override/globs

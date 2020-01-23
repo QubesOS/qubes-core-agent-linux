@@ -52,6 +52,7 @@ install:
 	install -t $(DESTDIR)$(QUBESRPCCMDDIR) \
 		qubes.Filecopy qubes.OpenInVM qubes.VMShell \
 		qubes.VMRootShell \
+		qubes.VMExec \
 		qubes.OpenURL \
 		qubes.SuspendPre qubes.SuspendPost qubes.GetAppmenus \
 		qubes.SuspendPreAll \
@@ -69,6 +70,7 @@ install:
 		qubes.GetDate \
 		qubes.ShowInTerminal \
 		qubes.ConnectTCP
+	ln -s qubes.VMExec $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.VMExecGUI
 	for config in *.config; do \
 		install -D -m 0644 "$$config" "$(DESTDIR)$(QUBESRPCCONFDIR)/$${config%.config}"; \
 	done

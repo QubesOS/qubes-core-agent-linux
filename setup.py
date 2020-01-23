@@ -16,7 +16,8 @@ if __name__ == '__main__':
 
         entry_points={
             'console_scripts': [
-                'qubes-firewall = qubesagent.firewall:main'
+                'qubes-firewall = qubesagent.firewall:main',
+                'qubes-vmexec = qubesagent.vmexec:main',
             ],
         }
     )

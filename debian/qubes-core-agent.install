@@ -30,6 +30,8 @@ etc/qubes-rpc/qubes.SuspendPreAll
 etc/qubes-rpc/qubes.ConnectTCP
 etc/qubes-rpc/qubes.VMShell
 etc/qubes-rpc/qubes.VMRootShell
+etc/qubes-rpc/qubes.VMExec
+etc/qubes-rpc/qubes.VMExecGUI
 etc/qubes-rpc/qubes.WaitForSession
 etc/qubes-rpc/qubes.GetDate
 etc/qubes-suspend-module-blacklist
@@ -43,6 +45,7 @@ etc/qubes/rpc-config/qubes.SelectDirectory
 etc/qubes/rpc-config/qubes.StartApp
 etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 etc/qubes/rpc-config/qubes.VMShell+WaitForSession
+etc/qubes/rpc-config/qubes.VMExecGUI
 etc/qubes/suspend-post.d/README
 etc/qubes/suspend-post.d/*.sh
 etc/qubes/suspend-pre.d/README
@@ -94,6 +97,7 @@ usr/bin/qubes-desktop-run
 usr/bin/qubes-open
 usr/bin/qubes-session-autostart
 usr/bin/qubes-run-terminal
+usr/bin/qubes-vmexec
 usr/bin/qvm-copy
 usr/bin/qvm-copy-to-vm
 usr/bin/qvm-features-request
