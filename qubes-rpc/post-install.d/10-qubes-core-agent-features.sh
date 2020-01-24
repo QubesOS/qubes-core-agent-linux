@@ -4,6 +4,7 @@
 
 qvm-features-request qrexec=1
 qvm-features-request os=Linux
+qvm-features-request vmexec=1
 
 if [ -x /usr/bin/qubes-gui ]; then
     qvm-features-request gui=1
