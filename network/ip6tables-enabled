@@ -23,6 +23,7 @@ COMMIT
 :FORWARD DROP [0:0]
 :OUTPUT ACCEPT [0:0]
 :QBS-FORWARD - [0:0]
+-A INPUT -m state --state INVALID -j DROP
 -A INPUT -i lo -j ACCEPT
 -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -i vif+ -p icmpv6 --icmpv6-type router-advertisement -j DROP
@@ -31,6 +32,7 @@ COMMIT
 -A INPUT -i vif+ -j REJECT --reject-with icmp6-adm-prohibited
 -A INPUT -p icmpv6 -j ACCEPT
 -A INPUT -j DROP
+-A FORWARD -m state --state INVALID -j DROP
 -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 -A FORWARD -j QBS-FORWARD
 -A FORWARD -i vif+ -o vif+ -j DROP
