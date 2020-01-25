@@ -615,7 +615,6 @@ rm -f %{name}-%{version}
 /usr/bin/qvm-run-vm
 /usr/bin/qvm-features-request
 /usr/bin/qvm-sync-clock
-/usr/bin/xenstore-watch-qubes
 /usr/bin/qubes-desktop-run
 /usr/bin/qubes-run-terminal
 /usr/bin/qubes-run-gnome-terminal
@@ -635,7 +634,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qvm-move-to-vm.kde
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
-/usr/lib/qubes/close-window
 /usr/lib/qubes/xdg-icon
 /usr/lib/qubes/update-proxy-configs
 /usr/lib/qubes/upgrades-installed-check

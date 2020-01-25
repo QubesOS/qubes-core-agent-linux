@@ -200,7 +200,6 @@ install-common: install-doc
 
 	install -d $(DESTDIR)/var/lib/qubes
 
-	install -D misc/xenstore-watch $(DESTDIR)$(BINDIR)/xenstore-watch-qubes
 	install -d $(DESTDIR)/etc/udev/rules.d
 	install -m 0644 misc/udev-qubes-misc.rules $(DESTDIR)/etc/udev/rules.d/50-qubes-misc.rules
 	install -d $(DESTDIR)$(LIBDIR)/qubes/
@@ -220,8 +219,6 @@ install-common: install-doc
 	install -m 2775 -d $(DESTDIR)/var/lib/qubes/dom0-updates
 	install -D -m 0644 misc/qubes-master-key.asc $(DESTDIR)/usr/share/qubes/qubes-master-key.asc
 	install misc/resize-rootfs $(DESTDIR)$(LIBDIR)/qubes/
-
-	install misc/close-window $(DESTDIR)$(LIBDIR)/qubes/close-window
 
 	install misc/upgrades-installed-check $(DESTDIR)$(LIBDIR)/qubes/upgrades-installed-check
 	install misc/upgrades-status-notify $(DESTDIR)$(LIBDIR)/qubes/upgrades-status-notify
