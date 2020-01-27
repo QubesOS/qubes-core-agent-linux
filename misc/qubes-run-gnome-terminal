@@ -1,0 +1,12 @@
+#!/bin/sh
+# Wrapper around gnome-terminal that runs it with --wait option
+# (if supoported).
+
+# Check if our gnome-terminal version supports --wait
+# (we can't just run it and check exit code, because if it works, it will
+# return the exit code of the child process)
+if gnome-terminal --help-terminal-options | grep --silent -- --wait; then
+    exec gnome-terminal --wait "$@"
+else
+    exec gnome-terminal "$@"
+fi

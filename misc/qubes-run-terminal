@@ -12,14 +12,7 @@ if is_command x-terminal-emulator; then
 fi
 
 if is_command gnome-terminal; then
-    # Check if our gnome-terminal version supports --wait
-    # (we can't just run it and check exit code, because if it works, it will
-    # return the exit code of the child process)
-    if gnome-terminal --help-terminal-options | grep --silent -- --wait; then
-        exec gnome-terminal --wait
-    else
-        exec gnome-terminal
-    fi
+    exec qubes-run-gnome-terminal
 fi
 
 for terminal in xfce4-terminal konsole urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal mate-terminal terminology st xterm; do
