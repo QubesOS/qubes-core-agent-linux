@@ -4,3 +4,4 @@ docutils
 pylint
 codecov
 python-daemon
+pyxdg
