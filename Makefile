@@ -186,6 +186,7 @@ install-doc:
 
 install-common: install-doc
 	$(MAKE) -C autostart-dropins install
+	$(MAKE) -C applications-dropins install
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
 	# force /usr/bin before /bin to have /usr/bin/python instead of /bin/python

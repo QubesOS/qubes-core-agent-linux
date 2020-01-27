@@ -577,10 +577,13 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 %config(noreplace) /etc/qubes/rpc-config/qubes.VMShell+WaitForSession
 %config(noreplace) /etc/qubes/rpc-config/qubes.VMExecGUI
-%dir /etc/qubes/autostart
 %config(noreplace) /etc/default/grub.qubes
+%dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
+%dir /etc/qubes/applications
+/etc/qubes/applications/README.txt
+%config /etc/qubes/applications/*.desktop.d/30_qubes.conf
 %dir /etc/qubes/suspend-pre.d
 /etc/qubes/suspend-pre.d/README
 %dir /etc/qubes/suspend-post.d
@@ -675,6 +678,7 @@ rm -f %{name}-%{version}
 %{python3_sitelib}/qubesagent/vmexec.py*
 %{python3_sitelib}/qubesagent/test_vmexec.py*
 %{python3_sitelib}/qubesagent/xdg.py*
+%{python3_sitelib}/qubesagent/test_xdg.py*
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc
