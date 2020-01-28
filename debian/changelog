@@ -1,3 +1,22 @@
+qubes-core-agent (4.1.8-1) unstable; urgency=medium
+
+  [ Pawel Marczewski ]
+  * qubes-run-terminal: use gnome-terminal --wait, if supported
+  * Add qubes.VMExec call, for running a single command
+  * Install faster console scripts for Python code
+  * Advertise qubes.VMExec support as a feature
+  * firewall: drop INVALID state TCP packets
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: include PyGTK setup
+  * travis: install also python xdg module
+
+  [ Pawel Marczewski ]
+  * Add qubes-run-gnome-terminal utility that uses --wait
+  * Add /etc/qubes/applications override, use it for gnome-terminal
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 28 Jan 2020 21:44:36 +0100
+
 qubes-core-agent (4.1.7-1) unstable; urgency=medium
 
   [ Jonas DOREL ]
