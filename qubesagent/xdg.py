@@ -4,17 +4,78 @@ from gi.repository import Gio  # pylint: disable=import-error
 from gi.repository import GLib  # pylint: disable=import-error
 import sys
 import os
+import io
+from xdg.DesktopEntry import DesktopEntry
+
+
+DROPINS_DIR = '/etc/qubes/applications'
+
+
+def find_dropins(filename, dropins_dir):
+    result = []
+    app_dropins_dir = os.path.join(
+        dropins_dir,
+        os.path.basename(filename) + '.d')
+    if os.path.isdir(app_dropins_dir):
+        for dropin in sorted(os.listdir(app_dropins_dir)):
+            result.append(
+                os.path.join(app_dropins_dir, dropin))
+    return result
+
+
+def load_desktop_entry_with_dropins(filename, dropins):
+    desktop_entry = DesktopEntry(filename)
+    for dropin in dropins:
+        dropin_entry = DesktopEntry(dropin)
+        for group_name, group in dropin_entry.content.items():
+            desktop_entry.content.setdefault(group_name, {}).update(group)
+    return desktop_entry
+
+
+def make_launcher(filename, dropins_dir=DROPINS_DIR):
+    dropins = find_dropins(filename, dropins_dir)
+    if not dropins:
+        return Gio.DesktopAppInfo.new_from_filename(filename)
+
+    desktop_entry = load_desktop_entry_with_dropins(filename, dropins)
+
+    data = GLib.Bytes(ini_to_string(desktop_entry).encode('utf-8'))
+    keyfile = GLib.KeyFile()
+    keyfile.load_from_bytes(data, 0)
+    return Gio.DesktopAppInfo.new_from_keyfile(keyfile)
+
+
+def ini_to_string(ini):
+    # See IniFile.write() in xdg package.
+
+    output = io.StringIO()
+    if ini.defaultGroup:
+        output.write("[%s]\n" % ini.defaultGroup)
+        for (key, value) in ini.content[ini.defaultGroup].items():
+            output.write("%s=%s\n" % (key, value))
+        output.write("\n")
+    for (name, group) in ini.content.items():
+        if name != ini.defaultGroup:
+            output.write("[%s]\n" % name)
+            for (key, value) in group.items():
+                output.write("%s=%s\n" % (key, value))
+            output.write("\n")
+
+    return output.getvalue()
+
 
 def pid_callback(launcher, pid, pid_list):
     pid_list.append(pid)
+
 
 def dbus_name_change(loop, name, old_owner, new_owner):
     if not new_owner:
         loop.quit()
 
-def launch(desktop, *files, **kwargs):
+
+def launch(filename, *files, **kwargs):
     wait = kwargs.pop('wait', True)
-    launcher = Gio.DesktopAppInfo.new_from_filename(desktop)
+    launcher = make_launcher(filename)
     try:
         import dbus
         from dbus.mainloop.glib import DBusGMainLoop

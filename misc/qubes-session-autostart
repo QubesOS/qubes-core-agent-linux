@@ -24,22 +24,13 @@
 import sys
 
 from xdg.DesktopEntry import DesktopEntry
-from qubesagent.xdg import launch
+from qubesagent.xdg import launch, find_dropins, \
+    load_desktop_entry_with_dropins
 import xdg.BaseDirectory
 import os
 
+
 QUBES_XDG_CONFIG_DROPINS = '/etc/qubes/autostart'
-
-def open_desktop_entry_and_dropins(filename):
-    desktop_entry = DesktopEntry(filename)
-    dropins_dir = os.path.join(QUBES_XDG_CONFIG_DROPINS,
-                               os.path.basename(filename) + '.d')
-    if os.path.isdir(dropins_dir):
-        for dropin in sorted(os.listdir(dropins_dir)):
-            dropin_content = DesktopEntry(os.path.join(dropins_dir, dropin))
-            desktop_entry.content.update(dropin_content.content)
-
-    return desktop_entry
 
 
 def entry_should_be_started(entry, environments):
@@ -80,7 +71,10 @@ def process_autostart(environments):
                 entry_path = os.path.join(path, entry_name)
                 # files in $HOME have higher priority than dropins
                 if not path.startswith(xdg.BaseDirectory.xdg_config_home):
-                    entry = open_desktop_entry_and_dropins(entry_path)
+                    dropins = find_dropins(
+                        entry_path, QUBES_XDG_CONFIG_DROPINS)
+                    entry = load_desktop_entry_with_dropins(
+                        entry_path, dropins)
                 else:
                     entry = DesktopEntry(entry_path)
                 if entry_should_be_started(entry, environments):

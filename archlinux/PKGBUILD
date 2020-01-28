@@ -33,7 +33,7 @@ noextract=()
 md5sums=(SKIP)
 
 build() {
-    for source in autostart-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
+    for source in autostart-dropins applications-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
         # shellcheck disable=SC2154
         (ln -s "$srcdir/../$source" "$srcdir/$source")
     done

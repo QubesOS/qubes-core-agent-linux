@@ -186,6 +186,7 @@ install-doc:
 
 install-common: install-doc
 	$(MAKE) -C autostart-dropins install
+	$(MAKE) -C applications-dropins install
 	install -m 0644 -D misc/fstab $(DESTDIR)/etc/fstab
 
 	# force /usr/bin before /bin to have /usr/bin/python instead of /bin/python
@@ -233,6 +234,7 @@ install-common: install-doc
 	install -m 0755 misc/qvm-features-request $(DESTDIR)$(BINDIR)/qvm-features-request
 	install -m 0755 misc/qubes-run-terminal $(DESTDIR)/$(BINDIR)
 	install -D -m 0644 misc/qubes-run-terminal.desktop $(DESTDIR)/$(APPLICATIONSDIR)/qubes-run-terminal.desktop
+	install -m 0755 misc/qubes-run-gnome-terminal $(DESTDIR)/$(BINDIR)
 
 	install -D -m 0644 misc/dconf-db-local-dpi $(DESTDIR)/etc/dconf/db/local.d/dpi
 
@@ -245,7 +247,7 @@ install-common: install-doc
 
 	install -D -m 0644 misc/marker-vm $(DESTDIR)/usr/share/qubes/marker-vm
 	cut -f 1,2 -d . version >> $(DESTDIR)/usr/share/qubes/marker-vm
-	
+
 	install -m 0755 misc/tinyproxy-wrapper $(DESTDIR)/usr/lib/qubes/tinyproxy-wrapper
 
 	install -m 0755 misc/qvm-console $(DESTDIR)$(BINDIR)/qvm-console
