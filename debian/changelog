@@ -1,3 +1,33 @@
+qubes-core-agent (4.0.52-1) unstable; urgency=medium
+
+  [ Pawel Marczewski ]
+  * StartApp: remove workaround for .desktop suffix
+  * GetAppmenus: ensure right app directories
+  * Silence shellcheck
+  * Make the file copy operation respect default_user
+  * qubes-session-autostart: handle error when reading a directory
+
+  [ AJ Jordan ]
+  * Fix typo
+
+  [ Pawel Marczewski ]
+  * firewall: drop INVALID state TCP packets
+
+  [ Frédéric Pierret (fepitre) ]
+  * Update python2 dependencies to python3 and clean deprecated
+    requirements
+  * Require python setuptools
+
+  [ Marek Marczykowski-Górecki ]
+  * Minor codestyle fix in qubesadmin/firewall.py
+  * Convert qubesagent module to python3
+  * Convert other scripts to python3
+  * Use spaces in xdg-icon script
+  * debian: switch to python3
+  * rpm: switch deps to python3-setuptools on CentOS too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 31 Jan 2020 03:49:43 +0100
+
 qubes-core-agent (4.0.51-1) wheezy; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
