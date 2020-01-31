@@ -6,6 +6,6 @@
 # (we can't just run it and check exit code, because if it works, it will
 # return the exit code of the child process)
 case "$(gnome-terminal --help-terminal-options)" in
-    *--wait*) exec gnome-terminal --wait "$@" ;;
-    *)        exec gnome-terminal "$@" ;;
+    *--wait\ *) exec gnome-terminal --wait "$@" ;;
+    *)          exec gnome-terminal "$@" ;;
 esac
