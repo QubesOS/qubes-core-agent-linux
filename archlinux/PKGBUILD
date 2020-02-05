@@ -1,5 +1,4 @@
 #!/bin/bash
-# Maintainer: Olivier Medoc <o_medoc@yahoo.fr>
 # shellcheck disable=SC2034
 pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring)
 pkgver=$(cat version)
@@ -10,7 +9,7 @@ arch=("x86_64")
 url="http://qubes-os.org/"
 license=('GPL')
 groups=()
-makedepends=(gcc make pkg-config "qubes-vm-utils>=3.1.3" qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python lsb-release pandoc)
+makedepends=(gcc make pkg-config qubes-vm-utils qubes-libvchan qubes-db-vm qubes-vm-xen libx11 python lsb-release pandoc)
 checkdepends=()
 provides=()
 conflicts=()
@@ -22,7 +21,6 @@ changelog=
 source=(
     PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook
     PKGBUILD-qubes-pacman-options.conf
-    PKGBUILD-qubes-repo-3.2.conf
     PKGBUILD-qubes-repo-4.1.conf
     PKGBUILD-keyring-keys
     PKGBUILD-keyring-trusted
@@ -60,9 +58,9 @@ build() {
 # * core systemd services and drop-ins
 # * basic network functionality (setting IP address, DNS, default gateway)
 package_qubes-vm-core() {
-    depends=("qubes-vm-utils>=3.1.3" python python-xdg ethtool ntp net-tools
+    depends=(qubes-vm-utils python python-xdg ethtool ntp net-tools
              gnome-packagekit imagemagick fakeroot notification-daemon dconf
-             zenity qubes-libvchan "qubes-db-vm>=3.2.1" haveged python-gobject
+             zenity qubes-libvchan qubes-db-vm haveged python-gobject
              python-dbus xdg-utils notification-daemon gawk sed procps-ng librsvg
              socat
              )
@@ -125,8 +123,8 @@ EOF
 #
 package_qubes-vm-networking() {
     pkgdesc="Qubes OS tools allowing to use a Qubes VM as a NetVM/ProxyVM"
-    depends=(qubes-vm-core "qubes-vm-utils>=3.1.3" python ethtool net-tools
-             "qubes-db-vm>=3.2.1" networkmanager iptables tinyproxy nftables
+    depends=(qubes-vm-core qubes-vm-utils python ethtool net-tools
+             qubes-db-vm networkmanager iptables tinyproxy nftables
              )
     install=PKGBUILD-networking.install
 
