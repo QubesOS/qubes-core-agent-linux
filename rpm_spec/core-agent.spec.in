@@ -124,12 +124,12 @@ Requires:   hostname
 Requires:   xterm
 # for qubes-desktop-run
 Requires:   pygobject3-base
-Requires:   python3-dbus
+Requires:   python%{python3_pkgversion}-dbus
 # for qubes-session-autostart, xdg-icon
-Requires:   python3-pyxdg
-Requires:   python3-daemon
+Requires:   python%{python3_pkgversion}-pyxdg
+Requires:   python%{python3_pkgversion}-daemon
 # for qvm-feature-request
-Requires:   python3-qubesdb
+Requires:   python%{python3_pkgversion}-qubesdb
 Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   zenity
