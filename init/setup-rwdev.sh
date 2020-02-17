@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Source Qubes library.
+# shellcheck source=init/functions
+. /usr/lib/qubes/init/functions
+
 set -e
 
 dev=/dev/xvdb
@@ -16,7 +20,13 @@ if [ -e "$dev" ] ; then
     if cmp --bytes $private_size "$dev" /dev/zero >/dev/null && { blkid -p "$dev" >/dev/null; [ $? -eq 2 ]; }; then
         # the device is empty, create filesystem
         echo "Virgin boot of the VM: creating private.img filesystem on $dev" >&2
-        if ! content=$(mkfs.ext4 -m 0 -q "$dev" 2>&1) ; then
+        # journals are only useful on reboot, so don't write one in a DispVM
+        if is_dispvm ; then
+            journal="-O ^has_journal"
+        else
+            journal="-O has_journal"
+        fi
+        if ! content=$(mkfs.ext4 -m 0 -q "$journal" "$dev" 2>&1) ; then
             echo "Virgin boot of the VM: creation of private.img on $dev failed:" >&2
             echo "$content" >&2
             echo "Virgin boot of the VM: aborting" >&2
