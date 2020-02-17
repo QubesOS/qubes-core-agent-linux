@@ -30,6 +30,8 @@ install-apt:
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/00notify-hook
 	install -D -m 0644 apt-conf-70no-unattended \
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/70no-unattended
+	install -D -m 0644 apt-conf-10no-cache \
+		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/10no-cache
 
 install-dnf: install-rpm
 	install -D -m 0644 dnf-qubes-hooks.py \
