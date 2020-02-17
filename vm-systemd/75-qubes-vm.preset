@@ -77,6 +77,12 @@ disable openct.service
 disable rngd.service
 disable tcsd.service
 
+# Debian only services 
+disable apt-daily-upgrade.timer
+disable apt-daily.timer
+disable cups-browsed.service
+disable avahi-daemon.socket
+
 enable qubes-sysinit.service
 enable qubes-early-vm-config.service
 enable qubes-db.service
