@@ -58,7 +58,7 @@ fi
 
 find "${apps_dirs[@]}" -name '*.desktop' -print0 2>/dev/null | \
          xargs -0 awk '
-         BEGINFILE { entry="" }
+         BEGINFILE { if (ERRNO) nextfile; entry="" }
          /^\[/ { if (tolower($0) != "\[desktop entry\]") nextfile } 
          /^Exec=/ { entry = entry FILENAME ":Exec=qubes-desktop-run " FILENAME "\n"; next }
          /^NoDisplay *= *true$/ { entry=""; nextfile }
