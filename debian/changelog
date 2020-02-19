@@ -1,3 +1,28 @@
+qubes-core-agent (4.0.53-1) unstable; urgency=medium
+
+  [ Neowutran ]
+  * archlinux: update dependencies
+  * archlinux: remove old maintainer key (olivier medoc)
+
+  [ Yukikoo ]
+  * archlinux: clean references to my server
+
+  [ Frédéric Pierret (fepitre) ]
+  * spec: replace python3 by python%{python3_pkgversion}
+
+  [ unman ]
+  * Do not reference sudo group when removing package
+
+  [ Saswat Padhi ]
+  * qubes.GetAppmenus: skip unreadable .desktop files
+  * signed
+
+  [ Amber M. Breslau ]
+  * init/functions: fix DispVM detection
+  * init/setup-rwdev: don't write a journal in DispVMs
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 19 Feb 2020 02:32:30 +0100
+
 qubes-core-agent (4.0.52-1) unstable; urgency=medium
 
   [ Pawel Marczewski ]
