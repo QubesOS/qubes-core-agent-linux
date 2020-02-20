@@ -123,7 +123,7 @@ Requires:   hostname
 # for Qubes Manager VM updater
 Requires:   xterm
 # for qubes-desktop-run
-Requires:   pygobject3-base
+Requires:   python%{python3_pkgversion}-gobject-base
 Requires:   python%{python3_pkgversion}-dbus
 # for qubes-session-autostart, xdg-icon
 Requires:   python%{python3_pkgversion}-pyxdg
