@@ -30,7 +30,7 @@ else
     # restore error. So instead of that, use tar2qfile exit code (and have dom0
     # detect if anything wrong with actual data)
     retcode=$?
-    wait -n
+    wait $!
     rm "$tmpdir/backup-data"
     rmdir "$tmpdir"
     exit "$retcode"
