@@ -123,7 +123,7 @@ Requires:   hostname
 # for Qubes Manager VM updater
 Requires:   xterm
 # for qubes-desktop-run
-Requires:   pygobject3-base
+Requires:   python%{python3_pkgversion}-gobject-base
 Requires:   python%{python3_pkgversion}-dbus
 # for qubes-session-autostart, xdg-icon
 Requires:   python%{python3_pkgversion}-pyxdg
@@ -139,6 +139,8 @@ Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 Requires:   python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 Requires: python%{python3_pkgversion}-setuptools
+# for qubes.ResizeDisk
+Requires:   parted
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
 Provides:   qubes-core-vm = %{version}-%{release}
