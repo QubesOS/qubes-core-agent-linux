@@ -1,3 +1,11 @@
+qubes-core-agent (4.1.10-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * spec: fix missing python3 gi module
+  * spec: add 'parted' dependency
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 01 Mar 2020 03:42:33 +0100
+
 qubes-core-agent (4.1.9-1) unstable; urgency=medium
 
   [ Rusty Bird ]
