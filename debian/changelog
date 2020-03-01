@@ -1,3 +1,65 @@
+qubes-core-agent (4.1.9-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * misc/qubes-run-gnome-terminal: avoid external utility (grep)
+  * misc/qubes-run-gnome-terminal: slightly restrict pattern
+
+  [ Amadeusz Piotr Żołnowski ]
+  * Remove no longer needed `xenstore-watch` and `close-window`
+  * Remove dconfig-profile user as it is generated automatically
+  * Split items in `misc` directory by topic
+  * Move `qvm-console` to core-admin-client repository
+  * Don't list `/var/run/qubes` in rpm files as it's dynamic dir
+  * Move `qubes-firewall` from `sbin` to `bin`
+  * Merge `app-defaults` and `sys-defaults` to `config-overrides`
+  * Install 50-qubes-mem-hotplug.rules in /lib/udev instead of /etc/udev
+  * Add README.md to package-managers
+
+  [ unman ]
+  * Do not reference sudo group when removing package
+
+  [ Zaoqi ]
+  * fix https://github.com/QubesOS/qubes-issues/issues/5619
+  * archlinux/PKGBUILD: remove python2
+
+  [ Frédéric Pierret (fepitre) ]
+  * spec: replace python3 by python%{python3_pkgversion}
+
+  [ Zaoqi ]
+  * archlinux/PKGBUILD: fix typo
+
+  [ Saswat Padhi ]
+  * qubes.GetAppmenus: skip unreadable .desktop files
+  * signed
+
+  [ unman ]
+  * Disable package caching in apt operations
+
+  [ Amber M. Breslau ]
+  * init/functions: fix DispVM detection
+  * init/setup-rwdev: don't write a journal in DispVMs
+
+  [ unman ]
+  * Disable unnecessary services in Debian
+
+  [ Neowutran ]
+  * archlinux: update dependencies
+  * archlinux: remove old maintainer key (olivier medoc)
+
+  [ Yukikoo ]
+  * archlinux: clean references to my server
+
+  [ Frédéric Pierret (fepitre) ]
+  * qubes-sysinit: set GUI_OPTS in gui-agent-linux
+
+  [ Marek Marczykowski-Górecki ]
+  * Adjust version of required qubes-gui-agent
+
+  [ Rusty Bird ]
+  * qubes.Restore: remove bashism found by new ShellCheck
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 01 Mar 2020 03:31:40 +0100
+
 qubes-core-agent (4.1.8-1) unstable; urgency=medium
 
   [ Pawel Marczewski ]
