@@ -9,9 +9,9 @@ mkfifo $stderr_pipe
 # tee can't write to file descriptor, nor /proc/self/fd/2 (EXIO on open)
 return_stderr_pipe=/tmp/qrexec-rpc-stderr-return.$$
 mkfifo $return_stderr_pipe
-{ cat <$return_stderr_pipe >&2 2>/dev/null; rm -f $return_stderr_pipe; } &
-{ tee $return_stderr_pipe 2>/dev/null <$stderr_pipe |\
-       logger -t "$1-$2" >/dev/null 2>&1; rm -f $stderr_pipe; } &
+{ cat <$return_stderr_pipe >&2 2>/dev/null; rm -f $return_stderr_pipe; } </dev/null >/dev/null &
+{ tee $return_stderr_pipe <$stderr_pipe |\
+       logger -t "$1-$2"; rm -f $stderr_pipe; } </dev/null >/dev/null 2>&1 &
 exec 2>$stderr_pipe
 
 QUBES_RPC=/etc/qubes-rpc
