@@ -139,7 +139,7 @@ if ! $YUM --help | grep -q downloadonly; then
         mapfile -t PKGLIST < <(echo "$UPDATES_FULL" | grep -v "^Obsoleting\|Could not" | cut -f 1 -d ' ')
         if [ "$check_update_retcode" -eq 0 ]; then
             # exit code 0 means no updates available - regardless of stdout messages
-            echo "No new updates available"
+            echo "No new updates available" >&2
             exit 0
         fi
         YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
@@ -194,7 +194,7 @@ if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
                 rpmkeys_error=1
                 rm "$pkg"
             else
-                echo "Successfully verified $pkg"
+                echo "Successfully verified $pkg" >&2
             fi
         done
         if [ ! "$rpmkeys_error" = "0" ]; then
@@ -211,5 +211,5 @@ if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
         exit "$qrexec_exit_code"
     fi
 else
-    echo "No packages downloaded"
+    echo "No packages downloaded" >&2
 fi
