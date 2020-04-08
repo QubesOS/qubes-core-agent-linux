@@ -208,6 +208,7 @@ if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
     $cmd "$DOM0_UPDATES_DIR"/packages/*.rpm || { qrexec_exit_code=$? ; true; };
     if [ ! "$qrexec_exit_code" = "0" ]; then
         echo "'$cmd $DOM0_UPDATES_DIR/packages/*.rpm' failed with exit code ${qrexec_exit_code}!" >&2
+        echo 'Sometimes this is caused by dom0 not having enough free space.' >&2
         exit "$qrexec_exit_code"
     fi
 else
