@@ -1,3 +1,23 @@
+qubes-core-agent (4.0.55-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix not closed file descriptors in qubes-rpc-multiplexer
+  * Fix downloading dom0 updates on Debian
+
+  [ Hans Jerry Illikainen ]
+  * qubes-download-dom0-updates: verify package signatures
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: output diagnostics messages to stderr
+
+  [ Frédéric Pierret (fepitre) ]
+  * setup-ip: fallback to legacy if nmcli is no present
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: use imported config
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 18 Apr 2020 16:06:23 +0200
+
 qubes-core-agent (4.0.54-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
