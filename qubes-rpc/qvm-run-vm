@@ -31,7 +31,8 @@ this tool does not propagate standard error or exit codes, nor does it offer
 protection against the remote VM messing with your terminal if standard output
 is your terminal.
 
-You can use \$dispvm or --dispvm instead of vmname to start a new DisposableVM.
+You can use @dispvm or \$dispvm or --dispvm instead of vmname to start a new
+DisposableVM.
 USAGE
 }
 
@@ -51,7 +52,7 @@ elif [ "$VMNAME" = "" ] ; then
 fi
 
 service="qubes.VMShell"
-case "$VMNAME" in \$dispvm|\$dispvm:*)
+case "$VMNAME" in [@$]dispvm|[@$]dispvm:*)
     service="$service+WaitForSession"
 esac
 
