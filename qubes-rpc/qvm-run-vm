@@ -45,7 +45,7 @@ VMNAME="$1"
 shift
 
 if [ "$VMNAME" = "--dispvm" ] ; then
-    VMNAME="\$dispvm"
+    VMNAME="@dispvm"
 elif [ "$VMNAME" = "" ] ; then
     print_usage
     exit 1
