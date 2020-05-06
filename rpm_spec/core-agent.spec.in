@@ -288,7 +288,7 @@ usermod -L user
 
 %pre passwordless-root
 
-usermod -p '' root
+usermod -L root
 
 %install
 
