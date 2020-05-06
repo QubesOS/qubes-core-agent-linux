@@ -26,10 +26,10 @@ Usage: $0 vmname command arguments
 Executes a command in another VM using the qubes.VMShell RPC service.  The
 arguments are joined with spaces and passed to "bash -c".
 
-Standard input and output are connected to the command.  Unlike qvm-run in Dom0,
-this tool does not propagate standard error or exit codes, nor does it offer
-protection against the remote VM messing with your terminal if standard output
-is your terminal.
+Standard input, output, and error are connected to the command.  Unlike qvm-run
+in Dom0, this tool does not propagate exit codes, nor does it offer protection
+against the remote VM messing with your terminal if standard output is your
+terminal.
 
 You can use @dispvm or \$dispvm or --dispvm instead of vmname to start a new
 DisposableVM.
