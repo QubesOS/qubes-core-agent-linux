@@ -64,7 +64,7 @@ USER_DROPIN_DIR ?= "usr/lib/systemd/user"
 
 SYSTEM_DROPINS := boot.automount chronyd.service crond.service
 SYSTEM_DROPINS += cups.service cups-browsed.service cups.path cups.socket ModemManager.service
-SYSTEM_DROPINS += getty@tty.service
+SYSTEM_DROPINS += getty@tty.service serial-getty@.service
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket
 SYSTEM_DROPINS += systemd-random-seed.service
