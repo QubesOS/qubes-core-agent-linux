@@ -88,6 +88,7 @@ lib/systemd/system/qubes-updates-proxy-forwarder@.service
 lib/systemd/system/qubes-updates-proxy-forwarder.socket
 lib/systemd/system/qubes-sync-time.service
 lib/systemd/system/qubes-sync-time.timer
+lib/systemd/system/serial-getty@.service.d/30_qubes.conf
 lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
 lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
 lib/systemd/system/tmp.mount.d/30_qubes.conf
