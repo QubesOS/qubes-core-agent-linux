@@ -160,6 +160,7 @@ Description: NetworkManager integration for Qubes VM
 
 Package: qubes-core-agent-passwordless-root
 Architecture: any
+Depends: libpam-runtime
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Provides: ${diverted-files}
