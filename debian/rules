@@ -23,8 +23,7 @@ override_dh_auto_install:
 	make -C network install
 	make -C package-managers install
 	make -C package-managers install-apt
-	make -C passwordless-root install
-	make -C passwordless-root/debian install
+	make -C passwordless-root install install-debian
 	make -C qubes-rpc install
 	make -C qubes-rpc/kde install
 	make -C qubes-rpc/nautilus install

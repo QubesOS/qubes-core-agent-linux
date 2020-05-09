@@ -288,7 +288,7 @@ usermod -L user
 
 %pre passwordless-root
 
-usermod -p '' root
+usermod -L root
 
 %install
 
@@ -299,7 +299,7 @@ make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
 make -C filesystem DESTDIR=$RPM_BUILD_ROOT install
 make -C misc DESTDIR=$RPM_BUILD_ROOT install
 make -C network DESTDIR=$RPM_BUILD_ROOT install
-make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install
+make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install install-rh
 make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
@@ -332,6 +332,16 @@ if ! grep -q /etc/default/grub.qubes /etc/default/grub 2>/dev/null; then
     # include another file
     echo '. /etc/default/grub.qubes' >> /etc/default/grub
 fi
+
+%triggerin passwordless-root -- util-linux
+
+qubesfile=/etc/pam.d/su.qubes
+origfile=${qubesfile%.qubes}
+backupfile=${origfile}.qubes-orig
+if [ -r "$origfile" -a ! -r "$backupfile" ]; then
+	mv -f "$origfile" "$backupfile"
+fi
+ln -sf "$qubesfile" "$origfile"
 
 %post
 
@@ -533,6 +543,13 @@ fi
 %postun passwordless-root
 if [ $1 -eq 0 ]; then
     usermod -p '*' root
+fi
+
+qubesfile=/etc/pam.d/su.qubes
+origfile=${qubesfile%.qubes}
+backupfile=${origfile}.qubes-orig
+if [ -f "$backupfile" ]; then
+    mv -f "$backupfile" "$origfile"
 fi
 
 %posttrans
@@ -755,6 +772,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 %config(noreplace) /etc/polkit-1/rules.d/00-qubes-allow-all.rules
 %config(noreplace) /etc/sudoers.d/qubes
+%config(noreplace) /etc/pam.d/su.qubes
 
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
@@ -869,6 +887,7 @@ The Qubes core startup configuration for SystemD init.
 /lib/systemd/system/ModemManager.service.d/30_qubes.conf
 /lib/systemd/system/NetworkManager.service.d/30_qubes.conf
 /lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
+/lib/systemd/system/serial-getty@.service.d/30_qubes.conf
 /lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
 /lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 /lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
