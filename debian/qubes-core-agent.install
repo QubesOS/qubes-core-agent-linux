@@ -44,6 +44,7 @@ etc/qubes/rpc-config/qubes.OpenInVM
 etc/qubes/rpc-config/qubes.OpenURL
 etc/qubes/rpc-config/qubes.SelectFile
 etc/qubes/rpc-config/qubes.SelectDirectory
+etc/qubes/rpc-config/qubes.ShowInTerminal
 etc/qubes/rpc-config/qubes.StartApp
 etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 etc/qubes/rpc-config/qubes.VMShell+WaitForSession

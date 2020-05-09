@@ -602,6 +602,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenURL
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectFile
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectDirectory
+%config(noreplace) /etc/qubes/rpc-config/qubes.ShowInTerminal
 %config(noreplace) /etc/qubes/rpc-config/qubes.StartApp
 %config(noreplace) /etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 %config(noreplace) /etc/qubes/rpc-config/qubes.VMShell+WaitForSession
