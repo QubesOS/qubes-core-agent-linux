@@ -17,3 +17,4 @@ install:
 		qubes-session-autostart
 	install -d $(DESTDIR)/$(APPLICATIONSDIR)
 	install -t $(DESTDIR)/$(APPLICATIONSDIR) -m 0644 qubes-run-terminal.desktop
+	install -t $(DESTDIR)/$(APPLICATIONSDIR) -m 0644 qubes-open-file-manager.desktop

@@ -689,6 +689,7 @@ rm -f %{name}-%{version}
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
 /usr/share/applications/qubes-run-terminal.desktop
+/usr/share/applications/qubes-open-file-manager.desktop
 /usr/share/qubes/serial.conf
 /usr/share/qubes/marker-vm
 /usr/share/glib-2.0/schemas/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override

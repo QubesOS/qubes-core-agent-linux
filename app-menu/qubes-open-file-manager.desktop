@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=Run Terminal
+Exec=xdg-open $HOME
+Icon=system-file-manager
+Type=Application
