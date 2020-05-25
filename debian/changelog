@@ -1,3 +1,24 @@
+qubes-core-agent (4.1.12-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * qvm-run-vm: add +WaitForSession for modern @dispvm syntax too
+  * qvm-run-vm: translate --dispvm to modern @dispvm syntax
+  * qvm-run-vm: fix comment
+
+  [ Paweł Marczewski ]
+  * Enable root autologin on serial console
+  * Lock root password in passwordless-root package
+  * Use pam-configs to override Debian PAM config
+  * Override PAM config for su in RPM package
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes.ShowInTerminal needs a graphical session running
+
+  [ Marta Marczykowska-Górecka ]
+  * Added a qubes-open-file-manager.desktop file
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 25 May 2020 03:35:46 +0200
+
 qubes-core-agent (4.1.11-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
