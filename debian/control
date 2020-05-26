@@ -157,6 +157,7 @@ Depends:
     libglib2.0-bin,
     network-manager (>= 0.8.1-1),
     network-manager-gnome,
+    policykit-1
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: NetworkManager integration for Qubes VM
