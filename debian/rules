@@ -38,3 +38,11 @@ override_dh_systemd_start:
 
 override_dh_install:
 	dh_install --fail-missing
+
+override_dh_gencontrol:
+ifneq ($(shell grep -o 'stretch\|buster' /etc/debian_version),)
+	echo "pythonver:Depends=python" >> debian/qubes-core-agent-nautilus.substvars
+else
+	echo "pythonver:Depends=python3" >> debian/qubes-core-agent-nautilus.substvars
+endif
+	dh_gencontrol
