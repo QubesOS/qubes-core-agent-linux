@@ -227,6 +227,7 @@ Summary:    NetworkManager integration for Qubes VM
 # to show/hide nm-applet
 Requires:   NetworkManager >= 0.8.1-1
 Requires:   glib2
+Requires:   polkit
 Requires:   qubes-core-agent-networking = %{version}
 Conflicts:  qubes-core-vm < 4.0.0
 
