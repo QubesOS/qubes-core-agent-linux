@@ -1,5 +1,3 @@
-RPMS_DIR=rpm/
-
 VERSION := $(shell cat version)
 
 DIST ?= fc18
@@ -19,30 +17,6 @@ PYTHON3_SITELIB = $(shell python3 -c 'import distutils.sysconfig; print(distutil
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
 
-help:
-	@echo "make rpms                  -- generate binary rpm packages"
-	@echo "make rpms-vm               -- generate binary rpm packages for VM"
-	@echo "make clean                 -- cleanup"
-	@echo "make install-vm            -- install VM related files"
-	@echo ""
-	@echo "You must have lsb_release, rpm-sign and pandoc installed."
-
-rpms: rpms-vm
-
-rpms-vm:
-	[ "$$BACKEND_VMM" != "" ] || { echo "error: you must define variable BACKEND_VMM" >&2 ; exit 1 ; }
-	lsb_release >/dev/null 2>&1 || { echo "error: you need lsb_release (package lsb) installed" >&2 ; exit 1 ; }
-	type pandoc >/dev/null 2>&1 || { echo "error: you need pandoc installed" >&2 ; exit 1 ; }
-	type rpmsign >/dev/null 2>&1 || { echo "error: you need rpm-sign installed" >&2 ; exit 1 ; }
-	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm.spec
-	rpmbuild --define "_rpmdir $(RPMS_DIR)" -bb rpm_spec/core-vm-doc.spec
-	[ "$$SKIP_SIGNING" != "" ] || rpm --addsign \
-		$(RPMS_DIR)/x86_64/qubes-core-vm-*$(VERSION)*.rpm \
-		$(RPMS_DIR)/x86_64/qubes-core-vm-doc-*$(VERSION)*.rpm
-
-rpms-dom0:
-	@true
-
 clean:
 	make -C misc clean
 	make -C qrexec clean
@@ -52,6 +26,8 @@ clean:
 	rm -rf test-packages/__pycache__
 	rm -rf test-packages/qubesagent.egg-info
 	rm -rf __pycache__
+	rm -rf debian/changelog.*
+	rm -rf pkgs
 	rm -f .coverage
 
 all:

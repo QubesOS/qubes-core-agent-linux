@@ -7,3 +7,5 @@ deb/*
 .coverage
 *.egg-info
 __pycache__
+debian/changelog.*
+pkgs
