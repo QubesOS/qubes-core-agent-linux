@@ -108,8 +108,8 @@ Package: qubes-core-agent-dom0-updates
 Architecture: any
 Depends:
     fakeroot,
-    yum,
-    yum-utils,
+    dnf | yum,
+    dnf | yum-utils,
     qubes-core-qrexec,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
