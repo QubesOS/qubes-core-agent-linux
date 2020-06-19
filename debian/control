@@ -108,6 +108,7 @@ Package: qubes-core-agent-dom0-updates
 Architecture: any
 Depends:
     fakeroot,
+    rpm,
     dnf | yum,
     dnf | yum-utils,
     qubes-core-qrexec,
