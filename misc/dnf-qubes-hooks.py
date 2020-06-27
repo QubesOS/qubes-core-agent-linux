@@ -67,8 +67,7 @@ class QubesHooks(dnf.Plugin):
             just_installed = self.base.transaction
             # ...and filter them out of available updates
             for item in just_installed:
-                for pkg in item.installs():
-                    updates.discard(pkg)
+                updates.discard(item.pkg)
             subprocess.call([
                 '/usr/lib/qubes/qrexec-client-vm',
                 'dom0',
