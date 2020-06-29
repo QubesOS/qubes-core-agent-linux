@@ -1,3 +1,21 @@
+qubes-core-agent (4.1.13-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * debian: conditional python version dependencies
+  * Fix missing dependency for managing Network-Manager in active user
+    session
+  * Use DNF instead of YUM if exists
+  * debian: add 'rpm' as dependency
+
+  [ Marta Marczykowska-Górecka ]
+  * fixed qubes.GetAppmenus ignoring some correct .desktop files
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "Fix updates notification on Fedora 29"
+  * dnf: update for DNF 4+ API
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 29 Jun 2020 06:29:35 +0200
+
 qubes-core-agent (4.1.12-1) unstable; urgency=medium
 
   [ Rusty Bird ]
