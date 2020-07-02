@@ -24,8 +24,7 @@ import logging
 import os
 import socket
 import subprocess
-from distutils import spawn
-
+import shutil
 import daemon
 
 import qubesdb
@@ -634,7 +633,7 @@ class NftablesWorker(FirewallWorker):
 
 
 def main():
-    if spawn.find_executable('nft'):
+    if shutil.which('nft'):
         worker = NftablesWorker()
     else:
         worker = IptablesWorker()
