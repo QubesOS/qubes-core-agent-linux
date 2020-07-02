@@ -1,3 +1,25 @@
+qubes-core-agent (4.0.56-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not use legacy distutils.spawn
+
+  [ Rusty Bird ]
+  * qvm-run-vm: add +WaitForSession for modern @dispvm syntax too
+  * qvm-run-vm: translate --dispvm to modern @dispvm syntax
+  * qvm-run-vm: fix comment
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes.ShowInTerminal needs a graphical session running
+
+  [ Frédéric Pierret (fepitre) ]
+  * Fix missing dependency for managing Network-Manager in active user
+    session
+
+  [ Marta Marczykowska-Górecka ]
+  * fixed qubes.GetAppmenus ignoring some correct .desktop files
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 02 Jul 2020 05:03:21 +0200
+
 qubes-core-agent (4.0.55-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
