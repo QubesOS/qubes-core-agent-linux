@@ -1,0 +1,42 @@
+#!/usr/bin/bash
+
+OPTS=()
+SPEC=
+while IFS= read -r line; do
+    if [ "$line" = "---" ]; then
+        break
+    fi
+    case "$line" in
+        --enablerepo=*|\
+        --disablerepo=*|\
+        --repoid=*|\
+        --repofrompath=*|\
+        --releasever=*)
+            OPTS+=("$line")
+            ;;
+        *)
+            SPEC="$line"
+            ;;
+    esac
+done
+
+repodir=$(mktemp -d)
+cat > "$repodir/template.repo"
+
+OPTS+=("--setopt=reposdir=${repodir}")
+OPTS+=("--quiet")
+
+RET=0
+
+if [ "$1" = "query" ]; then
+    # shellcheck disable=SC2068
+    dnf repoquery ${OPTS[@]} --qf='%{name}:%{epoch}:%{version}:%{release}:%{reponame}:%{downloadsize}:%{summary}' "$SPEC"
+    RET="$?"
+elif [ "$1" = "download" ]; then
+    # shellcheck disable=SC2068
+    curl -L "$(dnf download ${OPTS[@]} --url "$SPEC" | shuf -n 1)" -o -
+    RET="$?"
+fi
+
+rm -r "$repodir"
+exit "$RET"
