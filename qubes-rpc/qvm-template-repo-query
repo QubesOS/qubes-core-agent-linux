@@ -10,7 +10,6 @@ while IFS= read -r line; do
         --enablerepo=*|\
         --disablerepo=*|\
         --repoid=*|\
-        --repofrompath=*|\
         --releasever=*)
             OPTS+=("$line")
             ;;
