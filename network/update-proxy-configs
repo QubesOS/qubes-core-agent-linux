@@ -144,3 +144,9 @@ fi
 if [ -e /etc/PackageKit/PackageKit.conf ]; then
     update_conf /etc/PackageKit/PackageKit.conf "ProxyHTTP=$PROXY_ADDR"
 fi
+
+# Portage (Gentoo)
+if [ -e /etc/portage/make.conf ]; then
+    update_conf /etc/portage/make.conf "http_proxy=\"$PROXY_ADDR\"
+https_proxy=\"$PROXY_ADDR\""
+fi
