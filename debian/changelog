@@ -1,3 +1,13 @@
+qubes-core-agent (4.1.14-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not use legacy distutils.spawn
+
+  [ Frédéric Pierret (fepitre) ]
+  * update-proxy-configs: handle Portage(Gentoo)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 16 Jul 2020 13:37:16 +0200
+
 qubes-core-agent (4.1.13-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
