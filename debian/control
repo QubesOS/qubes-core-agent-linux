@@ -31,7 +31,7 @@ Depends:
     gawk,
     imagemagick,
     init-system-helpers,
-    initscripts,
+    initscripts | sysvinit-utils,
     librsvg2-bin,
     locales,
     ncurses-term,

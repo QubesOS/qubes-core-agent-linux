@@ -1,3 +1,10 @@
+qubes-core-agent (4.1.14-1ubuntu1) UNRELEASED; urgency=medium
+
+  * debian/control: initscripts dependency set to initscripts | sysvinit-utils
+    to fix FTBFS on Ubuntu 20.04 LTS (Focal Fossa).
+
+ -- Krzysztof Burghardt <krzysztof@burghardt.pl>  Mon, 20 Jul 2020 23:03:18 +0200
+
 qubes-core-agent (4.1.14-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
