@@ -108,3 +108,4 @@ enable qubes-sync-time.timer
 # Disable useless Xen services in Qubes VM
 disable xenstored.service
 disable xenconsoled.service
+disable proc-xen.mount
