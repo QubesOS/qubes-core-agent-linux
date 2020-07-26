@@ -1,0 +1,10 @@
+[Unit]
+Description=Xen driver domain device daemon
+ConditionVirtualization=xen
+
+[Service]
+Type=forking
+ExecStart=@sbindir@/xl devd
+
+[Install]
+WantedBy=multi-user.target

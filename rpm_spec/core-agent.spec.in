@@ -863,6 +863,7 @@ The Qubes core startup configuration for SystemD init.
 
 %files systemd
 %defattr(-,root,root,-)
+/etc/systemd/system/xendriverdomain.service
 /lib/systemd/system/qubes-misc-post.service
 /lib/systemd/system/qubes-mount-dirs.service
 /lib/systemd/system/qubes-rootfs-resize.service
