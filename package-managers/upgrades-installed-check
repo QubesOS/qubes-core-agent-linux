@@ -35,6 +35,13 @@ elif [ -e /etc/arch-release ]; then
     checkupdates_output="$(checkupdates 2>&1)"
     exit_code="$?"
     echo "$checkupdates_output" | grep -qF -- '->' && echo "false" || echo "true"
+elif [ -e /etc/gentoo-release ]; then
+    ## Gentoo
+    set -e
+    set -o pipefail
+    emerge_output="$(emerge -puDv @world 2>&1)"
+    exit_code="$?"
+    echo "$emerge_output" | grep -qF -- '[ebuild' && echo "false" || echo "true"
 else
     echo "Check not implemented for this distribution" >&2
     exit 1
