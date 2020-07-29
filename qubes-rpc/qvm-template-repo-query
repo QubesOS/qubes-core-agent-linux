@@ -31,7 +31,7 @@ if [ "$1" = "query" ]; then
     dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{reponame}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
     RET="$?"
 elif [ "$1" = "download" ]; then
-    curl -L "$(dnf download "${OPTS[@]}" --url "$SPEC" | shuf -n 1)" -o -
+    curl --silent -L "$(dnf download "${OPTS[@]}" --url "$SPEC" | shuf -n 1)" -o -
     RET="$?"
 fi
 
