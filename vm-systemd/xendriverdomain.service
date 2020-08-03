@@ -4,7 +4,7 @@ ConditionVirtualization=xen
 
 [Service]
 Type=forking
-ExecStart=@sbindir@/xl devd
+ExecStart=/usr/sbin/xl devd
 
 [Install]
 WantedBy=multi-user.target
