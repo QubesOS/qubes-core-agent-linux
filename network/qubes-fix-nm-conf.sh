@@ -17,6 +17,6 @@ if ! grep -q "^unmanaged-devices.*$VIFMAC" $FILE ; then
 	sed -i 's/^unmanaged-devices.*$/&,'$VIFMAC/ $FILE
 fi
 if ! grep -q "^dns=" $FILE ; then
-	sed -i '/\[main\] a dns=default' $FILE
+	sed -i '/\[main\]/a dns=default' $FILE
 fi
 exit 0
