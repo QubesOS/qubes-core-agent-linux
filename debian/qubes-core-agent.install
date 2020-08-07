@@ -18,7 +18,9 @@ etc/qubes-rpc/qubes.InstallUpdatesGUI
 etc/qubes-rpc/qubes.OpenInVM
 etc/qubes-rpc/qubes.OpenURL
 etc/qubes-rpc/qubes.PostInstall
+etc/qubes-rpc/qubes.RegisterBackupLocation
 etc/qubes-rpc/qubes.ResizeDisk
+etc/qubes-rpc/qubes.RestoreById
 etc/qubes-rpc/qubes.Restore
 etc/qubes-rpc/qubes.SelectDirectory
 etc/qubes-rpc/qubes.SelectFile

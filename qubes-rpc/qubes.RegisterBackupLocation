@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Register backup location (path or a command) to be retrieved with qubes
+# .RestoreById service.
+# Registered location is only valid as long as this service call stays open
+
+set -e
+
+REGISTRY_DIR="$XDG_RUNTIME_DIR/qubes-backup-location"
+
+if ! [ -d "$REGISTRY_DIR" ]; then
+    mkdir -p "$REGISTRY_DIR"
+fi
+
+read -r backup_location
+
+REGISTRY_FILE=$(mktemp "$REGISTRY_DIR/XXXXXXXX")
+
+PID=$$
+# this isn't perfetct, as comm field could contain spaces, but we do control
+# this value and we know it doesn't
+START_TIME=$(cut -f 22 -d ' ' /proc/$PID/stat)
+# add process id at the beginning to help verifying if it's still running;
+# record starttime too, to detect PID reuse
+printf "%d %d\n%s\n" "$PID" "$START_TIME" "$backup_location" >"$REGISTRY_FILE"
+# output registered ID to the user
+basename "$REGISTRY_FILE"
+# close stdout
+exec >&-
+# wait for stdin to close
+cat >/dev/null
+# and cleanup
+rm -f "$REGISTRY_FILE"

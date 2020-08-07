@@ -1,0 +1,82 @@
+#!/bin/sh
+
+set -e
+
+REGISTRY_DIR="$XDG_RUNTIME_DIR/qubes-backup-location"
+
+backup_location_id="$1"
+
+if [ -z "$backup_location_id" ]; then
+  echo "Missing backup location ID argument" >&2
+  exit 1
+fi
+
+if ! [ -e "$REGISTRY_DIR/$backup_location_id" ]; then
+  echo "Invalid location ID" >&2
+  exit 1
+fi
+
+while true; do
+  read -r check_pid check_starttime
+  read -r backup_location
+  break
+done < "$REGISTRY_DIR/$backup_location_id"
+
+if ! [ -e "/proc/$check_pid" ]; then
+  echo "Invalid location ID" >&2
+  exit 1
+fi
+
+pid_starttime=$(cut -f 22 -d ' ' "/proc/$check_pid/stat")
+if [ "$check_starttime" != "$pid_starttime" ]; then
+  echo "Invalid location ID" >&2
+  exit 1
+fi
+
+# now $backup_location is verified to be still valid
+
+echo Starting Restorecopy >&2
+read -r untrusted_paths
+echo "Backup location: $backup_location" >&2
+echo "Paths: $untrusted_paths" >&2
+if [ -f "$backup_location" ] ; then
+  echo "Performing restore from backup file $backup_location" >&2
+  TARGET="$backup_location"
+  echo "Copying $TARGET to STDOUT" >&2
+  # tar2qfile always use argv[1] for input path and the rest for selecting
+  # paths to extract - no other options are supported, so passing
+  # untrusted_paths directly is fine
+  # shellcheck disable=SC2086
+  /usr/lib/qubes/tar2qfile "$TARGET" $untrusted_paths
+else
+  echo "Checking if arguments is matching a command" >&2
+  COMMAND=$(echo "$backup_location" | cut -d ' ' -f 1)
+  if command -v "$COMMAND" >/dev/null; then
+    tmpdir=$(mktemp -d)
+    mkfifo "$tmpdir/backup-data"
+    echo "Redirecting $backup_location to STDOUT" >&2
+    # Parsing args to handle quotes correctly
+    # Dangerous method if args are uncontrolled
+    eval "set -- $backup_location"
+    # Use named pipe to pass original stdin to tar2file
+    "$@" > "$tmpdir/backup-data" < /dev/null &
+    # shellcheck disable=SC2086
+    # tar2qfile always use argv[1] for input path and the rest for selecting
+    # paths to extract - no other options are supported, so passing
+    # untrusted_paths directly is fine
+    /usr/lib/qubes/tar2qfile "$tmpdir/backup-data" $untrusted_paths
+    # Restoration may be terminated earlier because of selected files. This
+    # will be seen as EPIPE to the retrieving process, which may cause retcode
+    # other than 0 in some cases - which would be incorrectly treated as backup
+    # restore error. So instead of that, use tar2qfile exit code (and have dom0
+    # detect if anything wrong with actual data)
+    retcode=$?
+    wait $!
+    rm "$tmpdir/backup-data"
+    rmdir "$tmpdir"
+    exit "$retcode"
+  else
+    echo "Invalid command $COMMAND" >&2
+    exit 2
+  fi
+fi

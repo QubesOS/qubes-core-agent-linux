@@ -60,6 +60,8 @@ install:
 		qubes.WaitForSession \
 		qubes.DetachPciDevice \
 		qubes.Backup qubes.Restore \
+		qubes.RegisterBackupLocation \
+		qubes.RestoreById \
 		qubes.SelectFile qubes.SelectDirectory \
 		qubes.GetImageRGBA \
 		qubes.SetDateTime \
