@@ -1,3 +1,36 @@
+qubes-core-agent (4.1.15-1) unstable; urgency=medium
+
+  [ Krzysztof Burghardt ]
+  * Fix dependencies for Ubuntu 20.04 LTS (Focal Fossa)
+
+  [ Frédéric Pierret (fepitre) ]
+  * package-managers: handle Gentoo
+
+  [ Ivan Kardykov ]
+  * Fix open path in qubes-open-file-manager.desktop
+
+  [ Frédéric Pierret (fepitre) ]
+  * tinyproxy: support rsync for Gentoo
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: fix version detection for python3?-nautilus dependency
+
+  [ Frédéric Pierret (fepitre) ]
+  * Drop legacy xen entry in fstab
+  * xendriverdomain: remove Requires and After proc-xen.mount
+  * Update travis
+  * Fix regex in qubes-fix-nm-conf.sh
+  * xendriverdomain: remove placeholder for sbinpath
+
+  [ Marek Marczykowski-Górecki ]
+  * qfile-unpacker: add option for custom user and target directory
+  * tar2qfile: fix argument parser
+  * qfile-unpacker: add option (-w) to wait for disk space before
+    extracting
+  * Add services for paranoid backup restore mode
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 07 Aug 2020 03:52:18 +0200
+
 qubes-core-agent (4.1.14-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
