@@ -4,10 +4,27 @@
 # shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
+#### KVM:
+. /usr/lib/qubes/hypervisor.sh
+########
+
 set -e
 
+#### KVM:
+if hypervisor xen; then
+    DEVID="xvdb"
+elif hypervisor kvm; then
+    DEVID="vdb"
+else
+    exit 0
+fi
+########
+
 /usr/lib/qubes/init/setup-rwdev.sh
-if [ -e /dev/xvdb ] ; then mount /rw ; fi
+#### KVM:
+##if [ -e /dev/xvdb ] ; then mount /rw ; fi
+if [ -e /dev/${DEVID} ] ; then mount /rw ; fi
+########
 /usr/lib/qubes/init/setup-rw.sh
 
 initialize_home "/rw/home" ifneeded

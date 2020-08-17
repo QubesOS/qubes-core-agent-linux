@@ -1,6 +1,19 @@
 #!/bin/sh
 
-dev=/dev/xvdb
+#### KVM:
+. /usr/lib/qubes/hypervisor.sh
+########
+
+#### KVM:
+##dev=/dev/xvdb
+if hypervisor xen; then
+    dev="xvdb"
+elif hypervisor kvm; then
+    dev="vdb"
+else
+    exit 0
+fi
+########
 
 if mountpoint -q /rw ; then
     # This means /rw is mounted now.

@@ -3,15 +3,35 @@
 # Possibly resize root device (partition, filesystem), if underlying device was
 # enlarged.
 
+#### KVM:
+. /usr/lib/qubes/hypervisor.sh
+########
+
 set -e
 
-# if underlying root device is read-only, don't do anything
-if [ "$(blockdev --getro /dev/xvda)" -eq "1" ]; then
-    echo "xvda is read-only, not resizing" >&2
+#### KVM:
+if hypervisor xen; then
+    ROOTDEV="xvda"
+elif hypervisor kvm; then
+    ROOTDEV="vda"
+else
     exit 0
 fi
+########
 
-sysfs_xvda="/sys/class/block/xvda"
+# if underlying root device is read-only, don't do anything
+#### KVM:
+##if [ "$(blockdev --getro /dev/xvda)" -eq "1" ]; then
+##    echo "xvda is read-only, not resizing" >&2
+##    exit 0
+##fi
+##sysfs_xvda="/sys/class/block/xvda"
+if [ "$(blockdev --getro /dev/$ROOTDEV)" -eq "1" ]; then
+    echo "$ROOTDEV is read-only, not resizing" >&2
+    exit 0
+fi
+sysfs_rootdev="/sys/class/block/$ROOTDEV"
+########
 
 # if root filesystem is already using (almost) the whole disk
 # 203M for BIOS and /boot data
@@ -26,7 +46,10 @@ ext4_block_size=$(dumpe2fs /dev/mapper/dmroot | grep '^Block size:' | sed -E 's/
 rootfs_size=$((ext4_block_count * ext4_block_size / 512))
 # 5 MB in 512-byte units for some random extra bits
 size_margin=$((5 * 1024 * 2))
-if [ "$(cat $sysfs_xvda/size)" -lt \
+#### KVM:
+##if [ "$(cat $sysfs_xvda/size)" -lt \
+########
+if [ "$(cat $sysfs_rootdev/size)" -lt \
        $(( rootfs_size + boot_data_size + size_margin )) ]; then
    echo "root filesystem already at $rootfs_size blocks" >&2
    exit 0
