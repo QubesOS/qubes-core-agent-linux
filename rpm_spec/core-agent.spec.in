@@ -986,6 +986,11 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/tmp.mount.d/30_qubes.conf
 /usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
 /usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
+#### KVM:
+/lib/systemd/system/qubes-mount-dirs.service.d/30_qubes-kvm.conf
+/lib/systemd/system/qubes-rootfs-resize.service.d/30_qubes-kvm.conf
+/lib/systemd/system/qubes-sysinit.service.d/30_qubes-kvm.conf
+########
 
 %post systemd
 

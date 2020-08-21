@@ -38,6 +38,9 @@ SYSTEM_DROPINS += systemd-random-seed.service
 SYSTEM_DROPINS += tor.service tor@default.service
 SYSTEM_DROPINS += systemd-timesyncd.service
 SYSTEM_DROPINS += systemd-logind.service
+#### KVM:
+SYSTEM_DROPINS += qubes-mount-dirs.service qubes-rootfs-resize.service qubes-sysinit.service
+########
 
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
 SYSTEM_DROPINS_NETWORKING += tinyproxy.service
