@@ -151,4 +151,12 @@ if [ -e /etc/portage/make.conf ]; then
     update_conf /etc/portage/make.conf "http_proxy=\"$PROXY_ADDR\"
 https_proxy=\"$PROXY_ADDR\"
 RSYNC_PROXY=\"${PROXY_ADDR_BASE}\""
+
+    # Current workaround for gpg not resolving key servers used behing proxy
+    # See QubesOS/qubes-issues#6013
+    if [ -n "$PROXY_ADDR" ]; then
+        update_conf /etc/hosts "127.0.0.1 keys.gentoo.org keys.gnupg.net"
+    else
+        update_conf /etc/hosts ""
+    fi
 fi
