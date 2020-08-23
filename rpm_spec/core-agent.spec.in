@@ -23,6 +23,13 @@
 %define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
 
+# systemd is used in Fedora and CentOS
+%if 0%{?fedora} || 0%{?rhel}
+%define with_sysvinit 0
+%else
+%define with_sysvinit 1
+%endif
+
 %define scriptletfuns is_static() { \
     [ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
 } \
@@ -320,6 +327,10 @@ sed -i \
 
 install -D -m 0644 boot/dracut-qubes.conf $RPM_BUILD_ROOT/usr/lib/dracut/dracut.conf.d/30-qubes.conf
 install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
+
+%if ! %with_sysvinit
+    rm -rf $RPM_BUILD_ROOT/etc/init.d/qubes-* $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
+%endif
 
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
@@ -777,6 +788,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/pam.d/su.qubes
 
+%if %with_sysvinit
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
 License:        GPL v2 only
@@ -842,6 +854,7 @@ if [ "$1" = 0 ] ; then
         chkconfig --del $svc
     done
 fi
+%endif
 
 %package systemd
 Summary:        Qubes unit files for SystemD init style
