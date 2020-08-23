@@ -23,6 +23,13 @@
 %define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-qrexec-agent qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
 
+# systemd is used in Fedora and CentOS
+%if 0%{?fedora} || 0%{?rhel}
+%define with_sysvinit 0
+%else
+%define with_sysvinit 1
+%endif
+
 %define scriptletfuns is_static() { \
     [ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
 } \
@@ -308,6 +315,10 @@ sed -i \
         -e 's:-primary:-centos:' \
         -e 's:/fc:/centos:' \
         $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
+%endif
+
+%if ! %with_sysvinit
+    rm -rf $RPM_BUILD_ROOT/etc/init.d/qubes-* $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
 %endif
 
 %triggerin -- initscripts
@@ -760,6 +771,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/polkit-1/rules.d/00-qubes-allow-all.rules
 %config(noreplace) /etc/sudoers.d/qubes
 
+%if %with_sysvinit
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
 License:        GPL v2 only
@@ -826,6 +838,7 @@ if [ "$1" = 0 ] ; then
         chkconfig --del $svc
     done
 fi
+%endif
 
 %package systemd
 Summary:        Qubes unit files for SystemD init style
