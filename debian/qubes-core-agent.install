@@ -35,6 +35,8 @@ etc/qubes-rpc/qubes.VMExec
 etc/qubes-rpc/qubes.VMExecGUI
 etc/qubes-rpc/qubes.WaitForSession
 etc/qubes-rpc/qubes.GetDate
+etc/qubes-rpc/qubes.TemplateSearch
+etc/qubes-rpc/qubes.TemplateDownload
 etc/qubes-suspend-module-blacklist
 etc/qubes/autostart/*
 etc/qubes/applications/*
@@ -147,6 +149,7 @@ usr/lib/qubes/upgrades-status-notify
 usr/lib/qubes/vm-file-editor
 usr/lib/qubes/xdg-icon
 usr/lib/qubes/tinyproxy-wrapper
+usr/lib/qubes/qvm-template-repo-query
 usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
 usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
 usr/share/glib-2.0/schemas/*
