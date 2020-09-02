@@ -46,3 +46,4 @@ advertise_systemd_service updates-proxy-setup qubes-updates-proxy-forwarder.sock
 advertise_systemd_service qubes-updates-proxy qubes-updates-proxy.service
 advertise_systemd_service qubes-firewall qubes-firewall.service
 advertise_systemd_service qubes-network qubes-network.service
+advertise_systemd_service apparmor apparmor.service
