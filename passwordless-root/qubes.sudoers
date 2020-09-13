@@ -1,5 +1,5 @@
 Defaults !requiretty
-user ALL=(ALL) NOPASSWD: ALL
+%qubes ALL=(ALL) NOPASSWD: ALL
 
 # WTF?! Have you lost your mind?!
 #
