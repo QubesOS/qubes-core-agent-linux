@@ -30,8 +30,8 @@ shopt -s nullglob dotglob
 source /usr/lib/qubes/init/functions
 
 prerequisite() {
-   if ! is_rwonly_persistent ; then
-      echo "No TemplateBasedVM detected. Exiting."
+   if is_fully_persistent ; then
+      echo "No TemplateBasedVM/DisposableVM detected. Exiting."
       exit 0
    fi
 }
