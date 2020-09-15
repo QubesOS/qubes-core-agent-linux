@@ -15,6 +15,4 @@ echo "Mounting /rw/home onto /home" >&2
 mount /home
 echo "Mounting /rw/usrlocal onto /usr/local" >&2
 mount /usr/local
-# https://github.com/QubesOS/qubes-issues/issues/1328#issuecomment-169483029
-# Do none of the following in a DispVM.
 /usr/lib/qubes/init/bind-dirs.sh
