@@ -21,3 +21,6 @@ jobs:
       python: '3.5'
       env: DIST_DOM0=fc31 TESTS_ONLY=
       script: ~/qubes-builder/scripts/travis-deploy
+  allow_failures:
+    # no yum/dnf currently in bullseye
+    - env: DISTS_VM=bullseye USE_QUBES_REPO_VERSION=4.1 USE_QUBES_REPO_TESTING=1
