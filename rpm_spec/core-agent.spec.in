@@ -20,6 +20,8 @@
 #
 #
 
+%global with_sysvinit 0
+
 %define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
 
@@ -305,6 +307,10 @@ make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
+
+%if %with_sysvinit
+install DESTDIR=$RPM_BUILD_ROOT install-sysvinit
+%endif
 
 make -C package-managers DESTDIR=$RPM_BUILD_ROOT install install-dnf
 %if 0%{?rhel} == 7
@@ -779,6 +785,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/pam.d/su.qubes
 
+%if %with_sysvinit
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
 License:        GPL v2 only
@@ -844,6 +851,8 @@ if [ "$1" = 0 ] ; then
         chkconfig --del $svc
     done
 fi
+
+%endif
 
 %package systemd
 Summary:        Qubes unit files for SystemD init style
