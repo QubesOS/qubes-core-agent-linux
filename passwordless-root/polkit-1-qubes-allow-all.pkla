@@ -1,5 +1,5 @@
 [Qubes allow all]
-Identity=*
+Identity=unix-group:qubes
 Action=*
 ResultAny=yes
 ResultInactive=yes
