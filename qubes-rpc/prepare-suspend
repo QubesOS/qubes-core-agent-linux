@@ -38,9 +38,15 @@ if [ x"$action" = x"suspend" ]; then
     # detach all drivers from PCI devices (the real ones, not emulated by qemu)
     echo -n > /var/run/qubes-suspend-pci-devs-detached
     for dev_path in /sys/bus/pci/devices/*; do
-        # skip qemu emulated devs
         subsystem_vendor=$(cat "$dev_path/subsystem_vendor")
+        vendor=$(cat "$dev_path/vendor")
+        class=$(cat "$dev_path/class")
+        # skip qemu emulated devs
         if [ "$subsystem_vendor" = "0x1af4" ] || [ "$subsystem_vendor" = "0x5853" ]; then
+            continue
+        fi
+        # skip Intel Graphics Device
+        if [ "$vendor" = "0x8086" ] && [ "$class" = "0x030000" ]; then
             continue
         fi
         if ! [ -e "$dev_path/driver" ]; then
