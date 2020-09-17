@@ -125,7 +125,7 @@ install-sysvinit: install-init
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
 
-install-rh: install-systemd install-systemd-dropins
+install-rh: install-systemd install-systemd-dropins install-sysvinit
 
 install-doc:
 	$(MAKE) -C doc install
@@ -202,7 +202,7 @@ install-deb: install-common install-systemd install-systemd-dropins install-syst
 	mkdir -p $(DESTDIR)/etc/systemd/system/
 	install -m 0644 vm-systemd/haveged.service  $(DESTDIR)/etc/systemd/system/
 
-install-corevm: install-rh install-common install-systemd install-systemd-dropins install-networking
+install-corevm: install-rh install-common install-systemd install-sysvinit install-systemd-dropins install-networking
 
 install-netvm: install-systemd-networking-dropins install-networkmanager
 
