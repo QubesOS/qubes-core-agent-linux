@@ -1,0 +1,49 @@
+#!/usr/bin/bash
+
+OPTS=()
+SPEC=
+while IFS= read -r line; do
+    if [ "$line" = "---" ]; then
+        break
+    fi
+    case "$line" in
+        --enablerepo=*|\
+        --disablerepo=*|\
+        --repoid=*|\
+        --releasever=*|\
+        --refresh)
+            OPTS+=("$line")
+            ;;
+        *)
+            SPEC="$line"
+            ;;
+    esac
+done
+
+repodir=$(mktemp -d)
+cat > "$repodir/template.repo"
+
+OPTS+=("--setopt=reposdir=${repodir}")
+OPTS+=("--quiet")
+
+# This creates the hashfile if it doesn't exist, and keep the ctime and mtime
+# unchanged otherwise.
+# We then copy the {c,m}time to the repo config.
+# This allows DNF caching to work properly.
+hashfile="/tmp/qvm-template-$(b2sum "$repodir/template.repo" | cut -f1 -d' ')"
+touch -a "$hashfile"
+touch -r "$hashfile" "$repodir/template.repo"
+
+RET=0
+
+if [ "$1" = "query" ]; then
+    dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{reponame}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
+    RET="$?"
+elif [ "$1" = "download" ]; then
+    url="$(dnf download "${OPTS[@]}" --url "$SPEC" | shuf -n 1)"
+    curl --silent -L "$url" -o -
+    RET="$?"
+fi
+
+rm -r "$repodir"
+exit "$RET"

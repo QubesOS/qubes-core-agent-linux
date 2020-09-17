@@ -44,7 +44,7 @@ install:
 	install -t $(DESTDIR)$(QUBESLIBDIR) \
 		prepare-suspend resize-rootfs \
 		qfile-agent qopen-in-vm qrun-in-vm qubes-sync-clock \
-		tar2qfile vm-file-editor xdg-icon
+		tar2qfile vm-file-editor xdg-icon qvm-template-repo-query
 	# Install qfile-unpacker as SUID, because it will fail to receive
 	# files from other vm.
 	install -t $(DESTDIR)$(QUBESLIBDIR) -m 4755 qfile-unpacker
@@ -71,7 +71,9 @@ install:
 		qubes.PostInstall \
 		qubes.GetDate \
 		qubes.ShowInTerminal \
-		qubes.ConnectTCP
+		qubes.ConnectTCP \
+		qubes.TemplateSearch \
+		qubes.TemplateDownload
 	ln -s qubes.VMExec $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.VMExecGUI
 	for config in *.config; do \
 		install -D -m 0644 "$$config" "$(DESTDIR)$(QUBESRPCCONFDIR)/$${config%.config}"; \
