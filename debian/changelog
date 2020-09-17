@@ -1,3 +1,46 @@
+qubes-core-agent (4.1.16-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Workaround for gpg not resolving key servers used behing proxy
+
+  [ Marek Marczykowski-Górecki ]
+  * travis: allow bullseye install to fail - no dnf/yum available
+  * rpm: do not build qubes-core-agent-sysvinit package
+  * debian: drop python2 in build deps
+
+  [ Artur Puzio ]
+  * Skip IGD when unbinding device drivers on suspend
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "rpm: do not build qubes-core-agent-sysvinit package"
+
+  [ Frédéric Pierret (fepitre) ]
+  * spec: don't build sysvinit for Fedora and CentOS
+
+  [ herypt ]
+  * Advertise apparmor support
+
+  [ WillyPillow ]
+  * New qrexec calls for interacting with template repos.
+  * Remove repofrompath.
+  * Fix shell quoting.
+  * qubes.Template*: Change separator from : to | and include additional
+    metadata.
+  * qubes.Template*: Invoke curl with --silent.
+  * qubes.Template*: Add --refresh option and allow DNF cache to be
+    used.
+  * qvm-template: Add qubes.Template{Search,Download} files to the
+    package.
+
+  [ Peter Gerber ]
+  * passwordless-root: policykit: restrict access to group qubes
+  * passwordless-root: sudo: grant access for group qubes
+
+  [ Rusty Bird ]
+  * bind-dirs: run in DisposableVM, too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 17 Sep 2020 14:37:05 +0200
+
 qubes-core-agent (4.1.15-1) unstable; urgency=medium
 
   [ Krzysztof Burghardt ]
