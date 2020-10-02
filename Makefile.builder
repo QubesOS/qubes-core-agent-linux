@@ -15,7 +15,7 @@ ifneq ($(filter $(DIST), jessie stretch),)
 source-debian-quilt-copy-in: series_ext = -$(DIST)
 endif
 source-debian-quilt-copy-in:
-	if [ $(DIST) == bionic ] ; then \
+	if [[ $(DIST) == bionic ||  $(DIST) == focal ]] ; then \
 		sed -i /initscripts/d $(CHROOT_DIR)/$(DIST_SRC)/debian/control ;\
 	fi
 	-$(shell $(ORIG_SRC)/debian-quilt $(ORIG_SRC)/series-debian$(series_ext)-vm.conf $(CHROOT_DIR)/$(DIST_SRC)/debian/patches)
