@@ -1,3 +1,19 @@
+qubes-core-agent (4.1.17-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * vm-systemd: enable dummy modules and psu client
+
+  [ Saswat Padhi ]
+  * Fixed menu item name
+
+  [ Frédéric Pierret (fepitre) ]
+  * preset: handle dom0 and sys-usb qubes-psu-client
+
+  [ unman ]
+  * Allow build for Focal
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 10 Oct 2020 05:13:44 +0200
+
 qubes-core-agent (4.1.16-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
