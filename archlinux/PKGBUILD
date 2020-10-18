@@ -31,7 +31,7 @@ noextract=()
 md5sums=(SKIP)
 
 build() {
-    for source in autostart-dropins applications-dropins qubes-rpc qrexec misc Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
+    for source in autostart-dropins applications-dropins qubes-rpc misc Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
         # shellcheck disable=SC2154
         (ln -s "$srcdir/../$source" "$srcdir/$source")
     done
@@ -46,13 +46,12 @@ build() {
     # Fix for archlinux sbindir
     sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
 
-    for dir in qubes-rpc qrexec misc; do
+    for dir in qubes-rpc misc; do
         make -C "$dir"
     done
 }
 
 #This package provides:
-# * qrexec agent
 # * qubes rpc scripts
 # * core linux tools and scripts
 # * core systemd services and drop-ins
@@ -67,10 +66,6 @@ package_qubes-vm-core() {
     optdepends=(gnome-keyring gnome-settings-daemon python-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
     install=PKGBUILD.install
 
-    # Note: Archlinux removed use of directory such as /sbin /bin /usr/sbin (https://mailman.archlinux.org/pipermail/arch-dev-public/2012-March/022625.html)
-    # shellcheck disable=SC2154
-    make -C qrexec install DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
-
     make install-corevm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
     make -C qubes-rpc DESTDIR="$pkgdir" install
     make -C qubes-rpc/kde DESTDIR="$pkgdir" install
@@ -78,11 +73,11 @@ package_qubes-vm-core() {
     make -C qubes-rpc/thunar DESTDIR="$pkgdir" install
 
     # Remove things non wanted in archlinux
-    rm -r "$pkgdir/etc/yum"*
-    rm -r "$pkgdir/etc/dnf"*
-    rm -r "$pkgdir/etc/init.d"
+    rm -rf "$pkgdir/etc/yum"*
+    rm -rf "$pkgdir/etc/dnf"*
+    rm -rf "$pkgdir/etc/init.d"
     # Remove fedora specific scripts
-    rm "$pkgdir/etc/fstab"
+    rm -rf "$pkgdir/etc/fstab"
 
     # Install systemd script allowing to automount /lib/modules
     install -m 644 "$srcdir/PKGBUILD.qubes-ensure-lib-modules.service" "${pkgdir}/usr/lib/systemd/system/qubes-ensure-lib-modules.service"
@@ -109,7 +104,7 @@ ExecStart=-/usr/bin/agetty --autologin user --noclear %I 38400 linux
 EOF
 
     # Archlinux packaging guidelines: /var/run is a symlink to a tmpfs. Don't create it
-    rm -r "$pkgdir/var/run"
+    rm -rf "$pkgdir/var/run"
 }
 
 #This package provides:
