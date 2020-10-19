@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2034
-pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring)
+pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-passwordless-root)
 pkgver=$(cat version)
 pkgrel=15
 epoch=
@@ -31,7 +31,7 @@ noextract=()
 md5sums=(SKIP)
 
 build() {
-    for source in autostart-dropins applications-dropins app-menu qubes-rpc misc Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
+    for source in autostart-dropins applications-dropins app-menu qubes-rpc misc passwordless-root Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
         # shellcheck disable=SC2154
         (ln -s "$srcdir/../$source" "$srcdir/$source")
     done
@@ -141,6 +141,11 @@ package_qubes-vm-keyring() {
     install -m0644 PKGBUILD-keyring-trusted "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-trusted"
     install -m0644 PKGBUILD-keyring-revoked "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-revoked"
 
+}
+
+package_qubes-vm-passwordless-root() {
+    pkgdesc="Qubes OS Passwordless root access from normal user"
+    make -C passwordless-root install DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
 }
 
 # vim:set ts=2 sw=2 et:
