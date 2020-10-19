@@ -31,7 +31,7 @@ noextract=()
 md5sums=(SKIP)
 
 build() {
-    for source in autostart-dropins applications-dropins qubes-rpc misc Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
+    for source in autostart-dropins applications-dropins app-menu qubes-rpc misc Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
         # shellcheck disable=SC2154
         (ln -s "$srcdir/../$source" "$srcdir/$source")
     done
@@ -67,6 +67,7 @@ package_qubes-vm-core() {
     install=PKGBUILD.install
 
     make install-corevm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
+    make -C app-menu install DESTDIR="$pkgdir" install
     make -C qubes-rpc DESTDIR="$pkgdir" install
     make -C qubes-rpc/kde DESTDIR="$pkgdir" install
     make -C qubes-rpc/nautilus DESTDIR="$pkgdir" install
