@@ -74,13 +74,6 @@ package_qubes-vm-core() {
     make -C qubes-rpc/nautilus DESTDIR="$pkgdir" install
     make -C qubes-rpc/thunar DESTDIR="$pkgdir" install
 
-    # Remove things non wanted in archlinux
-    rm -rf "$pkgdir/etc/yum"*
-    rm -rf "$pkgdir/etc/dnf"*
-    rm -rf "$pkgdir/etc/init.d"
-    # Remove fedora specific scripts
-    rm -rf "$pkgdir/etc/fstab"
-
     # Install systemd script allowing to automount /lib/modules
     install -m 644 "$srcdir/PKGBUILD.qubes-ensure-lib-modules.service" "${pkgdir}/usr/lib/systemd/system/qubes-ensure-lib-modules.service"
 
