@@ -1,3 +1,39 @@
+qubes-core-agent (4.0.57-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * debian: conditional python version dependencies
+  * Use DNF instead of YUM if exists
+  * debian: add 'rpm' as dependency
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "Fix updates notification on Fedora 29"
+  * dnf: update for DNF 4+ API
+
+  [ Krzysztof Burghardt ]
+  * Fix dependencies for Ubuntu 20.04 LTS (Focal Fossa)
+
+  [ Marek Marczykowski-Górecki ]
+  * tar2qfile: fix argument parser
+  * debian: fix version detection for python3?-nautilus dependency
+
+  [ Peter Gerber ]
+  * passwordless-root: policykit: restrict access to group qubes
+  * passwordless-root: sudo: grant access for group qubes
+
+  [ Rusty Bird ]
+  * bind-dirs: run in DisposableVM, too
+
+  [ unman ]
+  * Allow build for Focal
+
+  [ Frédéric Pierret (fepitre) ]
+  * spec: don't build sysvinit for Fedora and CentOS
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: switch python -> python3 dependency
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 25 Oct 2020 05:00:00 +0100
+
 qubes-core-agent (4.0.56-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
