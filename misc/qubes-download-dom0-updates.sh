@@ -76,7 +76,8 @@ if [ -e /etc/debian_version ]; then
     # Default rpm configuration on Debian uses ~/.rpmdb for rpm database (as
     # rpm isn't native package manager there)
     mkdir -p "$DOM0_UPDATES_DIR$HOME"
-    ln -nsf "$DOM0_UPDATES_DIR/var/lib/rpm" "$DOM0_UPDATES_DIR$HOME/.rpmdb"
+    rm -rf "$DOM0_UPDATES_DIR$HOME/.rpmdb"
+    cp -r "$DOM0_UPDATES_DIR/var/lib/rpm" "$DOM0_UPDATES_DIR$HOME/.rpmdb"
 fi
 # Rebuild rpm database in case of different rpm version
 rm -f $DOM0_UPDATES_DIR/var/lib/rpm/__*
