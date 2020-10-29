@@ -12,7 +12,10 @@ SYSLIBDIR ?= /lib
 PYTHON ?= /usr/bin/python3
 PYTHON_SITEARCH = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(1)')
 PYTHON2_SITELIB = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()')
-PYTHON3_SITELIB = $(shell python3 -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
+PYTHON3_SITELIB = $(shell $(PYTHON) -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
+ifeq ($(shell rpm --eval %{centos_ver} 2>/dev/null),8)
+PLATFORM_PYTHON3_SITELIB = $(shell /usr/libexec/platform-python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
+endif
 
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
@@ -158,8 +161,15 @@ ifeq ($(shell rpm --eval %{centos_ver}),7)
 endif
 	install -D -m 0644 misc/dnf-qubes-hooks.py \
 		$(DESTDIR)$(PYTHON2_SITELIB)/dnf-plugins/qubes-hooks.py
+ifeq ($(shell rpm --eval %{centos_ver}),8)
+# we need to stick to related DNF python version
+# which is given by plateform-python
+	install -D -m 0644 misc/dnf-qubes-hooks.py \
+		$(DESTDIR)$(PLATFORM_PYTHON3_SITELIB)/dnf-plugins/qubes-hooks.py
+else
 	install -D -m 0644 misc/dnf-qubes-hooks.py \
 		$(DESTDIR)$(PYTHON3_SITELIB)/dnf-plugins/qubes-hooks.py
+endif
 	install -D -m 0644 misc/dnf-qubes-hooks.conf $(DESTDIR)/etc/dnf/plugins/qubes-hooks.conf
 
 install-doc:
