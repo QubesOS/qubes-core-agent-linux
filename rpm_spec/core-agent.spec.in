@@ -30,6 +30,10 @@
 %define with_sysvinit 1
 %endif
 
+%if 0%{?rhel} == 8
+%define plateform_python3_sitelib %(/usr/libexec/platform-python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
+%endif
+
 %define scriptletfuns is_static() { \
     [ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
 } \
@@ -144,8 +148,14 @@ Requires:   dconf
 Requires:   qubes-core-qrexec-vm
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
+%if 0%{?rhel} == 8
+# we need to stick to related DNF python version
+# which is python3.6 by default
+Requires:   python3-dnf-plugins-qubes-hooks
+%else
 Requires:   python%{python3_pkgversion}-dnf-plugins-qubes-hooks
-Requires: python%{python3_pkgversion}-setuptools
+%endif
+Requires:   python%{python3_pkgversion}-setuptools
 # for qubes.ResizeDisk
 Requires:   parted
 Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
@@ -170,7 +180,7 @@ Source0: %{name}-%{version}.tar.gz
 The Qubes core files for installation inside a Qubes VM.
 
 %package -n python2-dnf-plugins-qubes-hooks
-Summary:	DNF plugin for Qubes specific post-installation actions
+Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python2-devel
 %{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
 
@@ -179,8 +189,18 @@ DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
 
+%if 0%{?rhel} == 8
+%package -n python3-dnf-plugins-qubes-hooks
+Summary: DNF plugin for Qubes specific post-installation actions
+BuildRequires: python3-devel
+
+%description -n python3-dnf-plugins-qubes-hooks
+DNF plugin for Qubes specific post-installation actions:
+ * notify dom0 that updates were installed
+ * refresh applications shortcut list
+%else
 %package -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
-Summary:        DNF plugin for Qubes specific post-installation actions
+Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python%{python3_pkgversion}-devel
 %{?python_provide:%python_provide python%{python3_pkgversion}-dnf-plugins-qubes-hooks}
 
@@ -188,6 +208,7 @@ BuildRequires: python%{python3_pkgversion}-devel
 DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
+%endif
 
 %package nautilus
 Summary:    Qubes integration for Nautilus
@@ -300,7 +321,7 @@ usermod -L root
 
 %install
 
-make install-vm DESTDIR=$RPM_BUILD_ROOT
+make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
@@ -313,7 +334,7 @@ make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
 
-make -C package-managers DESTDIR=$RPM_BUILD_ROOT install install-dnf
+make -C package-managers PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT install install-dnf
 %if 0%{?rhel} == 7
 make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
 %endif
@@ -735,8 +756,13 @@ rm -f %{name}-%{version}
 %files -n python2-dnf-plugins-qubes-hooks
 %{python2_sitelib}/dnf-plugins/*
 
+%if 0%{?rhel} == 8
+%files -n python3-dnf-plugins-qubes-hooks
+%{plateform_python3_sitelib}/dnf-plugins/*
+%else
 %files -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
+%endif
 
 %files nautilus
 /usr/lib/qubes/qvm-copy-to-vm.gnome
