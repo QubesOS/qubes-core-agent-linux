@@ -1,3 +1,27 @@
+qubes-core-agent (4.1.18-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * Fix archlinux packaging
+  * Fix root mount as ro
+  * archlinux: add missing qubes-session-autostart
+  * Fix networking and remove qrexec pam related
+  * archlinux: add missing misc content
+  * archlinux: ensure SYSLIBDIR and LIBDIR for app-menu and misc
+  * archlinux: add passwordless-root package
+  * archlinux: remove uneeded 'rm -rf' after rework of makefiles
+  * archlinux: disable check on unassigned pkgdir var
+
+  [ icequbes1 ]
+  * Overwrite .rpmdb for debian updatevm
+
+  [ ejose19 ]
+  * archlinux: improve pacman proxy implementation
+
+  [ Frédéric Pierret (fepitre) ]
+  * dnf-plugin: restrict to only version provided by plateform-python
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 31 Oct 2020 05:39:07 +0100
+
 qubes-core-agent (4.1.17-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
