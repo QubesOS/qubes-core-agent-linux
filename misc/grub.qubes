@@ -1,5 +1,6 @@
 # make sure to use /dev/mapper/dmroot, not /dev/xvda directly - both have the
 # same fs, including UUID
+GRUB_DEVICE=/dev/mapper/dmroot
 GRUB_DISABLE_LINUX_UUID=true
 GRUB_DISABLE_OS_PROBER=true
 GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX root=/dev/mapper/dmroot console=tty0 console=hvc0"
