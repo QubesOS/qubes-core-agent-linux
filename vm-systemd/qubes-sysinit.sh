@@ -11,11 +11,6 @@ DEFAULT_ENABLED_APPVM="cups qubes-update-check meminfo-writer"
 DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup"
 DEFAULT_ENABLED="meminfo-writer"
 
-if systemd_version_changed ; then
-    # Ensure we're running right version of systemd (the one started by initrd may be different)
-    systemctl daemon-reexec
-fi
-
 # Wait for xenbus initialization
 while [ ! -e /dev/xen/xenbus ] && [ -e /proc/xen/xenbus ]; do
   sleep 0.1
