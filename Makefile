@@ -101,7 +101,7 @@ install-init:
 	install -m 0644 init/functions $(DESTDIR)$(LIBDIR)/qubes/init/
 
 # Systemd service files
-SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service)
+SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service) vm-systemd/dev-xvdc1-swap.service
 SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service
 SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES), $(SYSTEMD_ALL_SERVICES))
 

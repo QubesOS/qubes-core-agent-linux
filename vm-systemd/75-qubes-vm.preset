@@ -107,6 +107,7 @@ enable qubes-sync-time.timer
 enable module-load-dummy-psu.service
 enable module-load-dummy-backlight.service
 enable qubes-psu-client@.service default sys-usb
+enable dev-xvdc1-swap.service
 
 # Disable useless Xen services in Qubes VM
 disable xenstored.service

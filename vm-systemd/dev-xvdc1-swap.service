@@ -1,0 +1,13 @@
+[Unit]
+# have it as  .service, not .swap, because .swap has implicit dependency on
+# .device which needs udev running already
+Description=Enable swap on /dev/xvdc1 early
+DefaultDependencies=no
+Before=systemd-fsck-root.service
+
+[Service]
+Type=oneshot
+ExecStart=-/usr/sbin/swapon /dev/xvdc1
+
+[Install]
+WantedBy=sysinit.target
