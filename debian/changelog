@@ -1,3 +1,16 @@
+qubes-core-agent (4.0.58-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * dnf-plugin: restrict to only version provided by plateform-python
+
+  [ icequbes1 ]
+  * Overwrite .rpmdb for debian updatevm
+
+  [ ejose19 ]
+  * archlinux: improve pacman proxy implementation
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 02 Nov 2020 04:07:24 +0100
+
 qubes-core-agent (4.0.57-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
