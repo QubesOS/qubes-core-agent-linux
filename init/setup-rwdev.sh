@@ -7,7 +7,7 @@
 set -e
 
 dev=/dev/xvdb
-max_size=1073741824  # check at most 1 GiB
+max_size=10485760  # check at most 10 MiB
 
 if [ -e "$dev" ] ; then
     # The private /dev/xvdb device is present.
