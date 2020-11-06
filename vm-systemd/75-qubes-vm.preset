@@ -57,6 +57,7 @@ disable upower.service
 disable colord.service
 disable wpa_supplicant@.service
 disable dkms.service
+disable systemd-resolved
 
 # Fedora only services
 disable cpuspeed.service
