@@ -134,6 +134,10 @@ if [ "${ip}" ]; then
             "$iptables_cmd ! -i vif+ -s ${addr} -j DROP" \
             "COMMIT" | \
             ${cmdprefix} $ipt --noflush $ipt_arg
+        if [[ "$command" = 'online' ]]; then
+            ip neighbour "${ipcmd}" to "${addr}" \
+                dev "${vif}" lladdr 00:16:3e:5e:6c:6c:00 nud permanent
+        fi
     done
     # if no IPv6 is assigned, block all IPv6 traffic on that interface
     if ! [[ "$ip" = *:* ]]; then
@@ -155,7 +159,7 @@ if [ "${ip}" ]; then
             log error "Cannot set IPv6 route to ${addr}, IPv6 disabled in the kernel"
             continue
         fi
-        ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
+        ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric" onlink
 
         network_hooks "${command}" "${vif}" "${addr}"
     done

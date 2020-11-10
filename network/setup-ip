@@ -4,6 +4,14 @@
 # shellcheck disable=SC1091
 . /usr/lib/qubes/init/functions
 
+add_host_route () {
+    /sbin/ip -- route replace to unicast "$1" dev "$2" onlink scope host
+}
+
+add_default_route () {
+    /sbin/ip -- route replace to unicast default via "$1" dev "$2" onlink
+}
+
 configure_network() {
     local MAC="$1"
     local INTERFACE="$2"
@@ -17,20 +25,24 @@ configure_network() {
     local secondary_dns="${10}"
 
     /sbin/ifconfig "$INTERFACE" "$ip" netmask "$netmask"
+    /sbin/ip -- neighbour replace to "$ip" dev "$INTERFACE" \
+        lladdr "$MAC" nud permanent
     if [ -n "$ip6" ]; then
         /sbin/ifconfig "$INTERFACE" add "$ip6/$netmask6"
+        /sbin/ip -- neighbour replace to "$ip6" dev "$INTERFACE" \
+            lladdr "$MAC" nud permanent
     fi
     /sbin/ifconfig "$INTERFACE" up
 
     if [ -n "$gateway" ]; then
         /sbin/route add -host "$gateway" dev "$INTERFACE"
         if [ -n "$gateway6" ] && ! echo "$gateway6" | grep -q "^fe80:"; then
-            /sbin/route -6 add "$gateway6/$netmask6" dev "$INTERFACE"
+            add_route "$gateway6/$netmask6" "$INTERFACE"
         fi
         if ! qsvc disable-default-route ; then
-            /sbin/route add default gw "$gateway"
+            add_default_route "$gateway" "$INTERFACE"
             if [ -n "$gateway6" ]; then
-                /sbin/route -6 add default gw "$gateway6" dev "$INTERFACE"
+                add_default_route "$gateway6" "$INTERFACE"
             fi
         fi
     fi
