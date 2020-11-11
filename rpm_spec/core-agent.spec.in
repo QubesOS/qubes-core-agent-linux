@@ -778,6 +778,7 @@ rm -f %{name}-%{version}
 /lib/systemd/system/qubes-network.service
 /lib/systemd/system/qubes-updates-proxy.service
 /usr/lib/qubes/init/network-proxy-setup.sh
+/usr/lib/qubes/init/network-proxy-stop.sh
 /usr/lib/qubes/init/qubes-iptables
 /usr/lib/qubes/iptables-updates-proxy
 /usr/lib/qubes/qubes-setup-dnat-to-ns
