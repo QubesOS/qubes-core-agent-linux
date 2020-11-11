@@ -112,8 +112,8 @@ case "$command" in
         ;;
 esac
 
-domid=${vif/vif/}
-domid=${domid/.*/}
+[[ $vif =~ ^vif([0-9]+)\.([0-9]+)$ ]] || exit 1
+domid=${BASH_REMATCH[1]} sub=${BASH_REMATCH[2]}
 # metric must be possitive, but prefer later interface
 #  32752 is max XID aka domid
 metric=$(( 32752 - domid ))
@@ -135,8 +135,9 @@ if [ "${ip}" ]; then
             "COMMIT" | \
             ${cmdprefix} $ipt --noflush $ipt_arg
         if [[ "$command" = 'online' ]]; then
-            ip neighbour "${ipcmd}" to "${addr}" \
-                dev "${vif}" lladdr 00:16:3e:5e:6c:6c:00 nud permanent
+            mac=$(xenstore-read "backend/vif/$domid/$sub/mac") &&
+            ip -- neighbour "${ipcmd}" to "${addr}" \
+                dev "${vif}" lladdr "$mac" nud permanent
         fi
     done
     # if no IPv6 is assigned, block all IPv6 traffic on that interface
