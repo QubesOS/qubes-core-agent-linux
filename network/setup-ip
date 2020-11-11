@@ -3,6 +3,7 @@
 # Source Qubes library.
 # shellcheck disable=SC1091
 . /usr/lib/qubes/init/functions
+set -uo pipefail
 
 add_host_route () {
     /sbin/ip -- route replace to unicast "$1" dev "$2" onlink scope host
@@ -176,27 +177,27 @@ if [ -n "$INTERFACE" ]; then
     if [ "$ACTION" == "add" ]; then
         MAC="$(get_mac_from_iface "$INTERFACE")"
         if [ -n "$MAC" ]; then
-            ip="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip" 2> /dev/null)"
-            ip6="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip6" 2> /dev/null)"
-            netmask="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask" 2> /dev/null)"
-            netmask6="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask6" 2> /dev/null)"
-            gateway="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway" 2> /dev/null)"
-            gateway6="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway6" 2> /dev/null)"
+            ip="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip" 2> /dev/null)" || ip=
+            ip6="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip6" 2> /dev/null)" || ip6=
+            netmask="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask" 2> /dev/null)" || netmask=
+            netmask6="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask6" 2> /dev/null)" || netmask6=
+            gateway="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway" 2> /dev/null)" || gateway=
+            gateway6="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway6" 2> /dev/null)" || gateway6=
 
             # Handle legacy values
-            LEGACY_MAC="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)"
+            LEGACY_MAC="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)" || LEGACY_MAC=
             if [ "$MAC" == "$LEGACY_MAC" ] || [ -z "$LEGACY_MAC" ]; then
                 if [ -z "$ip" ]; then
-                    ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)"
+                    ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)" || ip=
                 fi
                 if [ -z "$ip6" ]; then
-                    ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)"
+                    ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)" || ip6=
                 fi
                 if [ -z "$gateway" ]; then
-                    gateway="$(/usr/bin/qubesdb-read /qubes-gateway 2> /dev/null)"
+                    gateway="$(/usr/bin/qubesdb-read /qubes-gateway 2> /dev/null)" || gateway=
                 fi
                 if [ -z "$gateway6" ]; then
-                    gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6 2> /dev/null)"
+                    gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6 2> /dev/null)" || gateway6=
                 fi
             fi
 
@@ -207,8 +208,8 @@ if [ -n "$INTERFACE" ]; then
                 netmask6="128"
             fi
 
-            primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null)
-            secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null)
+            primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null) || primary_dns=
+            secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null) || secondary_dns=
 
             if [ -n "$ip" ]; then
                 /sbin/ethtool -K "$INTERFACE" sg off
@@ -221,7 +222,7 @@ if [ -n "$INTERFACE" ]; then
                     configure_network "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
                 fi
 
-                network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
+                network=$(qubesdb-read /qubes-netvm-network 2>/dev/null) || network=
                 if [ -n "$network" ]; then
                     if ! qsvc disable-dns-server; then
                         configure_qubes_ns
