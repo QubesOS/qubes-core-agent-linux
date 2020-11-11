@@ -18,6 +18,7 @@ COMMIT
 -A INPUT -m state --state INVALID -j DROP
 -A INPUT -i lo -j ACCEPT
 -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A INPUT ! -i vif+ -p udp -s fe80::/64 -d fe80::/64 --dport 546 -j ACCEPT
 -A INPUT -i vif+ -p icmpv6 --icmpv6-type router-advertisement -j DROP
 -A INPUT -i vif+ -p icmpv6 --icmpv6-type redirect -j DROP
 -A INPUT -i vif+ -p icmpv6 -j ACCEPT
