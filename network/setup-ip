@@ -173,6 +173,14 @@ qubes_ip_change_hook() {
 
 have_qubesdb || exit 0
 
+ACTION="$1"
+INTERFACE="$2"
+
+if [ -z "$INTERFACE" ]; then
+    echo "Missing INTERFACE argument" >&2
+    exit 1
+fi
+
 if [ -n "$INTERFACE" ]; then
     if [ "$ACTION" == "add" ]; then
         MAC="$(get_mac_from_iface "$INTERFACE")"
@@ -232,8 +240,16 @@ if [ -n "$INTERFACE" ]; then
             fi
         fi
     elif [ "$ACTION" == "remove" ]; then
+        # make sure network is disabled, especially on shutdown, to prevent
+        # leaks when firewall will get stopped too
+        ip link set "$INTERFACE" down 2>/dev/null || :
+
         # If exists, we delete NetworkManager configuration file to prevent duplicate entries
         nm_config="/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE"
         rm -rf "$nm_config"
+    else
+        echo "Invalid action '$ACTION'" >&2
+        exit 1
     fi
+
 fi

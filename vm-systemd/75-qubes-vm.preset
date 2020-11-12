@@ -91,6 +91,7 @@ enable qubes-update-check.timer
 enable qubes-misc-post.service
 enable qubes-updates-proxy.service
 enable qubes-network.service
+enable qubes-network-uplink.service
 enable qubes-qrexec-agent.service
 enable qubes-mount-dirs.service
 enable qubes-rootfs-resize.service
