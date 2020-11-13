@@ -112,16 +112,28 @@ case "$command" in
         ;;
 esac
 
-[[ $vif =~ ^vif([0-9]+)\.([0-9]+)$ ]] || exit 1
+readonly max_domid=32752
+
+# if domid is 0 something is seriously wrong, so don’t check for that case
+if ! [[ $vif =~ ^vif([1-9][0-9]{,4})\.(0|[1-9][0-9]*)$ ]]; then
+    printf 'Bad interface name %q\n' "$vif">&2
+    exit 1
+fi
+
 domid=${BASH_REMATCH[1]} sub=${BASH_REMATCH[2]}
-# metric must be possitive, but prefer later interface
+
+# metric must be positive, but prefer later interface
 #  32752 is max XID aka domid
-metric=$(( 32752 - domid ))
+if (( domid > max_domid )); then
+    printf %s\\n "domid $domid too large"
+    exit 1
+fi
+metric=$(( max_domid - domid ))
 
 # add anti-spoofing rules before enabling the interface
 if [ "${ip}" ]; then
-    # If we've been given a list of IP addresses, then add routes from dom0 to
-    # the guest using those addresses.
+    # If we’ve been given a list of IP addresses, then add routes from us to
+    # the VMs we serve using those addresses.
     for addr in ${ip};
     do
         if [[ "$addr" = *:* ]]; then
