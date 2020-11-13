@@ -160,7 +160,7 @@ if [ "${ip}" ]; then
             log error "Cannot set IPv6 route to ${addr}, IPv6 disabled in the kernel"
             continue
         fi
-        ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric" onlink
+        ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
 
         network_hooks "${command}" "${vif}" "${addr}"
     done
