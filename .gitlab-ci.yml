@@ -1,0 +1,15 @@
+include:
+  - project: 'QubesOS/qubes-continuous-integration'
+    file: '/r4.0/gitlab-base.yml'
+  - project: 'QubesOS/qubes-continuous-integration'
+    file: '/r4.0/gitlab-vm.yml'
+
+tests:shellcheck:
+  stage: tests
+  variables:
+    TESTS_ONLY: 1
+  before_script:
+    - pip3 install --quiet -r ci/requirements.txt
+  script:
+    - ./run-tests
+    - shellcheck -e SC1117 $(grep -l '^#!/bin/\(ba\)\?sh' $(git ls-files))
