@@ -26,6 +26,7 @@ netns_appvm_if="${vif}"
 #               '----------------------------------'
 #
 
+readonly netvm_mac=fe:ff:ff:ff:ff:ff
 
 function run
 {
@@ -55,7 +56,7 @@ if test "$command" == online; then
     # for the peer interface, make sure that it has the same MAC address
     # as the actual VM, so that our neighbor entry works.
     run ip link add name "$netns_netvm_if" address "$mac" type veth \
-        peer name "$netvm_if" address fe:ff:ff:ff:ff:ff
+        peer name "$netvm_if" address "$netvm_mac"
     run ip link set dev "$netns_netvm_if" netns "$netns"
 
     netns ip6tables -t raw -I PREROUTING -j DROP
@@ -94,6 +95,7 @@ if test "$command" == online; then
     fi
 
     netns ip neighbour add to "$appvm_ip" dev "$netns_appvm_if" lladdr "$mac" nud permanent
+    netns ip neighbour add to "$netvm_ip" dev "$netns_netvm_if" lladdr "$netvm_mac" nud permanent
     netns ip addr add "$netvm_ip" dev "$netns_netvm_if"
     netns ip addr add "$appvm_gw_ip" dev "$netns_appvm_if"
 
