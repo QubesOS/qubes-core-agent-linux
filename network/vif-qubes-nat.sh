@@ -105,10 +105,4 @@ if test "$command" == online; then
     netns ip route add "$appvm_ip" dev "$netns_appvm_if" src "$appvm_gw_ip"
     netns ip route add "$netvm_gw_ip" dev "$netns_netvm_if" src "$netvm_ip"
     netns ip route add default via "$netvm_gw_ip" dev "$netns_netvm_if" src "$netvm_ip"
-
-
-    #run ip addr add "$netvm_gw_ip" dev "$netvm_if"
-    #run ip link set "$netvm_if" up
-    #run ip route add "$netvm_ip" dev "$netvm_if" src "$netvm_gw_ip"
 fi
-
