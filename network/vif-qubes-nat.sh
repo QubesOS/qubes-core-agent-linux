@@ -35,7 +35,12 @@ function run
 
 function netns
 {
-    run ip netns exec "$netns" "$@"
+    if [[ "$1" = 'ip' ]]; then
+        shift
+        run ip -n "$netns" "$@"
+    else
+        run ip netns exec "$netns" "$@"
+    fi
 }
 
 run ip addr flush dev "$netns_appvm_if"
