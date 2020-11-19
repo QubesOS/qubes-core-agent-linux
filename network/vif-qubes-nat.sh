@@ -46,9 +46,12 @@ if test "$command" == online; then
     run ip link set "$netns_appvm_if" netns "$netns"
 
     # keep the same MAC as the real vif interface, so NetworkManager will still
-    # ignore it
-    run ip link add "$netns_netvm_if" type veth peer name "$netvm_if" address fe:ff:ff:ff:ff:ff
-    run ip link set "$netns_netvm_if" netns "$netns"
+    # ignore it.
+    # for the peer interface, make sure that it has the same MAC address
+    # as the actual VM, so that our neighbor entry works.
+    run ip link add name "$netns_netvm_if" address "$mac" type veth \
+        peer name "$netvm_if" address fe:ff:ff:ff:ff:ff
+    run ip link set dev "$netns_netvm_if" netns "$netns"
 
     netns ip6tables -t raw -I PREROUTING -j DROP
     netns ip6tables -P INPUT DROP
@@ -85,6 +88,7 @@ if test "$command" == online; then
         netns iptables -t nat -I POSTROUTING -o "$netns_appvm_if" -s "$netvm_dns2_ip" -j SNAT --to-source "$appvm_dns2_ip"
     fi
 
+    netns ip neighbour add to "$appvm_ip" dev "$netns_appvm_if" lladdr "$mac" nud permanent
     netns ip addr add "$netvm_ip" dev "$netns_netvm_if"
     netns ip addr add "$appvm_gw_ip" dev "$netns_appvm_if"
 
