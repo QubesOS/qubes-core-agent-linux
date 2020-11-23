@@ -7,7 +7,7 @@ include:
 checks:tests:
   stage: checks
   before_script:
-    - sudo dnf install -y python3-pip
+    - sudo dnf install -y python3-pip python3-gobject-base ShellCheck
     - pip3 install --quiet -r ci/requirements.txt
   script:
     - ./run-tests
