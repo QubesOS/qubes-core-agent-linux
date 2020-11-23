@@ -7,7 +7,11 @@ include:
 checks:tests:
   stage: checks
   before_script:
+    - sudo dnf install -y python3-pip
     - pip3 install --quiet -r ci/requirements.txt
   script:
     - ./run-tests
     - shellcheck -e SC1117 $(grep -l '^#!/bin/\(ba\)\?sh' $(git ls-files))
+  after_script:
+    - "PATH=$PATH:$HOME/.local/bin"
+    - codecov
