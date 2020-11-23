@@ -4,10 +4,8 @@ include:
   - project: 'QubesOS/qubes-continuous-integration'
     file: '/r4.0/gitlab-vm.yml'
 
-tests:shellcheck:
-  stage: tests
-  variables:
-    TESTS_ONLY: 1
+checks:tests:
+  stage: checks
   before_script:
     - pip3 install --quiet -r ci/requirements.txt
   script:
