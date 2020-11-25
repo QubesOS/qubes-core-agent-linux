@@ -119,7 +119,7 @@ Summary:	The Qubes core files for VM
 Group:		Qubes
 Vendor:		Invisible Things Lab
 License:	GPL
-URL:		http://www.qubes-os.org
+URL:		https://www.qubes-os.org
 
 Conflicts:  firewalld
 Requires:   xdg-utils
@@ -141,6 +141,8 @@ Requires:   python%{python3_pkgversion}-pyxdg
 Requires:   python%{python3_pkgversion}-daemon
 # for qvm-feature-request
 Requires:   python%{python3_pkgversion}-qubesdb
+# for qubes.ShowInTerminal RPC service
+Requires:   socat
 Requires:   ImageMagick
 Requires:   librsvg2-tools
 Requires:   zenity
