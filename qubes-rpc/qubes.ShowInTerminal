@@ -1,10 +1,11 @@
 #!/bin/bash --
 
 set -eu
+umask 0077
 tmpdir="$(mktemp -d)"
 
-if [[ $tmpdir =~ \" ]]; then
-    echo 'Error: non admissible character detected in sock path.'
+if ! [[ $tmpdir =~ ^/[/A-Za-z0-9._-]+$ ]]; then
+    echo 'Error: non admissible character detected in sock path.'>&2
     exit 1
 fi
 
