@@ -24,6 +24,7 @@ dir=$(dirname "$0")
 # shellcheck disable=SC1091,SC1090
 . "$dir/vif-common.sh"
 
+set -o pipefail
 #main_ip=$(dom0_ip)
 
 # Network Hooks for triggering supplementary actions on AppVM connect
@@ -77,30 +78,34 @@ if [ "${ip}" ]; then
     appvm_ip="$(qubesdb-read "/mapped-ip/$ip4/visible-ip" 2>/dev/null || :)"
 fi
 
-# Apply NAT if IP visible from the VM is different than the "real" one
-# See vif-qubes-nat.sh for details
-# XXX: supported only for the first IPv4 address, IPv6 is dropped if this
-# feature is enabled
-if [ -n "$appvm_ip" ] && [ -n "$appvm_gw_ip" ] && [ "$appvm_ip" != "$netvm_ip" ]; then
-    # shellcheck disable=SC2154
-    if test "$command" == online; then
-        # shellcheck disable=SC2154
-        echo 1 >"/proc/sys/net/ipv4/conf/${vif}/proxy_arp"
-    fi
+readonly max_domid=32752
 
-    # shellcheck source=network/vif-qubes-nat.sh
-    . "$dir/vif-qubes-nat.sh"
+# if domid is 0 something is seriously wrong, so don’t check for that case
+if ! [[ $vif =~ ^vif([1-9][0-9]{,4})\.(0|[1-9][0-9]*)$ ]]; then
+    printf 'Bad interface name %q\n' "$vif">&2
+    exit 1
 fi
+
+domid=${BASH_REMATCH[1]} sub=${BASH_REMATCH[2]}
+
+# metric must be positive, but prefer later interface
+#  32752 is max XID aka domid
+if (( domid > max_domid )); then
+    printf %s\\n "domid $domid too large"
+    exit 1
+fi
+metric=$(( max_domid - domid ))
 
 # shellcheck disable=SC2154
 case "$command" in
     online)
-        ifconfig "${vif}" up
         echo 1 >"/proc/sys/net/ipv4/conf/${vif}/proxy_arp"
         ipcmd='add'
         iptables_cmd='-I PREROUTING 1'
         cmdprefix=''
         ipv6_disabled=$(cat /proc/sys/net/ipv6/conf/"${vif}"/disable_ipv6 || echo 1)
+        # without a MAC address we will fail later with a confusing error
+        mac=$(xenstore-read "backend/vif/$domid/$sub/mac") || exit 1
         ;;
     offline)
         do_without_error ifdown "${vif}"
@@ -112,12 +117,46 @@ case "$command" in
         ;;
 esac
 
-domid=${vif/vif/}
-domid=${domid/.*/}
-# metric must be possitive, but prefer later interface
-#  32752 is max XID aka domid
-metric=$(( 32752 - domid ))
+# Apply NAT if IP visible from the VM is different than the "real" one
+# See vif-qubes-nat.sh for details
+# XXX: supported only for the first IPv4 address, IPv6 is dropped if this
+# feature is enabled
+if [ -n "$appvm_ip" ] && [ -n "$appvm_gw_ip" ] && [ "$appvm_ip" != "$netvm_ip" ]; then
+    # shellcheck source=network/vif-qubes-nat.sh
+    . "$dir/vif-qubes-nat.sh"
+fi
 
+# add anti-spoofing rules before enabling the interface
+if [ "${ip}" ]; then
+    # If we’ve been given a list of IP addresses, then add routes from us to
+    # the VMs we serve using those addresses.
+    for addr in ${ip};
+    do
+        if [[ "$addr" = *:* ]]; then
+            ipt=ip6tables-restore
+        else
+            ipt=iptables-restore
+        fi
+        printf '%s\n' "*raw" \
+            "$iptables_cmd -i ${vif} ! -s ${addr} -j DROP" \
+            "$iptables_cmd ! -i vif+ -s ${addr} -j DROP" \
+            "COMMIT" | \
+            ${cmdprefix} $ipt --noflush $ipt_arg
+        if [[ "$command" = 'online' ]]; then
+            ip -- neighbour "${ipcmd}" to "${addr}" \
+                dev "${vif}" lladdr "$mac" nud permanent
+        fi
+    done
+    # if no IPv6 is assigned, block all IPv6 traffic on that interface
+    if ! [[ "$ip" = *:* ]]; then
+        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" | \
+            ${cmdprefix} ip6tables-restore --noflush $ipt_arg
+    fi
+fi
+
+if [ "$command" = "online" ]; then
+    ifconfig "${vif}" up
+fi
 
 if [ "${ip}" ]; then
     # If we've been given a list of IP addresses, then add routes from dom0 to
@@ -129,21 +168,9 @@ if [ "${ip}" ]; then
             continue
         fi
         ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
-        if [[ "$addr" = *:* ]]; then
-            ipt=ip6tables-restore
-        else
-            ipt=iptables-restore
-        fi
-        echo -e "*raw\\n$iptables_cmd -i ${vif} ! -s ${addr} -j DROP\\nCOMMIT" | \
-            ${cmdprefix} $ipt --noflush $ipt_arg
 
         network_hooks "${command}" "${vif}" "${addr}"
     done
-    # if no IPv6 is assigned, block all IPv6 traffic on that interface
-    if ! [[ "$ip" = *:* ]]; then
-        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" | \
-            ${cmdprefix} ip6tables-restore --noflush $ipt_arg
-    fi
     ${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
     if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]] && [[ "$ipv6_disabled" != 1 ]]; then
         ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
