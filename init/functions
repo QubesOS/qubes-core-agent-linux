@@ -141,7 +141,7 @@ get_qubes_managed_iface() {
     qubes_iface="$(get_iface_from_mac "$mac")"
     if [ "x$qubes_iface" != "x" ]; then
         echo "$qubes_iface"
-    else
+    elif [ -e /sys/class/net/eth0 ]; then
         echo eth0
     fi
 }
