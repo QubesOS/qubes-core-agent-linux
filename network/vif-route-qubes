@@ -153,8 +153,8 @@ if [ "${ip}" ]; then
         printf '%s\n' "*raw" \
             "$iptables_cmd -i ${vif} ! -s ${addr} -j DROP" \
             "$iptables_cmd ! -i vif+ -s ${addr} -j DROP" \
-            "COMMIT" | \
-            ${cmdprefix} $ipt --noflush $ipt_arg
+            "COMMIT" |
+            ${cmdprefix} "$ipt" --noflush $ipt_arg
         if [[ "$command" = 'online' ]]; then
             ip -- neighbour "${ipcmd}" to "${addr}" \
                 dev "${vif}" lladdr "$mac" nud permanent
@@ -166,7 +166,7 @@ if [ "${ip}" ]; then
     done
     # if no IPv6 is assigned, block all IPv6 traffic on that interface
     if ! [[ "$ip" = *:* ]]; then
-        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" | \
+        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" |
             ${cmdprefix} ip6tables-restore --noflush $ipt_arg
     fi
 fi
