@@ -48,8 +48,8 @@ network_hooks() {
 }
 
 conntrack_purge () {
-    local 'n=(0|[1-9][0-9]*)' output deleted msg
-    msg='flow entries have been deleted\.$'
+    local n output deleted msg
+    n='(0|[1-9][0-9]*)' msg='flow entries have been deleted\.$'
     deleted="^conntrack v$n\\.$n\\.$n \\(conntrack-tools\\): $n $msg"
     output=$(LC_ALL=C exec conntrack -D "$@" 2>&1 >/dev/null) || :
     [[ "$output" =~ $deleted ]]
