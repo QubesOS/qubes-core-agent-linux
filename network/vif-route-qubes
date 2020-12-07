@@ -198,7 +198,5 @@ fi
 
 log debug "Successful vif-route-qubes $command for $vif."
 if [ "$command" = "online" ]; then
-  # disable tx checksumming offload, apparently it doesn't work with our ancient qemu in stubdom
-  do_without_error ethtool -K "$vif" tx off
   success
 fi
