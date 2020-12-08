@@ -118,7 +118,7 @@ umount_retry() {
 
 get_mac_from_iface() {
     local iface="$1"
-    local mac
+    local mac=
     if [ "x$iface" != "x" ] && [ -e "/sys/class/net/$iface" ]; then
         mac="$(cat "/sys/class/net/$iface/address")"
     fi
@@ -127,7 +127,7 @@ get_mac_from_iface() {
 
 get_iface_from_mac() {
     local mac="$1"
-    local iface
+    local iface=
     if [ "x$mac" != "x" ]; then
         iface="$(ip -o link | grep -i "$mac" | awk '{print $2}' | cut -d ':' -f1)"
     fi
@@ -141,7 +141,7 @@ get_qubes_managed_iface() {
     qubes_iface="$(get_iface_from_mac "$mac")"
     if [ "x$qubes_iface" != "x" ]; then
         echo "$qubes_iface"
-    else
+    elif [ -e /sys/class/net/eth0 ]; then
         echo eth0
     fi
 }

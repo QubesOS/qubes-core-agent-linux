@@ -173,67 +173,80 @@ qubes_ip_change_hook() {
 
 have_qubesdb || exit 0
 
-if [ -n "$INTERFACE" ]; then
-    if [ "$ACTION" == "add" ]; then
-        MAC="$(get_mac_from_iface "$INTERFACE")"
-        if [ -n "$MAC" ]; then
-            ip="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip" 2> /dev/null)" || ip=
-            ip6="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip6" 2> /dev/null)" || ip6=
-            netmask="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask" 2> /dev/null)" || netmask=
-            netmask6="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask6" 2> /dev/null)" || netmask6=
-            gateway="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway" 2> /dev/null)" || gateway=
-            gateway6="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway6" 2> /dev/null)" || gateway6=
+ACTION="$1"
+INTERFACE="$2"
 
-            # Handle legacy values
-            LEGACY_MAC="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)" || LEGACY_MAC=
-            if [ "$MAC" == "$LEGACY_MAC" ] || [ -z "$LEGACY_MAC" ]; then
-                if [ -z "$ip" ]; then
-                    ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)" || ip=
-                fi
-                if [ -z "$ip6" ]; then
-                    ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)" || ip6=
-                fi
-                if [ -z "$gateway" ]; then
-                    gateway="$(/usr/bin/qubesdb-read /qubes-gateway 2> /dev/null)" || gateway=
-                fi
-                if [ -z "$gateway6" ]; then
-                    gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6 2> /dev/null)" || gateway6=
-                fi
+if [ -z "$INTERFACE" ]; then
+    echo "Missing INTERFACE argument" >&2
+    exit 1
+fi
+
+if [ "$ACTION" == "add" ]; then
+    MAC="$(get_mac_from_iface "$INTERFACE")"
+    if [ -n "$MAC" ]; then
+        ip="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip" 2> /dev/null)" || ip=
+        ip6="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip6" 2> /dev/null)" || ip6=
+        netmask="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask" 2> /dev/null)" || netmask=
+        netmask6="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask6" 2> /dev/null)" || netmask6=
+        gateway="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway" 2> /dev/null)" || gateway=
+        gateway6="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway6" 2> /dev/null)" || gateway6=
+
+        # Handle legacy values
+        LEGACY_MAC="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)" || LEGACY_MAC=
+        if [ "$MAC" == "$LEGACY_MAC" ] || [ -z "$LEGACY_MAC" ]; then
+            if [ -z "$ip" ]; then
+                ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)" || ip=
             fi
-
-            if [ -z "$netmask" ]; then
-                netmask="255.255.255.255"
+            if [ -z "$ip6" ]; then
+                ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)" || ip6=
             fi
-            if [ -z "$netmask6" ]; then
-                netmask6="128"
+            if [ -z "$gateway" ]; then
+                gateway="$(/usr/bin/qubesdb-read /qubes-gateway 2> /dev/null)" || gateway=
             fi
-
-            primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null) || primary_dns=
-            secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null) || secondary_dns=
-
-            if [ -n "$ip" ]; then
-                /sbin/ethtool -K "$INTERFACE" sg off
-                /sbin/ethtool -K "$INTERFACE" tx off
-
-                # If NetworkManager is enabled, let it configure the network
-                if qsvc network-manager && [ -e /usr/bin/nmcli ]; then
-                    configure_network_nm "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
-                else
-                    configure_network "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
-                fi
-
-                network=$(qubesdb-read /qubes-netvm-network 2>/dev/null) || network=
-                if [ -n "$network" ]; then
-                    if ! qsvc disable-dns-server; then
-                        configure_qubes_ns
-                    fi
-                    qubes_ip_change_hook
-                fi
+            if [ -z "$gateway6" ]; then
+                gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6 2> /dev/null)" || gateway6=
             fi
         fi
-    elif [ "$ACTION" == "remove" ]; then
-        # If exists, we delete NetworkManager configuration file to prevent duplicate entries
-        nm_config="/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE"
-        rm -rf "$nm_config"
+
+        if [ -z "$netmask" ]; then
+            netmask="255.255.255.255"
+        fi
+        if [ -z "$netmask6" ]; then
+            netmask6="128"
+        fi
+
+        primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null) || primary_dns=
+        secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null) || secondary_dns=
+
+        if [ -n "$ip" ]; then
+            /sbin/ethtool -K "$INTERFACE" sg off
+            /sbin/ethtool -K "$INTERFACE" tx off
+
+            # If NetworkManager is enabled, let it configure the network
+            if qsvc network-manager && [ -e /usr/bin/nmcli ]; then
+                configure_network_nm "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
+            else
+                configure_network "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
+            fi
+
+            network=$(qubesdb-read /qubes-netvm-network 2>/dev/null) || network=
+            if [ -n "$network" ]; then
+                if ! qsvc disable-dns-server; then
+                    configure_qubes_ns
+                fi
+                qubes_ip_change_hook
+            fi
+        fi
     fi
+elif [ "$ACTION" == "remove" ]; then
+    # make sure network is disabled, especially on shutdown, to prevent
+    # leaks when firewall will get stopped too
+    ip link set "$INTERFACE" down 2>/dev/null || :
+
+    # If exists, we delete NetworkManager configuration file to prevent duplicate entries
+    nm_config="/etc/NetworkManager/system-connections/qubes-uplink-$INTERFACE"
+    rm -rf "$nm_config"
+else
+    echo "Invalid action '$ACTION'" >&2
+    exit 1
 fi
