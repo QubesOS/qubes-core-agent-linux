@@ -164,16 +164,7 @@ mkdir -p "$DOM0_UPDATES_DIR/packages"
 
 set -e
 
-if [ "$GUI" = 1 ]; then
-    ( echo "1"
-    # shellcheck disable=SC2086
-    "${YUM_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}"
-    echo 100 ) | zenity --progress --pulsate --auto-close --auto-kill \
-         --text="Downloading updates for Dom0, please wait..." --title="Qubes Dom0 updates"
-else
-    # shellcheck disable=SC2086
-    "${YUM_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}"
-fi
+"${YUM_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}"
 
 find "$DOM0_UPDATES_DIR/var/cache" -name '*.rpm' -print0 2>/dev/null |\
     xargs -0 -r ln -f -t "$DOM0_UPDATES_DIR/packages/"
