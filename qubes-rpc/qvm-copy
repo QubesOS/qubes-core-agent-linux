@@ -38,7 +38,7 @@ fi
 
 if { [ $# -lt 2 ] && [ "$TARGET_TYPE" = "vm" ];} || { [ $# -lt 1 ] && [ "$TARGET_TYPE" = "default" ];} ; then
 
-	if [ $TARGET_TYPE = "vm" ]; then
+	if [ "$TARGET_TYPE" = "vm" ]; then
 		echo "usage: $0 [--without-progress] destination_qube_name FILE [FILE ...]"
 	else
 		echo "usage: $0 [--without-progress] FILE [FILE ...]"
@@ -46,7 +46,7 @@ if { [ $# -lt 2 ] && [ "$TARGET_TYPE" = "vm" ];} || { [ $# -lt 1 ] && [ "$TARGET
 
 	echo
 
-	if [ $OPERATION_TYPE = "move" ] ; then
+	if [ "$OPERATION_TYPE" = "move" ] ; then
 		echo "Move FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
 	else
 		echo "Copy FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
@@ -71,7 +71,7 @@ else
   VM="@default"
 fi
 
-if [ $PROGRESS_TYPE = console ] ; then
+if [ "$PROGRESS_TYPE" = console ] ; then
     FILECOPY_TOTAL_SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
     export FILECOPY_TOTAL_SIZE
 fi

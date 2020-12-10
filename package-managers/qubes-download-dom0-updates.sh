@@ -5,14 +5,14 @@ DOM0_UPDATES_DIR=/var/lib/qubes/dom0-updates
 GUI=1
 CLEAN=0
 CHECK_ONLY=0
-OPTS="--installroot $DOM0_UPDATES_DIR"
+OPTS=(--installroot "$DOM0_UPDATES_DIR")
 if [ -f "$DOM0_UPDATES_DIR/etc/dnf/dnf.conf" ]; then
-    OPTS="$OPTS --config=$DOM0_UPDATES_DIR/etc/dnf/dnf.conf"
+    OPTS+=("--config=$DOM0_UPDATES_DIR/etc/dnf/dnf.conf")
 elif [ -f "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
-    OPTS="$OPTS --config=$DOM0_UPDATES_DIR/etc/yum.conf"
+    OPTS+=("--config=$DOM0_UPDATES_DIR/etc/yum.conf")
 fi
 # DNF uses /etc/yum.repos.d, even when --installroot is specified
-OPTS="$OPTS --setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d"
+OPTS+=("--setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d")
 # DNF verifies signatures implicitly, but yumdownloader does not.
 SIGNATURE_REGEX=""
 PKGLIST=()
@@ -41,7 +41,8 @@ while [ -n "$1" ]; do
             YUM_ACTION=${1#--action=}
             ;;
         -*)
-            OPTS="$OPTS $1"
+            # we already add these options for DNF, and Yum doesn’t support them
+            case $1 in (--best|--allowerasing) :;; (*) OPTS+=("$1");; esac
             ;;
         *)
             PKGLIST+=( "${1}" )
@@ -57,12 +58,10 @@ if [ -z "$YUM_ACTION" ]; then
     YUM_ACTION=upgrade
 fi
 
-YUM="yum"
 if type dnf >/dev/null 2>&1; then
-    YUM="dnf --best --allowerasing --noplugins"
+    YUM=(dnf --best --allowerasing --noplugins)
 else
-    # salt in dom0 thinks it's using dnf but we only have yum so need to remove extra options
-    OPTS="${OPTS/--best --allowerasing/}"
+    YUM=(yum)
 fi
 
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
@@ -85,7 +84,7 @@ rpm --root=$DOM0_UPDATES_DIR --rebuilddb
 
 if [ "$CLEAN" = "1" ]; then
     # shellcheck disable=SC2086
-    $YUM $OPTS clean all
+    "${YUM[@]}" "${OPTS[@]}" clean all
     rm -f "$DOM0_UPDATES_DIR"/packages/*
     rm -rf "$DOM0_UPDATES_DIR"/var/cache/*
 fi
@@ -94,7 +93,7 @@ fi
 if [ ${#PKGLIST[@]} -eq 0 ] && [ "$CHECK_ONLY" = "1" ]; then
     echo "Checking for dom0 updates..." >&2
     # shellcheck disable=SC2086
-    UPDATES_FULL=$($YUM $OPTS check-update)
+    UPDATES_FULL=$("${YUM[@]}" "${OPTS[@]}" check-update)
     check_update_retcode=$?
     if [ "$check_update_retcode" -eq 1 ]; then
         # Exit here if yum have reported an error. Exit code 100 isn't an
@@ -115,10 +114,10 @@ if [ ${#PKGLIST[@]} -eq 0 ] && [ "$CHECK_ONLY" = "1" ]; then
 fi
 
 # now, we will download something
-YUM_COMMAND="fakeroot $YUM $YUM_ACTION -y --downloadonly"
+YUM_COMMAND=(fakeroot "${YUM[@]}" "$YUM_ACTION" -y --downloadonly)
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
-if ! $YUM --help | grep -q downloadonly; then
+if ! "${YUM[@]}" --help | grep -q downloadonly; then
     if dpkg --compare-versions \
             "$(dpkg-query --show --showformat='${version}' rpm)" gt 4.14; then
         SIGNATURE_REGEX="^[A-Za-z0-9._+-/]{1,128}\.rpm: digests signatures OK$"
@@ -131,10 +130,10 @@ if ! $YUM --help | grep -q downloadonly; then
         ln -nsf dnf/dnf.conf "$DOM0_UPDATES_DIR/etc/yum.conf"
     fi
     if [ "$YUM_ACTION" = "install" ]; then
-        YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
+        YUM_COMMAND=(yumdownloader "--destdir=$DOM0_UPDATES_DIR/packages" --resolve)
     elif [ "$YUM_ACTION" = "upgrade" ]; then
         # shellcheck disable=SC2086
-        UPDATES_FULL=$($YUM $OPTS check-update "${PKGLIST[@]}")
+        UPDATES_FULL=$("${YUM[@]}" "${OPTS[@]}" check-update "${PKGLIST[@]}")
         check_update_retcode=$?
         UPDATES_FULL=$(echo "$UPDATES_FULL" | grep -v "^Loaded plugins:\|^Last metadata\|^$")
         mapfile -t PKGLIST < <(echo "$UPDATES_FULL" | grep -v "^Obsoleting\|Could not" | cut -f 1 -d ' ')
@@ -143,14 +142,14 @@ if ! $YUM --help | grep -q downloadonly; then
             echo "No new updates available" >&2
             exit 0
         fi
-        YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
+        YUM_COMMAND=(yumdownloader "--destdir=$DOM0_UPDATES_DIR/packages" --resolve)
     elif [ "$YUM_ACTION" == "list" ] || [ "$YUM_ACTION" == "search" ]; then
         # those actions do not download any package, so lack of --downloadonly is irrelevant
-        YUM_COMMAND="$YUM $YUM_ACTION -y"
+        YUM_COMMAND=("${YUM[@]}" -y -- "$YUM_ACTION")
     elif [ "$YUM_ACTION" == "reinstall" ]; then
         # this is just approximation of 'reinstall' action...
-        mapfile -t PKGLIST < <(rpm --root=$DOM0_UPDATES_DIR -q "${PKGLIST[@]}")
-        YUM_COMMAND="yumdownloader --destdir=$DOM0_UPDATES_DIR/packages --resolve"
+        mapfile -t PKGLIST < <(rpm "--root=$DOM0_UPDATES_DIR" -q "${PKGLIST[@]}")
+        YUM_COMMAND=(yumdownloader "--destdir=$DOM0_UPDATES_DIR/packages" --resolve)
     else
         echo "ERROR: yum version installed in VM $(hostname) does not suppport --downloadonly option" >&2
         echo "ERROR: only 'install' and 'upgrade' actions supported ($YUM_ACTION not)" >&2
@@ -168,12 +167,12 @@ set -e
 if [ "$GUI" = 1 ]; then
     ( echo "1"
     # shellcheck disable=SC2086
-    $YUM_COMMAND $OPTS "${PKGLIST[@]}"
+    "${YUM_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}"
     echo 100 ) | zenity --progress --pulsate --auto-close --auto-kill \
          --text="Downloading updates for Dom0, please wait..." --title="Qubes Dom0 updates"
 else
     # shellcheck disable=SC2086
-    $YUM_COMMAND $OPTS "${PKGLIST[@]}"
+    "${YUM_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}"
 fi
 
 find "$DOM0_UPDATES_DIR/var/cache" -name '*.rpm' -print0 2>/dev/null |\
