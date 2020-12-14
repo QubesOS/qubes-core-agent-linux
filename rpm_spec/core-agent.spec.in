@@ -30,6 +30,9 @@
 %define with_sysvinit 1
 %endif
 
+%define qubes_rpm_keys_prefix /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes
+%define qubes_minor %{lua:local a, b = rpm.expand('%version'):gsub('^(%d+.%d+).%d+$', '%1')assert(b == 1)print(a)}
+
 %if 0%{?rhel} == 8
 %define plateform_python3_sitelib %(/usr/libexec/platform-python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
 %endif
@@ -345,14 +348,17 @@ make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
 sed -i \
         -e 's:-primary:-centos:' \
         -e 's:/fc:/centos:' \
-        $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
+        "$RPM_BUILD_ROOT"/etc/yum.repos.d/qubes-*.repo
 %endif
 
-install -D -m 0644 boot/dracut-qubes.conf $RPM_BUILD_ROOT/usr/lib/dracut/dracut.conf.d/30-qubes.conf
-install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
+install -D -m 0644 boot/dracut-qubes.conf "$RPM_BUILD_ROOT/usr/lib/dracut/dracut.conf.d/30-qubes.conf"
+install -D -m 0644 boot/grub.qubes "$RPM_BUILD_ROOT/etc/default/grub.qubes"
+for i in primary centos unstable; do
+    ln -s "RPM-GPG-KEYS-qubes-4-$i" "$RPM_BUILD_ROOT%{qubes_rpm_keys_prefix}-%{qubes_minor}-$i"
+done
 
 %if ! %with_sysvinit
-    rm -rf $RPM_BUILD_ROOT/etc/init.d/qubes-* $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
+    rm -rf -- "$RPM_BUILD_ROOT"/etc/init.d/qubes-* "$RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules"
 %endif
 
 %triggerin -- initscripts
@@ -604,7 +610,12 @@ rm -f %{name}-%{version}
 %{kde5_service_dir}/qvm-move.desktop
 %{kde5_service_dir}/qvm-dvm.desktop
 /etc/fstab
-/etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
+%qubes_rpm_keys_prefix-4-primary
+%qubes_rpm_keys_prefix-4-centos
+%qubes_rpm_keys_prefix-4-unstable
+%qubes_rpm_keys_prefix-%{qubes_minor}-primary
+%qubes_rpm_keys_prefix-%{qubes_minor}-centos
+%qubes_rpm_keys_prefix-%{qubes_minor}-unstable
 %dir /etc/qubes-rpc
 %config(noreplace) /etc/qubes-rpc/qubes.ShowInTerminal
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
