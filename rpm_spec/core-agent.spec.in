@@ -111,15 +111,15 @@ restore_units() { \
     done \
 } \
 
-Name:		qubes-core-agent
-Version:	@VERSION@
-Release:	1%{dist}
-Summary:	The Qubes core files for VM
+Name:       qubes-core-agent
+Version:    @VERSION@
+Release:    1%{dist}
+Summary:    The QubesOS core files for VMs
 
-Group:		Qubes
-Vendor:		Invisible Things Lab
-License:	GPL
-URL:		https://www.qubes-os.org
+Group:      Qubes
+Vendor:     Invisible Things Lab
+License:    GPL
+URL:        https://www.qubes-os.org
 
 Conflicts:  firewalld
 Requires:   xdg-utils
@@ -164,9 +164,9 @@ Obsoletes:  qubes-core-vm-kernel-placeholder <= 1.0
 Obsoletes:  qubes-upgrade-vm < 3.2
 Provides:   qubes-core-vm = %{version}-%{release}
 Obsoletes:  qubes-core-vm < 4.0.0
-Provides:	qubes-core-vm-doc = %{version}-%{release}
-Obsoletes:	qubes-core-vm-doc < 4.0.0
-Conflicts:	qubes-gui-agent < 4.1.6
+Provides:   qubes-core-vm-doc = %{version}-%{release}
+Obsoletes:  qubes-core-vm-doc < 4.0.0
+Conflicts:  qubes-gui-agent < 4.1.6
 BuildRequires: gcc
 BuildRequires: pandoc
 BuildRequires: xen-devel
@@ -357,7 +357,7 @@ install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
 
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
-	cp /usr/share/qubes/serial.conf /etc/init/serial.conf
+    cp /usr/share/qubes/serial.conf /etc/init/serial.conf
 fi
 
 %triggerin -- grub2-tools
@@ -374,7 +374,7 @@ qubesfile=/etc/pam.d/su.qubes
 origfile=${qubesfile%.qubes}
 backupfile=${origfile}.qubes-orig
 if [ -r "$origfile" -a ! -r "$backupfile" ]; then
-	mv -f "$origfile" "$backupfile"
+    mv -f "$origfile" "$backupfile"
 fi
 ln -sf "$qubesfile" "$origfile"
 
@@ -382,9 +382,9 @@ ln -sf "$qubesfile" "$origfile"
 
 # disable some Upstart services
 for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
-	if [ -e /etc/init/$F.conf ]; then
-		mv -f /etc/init/$F.conf /etc/init/$F.conf.disabled
-	fi
+    if [ -e /etc/init/$F.conf ]; then
+        mv -f /etc/init/$F.conf /etc/init/$F.conf.disabled
+    fi
 done
 
 chgrp user /var/lib/qubes/dom0-updates
@@ -457,7 +457,7 @@ exit 0
 fi
 
 if [ -e /etc/init/serial.conf ] && ! [ -f /var/lib/qubes/serial.orig ] ; then
-	cp /etc/init/serial.conf /var/lib/qubes/serial.orig
+    cp /etc/init/serial.conf /var/lib/qubes/serial.orig
 fi
 
 # Remove most of the udev scripts to speed up the VM boot time
