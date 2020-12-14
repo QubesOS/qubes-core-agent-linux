@@ -492,10 +492,15 @@ fi
 exit 0
 
 %triggerin -- selinux-policy
-#echo "--> Disabling SELinux..."
-sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
-mv /etc/selinux/config.processed /etc/selinux/config
-setenforce 0 2>/dev/null
+
+. /usr/lib/qubes/init/functions
+
+if ! is_protected_file /etc/selinux/config; then
+    echo "--> Disabling SELinux..."
+    sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+    mv /etc/selinux/config.processed /etc/selinux/config
+    setenforce 0 2>/dev/null
+fi
 exit 0
 
 %post network-manager
