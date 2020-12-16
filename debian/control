@@ -125,6 +125,7 @@ Depends:
     iptables,
     net-tools,
     ethtool,
+    conntrack,
     socat,
     tinyproxy,
     iproute2,
