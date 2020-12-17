@@ -1,7 +1,7 @@
 [Unit]
 Description=Early Qubes VM settings
 DefaultDependencies=no
-Before=sysinit.target
+Before=sysinit.target network-pre.target
 After=local-fs.target qubes-db.service
 
 [Service]

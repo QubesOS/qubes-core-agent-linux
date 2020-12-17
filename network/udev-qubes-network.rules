@@ -1,5 +1,5 @@
 # old udev has ENV{ID_NET_DRIVER}
-SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", ENV{ID_NET_DRIVER}=="vif", RUN+="/usr/lib/qubes/setup-ip"
-SUBSYSTEMS=="net", KERNEL=="eth*", ACTION=="remove", ENV{ID_NET_DRIVER}=="vif", RUN+="/usr/lib/qubes/setup-ip"
+SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", ENV{ID_NET_DRIVER}=="vif", ENV{SYSTEMD_WANTS}+="qubes-network-uplink@%k.service"
+SUBSYSTEMS=="net", KERNEL=="eth*", ACTION=="remove", ENV{ID_NET_DRIVER}=="vif", ENV{SYSTEMD_WANTS}+="qubes-network-uplink@%k.service"
 # new udev has DRIVERS
-SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", DRIVERS=="vif", RUN+="/usr/lib/qubes/setup-ip"
+SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", DRIVERS=="vif", ENV{SYSTEMD_WANTS}+="qubes-network-uplink@%k.service"

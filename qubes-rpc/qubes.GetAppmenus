@@ -9,12 +9,8 @@
 # Reload scripts in /etc/profile.d/, in case they register additional
 # directories in XDG_DATA_DIRS and we forgot them
 # (e.g. because we are running under sudo).
-for i in /etc/profile.d/*.sh ; do
-    if [ -r "$i" ]; then
-        # shellcheck disable=SC1090
-        . "$i" >/dev/null
-    fi
-done
+# shellcheck disable=SC1091
+source /etc/profile
 
 if [ -z "$XDG_DATA_HOME" ]; then
     user="$(whoami)"

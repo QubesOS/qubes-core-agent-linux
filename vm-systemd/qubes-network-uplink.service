@@ -1,0 +1,11 @@
+[Unit]
+Description=Qubes network uplink wait
+Before=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/qubes/init/network-uplink-wait.sh
+
+[Install]
+WantedBy=multi-user.target
