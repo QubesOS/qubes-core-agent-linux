@@ -88,8 +88,16 @@ fi
 
 readonly max_domid=32752
 
-# if domid is 0 something is seriously wrong, so don’t check for that case
-if ! [[ $vif =~ ^vif([1-9][0-9]{,4})\.(0|[1-9][0-9]*)$ ]]; then
+# This comment used to say, “if domid is 0 something is seriously wrong, so
+# don’t check for that case”.  Indeed, dom0 should never have an Ethernet
+# connection in a production QubesOS system.
+#
+# However, giving dom0 an Ethernet connection can be extremely useful in
+# insecure test environments, where there is simply no data worth compromising.
+# In fact, some test setups, including OpenQA, actually do this.  Therefore, we
+# now handle this case correctly, even though it is by definition a security
+# risk.
+if ! [[ $vif =~ ^vif(0|[1-9][0-9]{,4})\.(0|[1-9][0-9]*)$ ]]; then
     printf 'Bad interface name %q\n' "$vif">&2
     exit 1
 fi
