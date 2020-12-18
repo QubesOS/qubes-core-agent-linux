@@ -97,7 +97,7 @@ readonly max_domid=32752
 # In fact, some test setups, including OpenQA, actually do this.  Therefore, we
 # now handle this case correctly, even though it is by definition a security
 # risk.
-if ! [[ $vif =~ ^vif(0|[1-9][0-9]{,4})\.(0|[1-9][0-9]*)$ ]]; then
+if ! [[ $vif =~ ^vif(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
     printf 'Bad interface name %q\n' "$vif">&2
     exit 1
 fi
@@ -106,7 +106,8 @@ domid=${BASH_REMATCH[1]} sub=${BASH_REMATCH[2]}
 
 # metric must be positive, but prefer later interface
 #  32752 is max XID aka domid
-if (( domid > max_domid )); then
+#  the length check ensures there is no overflow
+if (( "${#domid}" > "${#max_domid}" || domid > max_domid )); then
     printf %s\\n "domid $domid too large"
     exit 1
 fi
