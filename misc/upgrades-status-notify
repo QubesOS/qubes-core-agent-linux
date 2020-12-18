@@ -2,7 +2,7 @@
 
 set -e
 
-upgrades_installed="$(/usr/lib/qubes/upgrades-installed-check 2>&1)"
+upgrades_installed="$(/usr/lib/qubes/upgrades-installed-check)"
 
 if [ "$upgrades_installed" = "true" ]; then
     /usr/lib/qubes/qrexec-client-vm dom0 qubes.NotifyUpdates /bin/sh -c 'echo 0'
