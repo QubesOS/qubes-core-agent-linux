@@ -1,4 +1,4 @@
-Defaults !requiretty
+Defaults role=unconfined_r, type=unconfined_t, !requiretty
 %qubes ALL=(ALL) NOPASSWD: ALL
 
 # WTF?! Have you lost your mind?!
