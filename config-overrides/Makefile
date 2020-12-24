@@ -12,6 +12,7 @@ install:
 	install -D -m 0440 sudoers.d_umask $(DESTDIR)$(SUDOERSDIR)/umask
 	install -D -m 0644 20_tcp_timestamps.conf $(DESTDIR)$(SYSCONFDIR)/sysctl.d/20_tcp_timestamps.conf
 	install -D -m 0644 dconf-db-local-dpi $(DESTDIR)$(SYSCONFDIR)/dconf/db/local.d/dpi
+	install -D -m 0644 dconf-db-local-middle-mouse-paste $(DESTDIR)$(SYSCONFDIR)/dconf/db/local.d/middle-mouse-paste
 	install -d $(DESTDIR)$(GLIBSCHEMAS)
 	install -t $(DESTDIR)$(GLIBSCHEMAS) -m 0644 \
 		20_org.gnome.desktop.wm.preferences.qubes.gschema.override \
