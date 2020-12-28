@@ -324,7 +324,7 @@ usermod -L root
 
 %install
 
-make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT
+make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir}
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
