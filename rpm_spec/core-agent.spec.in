@@ -324,7 +324,7 @@ usermod -L root
 
 %install
 
-make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT
+make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
@@ -795,12 +795,12 @@ rm -f %{name}-%{version}
 /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 /etc/xen/scripts/vif-qubes-nat.sh
 /etc/xen/scripts/vif-route-qubes
-/lib/systemd/system/qubes-firewall.service
-/lib/systemd/system/qubes-iptables.service
-/lib/systemd/system/qubes-network.service
-/lib/systemd/system/qubes-network-uplink.service
-/lib/systemd/system/qubes-network-uplink@.service
-/lib/systemd/system/qubes-updates-proxy.service
+/usr/lib/systemd/system/qubes-firewall.service
+/usr/lib/systemd/system/qubes-iptables.service
+/usr/lib/systemd/system/qubes-network.service
+/usr/lib/systemd/system/qubes-network-uplink.service
+/usr/lib/systemd/system/qubes-network-uplink@.service
+/usr/lib/systemd/system/qubes-updates-proxy.service
 /usr/lib/qubes/init/network-proxy-setup.sh
 /usr/lib/qubes/init/network-proxy-stop.sh
 /usr/lib/qubes/init/network-uplink-wait.sh
