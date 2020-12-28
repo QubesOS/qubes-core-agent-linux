@@ -47,6 +47,14 @@ network_hooks() {
     fi
 }
 
+conntrack_purge () {
+    local n output deleted msg
+    n='(0|[1-9][0-9]*)' msg='flow entries have been deleted\.$'
+    deleted="^conntrack v$n\\.$n\\.$n \\(conntrack-tools\\): $n $msg"
+    output=$(LC_ALL=C exec conntrack -D "$@" 2>&1 >/dev/null) || :
+    [[ "$output" =~ $deleted ]]
+}
+
 ipt_arg=
 if "iptables-restore" --help 2>&1 | grep -q wait=; then
     # 'wait' must be last on command line if secs not specified
@@ -80,8 +88,16 @@ fi
 
 readonly max_domid=32752
 
-# if domid is 0 something is seriously wrong, so don’t check for that case
-if ! [[ $vif =~ ^vif([1-9][0-9]{,4})\.(0|[1-9][0-9]*)$ ]]; then
+# This comment used to say, “if domid is 0 something is seriously wrong, so
+# don’t check for that case”.  Indeed, dom0 should never have an Ethernet
+# connection in a production QubesOS system.
+#
+# However, giving dom0 an Ethernet connection can be extremely useful in
+# insecure test environments, where there is simply no data worth compromising.
+# In fact, some test setups, including OpenQA, actually do this.  Therefore, we
+# now handle this case correctly, even though it is by definition a security
+# risk.
+if ! [[ $vif =~ ^vif(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
     printf 'Bad interface name %q\n' "$vif">&2
     exit 1
 fi
@@ -90,7 +106,8 @@ domid=${BASH_REMATCH[1]} sub=${BASH_REMATCH[2]}
 
 # metric must be positive, but prefer later interface
 #  32752 is max XID aka domid
-if (( domid > max_domid )); then
+#  the length check ensures there is no overflow
+if (( "${#domid}" > "${#max_domid}" || domid > max_domid )); then
     printf %s\\n "domid $domid too large"
     exit 1
 fi
@@ -126,6 +143,11 @@ if [ -n "$appvm_ip" ] && [ -n "$appvm_gw_ip" ] && [ "$appvm_ip" != "$netvm_ip" ]
     . "$dir/vif-qubes-nat.sh"
 fi
 
+case $- in
+(*e*) :;;
+(*) echo '-e not set'>&2; exit 1;;
+esac
+
 # add anti-spoofing rules before enabling the interface
 if [ "${ip}" ]; then
     # If we’ve been given a list of IP addresses, then add routes from us to
@@ -140,16 +162,20 @@ if [ "${ip}" ]; then
         printf '%s\n' "*raw" \
             "$iptables_cmd -i ${vif} ! -s ${addr} -j DROP" \
             "$iptables_cmd ! -i vif+ -s ${addr} -j DROP" \
-            "COMMIT" | \
-            ${cmdprefix} $ipt --noflush $ipt_arg
+            "COMMIT" |
+            ${cmdprefix} "$ipt" --noflush $ipt_arg
         if [[ "$command" = 'online' ]]; then
             ip -- neighbour "${ipcmd}" to "${addr}" \
                 dev "${vif}" lladdr "$mac" nud permanent
         fi
+        if ! conntrack_purge -s "$addr" || ! conntrack_purge -d "$addr"; then
+            printf 'Cannot purge stale conntrack entries for %q\n' "$addr">&2
+            exit 1
+        fi
     done
     # if no IPv6 is assigned, block all IPv6 traffic on that interface
     if ! [[ "$ip" = *:* ]]; then
-        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" | \
+        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" |
             ${cmdprefix} ip6tables-restore --noflush $ipt_arg
     fi
 fi
@@ -181,7 +207,5 @@ fi
 
 log debug "Successful vif-route-qubes $command for $vif."
 if [ "$command" = "online" ]; then
-  # disable tx checksumming offload, apparently it doesn't work with our ancient qemu in stubdom
-  do_without_error ethtool -K "$vif" tx off
   success
 fi
