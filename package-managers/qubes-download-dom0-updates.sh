@@ -22,7 +22,7 @@ export LC_ALL=C
 
 while [ -n "$1" ]; do
     case "$1" in
-        --doit)
+        --doit|--force-xen-upgrade|--console|--show-output)
             # ignore
             ;;
         --nogui)
