@@ -527,6 +527,9 @@ class NftablesWorker(FirewallWorker):
                 except socket.gaierror as e:
                     raise RuleParseError('Failed to resolve {}: {}'.format(
                         rule['dsthost'], str(e)))
+                except UnicodeError as e:
+                    raise RuleParseError('Invalid destination {}: {}'.format(
+                        rule['dsthost'], str(e)))
                 nft_rule += ' {} daddr {{ {} }}'.format(ip_match,
                     ', '.join(set(item[4][0] + fullmask for item in addrinfo)))
 
