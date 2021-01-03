@@ -32,7 +32,7 @@ elif [ -e /etc/arch-release ]; then
     ## Archlinux
     set -e
     set -o pipefail
-    checkupdates_output="$(checkupdates 2>&1)"
+    checkupdates >/dev/null 2>&1
     exit_code="$?"
     [ "$exit_code" -eq 2 ] && echo "true" && exit 0
     echo "false"
