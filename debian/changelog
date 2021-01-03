@@ -1,3 +1,113 @@
+qubes-core-agent (4.1.19-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * grub: override GRUB_DEVICE with /dev/mapper/dmroot
+  * Add a service to enable swap early - before fsck of the root
+    filesystem
+  * Drop systemd re-exec during boot
+  * Relax private.img condition for mkfs even further
+
+  [ Frédéric Pierret (fepitre) ]
+  * Add .gitlab-ci.yml
+
+  [ Marek Marczykowski-Górecki ]
+  * gitlab-ci: move tests earlier, rename job
+  * gitlab-ci: include codecov
+  * gitlab-ci: install test dependencies
+
+  [ Demi Marie Obenour ]
+  * qubes.ShowInTerminal requires socat
+
+  [ Marek Marczykowski-Górecki ]
+  * network: setup anti-spoofing firewall rules before enabling the
+    interface
+  * network: prevent IP spoofing on upstream (eth0) interface
+
+  [ Demi Marie Obenour ]
+  * Add permanent neighbor entries
+  * Add gateway IP+MAC, not VM’s own
+  * Don’t hardcode MAC addresses
+  * Fix running under -euo pipefail
+  * Don’t use onlink flag for nexthop
+  * vif-route-qubes: better input validation
+  * NAT network namespaces need neighbor entries
+  * Optimization: use `ip -n` over `ip netns exec`
+  * Add NetVM-facing neighbor entry in NAT namespace
+  * Remove commented-out code
+  * Use netvm_gw_ip instead of netvm_ip
+
+  [ ejose19 ]
+  * Replace custom script reloading with sourcing /etc/profile in
+    qubes.GetAppmenus
+
+  [ Demi Marie Obenour ]
+  * Only allow known-safe characters in socket paths
+
+  [ Marek Marczykowski-Górecki ]
+  * Allow DHCPv6 replies on uplink interface, if ipv6 is enabled
+  * network: stop IP forwarding before disabling firewall
+  * Order qubes-early-vm-config.service before networking
+  * Move network uplink setup to a separate service
+  * Cleanup setup-ip script a bit
+  * Make init/functions suitable for running with 'set -u'
+  * init/functions: do not guess 'eth0' as Qubes-managed interface
+  * Order NetworkManager after qubes-network-uplink.service
+
+  [ Demi Marie Obenour ]
+  * Replace tabs with spaces
+
+  [ Frédéric Pierret (fepitre) ]
+  * debian: update control
+  * debian: update compat
+
+  [ Demi Marie Obenour ]
+  * Always pass ‘-y’ to dnf
+  * Metadata is now signed
+  * Purge stale connection tracking entries
+  * vif-route-qubes: Check that the -e flag is set
+  * Remove spurious line continuation; add quotes.
+  * Stop disabling checksum offload
+  * Keep shellcheck from complaining
+  * Add conntrack-tools dependency to qubes-core-agent-networking
+  * Don’t assume dom0 will never have a network connection
+  * Don’t rely on an arbitrary length limit
+  * Use /usr/lib instead of /lib
+  * Only give the “qubes” group full Polkit access
+  * “sudo” must remove SELinux restrictions
+  * Use 022 instead of 002 as sudo umask
+
+  [ Marek Marczykowski-Górecki ]
+  * Actually install unit files into /usr/lib/systemd/system
+  * archlinux: add missing python-setuptools makedepends
+
+  [ icequbes1 ]
+  * Fix comments in default qubes-firewall-user-script
+  * Handle UnicodeError in firewall when resolving hostname
+
+  [ Demi Marie Obenour ]
+  * Avoid deprecated /var/run directory
+  * Ignore more options of qubes-dom0-update
+  * Allow SELinux to stay enabled
+  * Harden shell scripts against metacharacters
+  * Avoid spawning a Zenity progress meter
+
+  [ Ludovic Bellier ]
+  * upgrades-installed-check requires pacman-contrib for checkupdates
+  * fix archlinux detection of available upgrades note: checkupdates
+    return 2 when no updates are available (source: man page and source
+    code)
+  * fix for ArchLinux: notify dom0 about installed updates The launch of
+    the qubes-update-check service failed on ArchLinux, because the
+    qubes-rpc uses the `service` command which isn't available for this
+    OS.
+
+  [ Marek Marczykowski-Górecki ]
+  * archlinux: checkupdates output is not checked anymore, ignore it
+  * network: fix waiting for VM network uplink
+  * Increase upgrades-status-notify verbosity
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 03 Jan 2021 06:38:51 +0100
+
 qubes-core-agent (4.1.18-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
