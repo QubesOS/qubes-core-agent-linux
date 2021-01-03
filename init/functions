@@ -138,6 +138,12 @@ get_qubes_managed_iface() {
     local mac
     local qubes_iface
     mac="$(qubesdb-read /qubes-mac 2> /dev/null)"
+    if [ -z "$mac" ]; then
+        # no qubes-managed network interface
+        return
+    fi
+    # Load the module explicitly here, to avoid waiting for udev doing that
+    [ -e /sys/module/xen_netfront ] || modprobe xen-netfront || :
     qubes_iface="$(get_iface_from_mac "$mac")"
     if [ "x$qubes_iface" != "x" ]; then
         echo "$qubes_iface"
