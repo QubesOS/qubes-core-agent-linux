@@ -20,4 +20,8 @@ fi
 xterm -title update -e su -s /bin/sh -l -c "$update_cmd; echo Done.; test -f /var/run/qubes/this-is-templatevm && { echo Press Enter to shutdown the template, or Ctrl-C to just close this window; read x && poweroff; } ;"
 
 # Notify dom0 about installed updates
-su -s /bin/sh -c 'service qubes-update-check start'
+if [ -e /etc/arch-release ]; then
+    su -s /bin/sh -c 'systemctl start qubes-update-check'
+else
+    su -s /bin/sh -c 'service qubes-update-check start'
+fi

@@ -34,7 +34,8 @@ elif [ -e /etc/arch-release ]; then
     set -o pipefail
     checkupdates_output="$(checkupdates 2>&1)"
     exit_code="$?"
-    echo "$checkupdates_output" | grep -qF -- '->' && echo "false" || echo "true"
+    [ "$exit_code" -eq 2 ] && echo "true" && exit 0
+    echo "false"
 elif [ -e /etc/gentoo-release ]; then
     ## Gentoo
     set -e
