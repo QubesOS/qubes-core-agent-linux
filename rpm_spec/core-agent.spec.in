@@ -522,6 +522,7 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %systemd_post qubes-firewall.service
 %systemd_post qubes-iptables.service
 %systemd_post qubes-network.service
+%systemd_post qubes-network-uplink.service
 %systemd_post qubes-updates-proxy.service
 
 %post thunar
