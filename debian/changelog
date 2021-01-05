@@ -1,3 +1,15 @@
+qubes-core-agent (4.1.20-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * network: skip calling setup-ip from network-manager-prepare-conf-dir
+  * rpm: enable qubes-network-uplink.service on install
+
+  [ Olivier MEDOC ]
+  * archlinux: pin PKGBUILD to python3.X major version as new python
+    version will break the API
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 05 Jan 2021 20:51:04 +0100
+
 qubes-core-agent (4.1.19-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
