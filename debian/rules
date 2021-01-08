@@ -22,7 +22,7 @@ override_dh_fixperms:
 	dh_fixperms -a -Xqfile-unpacker
 
 override_dh_systemd_start:
-	dh_systemd_start --no-restart-on-upgrade
+	dh_systemd_start --no-restart-after-upgrade --no-restart-on-upgrade
 
 override_dh_install:
 	dh_install --fail-missing
