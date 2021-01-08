@@ -1,3 +1,9 @@
+qubes-core-agent (4.0.60-1) unstable; urgency=medium
+
+  * Fix sudo SELinux settings
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 08 Jan 2021 12:09:15 +0100
+
 qubes-core-agent (4.0.59-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
