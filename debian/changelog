@@ -1,3 +1,78 @@
+qubes-core-agent (4.0.59-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * grub: override GRUB_DEVICE with /dev/mapper/dmroot
+  * Drop systemd re-exec during boot
+  * Relax private.img condition for mkfs even further
+
+  [ Frédéric Pierret (fepitre) ]
+  * Add .gitlab-ci.yml
+
+  [ Demi Marie Obenour ]
+  * Optimization: use `ip -n` over `ip netns exec`
+  * Remove commented-out code
+
+  [ Marek Marczykowski-Górecki ]
+  * gitlab-ci: move tests earlier, rename job
+  * gitlab-ci: include codecov
+  * gitlab-ci: install test dependencies
+
+  [ Demi Marie Obenour ]
+  * qubes.ShowInTerminal requires socat
+
+  [ ejose19 ]
+  * Replace custom script reloading with sourcing /etc/profile in
+    qubes.GetAppmenus
+
+  [ Demi Marie Obenour ]
+  * Only allow known-safe characters in socket paths
+
+  [ Ludovic Bellier ]
+  * upgrades-installed-check requires pacman-contrib for checkupdates
+  * fix archlinux detection of available upgrades note: checkupdates
+    return 2 when no updates are available (source: man page and source
+    code)
+  * fix for ArchLinux: notify dom0 about installed updates The launch of
+    the qubes-update-check service failed on ArchLinux, because the
+    qubes-rpc uses the `service` command which isn't available for this
+    OS.
+
+  [ Marek Marczykowski-Górecki ]
+  * Allow DHCPv6 replies on uplink interface, if ipv6 is enabled
+  * network: stop IP forwarding before disabling firewall
+  * Order qubes-early-vm-config.service before networking
+
+  [ Demi Marie Obenour ]
+  * Purge stale connection tracking entries
+  * Keep shellcheck from complaining
+  * Add conntrack-tools dependency to qubes-core-agent-networking
+
+  [ Frédéric Pierret (fepitre) ]
+  * debian: update control
+  * debian: update compat
+
+  [ Demi Marie Obenour ]
+  * Allow SELinux to stay enabled
+  * Always pass ‘-y’ to dnf
+  * Use 022 instead of 002 as sudo umask
+  * Only give the “qubes” group full Polkit access
+  * “sudo” must remove SELinux restrictions
+  * Avoid deprecated /var/run directory
+
+  [ icequbes1 ]
+  * Fix comments in default qubes-firewall-user-script
+  * Handle UnicodeError in firewall when resolving hostname
+
+  [ Marek Marczykowski-Górecki ]
+  * archlinux: add missing python-setuptools makedepends
+  * Increase upgrades-status-notify verbosity
+
+  [ Olivier MEDOC ]
+  * archlinux: pin PKGBUILD to python3.X major version as new python
+    version will break the API
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 08 Jan 2021 06:18:24 +0100
+
 qubes-core-agent (4.0.58-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
