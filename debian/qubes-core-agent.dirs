@@ -9,3 +9,7 @@ lib/modules
 var/lib/qubes
 var/lib/qubes/dom0-updates
 rw
+usr/share/qubes/mime
+usr/share/qubes/mime/application
+usr/share/qubes/mime/image
+usr/share/qubes/mime/packages

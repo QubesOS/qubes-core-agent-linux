@@ -1,6 +1,7 @@
 #!/usr/bin/python3 --
 
 import sys, os, pwd
+import qubesdb
 from qubesagent.xdg import launch
 
 def main(argv):
@@ -27,6 +28,13 @@ def main(argv):
             sys.exit(1)
         xdg_data_dirs = xdg_data_dirs.split(':')
     paths_to_try = [xdg_data_home] + xdg_data_dirs
+    qubes_db = qubesdb.QubesDB()
+    if qubes_db.read('/qubes-service/app-dispvm.' + arg) is not None:
+        try:
+            del os.environ['XDG_DATA_HOME']
+        except KeyError:
+            pass
+        os.environ['XDG_DATA_DIRS'] = '/usr/share/qubes/mime'
     for path in paths_to_try:
         subpath = os.path.join(path, 'applications')
         for (raw_volume, directories, files) in os.walk(subpath):

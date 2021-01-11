@@ -7,6 +7,7 @@ QUBESDATADIR = $(DATADIR)/qubes
 .PHONY: all clean install
 
 all: marker-vm
+	export XDG_DATA_HOME=.; update-desktop-database . && exec update-mime-database mime
 
 clean:
 	-$(RM) marker-vm
@@ -19,6 +20,9 @@ install:
 	    marker-vm \
 	    qubes-master-key.asc
 	install -D -m 0644 mime-globs $(DESTDIR)$(QUBESDATADIR)/mime-override/globs
+	ln -s ../GConf $(DESTDIR)$(QUBESDATADIR)/GConf
+	ln -s ../glib-2.0 $(DESTDIR)$(QUBESDATADIR)/glib-2.0
+	cp -a mime $(DESTDIR)$(QUBESDATADIR)
 	install -d $(DESTDIR)$(BINDIR)
 	install -t $(DESTDIR)$(BINDIR) qvm-features-request
 
