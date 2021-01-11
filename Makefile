@@ -184,7 +184,12 @@ install-common: install-doc
 	mkdir -p $(DESTDIR)$(SBINDIR)
 
 	install -d -m 0750 $(DESTDIR)/etc/sudoers.d/
-	install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes
+	if [ -f /etc/redhat-release ] || [ -f /etc/debian_version ]; then \
+		exec install -D -m 0440 misc/qubes.sudoers $(DESTDIR)/etc/sudoers.d/qubes; \
+	else \
+		sed -E '/^[^#]/s/\<(ROLE|TYPE)=[A-Za-z0-9_]+[[:space:]]+//g' misc/qubes.sudoers | \
+		install -D -m 0440 /dev/stdin $(DESTDIR)/etc/sudoers.d/qubes; \
+	fi
 	install -D -m 0440 misc/sudoers.d_qt_x11_no_mitshm $(DESTDIR)/etc/sudoers.d/qt_x11_no_mitshm
 	install -D -m 0644 misc/20_tcp_timestamps.conf $(DESTDIR)/etc/sysctl.d/20_tcp_timestamps.conf
 
