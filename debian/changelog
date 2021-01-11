@@ -1,3 +1,13 @@
+qubes-core-agent (4.1.22-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: order -systemd post script after -networking
+
+  [ Rusty Bird ]
+  * qubes-early-vm-config.service: Wants=network-pre.target
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 10 Jan 2021 03:14:13 +0100
+
 qubes-core-agent (4.1.21-1) unstable; urgency=medium
 
   * Fix sudo SELinux settings

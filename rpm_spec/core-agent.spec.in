@@ -914,6 +914,8 @@ Conflicts:      qubes-core-agent-sysvinit
 Provides:       qubes-core-vm-systemd = %{version}-%{release}
 Obsoletes:      qubes-core-vm-systemd < 4.0.0
 Conflicts:      qubes-gui-agent < 4.1.0
+# preset units after possibly new are installed
+OrderWithRequires(post): qubes-core-agent-networking
 
 %description systemd
 The Qubes core startup configuration for SystemD init.
