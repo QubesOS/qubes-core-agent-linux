@@ -8,7 +8,12 @@ PAMCONFIGSDIR = /usr/share/pam-configs/
 
 install:
 	install -d -m 0750 $(DESTDIR)$(SUDOERSDIR)
-	install -D -m 0440 qubes.sudoers $(DESTDIR)$(SUDOERSDIR)/qubes
+	if [ -f /etc/redhat-release ] || [ -f /etc/debian_version ]; then \
+		exec install -D -m 0440 qubes.sudoers $(DESTDIR)$(SUDOERSDIR)/qubes; \
+	else \
+		sed -E '/^[^#]/s/\<(ROLE|TYPE)=[A-Za-z0-9_]+[[:space:]]+//g' qubes.sudoers | \
+		install -D -m 0440 /dev/stdin $(DESTDIR)$(SUDOERSDIR)/qubes; \
+	fi
 	install -D -m 0644 polkit-1-qubes-allow-all.pkla $(DESTDIR)$(POLKIT1DIR)/localauthority/50-local.d/qubes-allow-all.pkla
 	install -d -m 0750 $(DESTDIR)$(POLKIT1DIR)/rules.d
 	install -D -m 0644 polkit-1-qubes-allow-all.rules $(DESTDIR)$(POLKIT1DIR)/rules.d/00-qubes-allow-all.rules
