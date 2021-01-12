@@ -1,5 +1,5 @@
 pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-passwordless-root)
-pkgver=$(cat version)
+pkgver=$(cat version) || exit 1
 pkgrel=15
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
@@ -29,9 +29,9 @@ noextract=()
 md5sums=(SKIP)
 
 build() {
-    for source in autostart-dropins applications-dropins app-menu qubes-rpc misc passwordless-root Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent post-install.d; do
+    for source in autostart-dropins applications-dropins app-menu qubes-rpc misc passwordless-root Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent boot; do
         # shellcheck disable=SC2154
-        (ln -s "$srcdir/../$source" "$srcdir/$source")
+        ln -sf "../$source" "$srcdir"
     done
 
     # Fix for network tools paths
@@ -55,6 +55,12 @@ build() {
 # * core systemd services and drop-ins
 # * basic network functionality (setting IP address, DNS, default gateway)
 package_qubes-vm-core() {
+    local release
+    [[ "$pkgver" =~ ^([0-9]+)\.([0-9]+)($|\.) ]] || {
+        echo 'invalid $pkgver'>&2
+        exit 1
+    }
+    release=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}
     depends=(qubes-vm-utils python python-xdg ethtool ntp net-tools
              gnome-packagekit imagemagick fakeroot notification-daemon dconf
              zenity qubes-libvchan qubes-db-vm haveged python-gobject
@@ -67,6 +73,7 @@ package_qubes-vm-core() {
     install=PKGBUILD.install
 
 
+    install -D -m 0644 -- boot/grub.qubes "$pkgdir/etc/default/grub.qubes"
     # shellcheck disable=SC2154
     make install-corevm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
     make -C app-menu install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
@@ -84,11 +91,8 @@ package_qubes-vm-core() {
     install -m 644 "$srcdir/PKGBUILD.qubes-update-desktop-icons.hook" "${pkgdir}/usr/share/libalpm/hooks/qubes-update-desktop-icons.hook"
 
     # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
-    mkdir -p "${pkgdir}/etc/pacman.d"
+    mkdir -p -m 0755 "${pkgdir}/etc/pacman.d"
     install -m 644 "$srcdir/PKGBUILD-qubes-pacman-options.conf" "${pkgdir}/etc/pacman.d/10-qubes-options.conf"
-
-    # Install pacman repository
-    release=$(echo "$pkgver" | cut -d '.' -f 1,2)
     echo "Installing repository for release ${release}"
     install -m 644 "$srcdir/PKGBUILD-qubes-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf.disabled"
 
