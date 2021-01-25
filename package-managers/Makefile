@@ -11,7 +11,21 @@ YUMCONFDIR = $(SYSCONFDIR)/yum.conf.d
 QUBESLIBDIR = $(LIBDIR)/qubes
 QUBESSTATEDIR = $(STATEDIR)/qubes
 
-DIST ?= fc18
+ifneq (,$(wildcard /etc/fedora-release))
+DIST = fc$(shell rpm --eval %{fedora})
+else ifneq (,$(wildcard /etc/os-release))
+DIST = $(shell grep VERSION_CODENAME= /etc/os-release | cut -d'=' -f2)
+endif
+
+ifeq (,$(DIST))
+# On debian if previous attempt failed
+# it means we are on sid
+ifneq (,$(wildcard /etc/debian_version))
+DIST = $(shell cut -d'/' -f1 /etc/debian_version)
+endif
+endif
+
+DIST ?= fc33
 
 .PHONY: install install-apt install-dnf install-rpm install-yum
 
@@ -25,7 +39,7 @@ install:
 
 install-apt:
 	install -d $(DESTDIR)$(APTCONFDIR)/sources.list.d
-	sed -e "s/@DIST@/`lsb_release -cs`/" apt-qubes-r4.list.in \
+	sed "s/@DIST@/$(DIST)/" apt-qubes-r4.list.in \
 		> $(DESTDIR)$(APTCONFDIR)/sources.list.d/qubes-r4.list
 	install -D -m 0644 apt-qubes-archive-keyring.gpg \
 		$(DESTDIR)$(APTCONFDIR)/trusted.gpg.d/qubes-archive-keyring.gpg
