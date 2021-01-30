@@ -14,6 +14,26 @@ OPTIONS
 =======
 --without-progress
     Don't display progress info
+    
+    
+==============
+qvm-copy-to-vm
+==============
+**DEPRECATED**
+
+NAME
+====
+qvm-copy-to-vm - copy specified files to specified destination VM
+
+SYNOPSIS
+========
+| qvm-copy-to-vm [--without-progress] dest_vmname file [file]+
+
+OPTIONS
+=======
+--without-progress
+    Don't display progress info
+
 
 AUTHORS
 =======
