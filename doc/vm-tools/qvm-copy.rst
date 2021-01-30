@@ -1,14 +1,14 @@
 ==============
-qvm-copy-to-vm
+qvm-copy
 ==============
 
 NAME
 ====
-qvm-copy-to-vm - copy specified files to specified destination VM
+qvm-copy - copy specified files to specified destination VM
 
 SYNOPSIS
 ========
-| qvm-copy-to-vm [--without-progress] dest_vmname file [file]+
+| qvm-copy [--without-progress] dest_vmname file [file]+
 
 OPTIONS
 =======
