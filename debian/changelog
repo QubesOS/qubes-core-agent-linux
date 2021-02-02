@@ -1,3 +1,17 @@
+qubes-core-agent (4.1.23-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * sudo isn’t always built with SELinux support
+
+  [ Frédéric Pierret (fepitre) ]
+  * package-managers: improve DIST detection
+
+  [ Demi Marie Obenour ]
+  * Install grub.qubes on Arch
+  * Avoid passing dom0-provided options to ‘dnf clean’
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 02 Feb 2021 16:26:09 +0100
+
 qubes-core-agent (4.1.22-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
