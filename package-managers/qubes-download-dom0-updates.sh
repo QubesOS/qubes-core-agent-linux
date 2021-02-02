@@ -13,6 +13,7 @@ elif [ -f "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
 fi
 # DNF uses /etc/yum.repos.d, even when --installroot is specified
 OPTS+=("--setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d")
+CLEAN_OPTS=("${OPTS[@]}")
 # DNF verifies signatures implicitly, but yumdownloader does not.
 SIGNATURE_REGEX=""
 PKGLIST=()
@@ -84,7 +85,7 @@ rpm --root=$DOM0_UPDATES_DIR --rebuilddb
 
 if [ "$CLEAN" = "1" ]; then
     # shellcheck disable=SC2086
-    "${YUM[@]}" "${OPTS[@]}" clean all
+    "${YUM[@]}" "${CLEAN_OPTS[@]}" clean all
     rm -f "$DOM0_UPDATES_DIR"/packages/*
     rm -rf "$DOM0_UPDATES_DIR"/var/cache/*
 fi
