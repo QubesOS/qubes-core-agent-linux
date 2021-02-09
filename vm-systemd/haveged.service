@@ -1,5 +1,0 @@
-.include /lib/systemd/system/haveged.service
-
-[Install]
-WantedBy=
-WantedBy=multi-user.target
