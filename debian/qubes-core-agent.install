@@ -60,7 +60,6 @@ etc/sudoers.d/qt_x11_no_mitshm
 etc/sudoers.d/umask
 etc/sysctl.d/20_tcp_timestamps.conf
 etc/sysctl.d/80-qubes.conf
-etc/systemd/system/haveged.service
 etc/systemd/system/xendriverdomain.service
 lib/modules-load.d/qubes-core.conf
 lib/systemd/system-preset/75-qubes-vm.preset
