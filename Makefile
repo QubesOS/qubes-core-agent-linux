@@ -199,9 +199,6 @@ install-deb: install-common install-systemd install-systemd-dropins install-syst
 	install -d $(DESTDIR)/etc/needrestart/conf.d
 	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
 
-	mkdir -p $(DESTDIR)/etc/systemd/system/
-	install -m 0644 vm-systemd/haveged.service  $(DESTDIR)/etc/systemd/system/
-
 install-corevm: install-rh install-common install-systemd install-sysvinit install-systemd-dropins install-networking
 
 install-netvm: install-systemd-networking-dropins install-networkmanager
