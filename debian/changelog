@@ -1,3 +1,20 @@
+qubes-core-agent (4.1.24-1) unstable; urgency=medium
+
+  [ Christian Poeschl ]
+  * addresses https://github.com/QubesOS/qubes-issues/issues/6374
+
+  [ ravachol ]
+  * keep qvm-copy-to-vm but with deprecated note
+
+  [ Chris P ]
+  * remove trailing whitespaces; remove dest_vm argument
+
+  [ Marek Marczykowski-Górecki ]
+  * Start xfce4-notifyd when installed
+  * Remove haveged service override
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 13 Feb 2021 14:53:18 +0100
+
 qubes-core-agent (4.1.23-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
