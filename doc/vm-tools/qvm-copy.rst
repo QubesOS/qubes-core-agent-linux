@@ -1,6 +1,25 @@
 ==============
+qvm-copy
+==============
+
+NAME
+====
+qvm-copy - copy specified files to a destination VM. Prompt user to select a destination VM.
+
+SYNOPSIS
+========
+| qvm-copy [--without-progress] file [file]+
+
+OPTIONS
+=======
+--without-progress
+    Don't display progress info
+
+
+==============
 qvm-copy-to-vm
 ==============
+**DEPRECATED**
 
 NAME
 ====
@@ -14,6 +33,7 @@ OPTIONS
 =======
 --without-progress
     Don't display progress info
+
 
 AUTHORS
 =======
