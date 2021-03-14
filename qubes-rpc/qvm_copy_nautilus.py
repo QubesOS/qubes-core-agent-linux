@@ -6,7 +6,7 @@ from gi.repository import Nautilus, GObject
 class CopyToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
     '''Copy file(s) to AppVM.
 
-    Uses the nautilus-python api to previce a context menu with Nautilus which
+    Uses the nautilus-python api to provide a context menu with Nautilus which
     will enable the user to select file(s) to to copy to another AppVM
     '''
     def get_file_items(self, window, files):
