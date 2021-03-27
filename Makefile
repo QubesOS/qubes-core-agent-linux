@@ -188,6 +188,7 @@ install-networkmanager:
 
 	install -d $(DESTDIR)/usr/lib/NetworkManager/conf.d
 	install -m 0644 network/nm-30-qubes.conf $(DESTDIR)/usr/lib/NetworkManager/conf.d/30-qubes.conf
+	install -m 0644 network/nm-31-randomize-mac.conf $(DESTDIR)/usr/lib/NetworkManager/conf.d/31-randomize-mac.conf
 
 	install -d $(DESTDIR)/etc/xdg/autostart
 	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)$(LIBDIR)/qubes/
