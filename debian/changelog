@@ -1,3 +1,13 @@
+qubes-core-agent (4.1.25-1) unstable; urgency=medium
+
+  [ Markus Fenske ]
+  * Fix typo in qvm_copy_nautilus.py
+
+  [ Marek Marczykowski-Górecki ]
+  * network: enable MAC randomization for wifi connections by default
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 30 Mar 2021 21:36:07 +0200
+
 qubes-core-agent (4.1.24-1) unstable; urgency=medium
 
   [ Christian Poeschl ]
