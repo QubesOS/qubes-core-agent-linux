@@ -114,7 +114,7 @@ int main(int argc, char ** argv)
                 perror("setuid");
                 exit(1);
             }
-            return do_unpack();
+            return do_unpack(COPY_ALLOW_SYMLINKS|COPY_ALLOW_DIRECTORIES);
     }
     if (waitpid(pid, &ret, 0) < 0) {
         gui_fatal("Failed to wait for child process");
