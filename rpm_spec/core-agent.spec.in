@@ -24,7 +24,7 @@
 %define qubes_preset_file 75-qubes-vm.preset
 
 # systemd is used in Fedora and CentOS
-%if 0%{?fedora} || 0%{?rhel}
+%if 0%{?fedora} || 0%{?rhel} || 0%{?suse_version}
 %define with_sysvinit 0
 %else
 %define with_sysvinit 1
@@ -125,7 +125,6 @@ Conflicts:  firewalld
 Requires:   xdg-utils
 Requires:   qubes-utils >= 3.1.3
 Requires:   qubes-utils-libs >= 4.0.16
-Requires:   initscripts
 Requires:   gawk
 Requires:   sed
 Requires:   util-linux
@@ -134,17 +133,30 @@ Requires:   hostname
 # for Qubes Manager VM updater
 Requires:   xterm
 # for qubes-desktop-run
+%if 0%{?suse_version} > 0
+Requires:   %{python3_default}-gobject
+Requires:   %{python3_default}-pydbus
+%else
 Requires:   python%{python3_pkgversion}-gobject-base
 Requires:   python%{python3_pkgversion}-dbus
+%endif
 # for qubes-session-autostart, xdg-icon
 Requires:   python%{python3_pkgversion}-pyxdg
+%if 0%{?suse_version} > 0
+Requires:   %{python3_default}-python-daemon
+%else
 Requires:   python%{python3_pkgversion}-daemon
+%endif
 # for qvm-feature-request
 Requires:   python%{python3_pkgversion}-qubesdb
 # for qubes.ShowInTerminal RPC service
 Requires:   socat
-Requires:   ImageMagick
+%if 0%{?suse_version} > 0
+Requires:   librsvg-2-2
+%else
 Requires:   librsvg2-tools
+%endif
+Requires:   ImageMagick
 Requires:   zenity
 Requires:   dconf
 Requires:   qubes-core-qrexec-vm
@@ -181,16 +193,6 @@ Source0: %{name}-%{version}.tar.gz
 %description
 The Qubes core files for installation inside a Qubes VM.
 
-%package -n python2-dnf-plugins-qubes-hooks
-Summary: DNF plugin for Qubes specific post-installation actions
-BuildRequires: python2-devel
-%{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
-
-%description -n python2-dnf-plugins-qubes-hooks
-DNF plugin for Qubes specific post-installation actions:
- * notify dom0 that updates were installed
- * refresh applications shortcut list
-
 %if 0%{?rhel} == 8
 %package -n python3-dnf-plugins-qubes-hooks
 Summary: DNF plugin for Qubes specific post-installation actions
@@ -215,7 +217,11 @@ DNF plugin for Qubes specific post-installation actions:
 %package nautilus
 Summary:    Qubes integration for Nautilus
 Requires:   qubes-core-agent = %{version}
+%if 0%{?suse_version} > 0
+Requires:   %{python3_default}-nautilus
+%else
 Requires:   nautilus-python
+%endif
 Conflicts:  qubes-core-vm < 4.0.0
 
 %description nautilus
@@ -338,9 +344,6 @@ make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
 
 make -C package-managers PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT install install-dnf
-%if 0%{?rhel} == 7
-make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
-%endif
 
 %if 0%{?rhel} >= 7
 sed -i \
@@ -355,11 +358,6 @@ install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
 %if ! %with_sysvinit
     rm -rf $RPM_BUILD_ROOT/etc/init.d/qubes-* $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
 %endif
-
-%triggerin -- initscripts
-if [ -e /etc/init/serial.conf ]; then
-    cp /usr/share/qubes/serial.conf /etc/init/serial.conf
-fi
 
 %triggerin -- grub2-tools
 
@@ -675,10 +673,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-suspend-module-blacklist
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo
-%if 0%{?rhel} == 7
-/etc/yum/pluginconf.d/yum-qubes-hooks.conf
-/usr/lib/yum-plugins/yum-qubes-hooks.py*
-%endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %config(noreplace) /etc/dconf/db/local.d/dpi
 /lib/udev/rules.d/50-qubes-mem-hotplug.rules
@@ -761,9 +755,6 @@ rm -f %{name}-%{version}
 /usr/share/qubes/qubes-master-key.asc
 %dir /mnt/removable
 %dir /rw
-
-%files -n python2-dnf-plugins-qubes-hooks
-%{python2_sitelib}/dnf-plugins/*
 
 %if 0%{?rhel} == 8
 %files -n python3-dnf-plugins-qubes-hooks
@@ -906,9 +897,6 @@ Summary:        Qubes unit files for SystemD init style
 License:        GPL v2 only
 Group:          Qubes
 Requires:       systemd
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units
 Requires:       qubes-core-agent = %{version}
 Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-sysvinit

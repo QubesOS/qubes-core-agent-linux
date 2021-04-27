@@ -1,7 +1,6 @@
 LIBDIR ?= /usr/lib
 STATEDIR ?= /var/lib
 SYSCONFDIR ?= /etc
-PYTHON2_SITELIB = $(shell python2 -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib()')
 PYTHON3_SITELIB = $(shell $(PYTHON) -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
 ifeq ($(shell rpm --eval %{centos_ver} 2>/dev/null),8)
 PLATEFORM_PYTHON3_SITELIB = $(shell /usr/libexec/platform-python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
@@ -51,8 +50,6 @@ install-apt:
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/10no-cache
 
 install-dnf: install-rpm
-	install -D -m 0644 dnf-qubes-hooks.py \
-		$(DESTDIR)$(PYTHON2_SITELIB)/dnf-plugins/qubes-hooks.py
 ifeq ($(shell rpm --eval %{centos_ver} 2>/dev/null),8)
 # we need to stick to related DNF python version
 # which is given by platform-python
@@ -73,8 +70,13 @@ install-yum: install-rpm
 
 install-rpm:
 	install -d $(DESTDIR)$(SYSCONFDIR)/yum.repos.d
+ifeq (openSUSE,$(shell lsb-release -is))
+	sed -e "s/@DIST@//g" yum-qubes-r4.repo.in \
+		> $(DESTDIR)$(SYSCONFDIR)/yum.repos.d/qubes-r4.repo
+else
 	DIST='$(DIST)'; sed -e "s/@DIST@/$${DIST%%[0-9]*}/g" yum-qubes-r4.repo.in \
 		> $(DESTDIR)$(SYSCONFDIR)/yum.repos.d/qubes-r4.repo
+endif
 	install -d $(DESTDIR)$(SYSCONFDIR)/pki/rpm-gpg
 	install -t $(DESTDIR)$(SYSCONFDIR)/pki/rpm-gpg -m 0644 RPM-GPG-KEY-qubes*
 	install -d $(DESTDIR)$(YUMCONFDIR)

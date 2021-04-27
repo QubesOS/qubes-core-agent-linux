@@ -19,7 +19,11 @@ install:
 	install -D -m 0644 polkit-1-qubes-allow-all.rules $(DESTDIR)$(POLKIT1DIR)/rules.d/00-qubes-allow-all.rules
 
 install-rh:
+ifeq ($(shell lsb_release -is), openSUSE)
+	install -D -m 0644 pam.d_su.qubes.opensuse $(DESTDIR)$(PAMDIR)/su.qubes
+else
 	install -D -m 0644 pam.d_su.qubes $(DESTDIR)$(PAMDIR)/su.qubes
+endif
 
 install-debian:
 	install -D -m 0644 pam-configs_su.qubes $(DESTDIR)$(PAMCONFIGSDIR)/su.qubes
