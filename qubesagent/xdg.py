@@ -68,7 +68,9 @@ def pid_callback(launcher, pid, pid_list):
     pid_list.append(pid)
 
 
-def dbus_name_change(loop, name, old_owner, new_owner):
+def dbus_name_change(loop, service_id, name, old_owner, new_owner):
+    if name != service_id:
+        return
     if not new_owner:
         loop.quit()
 
@@ -94,11 +96,8 @@ def launch(filename, *files, **kwargs):
                 try:
                     proxy = bus.get_object(service_id, object_path)
                     match = bus.add_signal_receiver(
-                        functools.partial(dbus_name_change, loop),
-                        'NameOwnerChanged',
-                        dbus.BUS_DAEMON_IFACE,
-                        dbus.BUS_DAEMON_NAME,
-                        dbus.BUS_DAEMON_PATH)
+                        functools.partial(dbus_name_change, loop, service_id),
+                        'NameOwnerChanged')
                     if files:
                         proxy.Open(files, {},
                             dbus_interface='org.freedesktop.Application')
