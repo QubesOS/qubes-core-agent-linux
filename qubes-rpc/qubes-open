@@ -9,4 +9,4 @@ fi
 # closed, which is critical behaviour for DisposableVM (which gets destroyed
 # after this process exits)
 export DE=generic
-exec xdg-open "$@"
+exec xdg-open "$@" >&2
