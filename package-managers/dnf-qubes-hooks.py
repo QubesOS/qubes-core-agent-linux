@@ -28,6 +28,10 @@ import subprocess
 
 PLUGIN_CONF = 'qubes-hooks'
 
+def is_active(service):
+    status = subprocess.call(["systemctl", "is-active", "--quiet", service])
+    return status == 0
+
 class QubesHooks(dnf.Plugin):
     name = 'qubes-hooks'
 
@@ -37,6 +41,8 @@ class QubesHooks(dnf.Plugin):
         self.log = logging.getLogger('dnf')
 
     def resolved(self):
+        if not is_active("qubes-qrexec-agent"):
+            return
         # in case of no action to do, transaction() hook won't be called;
         # report updates availability here - especially when everything is up
         # to date - to clear updates-available flag
@@ -53,6 +59,8 @@ class QubesHooks(dnf.Plugin):
             ])
 
     def transaction(self):
+        if not is_active("qubes-qrexec-agent"):
+            return
         if LooseVersion(dnf.const.VERSION) < '2.0.0':
             config = self.read_config(self.base.conf, PLUGIN_CONF)
         else:
