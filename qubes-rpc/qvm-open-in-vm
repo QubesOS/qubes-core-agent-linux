@@ -18,20 +18,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# lack of -e and -u is intentional
+# lack of -e is intentional
+set -u
 
 # we use “is this variable set” a lot, and use variables that we haven’t set, so
 # unset these variables first, to ensure that values from the environment don’t
 # cause problems.
 unset qopen_opts target filename seen_dashdash i
+qopen_opts= seen_dashdash=
 
 usage() {
-    case $0 in
-    (qvm-open-in-dvm|*/qvm-open-in-dvm)
-        printf 'Usage: %s [--view-only] [--] filename\n' "$0" >&2
-        ;;
-    (*) printf 'Usage: %s [--view-only] [--] vmname filename\n' "$0";;
-    esac >&2
+    printf 'Usage: %s [--view-only] [--] vmname filename\n' "$0" >&2
     exit 2
 }
 
@@ -51,9 +48,8 @@ for i; do
         usage
     fi
 done
-set +u
 
-if [ -z "$target" ] || [ -z "$filename" ]; then
+if [ -z "${target-}" ] || [ -z "${filename-}" ]; then
     usage
 fi
 
