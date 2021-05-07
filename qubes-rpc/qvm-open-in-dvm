@@ -25,7 +25,7 @@ set -ux
 # unset these variables first, to ensure that values from the environment don’t
 # cause problems.
 unset qopen_opts filename seen_dashdash i
-qopen_opts= seen_dashdash=
+qopen_opts='' seen_dashdash=''
 
 usage() {
     printf 'Usage: %s [--view-only] [--] filename\n' "$0" >&2
@@ -51,7 +51,11 @@ done
 
 expr "@$filename" : '@[A-Za-z][A-Za-z0-9+]*://'>/dev/null
 case $? in
-(0) exec /usr/lib/qubes/qrexec-client-vm -- @dispvm qubes.OpenURL /bin/sh -c 'printf %s\\n "$1"; exec cat >/dev/null' sh "$filename";;
-(1) exec /usr/lib/qubes/qrexec-client-vm -- @dispvm qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" $qopen_opts -- "$filename";;
+(0)
+    # shellcheck disable=SC2016
+    exec /usr/lib/qubes/qrexec-client-vm -- @dispvm qubes.OpenURL \
+        /bin/sh -c 'printf %s\\n "$1"; exec cat >/dev/null' sh "$filename";;
+(1) exec /usr/lib/qubes/qrexec-client-vm -- @dispvm qubes.OpenInVM \
+    /usr/lib/qubes/qopen-in-vm $qopen_opts -- "$filename";;
 (*) exit "$?";;
 esac >/dev/null 2>&1 </dev/null
