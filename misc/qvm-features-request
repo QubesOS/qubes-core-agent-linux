@@ -29,6 +29,12 @@ import sys
 
 import qubesdb
 
+
+def is_active(service):
+    status = subprocess.call(["systemctl", "is-active", "--quiet", service])
+    return status == 0
+
+
 class FeatureRequestAction(argparse.Action):
     '''Action for argument parser that stores a property.'''
     # pylint: disable=redefined-builtin,too-few-public-methods
@@ -66,7 +72,8 @@ parser.add_argument('features',
 
 def main(args=None):
     args = parser.parse_args(args)
-
+    if not is_active("qubes-qrexec-agent"):
+        return
     qdb = qubesdb.QubesDB()
     for feature, value in args.features.items():
         qdb.write('/features-request/' + feature, value)
