@@ -20,6 +20,7 @@ source=(
     PKGBUILD.qubes-ensure-lib-modules.service PKGBUILD.qubes-update-desktop-icons.hook
     PKGBUILD-qubes-pacman-options.conf
     PKGBUILD-qubes-repo-4.0.conf
+    PKGBUILD-qubes-testing-repo-4.0.conf
     PKGBUILD-keyring-keys
     PKGBUILD-keyring-trusted
     PKGBUILD-keyring-revoked
@@ -96,6 +97,7 @@ package_qubes-vm-core() {
     release=$(echo "$pkgver" | cut -d '.' -f 1,2)
     echo "Installing repository for release ${release}"
     install -m 644 "$srcdir/PKGBUILD-qubes-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf.disabled"
+    install -m 644 "$srcdir/PKGBUILD-qubes-testing-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-testing-repository-${release}.conf.disabled"
 
     # Archlinux specific: enable autologin on tty1
     mkdir -p "$pkgdir/etc/systemd/system/getty@tty1.service.d/"
