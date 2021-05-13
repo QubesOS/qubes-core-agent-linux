@@ -4,11 +4,12 @@ qvm-open-in-dvm
 
 NAME
 ====
-qvm-open-in-dvm - open a specified file in disposable VM
+qvm-open-in-dvm - open a specified file or URL in a disposable VM
 
 SYNOPSIS
 ========
 | qvm-open-in-dvm filename
+| qvm-open-in-dvm URL
 
 OPTIONS
 =======
