@@ -48,7 +48,7 @@ fi
 
 case "$filename" in
 	*://*)
-        exec /usr/lib/qubes/qrexec-client-vm "$target" qubes.OpenURL /bin/echo "$filename"
+        exec /usr/lib/qubes/qrexec-client-vm "$target" qubes.OpenURL /bin/sh -c 'printf "%s\n" "$0"; cat >/dev/null' "$filename"
         ;;
     *)
         exec /usr/lib/qubes/qrexec-client-vm "$target" qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" $qopen_opts "$filename"
