@@ -127,6 +127,23 @@ class FirewallWorker(object):
         rules.append({'action': policy})
         return rules
 
+    def write_dns_info(self, source, host, hostaddrs):
+        """
+        Write resolved DNS addresses back to QubesDB. This can be useful
+        for the user or DNS applications to pin these DNS addresses to the
+        IPs resolved during firewall setup.
+
+        :param source: VM IP
+        :param host: hostname
+        :param hostaddrs: set of IP addresses :host: was resolved to
+        :return: None
+        """
+        self.qdb.write('/dns/{}/{}'.format(source, host), str(hostaddrs))
+
+    def clear_dns_info(self, source):
+        """ Clear all DNS info for the given VM IP."""
+        self.qdb.rm('/dns/{}/'.format(source))
+
     def list_targets(self):
         return set(t.split('/')[2] for t in self.qdb.list('/qubes-firewall/'))
 
@@ -264,13 +281,14 @@ class IptablesWorker(FirewallWorker):
             ['-I', 'QBS-FORWARD', '-s', addr, '-j', chain])
         self.chains[family].add(chain)
 
-    def prepare_rules(self, chain, rules, family):
+    def prepare_rules(self, chain, rules, family, source):
         """
         Helper function to translate rules list into input for iptables-restore
 
         :param chain: name of the chain to put rules into
         :param rules: list of rules
         :param family: address family (4 or 6)
+        :param source: source for which to apply the chain
         :return: input for iptables-restore
         :rtype: str
         """
@@ -280,6 +298,8 @@ class IptablesWorker(FirewallWorker):
         fullmask = '/128' if family == 6 else '/32'
 
         dns = list(addr + fullmask for addr in self.dns_addresses(family))
+
+        self.clear_dns_info(source)
 
         for rule in rules:
             unsupported_opts = set(rule.keys()).difference(
@@ -312,6 +332,7 @@ class IptablesWorker(FirewallWorker):
                     raise RuleParseError('Failed to resolve {}: {}'.format(
                         rule['dsthost'], str(e)))
                 dsthosts = set(item[4][0] + fullmask for item in addrinfo)
+                self.write_dns_info(source, rule['dsthost'], dsthosts)
             else:
                 dsthosts = None
 
@@ -391,7 +412,7 @@ class IptablesWorker(FirewallWorker):
         if chain not in self.chains[family]:
             self.create_chain(source, chain, family)
 
-        iptables = self.prepare_rules(chain, rules, family)
+        iptables = self.prepare_rules(chain, rules, family, source)
         try:
             self.run_ipt(family, ['-F', chain])
             p = self.run_ipt_restore(family, ['-n'])
@@ -559,13 +580,14 @@ class NftablesWorker(FirewallWorker):
 
         self.run_nft(nft_input)
 
-    def prepare_rules(self, chain, rules, family):
+    def prepare_rules(self, chain, rules, family, source):
         """
         Helper function to translate rules list into input for iptables-restore
 
         :param chain: name of the chain to put rules into
         :param rules: list of rules
         :param family: address family (4 or 6)
+        :param source: source for which to apply the chain
         :return: input for iptables-restore
         :rtype: str
         """
@@ -577,6 +599,8 @@ class NftablesWorker(FirewallWorker):
         fullmask = '/128' if family == 6 else '/32'
 
         dns = list(addr + fullmask for addr in self.dns_addresses(family))
+
+        self.clear_dns_info(source)
 
         for rule in rules:
             unsupported_opts = set(rule.keys()).difference(
@@ -622,8 +646,10 @@ class NftablesWorker(FirewallWorker):
                 except UnicodeError as e:
                     raise RuleParseError('Invalid destination {}: {}'.format(
                         rule['dsthost'], str(e)))
+                dsthosts = set(item[4][0] + fullmask for item in addrinfo)
                 nft_rule += ' {} daddr {{ {} }}'.format(ip_match,
-                    ', '.join(set(item[4][0] + fullmask for item in addrinfo)))
+                    ', '.join(dsthosts))
+                self.write_dns_info(source, rule['dsthost'], dsthosts)
 
             if 'dstports' in rule:
                 dstports = rule['dstports']
@@ -694,7 +720,7 @@ class NftablesWorker(FirewallWorker):
         if chain not in self.chains[family]:
             self.create_chain(source, chain, family)
 
-        self.run_nft(self.prepare_rules(chain, rules, family))
+        self.run_nft(self.prepare_rules(chain, rules, family, source))
 
     def apply_rules(self, source, rules):
         if self.is_ip6(source):
