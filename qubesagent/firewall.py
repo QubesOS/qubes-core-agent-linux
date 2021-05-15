@@ -143,6 +143,19 @@ class FirewallWorker(object):
         for host, hostaddrs in dns.items():
             self.qdb.write('/dns/{}/{}'.format(source, host), str(hostaddrs))
 
+    def update_handled(self, addr):
+        """
+        Update the QubesDB count of how often the given address was handled.
+        User applications may watch these paths for count increases to remain
+        up to date with QubesDB changes.
+        """
+        cnt = self.qdb.read('/qubes-firewall_handled/{}'.format(addr))
+        try:
+            cnt = int(cnt)
+        except (TypeError, ValueError):
+            cnt = 0
+        self.qdb.write('/qubes-firewall_handled/{}'.format(addr), str(cnt+1))
+
     def list_targets(self):
         return set(t.split('/')[2] for t in self.qdb.list('/qubes-firewall/'))
 
@@ -178,6 +191,8 @@ class FirewallWorker(object):
             except RuleApplyError:
                 self.log_error(
                     'Failed to block traffic for {}'.format(addr))
+
+        self.update_handled(addr)
 
     @staticmethod
     def dns_addresses(family=None):
