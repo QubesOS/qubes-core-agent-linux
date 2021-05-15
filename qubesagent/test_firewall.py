@@ -29,6 +29,14 @@ class DummyQubesDB(object):
         except KeyError:
             return None
 
+    def rm(self, path):
+        if path.endswith('/'):
+            for key in self.entries:
+                if key.startswith(path):
+                    self.entries.pop(key)
+        else:
+            self.entries.pop(path)
+
     def multiread(self, prefix):
         result = {}
         for key, value in self.entries.items():
