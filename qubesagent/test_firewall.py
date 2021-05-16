@@ -32,7 +32,7 @@ class DummyQubesDB(object):
 
     def rm(self, path):
         if path.endswith('/'):
-            for key in self.entries:
+            for key in list(self.entries):
                 if key.startswith(path):
                     self.entries.pop(key)
         else:
@@ -166,7 +166,7 @@ class NftablesWorker(qubesagent.firewall.NftablesWorker):
         else:
             return ['2001::1', '2001::2']
 
-class WorkerTestCase(TestCase):
+class WorkerCommon(object):
     def assertPrepareRulesDnsRet(self, dns_ret, expected_domain, family):
         self.assertEqual(dns_ret.keys(), {expected_domain})
         self.assertIsInstance(dns_ret[expected_domain], set)
@@ -179,7 +179,18 @@ class WorkerTestCase(TestCase):
         else:
             raise ValueError()
 
-class TestIptablesWorker(WorkerTestCase):
+    def test_701_dns_info(self):
+        rules = [
+            {'action': 'accept', 'proto': 'tcp',
+                'dstports': '80-80', 'dsthost': 'ripe.net'},
+            {'action': 'drop'},
+        ]
+        self.obj.apply_rules('10.137.0.1', rules)
+        self.assertIsNotNone(self.obj.qdb.read('/dns/10.137.0.1/ripe.net'))
+        self.obj.apply_rules('10.137.0.1', [{'action': 'drop'}])
+        self.assertIsNone(self.obj.qdb.read('/dns/10.137.0.1/ripe.net'))
+
+class TestIptablesWorker(TestCase, WorkerCommon):
     def setUp(self):
         super(TestIptablesWorker, self).setUp()
         self.obj = IptablesWorker()
@@ -398,8 +409,7 @@ class TestIptablesWorker(WorkerTestCase):
             ['-t', 'mangle', '-F', 'QBS-POSTROUTING'],
         ])
 
-
-class TestNftablesWorker(WorkerTestCase):
+class TestNftablesWorker(TestCase, WorkerCommon):
     def setUp(self):
         super(TestNftablesWorker, self).setUp()
         self.obj = NftablesWorker()
