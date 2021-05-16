@@ -679,7 +679,9 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qopen-in-vm
 /usr/lib/qubes/qrun-in-vm
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
+/usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-copy-to-vm.kde
+/usr/lib/qubes/qvm-move-to-vm.gnome
 /usr/lib/qubes/qvm-move-to-vm.kde
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
@@ -753,8 +755,6 @@ rm -f %{name}-%{version}
 %{_mandir}/man1/qrexec-client-vm.1*
 
 %files nautilus
-/usr/lib/qubes/qvm-copy-to-vm.gnome
-/usr/lib/qubes/qvm-move-to-vm.gnome
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
