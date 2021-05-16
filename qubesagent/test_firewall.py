@@ -166,8 +166,20 @@ class NftablesWorker(qubesagent.firewall.NftablesWorker):
         else:
             return ['2001::1', '2001::2']
 
+class WorkerTestCase(TestCase):
+    def assertPrepareRulesDnsRet(self, dns_ret, expected_domain, family):
+        self.assertEqual(dns_ret.keys(), {expected_domain})
+        self.assertIsInstance(dns_ret[expected_domain], set)
+        if family == 4:
+            self.assertIsNotNone(re.match('^\d+\.\d+\.\d+\.\d+/32$',
+                                dns_ret[expected_domain].pop()))
+        elif family == 6:
+            self.assertIsNotNone(re.match('^[0-9a-f:]+/\d+$',
+                                dns_ret[expected_domain].pop()))
+        else:
+            raise ValueError()
 
-class TestIptablesWorker(TestCase):
+class TestIptablesWorker(WorkerTestCase):
     def setUp(self):
         super(TestIptablesWorker, self).setUp()
         self.obj = IptablesWorker()
@@ -226,10 +238,7 @@ class TestIptablesWorker(TestCase):
         )
         ret = self.obj.prepare_rules('chain', rules, 4)
         self.assertEqual(ret[0], expected_iptables)
-        self.assertEqual(ret[1].keys(), {'yum.qubes-os.org'})
-        self.assertIsInstance(ret[1]['yum.qubes-os.org'], set)
-        self.assertIsNotNone(re.match('^\d+\.\d+\.\d+\.\d+/32$',
-                            ret[1]['yum.qubes-os.org'].pop()))
+        self.assertPrepareRulesDnsRet(ret[1], 'yum.qubes-os.org', 4)
         with self.assertRaises(qubesagent.firewall.RuleParseError):
             self.obj.prepare_rules('chain', [{'unknown': 'xxx'}], 4)
         with self.assertRaises(qubesagent.firewall.RuleParseError):
@@ -268,10 +277,7 @@ class TestIptablesWorker(TestCase):
         )
         ret = self.obj.prepare_rules('chain', rules, 6)
         self.assertEqual(ret[0], expected_iptables)
-        self.assertEqual(ret[1].keys(), {'ripe.net'})
-        self.assertIsInstance(ret[1]['ripe.net'], set)
-        self.assertIsNotNone(re.match('^[0-9a-f:]+/\d+$',
-                            ret[1]['ripe.net'].pop()))
+        self.assertPrepareRulesDnsRet(ret[1], 'ripe.net', 6)
 
     def test_004_apply_rules4(self):
         rules = [{'action': 'accept'}]
@@ -393,7 +399,7 @@ class TestIptablesWorker(TestCase):
         ])
 
 
-class TestNftablesWorker(TestCase):
+class TestNftablesWorker(WorkerTestCase):
     def setUp(self):
         super(TestNftablesWorker, self).setUp()
         self.obj = NftablesWorker()
@@ -462,10 +468,7 @@ class TestNftablesWorker(TestCase):
         )
         ret = self.obj.prepare_rules('chain', rules, 4)
         self.assertEqual(ret[0], expected_nft)
-        self.assertEqual(ret[1].keys(), {'yum.qubes-os.org'})
-        self.assertIsInstance(ret[1]['yum.qubes-os.org'], set)
-        self.assertIsNotNone(re.match('^\d+\.\d+\.\d+\.\d+/32$',
-                            ret[1]['yum.qubes-os.org'].pop()))
+        self.assertPrepareRulesDnsRet(ret[1], 'yum.qubes-os.org', 4)
         with self.assertRaises(qubesagent.firewall.RuleParseError):
             self.obj.prepare_rules('chain', [{'unknown': 'xxx'}], 4)
         with self.assertRaises(qubesagent.firewall.RuleParseError):
@@ -503,10 +506,7 @@ class TestNftablesWorker(TestCase):
         )
         ret = self.obj.prepare_rules('chain', rules, 6)
         self.assertEqual(ret[0], expected_nft)
-        self.assertEqual(ret[1].keys(), {'ripe.net'})
-        self.assertIsInstance(ret[1]['ripe.net'], set)
-        self.assertIsNotNone(re.match('^[0-9a-f:]+/\d+$',
-                            ret[1]['ripe.net'].pop()))
+        self.assertPrepareRulesDnsRet(ret[1], 'ripe.net', 6)
 
     def test_004_apply_rules4(self):
         rules = [{'action': 'accept'}]
