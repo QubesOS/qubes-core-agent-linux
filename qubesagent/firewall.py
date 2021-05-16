@@ -211,14 +211,14 @@ class FirewallWorker(object):
         self.run_firewall_dir()
         self.run_user_script()
         self.sd_notify('READY=1')
+        self.qdb.watch('/qubes-firewall/')
+        self.qdb.watch('/connected-ips')
+        self.qdb.watch('/connected-ips6')
         # initial load
         for source_addr in self.list_targets():
             self.handle_addr(source_addr)
         self.update_connected_ips(4)
         self.update_connected_ips(6)
-        self.qdb.watch('/qubes-firewall/')
-        self.qdb.watch('/connected-ips')
-        self.qdb.watch('/connected-ips6')
         try:
             for watch_path in iter(self.qdb.read_watch, None):
                 if watch_path == '/connected-ips':
