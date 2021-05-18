@@ -175,6 +175,9 @@ BuildRequires: qubes-libvchan-@BACKEND_VMM@-devel
 BuildRequires: pam-devel
 BuildRequires: python%{python3_pkgversion}-setuptools
 BuildRequires: systemd
+%if 0%{?rhel} >= 8
+BuildRequires: redhat-lsb
+%endif
 Source0: %{name}-%{version}.tar.gz
 
 %description

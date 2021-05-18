@@ -2,6 +2,12 @@ VERSION := $(shell cat version)
 
 ifneq (,$(wildcard /etc/fedora-release))
 DIST = fc$(shell rpm --eval %{fedora})
+else ifneq (,$(wildcard /etc/centos-release))
+ifeq (CentOSStream, $(shell lsb_release -is))
+DIST = centos-stream
+else
+DIST = centos
+endif
 else ifneq (,$(wildcard /etc/os-release))
 DIST = $(shell grep VERSION_CODENAME= /etc/os-release | cut -d'=' -f2)
 endif
