@@ -169,12 +169,12 @@ class FirewallWorker(object):
         User applications may watch these paths for count increases to remain
         up to date with QubesDB changes.
         """
-        cnt = self.qdb.read('/qubes-firewall_handled/{}'.format(addr))
+        cnt = self.qdb.read('/qubes-firewall-handled/{}'.format(addr))
         try:
             cnt = int(cnt)
         except (TypeError, ValueError):
             cnt = 0
-        self.qdb.write('/qubes-firewall_handled/{}'.format(addr), str(cnt+1))
+        self.qdb.write('/qubes-firewall-handled/{}'.format(addr), str(cnt+1))
 
     def list_targets(self):
         return set(t.split('/')[2] for t in self.qdb.list('/qubes-firewall/'))

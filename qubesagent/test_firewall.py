@@ -685,17 +685,17 @@ class TestFirewallWorker(TestCase):
     def test_handle_addr(self):
         self.obj.handle_addr('10.137.0.2')
         self.assertEqual(self.obj.rules['10.137.0.2'], [{'action': 'accept'}])
-        self.assertEqual(self.obj.qdb.entries['/qubes-firewall_handled/10.137.0.2'], '1')
+        self.assertEqual(self.obj.qdb.entries['/qubes-firewall-handled/10.137.0.2'], '1')
         self.obj.handle_addr('10.137.0.2')
         self.assertEqual(self.obj.rules['10.137.0.2'], [{'action': 'accept'}])
-        self.assertEqual(self.obj.qdb.entries['/qubes-firewall_handled/10.137.0.2'], '2')
+        self.assertEqual(self.obj.qdb.entries['/qubes-firewall-handled/10.137.0.2'], '2')
         # fallback to block all
         self.obj.handle_addr('10.137.0.3')
         self.assertEqual(self.obj.rules['10.137.0.3'], [{'action': 'drop'}])
-        self.assertEqual(self.obj.qdb.entries['/qubes-firewall_handled/10.137.0.3'], '1')
+        self.assertEqual(self.obj.qdb.entries['/qubes-firewall-handled/10.137.0.3'], '1')
         self.obj.handle_addr('10.137.0.4')
         self.assertEqual(self.obj.rules['10.137.0.4'], [{'action': 'drop'}])
-        self.assertEqual(self.obj.qdb.entries['/qubes-firewall_handled/10.137.0.4'], '1')
+        self.assertEqual(self.obj.qdb.entries['/qubes-firewall-handled/10.137.0.4'], '1')
 
     @patch('os.path.isfile')
     @patch('os.access')
