@@ -1,5 +1,5 @@
 <action>
-	<icon>folder-copy</icon>
+	<icon>stock_folder-copy</icon>
 	<name>Copy to VM</name>
 	<unique-id>1507455450991127-4</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh copy %F</command>
@@ -13,7 +13,7 @@
 	<video-files/>
 </action>
 <action>
-	<icon>folder-move</icon>
+	<icon>stock_folder-move</icon>
 	<name>Move to VM</name>
 	<unique-id>1507455437157027-3</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh move %F</command>
