@@ -13,12 +13,10 @@ shift
 # copy and move handle a list of files where other actions don't
 case "$action" in
     copy)
-        #shellcheck disable=SC2016
-        qvm-copy-to-vm '$default' "$@" | zenity --notification --text="Copying files..." --timeout 3
+        /usr/lib/qubes/qvm-copy-to-vm.gnome "$@"
         ;;
     move)
-        #shellcheck disable=SC2016
-        qvm-move-to-vm '$default' "$@" | zenity --notification --text="Moving files..." --timeout 3
+        /usr/lib/qubes/qvm-move-to-vm.gnome "$@"
         ;;
     img)
         for file in "$@"

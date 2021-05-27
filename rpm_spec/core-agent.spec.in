@@ -176,6 +176,9 @@ BuildRequires: qubes-libvchan-@BACKEND_VMM@-devel
 BuildRequires: pam-devel
 BuildRequires: python%{python3_pkgversion}-setuptools
 BuildRequires: systemd
+%if 0%{?rhel} >= 8
+BuildRequires: redhat-lsb
+%endif
 Source0: %{name}-%{version}.tar.gz
 
 %description
@@ -707,7 +710,9 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qopen-in-vm
 /usr/lib/qubes/qrun-in-vm
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
+/usr/lib/qubes/qvm-copy-to-vm.gnome
 /usr/lib/qubes/qvm-copy-to-vm.kde
+/usr/lib/qubes/qvm-move-to-vm.gnome
 /usr/lib/qubes/qvm-move-to-vm.kde
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
@@ -774,8 +779,6 @@ rm -f %{name}-%{version}
 %endif
 
 %files nautilus
-/usr/lib/qubes/qvm-copy-to-vm.gnome
-/usr/lib/qubes/qvm-move-to-vm.gnome
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
