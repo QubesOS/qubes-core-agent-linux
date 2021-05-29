@@ -193,7 +193,7 @@ class TestIptablesWorker(TestCase):
         expected_iptables = (
             "*filter\n"
             "-A chain -d 1.2.3.0/24 -p tcp --dport 80:80 -j ACCEPT\n"
-            "-A chain -d 147.75.32.69/32 -p udp --dport 443:1024 -j ACCEPT\n"
+            "-A chain -d 147.75.32.1/32 -p udp --dport 443:1024 -j ACCEPT\n"
             "-A chain -d 1.1.1.1/32 -p tcp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 2.2.2.2/32 -p tcp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 1.1.1.1/32 -p udp --dport 53:53 -j ACCEPT\n"
@@ -370,7 +370,7 @@ class TestNftablesWorker(TestCase):
             'table ip qubes-firewall {\n'
             '  chain chain {\n'
             '    ip protocol tcp ip daddr 1.2.3.0/24 tcp dport 80 accept\n'
-            '    ip protocol udp ip daddr { 147.75.32.69/32 } '
+            '    ip protocol udp ip daddr { 147.75.32.1/32 } '
             'udp dport 443-1024 accept\n'
             '    ip daddr { 1.1.1.1/32, 2.2.2.2/32 } tcp dport 53 accept\n'
             '    ip daddr { 1.1.1.1/32, 2.2.2.2/32 } udp dport 53 accept\n'
