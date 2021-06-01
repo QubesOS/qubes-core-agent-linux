@@ -127,6 +127,55 @@ class FirewallWorker(object):
         rules.append({'action': policy})
         return rules
 
+    def resolve_dns(self, fqdn, family):
+        """
+        Resolve the given FQDN via DNS.
+        :param fqdn: FQDN
+        :param family: 4 or 6 for IPv4 or IPv6
+        :return: see socket.getaddrinfo()
+        :raises: RuleParseError
+        """
+        try:
+            addrinfo = socket.getaddrinfo(fqdn, None,
+                (socket.AF_INET6 if family == 6 else socket.AF_INET))
+        except socket.gaierror as e:
+            raise RuleParseError('Failed to resolve {}: {}'.format(
+                fqdn, str(e)))
+        except UnicodeError as e:
+            raise RuleParseError('Invalid destination {}: {}'.format(
+                fqdn, str(e)))
+        return addrinfo
+
+
+    def update_dns_info(self, source, dns):
+        """
+        Write resolved DNS addresses back to QubesDB. This can be useful
+        for the user or DNS applications to pin these DNS addresses to the
+        IPs resolved during firewall setup.
+
+        :param source: VM IP
+        :param dns: dict: hostname -> set of IP addresses
+        :return: None
+        """
+        #clear old info
+        self.qdb.rm('/dns/{}/'.format(source))
+
+        for host, hostaddrs in dns.items():
+            self.qdb.write('/dns/{}/{}'.format(source, host), str(hostaddrs))
+
+    def update_handled(self, addr):
+        """
+        Update the QubesDB count of how often the given address was handled.
+        User applications may watch these paths for count increases to remain
+        up to date with QubesDB changes.
+        """
+        cnt = self.qdb.read('/qubes-firewall-handled/{}'.format(addr))
+        try:
+            cnt = int(cnt)
+        except (TypeError, ValueError):
+            cnt = 0
+        self.qdb.write('/qubes-firewall-handled/{}'.format(addr), str(cnt+1))
+
     def list_targets(self):
         return set(t.split('/')[2] for t in self.qdb.list('/qubes-firewall/'))
 
@@ -163,6 +212,8 @@ class FirewallWorker(object):
                 self.log_error(
                     'Failed to block traffic for {}'.format(addr))
 
+        self.update_handled(addr)
+
     @staticmethod
     def dns_addresses(family=None):
         with open('/etc/resolv.conf') as resolv:
@@ -180,14 +231,14 @@ class FirewallWorker(object):
         self.run_firewall_dir()
         self.run_user_script()
         self.sd_notify('READY=1')
+        self.qdb.watch('/qubes-firewall/')
+        self.qdb.watch('/connected-ips')
+        self.qdb.watch('/connected-ips6')
         # initial load
         for source_addr in self.list_targets():
             self.handle_addr(source_addr)
         self.update_connected_ips(4)
         self.update_connected_ips(6)
-        self.qdb.watch('/qubes-firewall/')
-        self.qdb.watch('/connected-ips')
-        self.qdb.watch('/connected-ips6')
         try:
             for watch_path in iter(self.qdb.read_watch, None):
                 if watch_path == '/connected-ips':
@@ -271,8 +322,9 @@ class IptablesWorker(FirewallWorker):
         :param chain: name of the chain to put rules into
         :param rules: list of rules
         :param family: address family (4 or 6)
-        :return: input for iptables-restore
-        :rtype: str
+        :return: tuple: (input for iptables-restore, dict of DNS records resolved
+                        during execution)
+        :rtype: (str, dict)
         """
 
         iptables = "*filter\n"
@@ -280,6 +332,8 @@ class IptablesWorker(FirewallWorker):
         fullmask = '/128' if family == 6 else '/32'
 
         dns = list(addr + fullmask for addr in self.dns_addresses(family))
+
+        ret_dns = {}
 
         for rule in rules:
             unsupported_opts = set(rule.keys()).difference(
@@ -305,13 +359,9 @@ class IptablesWorker(FirewallWorker):
             elif 'dst6' in rule:
                 dsthosts = [rule['dst6']]
             elif 'dsthost' in rule:
-                try:
-                    addrinfo = socket.getaddrinfo(rule['dsthost'], None,
-                        (socket.AF_INET6 if family == 6 else socket.AF_INET))
-                except socket.gaierror as e:
-                    raise RuleParseError('Failed to resolve {}: {}'.format(
-                        rule['dsthost'], str(e)))
+                addrinfo = self.resolve_dns(rule['dsthost'], family)
                 dsthosts = set(item[4][0] + fullmask for item in addrinfo)
+                ret_dns[rule['dsthost']] = dsthosts
             else:
                 dsthosts = None
 
@@ -374,7 +424,7 @@ class IptablesWorker(FirewallWorker):
                     iptables += ipt_rule
 
         iptables += 'COMMIT\n'
-        return iptables
+        return (iptables, ret_dns)
 
     def apply_rules_family(self, source, rules, family):
         """
@@ -391,7 +441,7 @@ class IptablesWorker(FirewallWorker):
         if chain not in self.chains[family]:
             self.create_chain(source, chain, family)
 
-        iptables = self.prepare_rules(chain, rules, family)
+        (iptables, dns) = self.prepare_rules(chain, rules, family)
         try:
             self.run_ipt(family, ['-F', chain])
             p = self.run_ipt_restore(family, ['-n'])
@@ -399,6 +449,7 @@ class IptablesWorker(FirewallWorker):
             if p.returncode != 0:
                 raise RuleApplyError(
                     'iptables-restore failed: {}'.format(output))
+            self.update_dns_info(source, dns)
         except subprocess.CalledProcessError as e:
             raise RuleApplyError('\'iptables -F {}\' failed: {}'.format(
                 chain, e.output))
@@ -561,13 +612,14 @@ class NftablesWorker(FirewallWorker):
 
     def prepare_rules(self, chain, rules, family):
         """
-        Helper function to translate rules list into input for iptables-restore
+        Helper function to translate rules list into input for nft
 
         :param chain: name of the chain to put rules into
         :param rules: list of rules
         :param family: address family (4 or 6)
-        :return: input for iptables-restore
-        :rtype: str
+        :return: tuple: (input for nft, dict of DNS records resolved
+                        during execution)
+        :rtype: (str, dict)
         """
 
         assert family in (4, 6)
@@ -577,6 +629,8 @@ class NftablesWorker(FirewallWorker):
         fullmask = '/128' if family == 6 else '/32'
 
         dns = list(addr + fullmask for addr in self.dns_addresses(family))
+
+        ret_dns = {}
 
         for rule in rules:
             unsupported_opts = set(rule.keys()).difference(
@@ -613,17 +667,11 @@ class NftablesWorker(FirewallWorker):
             elif 'dst6' in rule:
                 nft_rule += ' ip6 daddr {}'.format(rule['dst6'])
             elif 'dsthost' in rule:
-                try:
-                    addrinfo = socket.getaddrinfo(rule['dsthost'], None,
-                        (socket.AF_INET6 if family == 6 else socket.AF_INET))
-                except socket.gaierror as e:
-                    raise RuleParseError('Failed to resolve {}: {}'.format(
-                        rule['dsthost'], str(e)))
-                except UnicodeError as e:
-                    raise RuleParseError('Invalid destination {}: {}'.format(
-                        rule['dsthost'], str(e)))
+                addrinfo = self.resolve_dns(rule['dsthost'], family)
+                dsthosts = set(item[4][0] + fullmask for item in addrinfo)
                 nft_rule += ' {} daddr {{ {} }}'.format(ip_match,
-                    ', '.join(set(item[4][0] + fullmask for item in addrinfo)))
+                    ', '.join(dsthosts))
+                ret_dns[rule['dsthost']] = dsthosts
 
             if 'dstports' in rule:
                 dstports = rule['dstports']
@@ -677,7 +725,7 @@ class NftablesWorker(FirewallWorker):
                 table='qubes-firewall',
                 chain=chain,
                 rules='\n   '.join(nft_rules)
-            ))
+            ), ret_dns)
 
     def apply_rules_family(self, source, rules, family):
         """
@@ -694,7 +742,9 @@ class NftablesWorker(FirewallWorker):
         if chain not in self.chains[family]:
             self.create_chain(source, chain, family)
 
-        self.run_nft(self.prepare_rules(chain, rules, family))
+        (nft, dns) = self.prepare_rules(chain, rules, family)
+        self.run_nft(nft)
+        self.update_dns_info(source, dns)
 
     def apply_rules(self, source, rules):
         if self.is_ip6(source):
