@@ -64,8 +64,10 @@ def ini_to_string(ini):
     return output.getvalue()
 
 
-def pid_callback(launcher, pid, pid_list):
+def pid_callback(launcher, pid, data):
+    pid_list, loop = data
     pid_list.append(pid)
+    GLib.child_watch_add(0, pid, lambda *args: loop.quit())
 
 
 def dbus_name_change(loop, service_id, name, old_owner, new_owner):
@@ -78,14 +80,15 @@ def dbus_name_change(loop, service_id, name, old_owner, new_owner):
 def launch(filename, *files, **kwargs):
     wait = kwargs.pop('wait', True)
     launcher = make_launcher(filename)
+    loop = None
     try:
         import dbus
         from dbus.mainloop.glib import DBusGMainLoop
+        loop = GLib.MainLoop()
+        DBusGMainLoop(set_as_default=True)
         if hasattr(launcher, 'get_boolean'):
             activatable = launcher.get_boolean('DBusActivatable')
             if activatable:
-                loop = GLib.MainLoop()
-                DBusGMainLoop(set_as_default=True)
                 bus = dbus.SessionBus()
                 service_id = launcher.get_id()
                 # cut the .desktop suffix
@@ -116,12 +119,17 @@ def launch(filename, *files, **kwargs):
     except ImportError:
         pass
     if wait:
+        if loop is None:
+            loop = GLib.MainLoop()
         pid_list = []
         flags = GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD
         launcher.launch_uris_as_manager(files, None, flags, None, None,
-                pid_callback, pid_list)
-        for pid in pid_list:
-            os.waitpid(pid, 0)
+                pid_callback, (pid_list, loop))
+        
+        if pid_list:
+            # run the loop only if there is some PID watcher registered -
+            # otherwise nothing will stop it ever
+            loop.run()
     else:
         launcher.launch(files, None)
 
