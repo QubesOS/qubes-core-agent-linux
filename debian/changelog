@@ -1,3 +1,49 @@
+qubes-core-agent (4.1.26-1) unstable; urgency=medium
+
+  [ Neowutran ]
+  * fix #6346: quit loop only when the original process is terminated
+  * fix #6562. qvm-open-in-vm: wait EOF when handling URL
+
+  [ ddevz ]
+  * Update qvm-open-in-dvm.rst
+
+  [ Frédéric Pierret (fepitre) ]
+  * dnf plugin: don't try to execute qrexec if service is not running
+  * qvm-features-request: ensure qrexec agent is started
+
+  [ herypt ]
+  * Fix Thunar icons
+  * Add progress bar to Thunar actions
+
+  [ unman ]
+  * Change language for qvm-copy in KDE
+
+  [ Frédéric Pierret (fepitre) ]
+  * Properly handle CentOS Stream
+
+  [ Marek Marczykowski-Górecki ]
+  * Make shellcheck happy
+  * Update IP address in tests
+
+  [ 3hhh ]
+  * Export DNS information obtained during firewall setup to QubesDB
+  * firewall: refactor to remove side effects from prepare_rules()
+  * mock qubesdb.rm()
+  * firewall: mark an IP as handled in /qubes-firewall_handled/[ip]
+    after each handling iteration
+  * firewall: adjust tests to the new tuple returned by prepare_rules()
+  * add some checks for QubesDB /qubes-firewall_handled/[ip]
+  * tests/firewall: some code refactoring
+  * tests/firewall: added test for /dns/[ip]/[domain] info
+  * firewall: start watches before initial load
+  * firewall: put DNS resolving into its own function
+  * firewall: prefer - over _ for QubesDB path
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes-desktop-run: setup glib event loop for non-dbus apps too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 16 Jun 2021 16:36:18 +0200
+
 qubes-core-agent (4.1.25-1) unstable; urgency=medium
 
   [ Markus Fenske ]
