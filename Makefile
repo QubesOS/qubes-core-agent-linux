@@ -36,6 +36,7 @@ SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.sock
 SYSTEM_DROPINS += systemd-random-seed.service
 SYSTEM_DROPINS += tor.service tor@default.service
 SYSTEM_DROPINS += systemd-timesyncd.service
+SYSTEM_DROPINS += systemd-logind.service
 
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
 SYSTEM_DROPINS_NETWORKING += tinyproxy.service

@@ -958,6 +958,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/serial-getty@.service.d/30_qubes.conf
 /usr/lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
 /usr/lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
+/usr/lib/systemd/system/systemd-logind.service.d/30_qubes.conf
 /usr/lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
 /usr/lib/systemd/system/tor.service.d/30_qubes.conf
 /usr/lib/systemd/system/tor@default.service.d/30_qubes.conf
