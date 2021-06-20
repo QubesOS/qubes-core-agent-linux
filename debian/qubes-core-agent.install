@@ -91,6 +91,7 @@ lib/systemd/system/tmp.mount.d/30_qubes.conf
 lib/systemd/system/tor.service.d/30_qubes.conf
 lib/systemd/system/tor@default.service.d/30_qubes.conf
 lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
+lib/systemd/system/systemd-logind.service.d/30_qubes.conf
 usr/bin/qubes-desktop-run
 usr/bin/qubes-open
 usr/bin/qubes-session-autostart
