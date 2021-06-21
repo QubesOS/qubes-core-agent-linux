@@ -185,10 +185,20 @@ class FirewallWorker(object):
 
     def log_error(self, msg):
         self.log.error(msg)
-        subprocess.call(
-            ['notify-send', '-t', '3000', msg],
-            env=os.environ.copy().update({'DISPLAY': ':0'})
-        )
+        try:
+            subprocess.check_output(
+                ['sudo', '-u', self.qdb.read('/default-user') or 'user',
+                    'notify-send', '-t', '8000', '--icon=network-error',
+                    msg],
+                env={'DISPLAY': ':0'},
+                stderr=subprocess.STDOUT,
+                timeout=1, #avoid hangs due to odd sudoer configs
+            )
+        except subprocess.SubprocessError as e:
+            self.log.error(
+                'Failed to notify the user about {} ({})'.format(
+                    msg, str(e)
+                ))
 
     def handle_addr(self, addr):
         try:
