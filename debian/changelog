@@ -1,3 +1,56 @@
+qubes-core-agent (4.0.62-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * sudo isn’t always built with SELinux support
+
+  [ Christian Poeschl ]
+  * addresses https://github.com/QubesOS/qubes-issues/issues/6374
+
+  [ ravachol ]
+  * keep qvm-copy-to-vm but with deprecated note
+
+  [ Chris P ]
+  * remove trailing whitespaces; remove dest_vm argument
+
+  [ Markus Fenske ]
+  * Fix typo in qvm_copy_nautilus.py
+
+  [ Neowutran ]
+  * fix #6346: quit loop only when the original process is terminated
+
+  [ Frédéric Pierret (fepitre) ]
+  * dnf plugin: don't try to execute qrexec if service is not running
+  * qvm-features-request: ensure qrexec agent is started
+
+  [ ddevz ]
+  * Update qvm-open-in-dvm.rst
+
+  [ Neowutran ]
+  * fix #6562. qvm-open-in-vm: wait EOF when handling URL
+
+  [ herypt ]
+  * Fix Thunar icons
+  * Add progress bar to Thunar actions
+
+  [ unman ]
+  * Change language for qvm-copy in KDE
+
+  [ Frédéric Pierret (fepitre) ]
+  * package-managers: improve DIST detection
+  * Properly handle CentOS Stream
+
+  [ Marek Marczykowski-Górecki ]
+  * Make shellcheck happy
+  * qubes-desktop-run: setup glib event loop for non-dbus apps too
+
+  [ 3hhh ]
+  * systemd-logind: disable watchdog
+
+  [ Marek Marczykowski-Górecki ]
+  * Update IP address in tests
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 24 Jun 2021 06:13:34 +0200
+
 qubes-core-agent (4.0.61-1) unstable; urgency=medium
 
   * debian: prevent qrexec restart on update
