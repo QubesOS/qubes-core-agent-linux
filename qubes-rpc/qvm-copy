@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh --
 set -e
 #
 # The Qubes OS Project, https://www.qubes-os.org#
@@ -21,23 +21,25 @@ set -e
 #
 #
 
-PROGRAM_NAME=${0##*/}
+unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE
+case ${0##*/} in
+(qvm-move) OPERATION_TYPE=move TARGET_TYPE=default MIN_ARGS=1;;
+(qvm-copy) OPERATION_TYPE=copy TARGET_TYPE=default MIN_ARGS=1;;
+(qvm-copy-to-vm) OPERATION_TYPE=copy TARGET_TYPE=vm MIN_ARGS=2;;
+(qvm-move-to-vm) OPERATION_TYPE=move TARGET_TYPE=vm MIN_ARGS=2;;
+(*) printf 'Invoked with unrecognized name %s, cannot determine operation to perform\n' "$0"; exit 1;;
+esac
 
-if [ "$PROGRAM_NAME" = "qvm-move-to-vm" ] || [ "$PROGRAM_NAME" = "qvm-move" ]; then
-  OPERATION_TYPE="move"
+if [ "$1" = "--without-progress" ] ; then
+	export PROGRESS_TYPE=none
+	shift
 else
-  OPERATION_TYPE="copy"
+    export PROGRESS_TYPE=console
 fi
 
-if [ "$PROGRAM_NAME" = "qvm-move-to-vm" ] || [ "$PROGRAM_NAME" = "qvm-copy-to-vm" ]; then
-  TARGET_TYPE="vm"
-else
-  TARGET_TYPE="default"
-fi
+if [ "$1" = '--' ]; then shift; fi
 
-
-if { [ $# -lt 2 ] && [ "$TARGET_TYPE" = "vm" ];} || { [ $# -lt 1 ] && [ "$TARGET_TYPE" = "default" ];} ; then
-
+if [ "$#" -lt "$MIN_ARGS" ]; then
 	if [ "$TARGET_TYPE" = "vm" ]; then
 		echo "usage: $0 [--without-progress] destination_qube_name FILE [FILE ...]"
 	else
@@ -57,13 +59,6 @@ if { [ $# -lt 2 ] && [ "$TARGET_TYPE" = "vm" ];} || { [ $# -lt 1 ] && [ "$TARGET
 	exit 1
 fi
 
-if [ "$1" = "--without-progress" ] ; then
-	export PROGRESS_TYPE=none
-	shift
-else
-	export PROGRESS_TYPE=console
-fi
-
 if [ "$TARGET_TYPE" = "vm" ]; then
   VM="$1"
   shift
@@ -81,7 +76,7 @@ if [ "$TARGET_TYPE" = "vm" ]; then
     echo "use qvm-copy/qvm-move to avoid typing target qube name twice" >&2
 fi
 
-/usr/lib/qubes/qrexec-client-vm "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
+/usr/lib/qubes/qrexec-client-vm -- "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
 	rm -rf -- "$@"
