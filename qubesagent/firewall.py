@@ -24,6 +24,7 @@ import logging
 import os
 import socket
 import subprocess
+import pwd
 import shutil
 import daemon
 
@@ -185,10 +186,29 @@ class FirewallWorker(object):
 
     def log_error(self, msg):
         self.log.error(msg)
-        subprocess.call(
-            ['notify-send', '-t', '3000', msg],
-            env=os.environ.copy().update({'DISPLAY': ':0'})
-        )
+
+        user = (self.qdb.read('/default-user') or b'user').decode()
+        try:
+            uid = pwd.getpwnam(user).pw_uid
+        except KeyError:
+            uid = 1000
+
+        try:
+            subprocess.check_output(
+                ['runuser', '-u', user, '--', 'notify-send', '-t', '8000',
+                    '--icon=network-error', msg],
+                env={'DISPLAY': ':0',
+                    'PATH': '/usr/sbin:/usr/bin',
+                    #dbus address is needed on fedora, but optional on debian
+                    'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/{}/bus'.format(
+                        uid)},
+                stderr=subprocess.STDOUT,
+            )
+        except subprocess.SubprocessError as e:
+            self.log.error(
+                'Failed to notify the user about: {} ({})'.format(
+                    msg, str(e)
+                ))
 
     def handle_addr(self, addr):
         try:
