@@ -2,7 +2,8 @@
 #
 # The Qubes OS Project, http://www.qubes-os.org
 #
-# Copyright (C) 2010  Rafal Wojtczuk  <rafal@invisiblethingslab.com>
+# Copyright (C) 2010  Rafal Wojtczuk <rafal@invisiblethingslab.com>
+# Copyright (C) 2021  Frédéric Pierret <frederic.pierret@qubes-os.org>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,7 +23,7 @@
 
 print_usage() {
 cat >&2 <<USAGE
-Usage: $0 vmname command arguments
+Usage: $0 [OPTIONS] vmname command arguments
 Executes a command in another VM using the qubes.VMShell RPC service.  The
 arguments are joined with spaces and passed to "bash -c".
 
@@ -31,29 +32,51 @@ in Dom0, this tool does not propagate exit codes, nor does it offer protection
 against the remote VM messing with your terminal if standard output is your
 terminal.
 
-You can use @dispvm or \$dispvm or --dispvm instead of vmname to start a new
-DisposableVM.
+You can use @dispvm or \$dispvm instead of vmname to start a new DisposableVM.
+
+Options:
+    --help      Show this help
+    --no-gui    Run the command without GUI
+    --dispvm    Execute command in a DisposibleVM
 USAGE
 }
 
-if [ $# -lt 2 ] ; then
+
+if ! OPTS=$(getopt -o htd --long help,no-gui,dispvm -n "$0" -- "$@"); then
     print_usage
     exit 1
 fi
 
-VMNAME="$1"
-shift
+eval set -- "$OPTS"
 
-if [ "$VMNAME" = "--dispvm" ] ; then
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h | --help) print_usage; exit 0;;
+        -t | --no-gui ) nogui=1;;
+        -d | --dispvm) dispvm=1;;
+        --) shift; break;;
+    esac
+    shift
+done
+
+if { [ "$dispvm" != 1 ] && [ $# -lt 2 ]; } || { [ "$dispvm" = 1 ] && [ $# -eq 0 ]; } ; then
+    print_usage
+    exit 1
+fi
+
+if [ "$dispvm" != 1 ]; then
+    VMNAME="$1"
+    shift
+else
     VMNAME="@dispvm"
-elif [ "$VMNAME" = "" ] ; then
-    print_usage
-    exit 1
 fi
+
 
 service="qubes.VMShell"
 case "$VMNAME" in [@$]dispvm|[@$]dispvm:*)
-    service="$service+WaitForSession"
+    if [ "$nogui" != 1 ]; then
+        service="$service+WaitForSession"
+    fi
 esac
 
 exec /usr/lib/qubes/qrexec-client-vm "$VMNAME" "$service" "/usr/lib/qubes/qrun-in-vm" "$@"
