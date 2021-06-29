@@ -9,3 +9,4 @@ deb/*
 __pycache__
 debian/changelog.*
 pkgs
+misc/mime/[^p]*
