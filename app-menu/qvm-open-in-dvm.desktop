@@ -1,0 +1,10 @@
+### Note: With this installed, typing "xdg-settings set default-web-browser qvm-open-in-dvm.desktop" will make it so that in gnome-terminal
+###   that right clicking on a URL on screen, then selecting "open with" to open the link, will open it in a disposable VM (as opposed to opening it in the current VM)
+###   (typing "xdg-settings set default-web-browser firefox.desktop" will put it back to normal)
+
+[Desktop Entry]
+Name=qvm-open-in-dvm
+Exec=qvm-open-in-dvm %u
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=x-scheme-handler/unknown;x-scheme-handler/about;text/html;text/xml;application/xhtml+xml;application/xml;application/vnd.mozilla.xul+xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;
