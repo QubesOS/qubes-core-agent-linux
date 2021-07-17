@@ -128,6 +128,25 @@ class FirewallWorker(object):
         rules.append({'action': policy})
         return rules
 
+    def read_forward_rules(self, target):
+        """Read forward rules from QubesDB and return them as a list of dicts"""
+        """No policy here since they already are in the forward dict, use first/last flags"""
+        entries = self.qdb.multiread('/qubes-firewall-forward/')
+        assert isinstance(entries, dict)
+        # drop full path
+        entries = dict(((k.split('/')[3], v.decode())
+                        for k, v in entries.items()))
+        rules = []
+        for ruleno, rule in sorted(entries.items()):
+            if len(ruleno) != 4 or not ruleno.isdigit():
+                raise RuleParseError(
+                    'Unexpected non-rule found: {}={}'.format(ruleno, rule))
+            rule_dict = dict(elem.split('=') for elem in rule.split(' '))
+            if 'action' not in rule_dict:
+                raise RuleParseError('Rule \'{}\' lack action'.format(rule))
+            rules.append(rule_dict)
+        return rules
+
     def resolve_dns(self, fqdn, family):
         """
         Resolve the given FQDN via DNS.
@@ -178,7 +197,12 @@ class FirewallWorker(object):
         self.qdb.write('/qubes-firewall-handled/{}'.format(addr), str(cnt+1))
 
     def list_targets(self):
+        # here is 2 because we have /qubes-firewall/<ip>
         return set(t.split('/')[2] for t in self.qdb.list('/qubes-firewall/'))
+
+    def list_forward_targets(self):
+        # here is 3 because we have /qubes-firewall-forward/<appvm>/<ip>
+        return set(t.split('/')[3] for t in self.qdb.list('/qubes-firewall-forward/'))
 
     @staticmethod
     def is_ip6(addr):
@@ -234,6 +258,31 @@ class FirewallWorker(object):
 
         self.update_handled(addr)
 
+    def handle_forward_addr(self, addr):
+        # TODOTODOTODO
+        try:
+            rules = self.read_forward_rules(addr)
+            self.apply_rules(addr, rules)
+        except RuleParseError as e:
+            self.log_error(
+                'Failed to parse rules for {} ({}), blocking traffic'.format(
+                    addr, str(e)
+                ))
+            self.apply_rules(addr, [{'action': 'drop'}])
+        except RuleApplyError as e:
+            self.log_error(
+                'Failed to apply rules for {} ({}), blocking traffic'.format(
+                    addr, str(e))
+            )
+            # retry with fallback rules
+            try:
+                self.apply_rules(addr, [{'action': 'drop'}])
+            except RuleApplyError:
+                self.log_error(
+                    'Failed to block traffic for {}'.format(addr))
+
+        #self.update_handled(addr)
+
     @staticmethod
     def dns_addresses(family=None):
         with open('/etc/resolv.conf') as resolv:
@@ -252,11 +301,16 @@ class FirewallWorker(object):
         self.run_user_script()
         self.sd_notify('READY=1')
         self.qdb.watch('/qubes-firewall/')
+        self.qdb.watch('/qubes-firewall-forward/')
         self.qdb.watch('/connected-ips')
         self.qdb.watch('/connected-ips6')
         # initial load
         for source_addr in self.list_targets():
             self.handle_addr(source_addr)
+
+        for target_addr in self.list_forward_targets():
+            self.handle_forward_addr(target_addr)
+
         self.update_connected_ips(4)
         self.update_connected_ips(6)
         try:
