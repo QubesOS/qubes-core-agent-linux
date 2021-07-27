@@ -137,6 +137,9 @@ class FirewallWorker(object):
         entries = dict(((k.split('/')[3], v.decode())
                         for k, v in entries.items()))
         rules = []
+        if 'last' in entries:
+            entries.remove('last')
+            rules.append({'last': True})
         for ruleno, rule in sorted(entries.items()):
             if len(ruleno) != 4 or not ruleno.isdigit():
                 raise RuleParseError(
@@ -262,26 +265,20 @@ class FirewallWorker(object):
         # TODOTODOTODO
         try:
             rules = self.read_forward_rules(addr)
-            self.apply_rules(addr, rules)
+            self.apply_forward_rules(addr, rules)
+        
         except RuleParseError as e:
             self.log_error(
                 'Failed to parse rules for {} ({}), blocking traffic'.format(
                     addr, str(e)
                 ))
             self.apply_rules(addr, [{'action': 'drop'}])
+        
         except RuleApplyError as e:
             self.log_error(
                 'Failed to apply rules for {} ({}), blocking traffic'.format(
                     addr, str(e))
             )
-            # retry with fallback rules
-            try:
-                self.apply_rules(addr, [{'action': 'drop'}])
-            except RuleApplyError:
-                self.log_error(
-                    'Failed to block traffic for {}'.format(addr))
-
-        #self.update_handled(addr)
 
     @staticmethod
     def dns_addresses(family=None):
@@ -340,6 +337,9 @@ class FirewallWorker(object):
 class IptablesWorker(FirewallWorker):
     supported_rule_opts = ['action', 'proto', 'dst4', 'dst6', 'dsthost',
                            'dstports', 'specialtarget', 'icmptype']
+
+    supported_forward_rule_opts = ['action', 'proto', 'src4', 'src6', 'srcports',
+                           'dstports', 'forwardtype']
 
     def __init__(self):
         super(IptablesWorker, self).__init__()
@@ -500,6 +500,82 @@ class IptablesWorker(FirewallWorker):
         iptables += 'COMMIT\n'
         return (iptables, ret_dns)
 
+def prepare_forward_rules(self, chain, rules, family, last=False):
+        """
+        Helper function to translate rules list into input for iptables-restore
+
+        :param chain: name of the chain to put rules into
+        :param rules: list of rules
+        :param family: address family (4 or 6)
+        :return: tuple: (input for iptables-restore, dict of DNS records resolved
+                        during execution)
+        :rtype: (str, dict)
+        """
+
+        iptables = "*filter\n"
+
+        fullmask = '/128' if family == 6 else '/32'
+
+        for rule in rules:
+            unsupported_opts = set(rule.keys()).difference(
+                set(self.supported_forward_rule_opts))
+            if unsupported_opts:
+                raise RuleParseError(
+                    'Unsupported forward rule option(s): {!s}'.format(unsupported_opts))
+            if 'src4' in rule and family == 6:
+                raise RuleParseError('IPv4 rule found for IPv6 address')
+            if 'src6' in rule and family == 4:
+                raise RuleParseError('src6 rule found for IPv4 address')
+
+            if 'proto' in rule:
+                protos = [rule['proto']]
+            else:
+                protos = None
+
+            if 'src4' in rule:
+                srchosts = [rule['src4']]
+            elif 'src6' in rule:
+                srchosts = [rule['src6']]
+            else:
+                srchosts = None
+
+            if 'dstports' in rule:
+                dstports = rule['dstports'].replace('-', ':')
+            else:
+                dstports = None
+
+            if 'srcports' in rule:
+                srcports = rule['srcports'].replace('-', ':')
+            else:
+                srcports = None
+
+            # make them iterable
+            if protos is None:
+                protos = [None]
+            if srchosts is None:
+                srchosts = [None]
+
+            if rule['action'] != 'forward':
+                raise RuleParseError(
+                    'Invalid rule action {}'.format(rule['action']))
+
+            # sorting here is only to ease writing tests
+            for proto in sorted(protos):
+                for dstport in sorted(dstports):
+                    ipt_rule = '-A {}'.format(chain)
+                    if dsthost is not None:
+                        ipt_rule += ' -d {}'.format(dsthost)
+                    if proto is not None:
+                        ipt_rule += ' -p {}'.format(proto)
+                    if dstports is not None:
+                        ipt_rule += ' --dport {}'.format(dstports)
+                    ipt_rule += ' -j {}\n'.format(action)
+                    iptables += ipt_rule
+    
+
+        iptables += 'COMMIT\n'
+        return (iptables, ret_dns)
+
     def apply_rules_family(self, source, rules, family):
         """
         Apply rules for given source address.
@@ -599,6 +675,9 @@ class IptablesWorker(FirewallWorker):
 class NftablesWorker(FirewallWorker):
     supported_rule_opts = ['action', 'proto', 'dst4', 'dst6', 'dsthost',
                            'dstports', 'specialtarget', 'icmptype']
+
+    supported_forward_rule_opts = ['action', 'proto', 'src4', 'src6', 'srcports',
+                           'dstports', 'forwardtype']
 
     def __init__(self):
         super(NftablesWorker, self).__init__()
@@ -769,6 +848,95 @@ class NftablesWorker(FirewallWorker):
                     nft_rule += ' icmp type {}'.format(rule['icmptype'])
                 elif family == 6:
                     nft_rule += ' icmpv6 type {}'.format(rule['icmptype'])
+
+            # now duplicate rules for tcp/udp if needed
+            # it isn't possible to specify "tcp dport xx || udp dport xx" in
+            # one rule
+            if dstports is not None:
+                if 'proto' not in rule:
+                    nft_rules.append(
+                        nft_rule + ' tcp dport {} {}'.format(
+                            dstports, action))
+                    nft_rules.append(
+                        nft_rule + ' udp dport {} {}'.format(
+                            dstports, action))
+                else:
+                    nft_rules.append(
+                        nft_rule + ' {} dport {} {}'.format(
+                            rule['proto'], dstports, action))
+            else:
+                nft_rules.append(nft_rule + ' ' + action)
+
+        return (
+            'flush chain {family} {table} {chain}\n'
+            'table {family} {table} {{\n'
+            '  chain {chain} {{\n'
+            '   {rules}\n'
+            '  }}\n'
+            '}}\n'.format(
+                family=('ip6' if family == 6 else 'ip'),
+                table='qubes-firewall',
+                chain=chain,
+                rules='\n   '.join(nft_rules)
+            ), ret_dns)
+
+    def prepare_forward_rules(self, chain, rules, family):
+        """
+        Helper function to translate rules list into input for nft
+
+        :param chain: name of the chain to put rules into
+        :param rules: list of rules
+        :param family: address family (4 or 6)
+        :return: tuple: (input for nft, dict of DNS records resolved
+                        during execution)
+        :rtype: (str, dict)
+        """
+
+        assert family in (4, 6)
+        nft_rules = []
+        ip_match = 'ip6' if family == 6 else 'ip'
+
+        fullmask = '/128' if family == 6 else '/32'
+
+        for rule in rules:
+            unsupported_opts = set(rule.keys()).difference(
+                set(self.supported_forward_rule_opts))
+            if unsupported_opts:
+                raise RuleParseError(
+                    'Unsupported rule option(s): {!s}'.format(unsupported_opts))
+            if 'src4' in rule and family == 6:
+                raise RuleParseError('IPv4 rule found for IPv6 address')
+            if 'src6' in rule and family == 4:
+                raise RuleParseError('src6 rule found for IPv4 address')
+
+            nft_rule = ""
+            
+            if rule['action'] != 'forward':
+                raise RuleParseError(
+                    'Invalid rule action {}'.format(rule['action']))
+
+            if 'proto' in rule:
+                if family == 4:
+                    nft_rule += ' ip protocol {}'.format(rule['proto'])
+                elif family == 6:
+                    nft_rule += ' ip6 nexthdr {}'.format(rule['proto'])
+
+            if 'src4' in rule:
+                nft_rule += ' ip daddr {}'.format(rule['dst4'])
+            elif 'src6' in rule:
+                nft_rule += ' ip6 daddr {}'.format(rule['dst6'])
+            else:
+                raise RuleParseError(
+                    'Missing source address!')
+                
+
+            if 'dstports' in rule:
+                dstports = rule['dstports']
+                if len(set(dstports.split('-'))) == 1:
+                    dstports = dstports.split('-')[0]
+            else:
+                raise RuleParseError(
+                    'dstports needs to be defined!')
 
             # now duplicate rules for tcp/udp if needed
             # it isn't possible to specify "tcp dport xx || udp dport xx" in
