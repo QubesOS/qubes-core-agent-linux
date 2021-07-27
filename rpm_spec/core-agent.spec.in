@@ -631,6 +631,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPost
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPostAll
 %config(noreplace) /etc/qubes-rpc/qubes.WaitForSession
+%config(noreplace) /etc/qubes-rpc/qubes.DesktopNotify
 %config(noreplace) /etc/qubes-rpc/qubes.DetachPciDevice
 %config(noreplace) /etc/qubes-rpc/qubes.Backup
 %config(noreplace) /etc/qubes-rpc/qubes.Restore

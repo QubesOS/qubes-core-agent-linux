@@ -1,0 +1,10 @@
+[Unit]
+Description=Qubes desktop notification forwarder
+After=dbus.service
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/qubes/notification-forwarder.py
+
+[Install]
+WantedBy=basic.target

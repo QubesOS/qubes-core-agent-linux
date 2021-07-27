@@ -1,0 +1,294 @@
+#!/usr/bin/env python3
+# vim: fileencoding=utf-8
+#
+# The Qubes OS Project, https://www.qubes-os.org/
+#
+# Copyright (C) 2021
+#                   David Hobach <tripleh@hackingthe.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+import sys
+import os
+import logging
+from collections import namedtuple
+from threading import Thread
+import re
+import pwd
+import unicodedata
+import dbus
+import dbus.mainloop.glib
+from gi.repository import GLib
+
+Notification = namedtuple("Notification", ("app_name", "notification_id", "app_icon",
+                                           "summary", "body", "actions", "hints",
+                                           "expire_timeout"))
+
+def get_logger():
+    log = logging.getLogger(__name__)
+    #NOTE: stderr is forwarded to the local log & the requesting VM (!!!)
+    log.addHandler(logging.StreamHandler(sys.stderr))
+    log.setLevel(logging.INFO)
+    return log
+
+#globals
+LOG = get_logger()
+IDS = dict() #calling notification ID --> our notification ID
+BUS_NAME = "org.freedesktop.Notifications"
+BUS_PATH = "/org/freedesktop/Notifications"
+BUS = None
+
+class ParseException(Exception):
+    """ Thrown when untrusted content parsing failed and that content should be dropped/ignored. """
+    def __init__(self, msg):
+        LOG.warning(msg)
+        iface = get_iface()
+        iface.Notify("qubes.DesktopNotify", 0, "", "Notification dropped.", msg, [], {}, 5000,
+                     signature="susssasa{sv}i")
+        super().__init__()
+
+def get_iface():
+    global BUS
+    if not BUS:
+        BUS = dbus.SessionBus()
+    proxy = BUS.get_object(BUS_NAME, BUS_PATH)
+    return dbus.Interface(proxy, BUS_NAME)
+
+def _notify(trusted_notification):
+    iface = get_iface() #we shouldn't cache it as we'll run into issues otherwise (cf. notification-forwarder)
+
+    return iface.Notify(
+        trusted_notification.app_name,
+        trusted_notification.notification_id,
+        trusted_notification.app_icon,
+        trusted_notification.summary,
+        trusted_notification.body,
+        trusted_notification.actions,
+        trusted_notification.hints,
+        trusted_notification.expire_timeout,
+        signature="susssasa{sv}i"
+    )
+
+def notify(vm, trusted_notification):
+    notification = trusted_notification
+
+    #the ID is the caller ID --> fix it
+    our_id = IDS.get(notification.notification_id, 0)
+
+    #give the sending VM a dedicated field (summary) to hopefully avoid spoofing attacks (e.g. with backspaces)
+    summary = vm
+    if notification.body and notification.summary:
+        body = " : ".join([notification.summary, notification.body])
+    elif notification.body:
+        body = notification.body
+    else:
+        body = notification.summary
+
+    notification = Notification(
+        app_name=notification.app_name,
+        notification_id=our_id,
+        app_icon=notification.app_icon,
+        summary=summary,
+        body=body,
+        actions=notification.actions,
+        hints=notification.hints,
+        expire_timeout=notification.expire_timeout,
+    )
+
+    LOG.info(f"Notification from VM {vm}: {notification}")
+    ret_id = _notify(notification)
+
+    if trusted_notification.notification_id > 0:
+        IDS[trusted_notification.notification_id] = ret_id
+
+def close_notification(trusted_id):
+    #the ID is the caller ID --> fix it
+    try:
+        our_id = IDS.pop(trusted_id)
+    except KeyError:
+        LOG.warning("Received a closed request for a notification that's not in our databse. This is unexpected. Ignoring...")
+        return
+
+    iface = get_iface()
+    iface.CloseNotification(our_id, signature="u")
+
+def regex_sanitize(vm, regex, untrusted_str, field):
+    m = re.match(regex, untrusted_str)
+    if m:
+        return m.group(1)
+    raise ParseException(f"Received unexpected message content in the field {field} from VM {vm}.")
+
+def parse_notification_id(vm, untrusted):
+    return int(regex_sanitize(vm, r"^([0-9]{1,6})$", untrusted, "notification_id"))
+
+def parse_expire_timeout(vm, untrusted):
+    return int(regex_sanitize(vm, r"^(\-?[0-9]{1,10})$", untrusted, "expire_timeout"))
+
+def assert_printable(vm, untrusted, max_len):
+    l = len(untrusted)
+    if l >= max_len:
+        raise ParseException(f"Received content of excessive length ({l} >= {max_len}) from VM {vm}.")
+
+    for ch in untrusted:
+        cat = unicodedata.category(ch)
+        if cat[0] == "C" and cat != "Cc":
+            #https://www.unicode.org/reports/tr44/#GC_Values_Table
+            raise ParseException(f"Received content with {cat} control characters from VM {vm}.")
+
+    return untrusted
+
+def parse_app_name(vm, untrusted):
+    return assert_printable(vm, untrusted, 50)
+
+def parse_app_icon(vm, untrusted):
+    # The sending VM is supposed to either send a file:// URI or a well-known icon name.
+    # We don't support raw binary icons at the moment (and it might not be wise to do so).
+
+    #NOTE:
+    # - modern Unix path names support everything except \0
+    # - we enforce an absolute file path and only allow /usr/share/ icons to limit file probing attacks
+    #   (the log/stderr is currently forwarded to the requester so he can see whether the file exists or not)
+    m = re.match(r"^file://(/usr/share/[^\0]+\.(?:png|svg|gif))$", untrusted)
+    if m:
+        untrusted_path = m.group(1)
+
+        if len(untrusted_path) > 200:
+            raise ParseException(f"Received content with excessively long icon path from VM {vm}.")
+
+        if "/tmp/" in untrusted_path:
+            return ""
+
+        try:
+            with open(untrusted_path):
+                pass
+        except IOError:
+            return ""
+
+        return untrusted
+
+    #allowed: https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s04.html
+    m = re.match(r"^([a-z\-]{0,30})$", untrusted)
+    if m:
+        return m.group(1)
+
+    raise ParseException(f"Received an invalid icon from VM {vm}.")
+
+def parse_summary(vm, untrusted):
+    return assert_printable(vm, untrusted, 200)
+
+def parse_body(vm, untrusted):
+    return assert_printable(vm, untrusted, 1000)
+
+def handle_untrusted_notification(vm, untrusted):
+    if len(untrusted) >= 6 and len(untrusted) < 20:
+        return Notification(
+            notification_id=parse_notification_id(vm, untrusted[0]),
+            expire_timeout=parse_expire_timeout(vm, untrusted[1]),
+            app_name=parse_app_name(vm, untrusted[2]),
+            app_icon=parse_app_icon(vm, untrusted[3]),
+            summary=parse_summary(vm, untrusted[4]),
+            body=parse_body(vm, "\n".join(untrusted[5:])),
+            actions=[],
+            hints={},
+            )
+    raise ParseException(f"Received message with too few or too many lines from VM {vm}.")
+
+def handle_untrusted_message(vm, untrusted):
+    try:
+        if untrusted[0] == "close":
+            if len(untrusted) == 2:
+                trusted_id = parse_notification_id(vm, untrusted[1])
+                close_notification(trusted_id)
+                return
+            raise ParseException(f"Received message of unexpected length from VM {vm}.")
+        elif untrusted[0] == "notify":
+            trusted_notification = handle_untrusted_notification(vm, untrusted[1:])
+            notify(vm, trusted_notification)
+            return
+    except IndexError:
+        raise ParseException(f"Received message with unexpected content from VM {vm}.")
+    raise ParseException(f"Received message with unexpected command from VM {vm}.")
+
+def handle_untrusted(vm):
+    untrusted = []
+    for untrusted_line in sys.stdin:
+        #NOTE: sys.stdin is text-only in python by default (but might give us byte strings?)
+        if not isinstance(untrusted_line, str):
+            LOG.warning(f"Received non-string content from VM {vm}.")
+            continue
+        untrusted_line = untrusted_line.rstrip("\n")
+        if untrusted_line == "<qrexec>":
+            untrusted = []
+        elif untrusted_line == "</qrexec>":
+            try:
+                handle_untrusted_message(vm, untrusted)
+            except ParseException:
+                pass
+            untrusted = []
+        else:
+            untrusted.append(untrusted_line)
+
+class CloseWatcher(Thread):
+    """ Watches dbus for close signals for notifications that we sent. """
+
+    def __init__(self):
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        self.bus = dbus.SessionBus()
+        self.bus.add_signal_receiver(self.on_closed, signal_name="NotificationClosed", bus_name=BUS_NAME, path=BUS_PATH)
+        super().__init__(daemon=True)
+
+    def run(self):
+        GLib.MainLoop().run()
+
+    def on_closed(self, *args, **kwargs):
+        LOG.debug("on_closed")
+        try:
+            our_id = args[0]
+            reason = args[1]
+        except IndexError:
+            LOG.warning("Unexpected parameters passed to on_closed. Ignoring...")
+            return
+
+        for key, val in IDS.items():
+            if val == our_id:
+                IDS.pop(key, None)
+                return
+
+def set_env():
+    if not os.environ.get("DISPLAY"):
+        os.environ.setdefault("DISPLAY", ":0")
+    if not os.environ.get("DBUS_SESSION_BUS_ADDRESS"):
+        qdb = qubesdb.QubesDB()
+        user = (qdb.read("/default-user") or b"user").decode()
+        try:
+            uid = pwd.getpwnam(user).pw_uid
+        except KeyError:
+            uid = 1000
+        os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{uid}/bus")
+
+def main():
+    set_env()
+
+    vm = os.environ.get("QREXEC_REMOTE_DOMAIN")
+    if not vm:
+        LOG.error("Failed to identify the source VM.")
+        sys.exit(4)
+
+    CloseWatcher().start()
+    handle_untrusted(vm)
+
+if __name__ == "__main__":
+    main()

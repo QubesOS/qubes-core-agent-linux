@@ -10,6 +10,7 @@ etc/needrestart/conf.d/50_qubes.conf
 etc/profile.d/qt_x11_no_mitshm.sh
 etc/qubes-rpc/qubes.ShowInTerminal
 etc/qubes-rpc/qubes.Backup
+etc/qubes-rpc/qubes.DesktopNotify
 etc/qubes-rpc/qubes.DetachPciDevice
 etc/qubes-rpc/qubes.Filecopy
 etc/qubes-rpc/qubes.GetAppmenus
