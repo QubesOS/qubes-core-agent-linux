@@ -42,9 +42,16 @@ progress_zenity() {
     local pos
 
     while read -r pos; do
+        # To avoid a window focus race with the qubes.Filecopy confirmation
+        # dialog, launch zenity *after* the copy has begun: Prepend an empty
+        # first line ...
+        if [[ $pos == 0 ]]; then
+            echo
+        fi
+
         echo $((100 * pos / SIZE))
     done | {
-        read -r  # wait for first line (always "0") and throw it away
+        read -r  # ... and throw it away.
         zenity --progress --text="$DESCRIPTION" --auto-close
     }
 }
