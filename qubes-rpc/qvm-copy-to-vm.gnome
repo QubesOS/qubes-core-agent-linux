@@ -66,6 +66,8 @@ if [[ $SIZE == 0 ]]; then
     progress_none
 elif [[ $0 == *.kde ]] && type kdialog qdbus >/dev/null; then
     progress_kdialog
-else
+elif type zenity >/dev/null; then
     progress_zenity
+else
+    progress_none
 fi
