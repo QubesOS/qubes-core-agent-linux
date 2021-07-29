@@ -29,21 +29,25 @@ if [[ $SIZE == 0 ]]; then
     }
 elif [[ $0 == *.kde ]] && command -v kdialog >/dev/null; then
     progress() {
-        (while read -r CURRSIZE; do
-            if [[ $CURRSIZE == 0 ]]; then
+        local pos ref
+
+        (while read -r pos; do
+            if [[ $pos == 0 ]]; then
                 # shellcheck disable=SC2207
-                REF=( $(kdialog --progressbar "$DESCRIPTION") )
-                trap 'qdbus "${REF[@]}" close' EXIT  # for this subshell
-                qdbus "${REF[@]}" Set "" maximum "$SIZE"
+                ref=( $(kdialog --progressbar "$DESCRIPTION") )
+                trap 'qdbus "${ref[@]}" close' EXIT  # for this subshell
+                qdbus "${ref[@]}" Set "" maximum "$SIZE"
             fi
 
-            qdbus "${REF[@]}" Set "" value "$CURRSIZE"
+            qdbus "${ref[@]}" Set "" value "$pos"
         done) >/dev/null  # hide qdbus's empty output lines
     }
 else
     progress() {
-        while read -r CURRSIZE; do
-            echo $((100 * CURRSIZE / SIZE))
+        local pos
+
+        while read -r pos; do
+            echo $((100 * pos / SIZE))
         done | {
             read -r  # wait for first line (always "0") and throw it away
             zenity --progress --text="$DESCRIPTION" --auto-close
