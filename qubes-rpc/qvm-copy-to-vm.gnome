@@ -58,5 +58,5 @@ else
     DESCRIPTION="Copying files..."
 fi
 
-PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm \$default qubes.Filecopy \
+PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm @default qubes.Filecopy \
                   /usr/lib/qubes/qfile-agent "$@" | progress
