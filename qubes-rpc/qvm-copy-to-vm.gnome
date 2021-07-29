@@ -64,7 +64,7 @@ PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm @default qubes.Filecopy \
                   /usr/lib/qubes/qfile-agent "$@" |
 if [[ $SIZE == 0 ]]; then
     progress_none
-elif [[ $0 == *.kde ]] && command -v kdialog >/dev/null; then
+elif [[ $0 == *.kde ]] && type kdialog qdbus >/dev/null; then
     progress_kdialog
 else
     progress_zenity
