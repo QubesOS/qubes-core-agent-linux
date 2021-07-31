@@ -19,8 +19,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-progress_none() {
-    cat >/dev/null
+copy() {
+    /usr/lib/qubes/qrexec-client-vm @default qubes.Filecopy \
+                                    /usr/lib/qubes/qfile-agent "$@"
 }
 
 progress_kdialog() {
@@ -67,14 +68,12 @@ else
     DESCRIPTION="Copying files..."
 fi
 
-PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm @default qubes.Filecopy \
-                  /usr/lib/qubes/qfile-agent "$@" |
 if [[ $SIZE == 0 ]]; then
-    progress_none
+    PROGRESS_TYPE=none copy "$@"
 elif [[ $0 == *.kde ]] && type kdialog qdbus >/dev/null; then
-    progress_kdialog
+    PROGRESS_TYPE=gui  copy "$@" | progress_kdialog
 elif type zenity >/dev/null; then
-    progress_zenity
+    PROGRESS_TYPE=gui  copy "$@" | progress_zenity
 else
-    progress_none
+    PROGRESS_TYPE=none copy "$@"
 fi
