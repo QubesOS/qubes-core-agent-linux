@@ -30,7 +30,7 @@ target=
 filename=
 
 while [ $# -gt 0 ]; do
-    if [ "x$1" = "x--view-only" ]; then
+    if [ "$1" = "--view-only" ]; then
         qopen_opts=--view-only
     elif [ -z "$target" ]; then
         target="$1"
