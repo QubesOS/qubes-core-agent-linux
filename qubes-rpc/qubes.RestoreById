@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -36,9 +36,9 @@ fi
 # now $backup_location is verified to be still valid
 
 echo Starting Restorecopy >&2
-read -r untrusted_paths
+IFS=' ' read -r -a untrusted_paths
 echo "Backup location: $backup_location" >&2
-echo "Paths: $untrusted_paths" >&2
+echo "Paths: $(printf '%s' "${untrusted_paths[*]}" | LC_ALL=C tr -c '[:print:]' '_')" >&2
 if [ -f "$backup_location" ] ; then
   echo "Performing restore from backup file $backup_location" >&2
   TARGET="$backup_location"
@@ -46,8 +46,7 @@ if [ -f "$backup_location" ] ; then
   # tar2qfile always use argv[1] for input path and the rest for selecting
   # paths to extract - no other options are supported, so passing
   # untrusted_paths directly is fine
-  # shellcheck disable=SC2086
-  /usr/lib/qubes/tar2qfile "$TARGET" $untrusted_paths
+  /usr/lib/qubes/tar2qfile "$TARGET" "${untrusted_paths[@]}"
 else
   echo "Checking if arguments is matching a command" >&2
   COMMAND=$(echo "$backup_location" | cut -d ' ' -f 1)
@@ -60,11 +59,10 @@ else
     eval "set -- $backup_location"
     # Use named pipe to pass original stdin to tar2file
     "$@" > "$tmpdir/backup-data" < /dev/null &
-    # shellcheck disable=SC2086
     # tar2qfile always use argv[1] for input path and the rest for selecting
     # paths to extract - no other options are supported, so passing
     # untrusted_paths directly is fine
-    /usr/lib/qubes/tar2qfile "$tmpdir/backup-data" $untrusted_paths
+    /usr/lib/qubes/tar2qfile "$tmpdir/backup-data" "${untrusted_paths[@]}"
     # Restoration may be terminated earlier because of selected files. This
     # will be seen as EPIPE to the retrieving process, which may cause retcode
     # other than 0 in some cases - which would be incorrectly treated as backup
