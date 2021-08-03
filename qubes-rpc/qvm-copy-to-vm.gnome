@@ -18,38 +18,48 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-#
+
+copy() {
+    /usr/lib/qubes/qrexec-client-vm @default qubes.Filecopy \
+                                    /usr/lib/qubes/qfile-agent "$@"
+}
+
+progress_kdialog() {
+    local pos ref
+
+    (while read -r pos; do
+        if [[ $pos == 0 ]]; then
+            # shellcheck disable=SC2207
+            ref=( $(kdialog --progressbar "$DESCRIPTION") )
+            trap 'qdbus "${ref[@]}" close' EXIT  # for this subshell
+            qdbus "${ref[@]}" Set "" maximum "$SIZE"
+        fi
+
+        qdbus "${ref[@]}" Set "" value "$pos"
+    done) >/dev/null  # hide qdbus's empty output lines
+}
+
+progress_zenity() {
+    local pos
+
+    while read -r pos; do
+        # To avoid a window focus race with the qubes.Filecopy confirmation
+        # dialog, launch zenity *after* the copy has begun: Prepend an empty
+        # first line ...
+        if [[ $pos == 0 ]]; then
+            echo
+        fi
+
+        echo $((100 * pos / SIZE))
+    done | {
+        read -r  # ... and throw it away.
+        zenity --progress --text="$DESCRIPTION" --auto-close
+    }
+}
+
 
 SIZE=$(du -bcs -- "$@" 2>/dev/null | tail -n 1 | cut -f 1)
 set -e -o pipefail
-
-if [[ $SIZE == 0 ]]; then
-    progress() {
-        cat >/dev/null
-    }
-elif [[ $0 == *.kde ]] && command -v kdialog >/dev/null; then
-    progress() {
-        (while read -r CURRSIZE; do
-            if [[ $CURRSIZE == 0 ]]; then
-                # shellcheck disable=SC2207
-                REF=( $(kdialog --progressbar "$DESCRIPTION") )
-                trap 'qdbus "${REF[@]}" close' EXIT  # for this subshell
-                qdbus "${REF[@]}" Set "" maximum "$SIZE"
-            fi
-
-            qdbus "${REF[@]}" Set "" value "$CURRSIZE"
-        done) >/dev/null  # hide qdbus's empty output lines
-    }
-else
-    progress() {
-        while read -r CURRSIZE; do
-            echo $((100 * CURRSIZE / SIZE))
-        done | {
-            read -r  # wait for first line (always "0") and throw it away
-            zenity --progress --text="$DESCRIPTION" --auto-close
-        }
-    }
-fi
 
 if [[ ${0##*/} == qvm-move-to-vm.* ]]; then
     DESCRIPTION="Moving files..."
@@ -58,5 +68,12 @@ else
     DESCRIPTION="Copying files..."
 fi
 
-PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm \$default qubes.Filecopy \
-                  /usr/lib/qubes/qfile-agent "$@" | progress
+if [[ $SIZE == 0 ]]; then
+    PROGRESS_TYPE=none copy "$@"
+elif [[ $0 == *.kde ]] && type kdialog qdbus >/dev/null; then
+    PROGRESS_TYPE=gui  copy "$@" | progress_kdialog
+elif type zenity >/dev/null; then
+    PROGRESS_TYPE=gui  copy "$@" | progress_zenity
+else
+    PROGRESS_TYPE=none copy "$@"
+fi
