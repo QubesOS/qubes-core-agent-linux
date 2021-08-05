@@ -1,25 +1,30 @@
-#!/bin/sh
+#!/usr/bin/python3 --
 
-if [ -z "$1" ]; then
-    echo "This service requires an argument" >&2
-    exit 1
-fi
+import sys, os, pwd
+from qubesagent.xdg import launch
+from xdg.BaseDirectory import xdg_data_dirs
 
-app_basename="$1.desktop"
+def main(argv):
+    try:
+        (arg0, arg,) = argv
+    except ValueError:
+        print('This service requires an argument', file=sys.stderr)
+        sys.exit(1)
+    for path in xdg_data_dirs:
+        subpath = os.path.join(path, 'applications')
+        for (raw_volume, directories, files) in os.walk(subpath):
+            volume = raw_volume[len(subpath):]
+            if volume:
+                volume = volume[1:].replace('/', '-') + '-'
+            for f in files:
+                if not f.endswith('.desktop'):
+                    continue
+                the_id = volume + f[:-8]
+                if the_id == arg:
+                    launch(os.path.join(raw_volume, f))
+                    return
+    print(arg, 'not found in', ':'.join(xdg_data_dirs))
+    sys.exit(1)
 
-# Based on XDG Base Directory Specification, Version 0.7
-[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-[ -n "$XDG_DATA_DIRS" ] || XDG_DATA_DIRS="/usr/local/share:/usr/share"
-
-for dir in $(echo "$XDG_DATA_HOME:$XDG_DATA_DIRS" | tr : ' '); do
-    if ! [ -d "$dir/applications" ]; then
-        continue
-    fi
-    for subdir in $(find "$dir/applications" -type d | sort); do
-        if [ -f "$subdir/$app_basename" ]; then
-            exec qubes-desktop-run "$subdir/$app_basename"
-        fi
-    done
-done
-echo "applications/$app_basename not found in $XDG_DATA_HOME:$XDG_DATA_DIRS" >&2
-exit 1
+if __name__ == '__main__':
+    main(sys.argv)
