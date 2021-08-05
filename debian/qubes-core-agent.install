@@ -164,3 +164,9 @@ usr/share/man/man1/qvm-*
 usr/share/qubes/mime-override/globs
 usr/share/qubes/qubes-master-key.asc
 usr/share/qubes/marker-vm
+usr/share/qubes/xdg-override/*
+usr/share/qubes/xdg-override/applications/*
+usr/share/qubes/xdg-override/mime/*
+usr/share/qubes/xdg-override/mime/application/*.xml
+usr/share/qubes/xdg-override/mime/image/*.xml
+usr/share/qubes/xdg-override/mime/packages/*.xml

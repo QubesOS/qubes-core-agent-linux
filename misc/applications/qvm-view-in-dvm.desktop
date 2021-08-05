@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Name=QubesOS View In DisposableVM
+Exec=/usr/bin/qvm-open-in-dvm --view-only -- %u
+Terminal=false
+Type=Application
+MimeType=application/qubes-untrusted-file;text/plain;application/octet-stream;application/x-zerosize;application/pdf;image/svg+xml;application/xml;application/x-wwf;image/png;

@@ -5,6 +5,7 @@ QUBESLIBDIR = $(LIBDIR)/qubes
 QUBESRPCCMDDIR = $(SYSCONFDIR)/qubes-rpc
 QUBESCONFDIR = $(SYSCONFDIR)/qubes
 QUBESRPCCONFDIR = $(QUBESCONFDIR)/rpc-config
+LN := ln -sf
 
 ifneq ($(DEBUG),0)
 DEBUG_FLAGS := -g
@@ -32,16 +33,16 @@ install:
 	install -t $(DESTDIR)$(BINDIR) \
 		qubes-open \
 		qvm-open-in-vm qvm-run-vm qvm-sync-clock
-	ln -s qvm-open-in-vm $(DESTDIR)$(BINDIR)/qvm-open-in-dvm
+	$(LN) qvm-open-in-vm $(DESTDIR)$(BINDIR)/qvm-open-in-dvm
 	install -t $(DESTDIR)$(BINDIR) qvm-copy
-	ln -s qvm-copy $(DESTDIR)$(BINDIR)/qvm-move-to-vm
-	ln -s qvm-copy $(DESTDIR)$(BINDIR)/qvm-move
-	ln -s qvm-copy $(DESTDIR)$(BINDIR)/qvm-copy-to-vm
+	$(LN) qvm-copy $(DESTDIR)$(BINDIR)/qvm-move-to-vm
+	$(LN) qvm-copy $(DESTDIR)$(BINDIR)/qvm-move
+	$(LN) qvm-copy $(DESTDIR)$(BINDIR)/qvm-copy-to-vm
 	install -d $(DESTDIR)$(QUBESLIBDIR)
 	install -t $(DESTDIR)$(QUBESLIBDIR) qvm-copy-to-vm.gnome
-	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-move-to-vm.gnome
-	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-copy-to-vm.kde
-	ln -s qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-move-to-vm.kde
+	$(LN) qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-move-to-vm.gnome
+	$(LN) qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-copy-to-vm.kde
+	$(LN) qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-move-to-vm.kde
 	install -t $(DESTDIR)$(QUBESLIBDIR) \
 		prepare-suspend resize-rootfs \
 		qfile-agent qopen-in-vm qrun-in-vm qubes-sync-clock \
@@ -75,7 +76,7 @@ install:
 		qubes.ConnectTCP \
 		qubes.TemplateSearch \
 		qubes.TemplateDownload
-	ln -s qubes.VMExec $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.VMExecGUI
+	$(LN) qubes.VMExec $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.VMExecGUI
 	for config in *.config; do \
 		install -D -m 0644 "$$config" "$(DESTDIR)$(QUBESRPCCONFDIR)/$${config%.config}"; \
 	done

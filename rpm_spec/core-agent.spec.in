@@ -168,6 +168,7 @@ Provides:   qubes-core-vm-doc = %{version}-%{release}
 Obsoletes:  qubes-core-vm-doc < 4.0.0
 Conflicts:  qubes-gui-agent < 4.1.6
 BuildRequires: gcc
+BuildRequires: desktop-file-utils
 BuildRequires: pandoc
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
@@ -179,6 +180,8 @@ BuildRequires: systemd
 %if 0%{?rhel} >= 8
 BuildRequires: redhat-lsb
 %endif
+# for update-mime-database
+BuildRequires: shared-mime-info
 Source0: %{name}-%{version}.tar.gz
 
 %description
@@ -657,6 +660,22 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/rpc-config/qubes.VMShell+WaitForSession
 %config(noreplace) /etc/qubes/rpc-config/qubes.VMExecGUI
 %config(noreplace) /etc/default/grub.qubes
+
+# MIME stuff
+%define qubesdata %_datadir/qubes/xdg-override
+%define qubesmime %qubesdata/mime
+%dir %qubesdata
+%qubesdata/*
+%qubesdata/applications/*
+%dir %qubesmime
+%qubesmime/*
+%dir %qubesmime/application
+%qubesmime/application/*
+%dir %qubesmime/packages
+%qubesmime/packages/*
+%dir %qubesmime/image
+%qubesmime/image/*
+
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf

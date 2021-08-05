@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mime-info [
+<!ELEMENT mime-info (mime-type)+>
+<!ATTLIST mime-info xmlns CDATA #FIXED "http://www.freedesktop.org/standards/shared-mime-info">
+<!ELEMENT mime-type (comment+ , (acronym , expanded-acronym)? , (icon | generic-icon | glob | magic | treemagic | root-XML | alias | sub-class-of)*)>
+<!ATTLIST mime-type type CDATA #REQUIRED>
+<!-- a comment describing a document with the respective MIME type. Example: "WMV video" --><!ELEMENT comment (#PCDATA)>
+<!ATTLIST comment xml:lang CDATA #IMPLIED>
+<!-- a comment describing the respective unexpanded MIME type acronym. Example: "WMV" --><!ELEMENT acronym (#PCDATA)>
+<!-- a comment describing the respective expanded MIME type acronym. Example: "Windows Media Video" --><!ELEMENT expanded-acronym (#PCDATA)>
+<!ELEMENT icon EMPTY>
+<!ATTLIST icon name CDATA #REQUIRED>
+<!-- a generic icon name as per the Icon Naming Specification, only required if computing
+  it from the mime-type would not work, See "generic-icon" in the Shared Mime Specification --><!ELEMENT generic-icon EMPTY>
+<!ATTLIST generic-icon name (application-x-executable | audio-x-generic | folder | font-x-generic | image-x-generic | package-x-generic | text-html | text-x-generic | text-x-generic-template | text-x-script | video-x-generic | x-office-address-book | x-office-calendar | x-office-document | x-office-presentation | x-office-spreadsheet) #REQUIRED>
+<!ELEMENT glob EMPTY>
+<!ATTLIST glob pattern CDATA #REQUIRED>
+<!ATTLIST glob weight CDATA "50">
+<!ATTLIST glob case-sensitive CDATA #IMPLIED>
+<!ELEMENT magic (match)+>
+<!ATTLIST magic priority CDATA "50">
+<!ELEMENT match (match)*>
+<!ATTLIST match offset CDATA #REQUIRED>
+<!ATTLIST match type (string | big16 | big32 | little16 | little32 | host16 | host32 | byte) #REQUIRED>
+<!ATTLIST match value CDATA #REQUIRED>
+<!ATTLIST match mask CDATA #IMPLIED>
+<!ELEMENT treemagic (treematch)+>
+<!ATTLIST treemagic priority CDATA "50">
+<!ELEMENT treematch (treematch)*>
+<!ATTLIST treematch path CDATA #REQUIRED>
+<!ATTLIST treematch type (file | directory | link) #IMPLIED>
+<!ATTLIST treematch match-case (true | false) #IMPLIED>
+<!ATTLIST treematch executable (true | false) #IMPLIED>
+<!ATTLIST treematch non-empty (true | false) #IMPLIED>
+<!ATTLIST treematch mimetype CDATA #IMPLIED>
+<!ELEMENT root-XML EMPTY>
+<!ATTLIST root-XML namespaceURI CDATA #REQUIRED>
+<!ATTLIST root-XML localName CDATA #REQUIRED>
+<!ELEMENT alias EMPTY>
+<!ATTLIST alias type CDATA #REQUIRED>
+<!ELEMENT sub-class-of EMPTY>
+<!ATTLIST sub-class-of type CDATA #REQUIRED>
+]>
+<!--
+This file is a stripped-down version of the freedesktop.org shared MIME
+database. The comment in the original follows:
+
+The freedesktop.org shared MIME database (this file) was created by merging
+several existing MIME databases (all released under the GPL).
+
+It comes with ABSOLUTELY NO WARRANTY, to the extent permitted by law. You may
+redistribute copies of update-mime-database under the terms of the GNU General
+Public License. For more information about these matters, see the file named
+COPYING.
+
+The latest version is available from:
+
+	http://www.freedesktop.org/wiki/Software/shared-mime-info/
+
+To extend this database, users and applications should create additional
+XML files in the 'packages' directory and run the update-mime-database
+command to generate the output files.
+-->
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/qubes-untrusted-file">
+    <comment>Untrusted file to open in a DispVM</comment>
+    <glob pattern="*" weight="100"/>
+  </mime-type>
+  <mime-type type="image/svg+xml">
+    <comment>SVG image</comment>
+    <comment xml:lang="af">SVG-beeld</comment>
+    <comment xml:lang="ar">صورة SVG</comment>
+    <comment xml:lang="be-Latn">Vyjava SVG</comment>
+    <comment xml:lang="bg">Изображение — SVG</comment>
+    <comment xml:lang="ca">imatge SVG</comment>
+    <comment xml:lang="cs">obrázek SVG</comment>
+    <comment xml:lang="da">SVG-billede</comment>
+    <comment xml:lang="de">SVG-Bild</comment>
+    <comment xml:lang="el">Εικόνα SVG</comment>
+    <comment xml:lang="en-GB">SVG image</comment>
+    <comment xml:lang="eo">SVG-bildo</comment>
+    <comment xml:lang="es">imagen SVG</comment>
+    <comment xml:lang="eu">SVG irudia</comment>
+    <comment xml:lang="fi">SVG-kuva</comment>
+    <comment xml:lang="fo">SVG mynd</comment>
+    <comment xml:lang="fr">image SVG</comment>
+    <comment xml:lang="fur">imagjin SVG</comment>
+    <comment xml:lang="ga">íomhá SVG</comment>
+    <comment xml:lang="gl">imaxe SVG</comment>
+    <comment xml:lang="he">תמונת SVG</comment>
+    <comment xml:lang="hr">SVG slika</comment>
+    <comment xml:lang="hu">SVG kép</comment>
+    <comment xml:lang="ia">Imagine SVG</comment>
+    <comment xml:lang="id">Citra SVG</comment>
+    <comment xml:lang="it">Immagine SVG</comment>
+    <comment xml:lang="ja">SVG 画像</comment>
+    <comment xml:lang="kk">SVG суреті</comment>
+    <comment xml:lang="ko">SVG 그림</comment>
+    <comment xml:lang="lt">SVG paveikslėlis</comment>
+    <comment xml:lang="lv">SVG attēls</comment>
+    <comment xml:lang="nb">SVG-bilde</comment>
+    <comment xml:lang="nl">SVG-afbeelding</comment>
+    <comment xml:lang="nn">SVG-bilete</comment>
+    <comment xml:lang="oc">imatge SVG</comment>
+    <comment xml:lang="pl">Obraz SVG</comment>
+    <comment xml:lang="pt">imagem SVG</comment>
+    <comment xml:lang="pt-BR">Imagem SVG</comment>
+    <comment xml:lang="ro">Imagine SVG</comment>
+    <comment xml:lang="ru">Изображение SVG</comment>
+    <comment xml:lang="sk">Obrázok SVG</comment>
+    <comment xml:lang="sl">Slikovna vektorska datoteka SVG</comment>
+    <comment xml:lang="sq">Figurë SVG</comment>
+    <comment xml:lang="sr">СВГ слика</comment>
+    <comment xml:lang="sv">SVG-bild</comment>
+    <comment xml:lang="tr">SVG görüntüsü</comment>
+    <comment xml:lang="uk">зображення SVG</comment>
+    <comment xml:lang="vi">Ảnh SVG</comment>
+    <comment xml:lang="zh-CN">SVG 图像</comment>
+    <comment xml:lang="zh-TW">SVG 影像</comment>
+    <acronym>SVG</acronym>
+    <expanded-acronym>Scalable Vector Graphics</expanded-acronym>
+    <sub-class-of type="application/xml"/>
+    <!-- The original database includes this at offsets 0 through 256; we only
+         allow it at offset 0 -->
+    <magic priority="80">
+      <match type="string" value="&lt;!DOCTYPE svg" offset="0"/>
+      <match type="string" value="&lt;!-- Created with Inkscape" offset="0"/>
+      <match type="string" value="&lt;svg" offset="0"/>
+    </magic>
+    <!-- The original database includes this at offsets 1 through 256; we only
+         allow it at offset 0 -->
+    <!--
+    <magic priority="45">
+      <match type="string" value="&lt;svg" offset="1:256"/>
+    </magic> -->
+    <glob pattern="*.svg"/>
+    <!-- this is from the original database; it is disabled in QubesOS to reduce
+         attack surface -->
+    <!-- <root-XML namespaceURI="http://www.w3.org/2000/svg" localName="svg"/> -->
+  </mime-type>
+  <mime-type type="application/x-wwf">
+    <comment>WWF document</comment>
+    <comment xml:lang="af">WWF-dokument</comment>
+    <comment xml:lang="ast">Documentu WWF</comment>
+    <comment xml:lang="bg">Документ — WWF</comment>
+    <comment xml:lang="ca">document WWF</comment>
+    <comment xml:lang="cs">dokument WWF</comment>
+    <comment xml:lang="da">WWF-dokument</comment>
+    <comment xml:lang="de">WWF-Dokument</comment>
+    <comment xml:lang="el">Έγγραφο WWF</comment>
+    <comment xml:lang="en-GB">WWF document</comment>
+    <comment xml:lang="eo">WWF-dokumento</comment>
+    <comment xml:lang="es">documento WWF</comment>
+    <comment xml:lang="eu">WWF dokumentua</comment>
+    <comment xml:lang="fi">WWF-asiakirja</comment>
+    <comment xml:lang="fr">document WWF</comment>
+    <comment xml:lang="fur">document WWF</comment>
+    <comment xml:lang="ga">cáipéis WWF</comment>
+    <comment xml:lang="gl">documento de WWF</comment>
+    <comment xml:lang="he">מסמך WWF</comment>
+    <comment xml:lang="hr">WWF dokument</comment>
+    <comment xml:lang="hu">WWF-dokumentum</comment>
+    <comment xml:lang="ia">Documento WWF</comment>
+    <comment xml:lang="id">Dokumen WWF</comment>
+    <comment xml:lang="it">Documento WWF</comment>
+    <comment xml:lang="ja">WWF 文書</comment>
+    <comment xml:lang="ka">WWF დოკუმენტი</comment>
+    <comment xml:lang="kk">WWF құжаты</comment>
+    <comment xml:lang="ko">WWF 문서</comment>
+    <comment xml:lang="lv">WWF dokuments</comment>
+    <comment xml:lang="nl">WWF document</comment>
+    <comment xml:lang="oc">document WWF</comment>
+    <comment xml:lang="pl">Dokument WWF</comment>
+    <comment xml:lang="pt">documento WWF</comment>
+    <comment xml:lang="pt-BR">Documento WWF</comment>
+    <comment xml:lang="ru">Документ WWF</comment>
+    <comment xml:lang="sk">Dokument  WWF</comment>
+    <comment xml:lang="sl">Dokument WWF</comment>
+    <comment xml:lang="sr">ВВФ документ</comment>
+    <comment xml:lang="sv">WWF-dokument</comment>
+    <comment xml:lang="tr">WWF belgesi</comment>
+    <comment xml:lang="uk">документ WWF</comment>
+    <comment xml:lang="zh-CN">WWF</comment>
+    <comment xml:lang="zh-TW">WWF 文件</comment>
+    <generic-icon name="x-office-document"/>
+    <glob pattern="*.wwf"/>
+    <sub-class-of type="application/pdf"/>
+    <alias type="application/wwf"/>
+  </mime-type>
+  <mime-type type="application/pdf">
+    <comment>PDF document</comment>
+    <comment xml:lang="af">PDF-dokument</comment>
+    <comment xml:lang="ar">مستند PDF</comment>
+    <comment xml:lang="ast">Documentu PDF</comment>
+    <comment xml:lang="be-Latn">Dakument PDF</comment>
+    <comment xml:lang="bg">Документ — PDF</comment>
+    <comment xml:lang="ca">document PDF</comment>
+    <comment xml:lang="cs">dokument PDF</comment>
+    <comment xml:lang="cy">Dogfen PDF</comment>
+    <comment xml:lang="da">PDF-dokument</comment>
+    <comment xml:lang="de">PDF-Dokument</comment>
+    <comment xml:lang="el">Έγγραφο PDF</comment>
+    <comment xml:lang="en-GB">PDF document</comment>
+    <comment xml:lang="eo">PDF-dokumento</comment>
+    <comment xml:lang="es">documento PDF</comment>
+    <comment xml:lang="eu">PDF dokumentua</comment>
+    <comment xml:lang="fi">PDF-asiakirja</comment>
+    <comment xml:lang="fo">PDF skjal</comment>
+    <comment xml:lang="fr">document PDF</comment>
+    <comment xml:lang="fur">document PDF</comment>
+    <comment xml:lang="ga">cáipéis PDF</comment>
+    <comment xml:lang="gl">documento PDF</comment>
+    <comment xml:lang="he">מסמך PDF</comment>
+    <comment xml:lang="hr">PDF dokument</comment>
+    <comment xml:lang="hu">PDF-dokumentum</comment>
+    <comment xml:lang="ia">Documento PDF</comment>
+    <comment xml:lang="id">Dokumen PDF</comment>
+    <comment xml:lang="it">Documento PDF</comment>
+    <comment xml:lang="ja">PDF ドキュメント</comment>
+    <comment xml:lang="kk">PDF құжаты</comment>
+    <comment xml:lang="ko">PDF 문서</comment>
+    <comment xml:lang="lt">PDF dokumentas</comment>
+    <comment xml:lang="lv">PDF dokuments</comment>
+    <comment xml:lang="ms">Dokumen PDF</comment>
+    <comment xml:lang="nb">PDF-dokument</comment>
+    <comment xml:lang="nl">PDF-document</comment>
+    <comment xml:lang="nn">PDF-dokument</comment>
+    <comment xml:lang="oc">document PDF</comment>
+    <comment xml:lang="pl">Dokument PDF</comment>
+    <comment xml:lang="pt">documento PDF</comment>
+    <comment xml:lang="pt-BR">Documento PDF</comment>
+    <comment xml:lang="ro">Document PDF</comment>
+    <comment xml:lang="ru">Документ PDF</comment>
+    <comment xml:lang="sk">Dokument PDF</comment>
+    <comment xml:lang="sl">Dokument PDF</comment>
+    <comment xml:lang="sq">Dokument PDF</comment>
+    <comment xml:lang="sr">ПДФ документ</comment>
+    <comment xml:lang="sv">PDF-dokument</comment>
+    <comment xml:lang="tr">PDF belgesi</comment>
+    <comment xml:lang="uk">документ PDF</comment>
+    <comment xml:lang="vi">Tài liệu PDF</comment>
+    <comment xml:lang="zh-CN">PDF 文档</comment>
+    <comment xml:lang="zh-TW">PDF 文件</comment>
+    <acronym>PDF</acronym>
+    <expanded-acronym>Portable Document Format</expanded-acronym>
+    <generic-icon name="x-office-document"/>
+    <magic priority="50">
+      <match type="string" value="%PDF-" offset="0"/>
+    </magic>
+    <glob pattern="*.pdf"/>
+    <alias type="application/x-pdf"/>
+    <alias type="image/pdf"/>
+    <alias type="application/acrobat"/>
+    <alias type="application/nappdf"/>
+  </mime-type>
+  <mime-type type="application/xml">
+    <comment>XML document</comment>
+    <comment xml:lang="af">XML-dokument</comment>
+    <comment xml:lang="ar">مستند XML</comment>
+    <comment xml:lang="ast">Documentu XML</comment>
+    <comment xml:lang="be-Latn">Dakument XML</comment>
+    <comment xml:lang="bg">Документ — XML</comment>
+    <comment xml:lang="ca">document XML</comment>
+    <comment xml:lang="cs">dokument XML</comment>
+    <comment xml:lang="da">XML-dokument</comment>
+    <comment xml:lang="de">XML-Dokument</comment>
+    <comment xml:lang="el">Έγγραφο XML</comment>
+    <comment xml:lang="en-GB">XML document</comment>
+    <comment xml:lang="eo">XML-dokumento</comment>
+    <comment xml:lang="es">documento XML</comment>
+    <comment xml:lang="eu">XML dokumentua</comment>
+    <comment xml:lang="fi">XML-asiakirja</comment>
+    <comment xml:lang="fo">XML skjal</comment>
+    <comment xml:lang="fr">document XML</comment>
+    <comment xml:lang="fur">document XML</comment>
+    <comment xml:lang="ga">cáipéis XML</comment>
+    <comment xml:lang="gl">documento XML</comment>
+    <comment xml:lang="he">מסמך XML</comment>
+    <comment xml:lang="hr">XML dokument</comment>
+    <comment xml:lang="hu">XML dokumentum</comment>
+    <comment xml:lang="ia">Documento XML</comment>
+    <comment xml:lang="id">Dokumen XML</comment>
+    <comment xml:lang="it">Documento XML</comment>
+    <comment xml:lang="ja">XML ドキュメント</comment>
+    <comment xml:lang="kk">XML құжаты</comment>
+    <comment xml:lang="ko">XML 문서</comment>
+    <comment xml:lang="lt">XML dokumentas</comment>
+    <comment xml:lang="lv">XML dokuments</comment>
+    <comment xml:lang="nb">XML-dokument</comment>
+    <comment xml:lang="nl">XML-document</comment>
+    <comment xml:lang="nn">XML-dokument</comment>
+    <comment xml:lang="oc">document XML</comment>
+    <comment xml:lang="pl">Dokument XML</comment>
+    <comment xml:lang="pt">documento XML</comment>
+    <comment xml:lang="pt-BR">Documento XML</comment>
+    <comment xml:lang="ro">Document XML</comment>
+    <comment xml:lang="ru">Документ XML</comment>
+    <comment xml:lang="sk">Dokument XML</comment>
+    <comment xml:lang="sl">Dokument XML</comment>
+    <comment xml:lang="sq">Dokument XML</comment>
+    <comment xml:lang="sr">ИксМЛ документ</comment>
+    <comment xml:lang="sv">XML-dokument</comment>
+    <comment xml:lang="tr">XML belgesi</comment>
+    <comment xml:lang="uk">документ XML</comment>
+    <comment xml:lang="vi">Tài liệu XML</comment>
+    <comment xml:lang="zh-CN">XML 文档</comment>
+    <comment xml:lang="zh-TW">XML 文件</comment>
+    <acronym>XML</acronym>
+    <expanded-acronym>eXtensible Markup Language</expanded-acronym>
+    <sub-class-of type="text/plain"/>
+    <generic-icon name="text-html"/>
+    <magic priority="40">
+      <match type="string" value="&lt;?xml" offset="0"/>
+    </magic>
+    <glob pattern="*.xml"/>
+    <glob pattern="*.xbl"/>
+    <glob pattern="*.xsd"/>
+    <glob pattern="*.rng"/>
+    <alias type="text/xml"/>
+  </mime-type>
+  <mime-type type="image/png">
+    <comment>PNG image</comment>
+    <comment xml:lang="af">PNG-beeld</comment>
+    <comment xml:lang="ar">صورة PNG</comment>
+    <comment xml:lang="az">PNG rəsmi</comment>
+    <comment xml:lang="be-Latn">Vyjava PNG</comment>
+    <comment xml:lang="bg">Изображение — PNG</comment>
+    <comment xml:lang="ca">imatge PNG</comment>
+    <comment xml:lang="cs">obrázek PNG</comment>
+    <comment xml:lang="cy">Delwedd PNG</comment>
+    <comment xml:lang="da">PNG-billede</comment>
+    <comment xml:lang="de">PNG-Bild</comment>
+    <comment xml:lang="el">Εικόνα PNG</comment>
+    <comment xml:lang="en-GB">PNG image</comment>
+    <comment xml:lang="eo">PNG-bildo</comment>
+    <comment xml:lang="es">imagen PNG</comment>
+    <comment xml:lang="eu">PNG irudia</comment>
+    <comment xml:lang="fi">PNG-kuva</comment>
+    <comment xml:lang="fo">PNG mynd</comment>
+    <comment xml:lang="fr">image PNG</comment>
+    <comment xml:lang="fur">imagjin PNG</comment>
+    <comment xml:lang="ga">íomhá PNG</comment>
+    <comment xml:lang="gl">imaxe PNG</comment>
+    <comment xml:lang="he">תמונת PNG</comment>
+    <comment xml:lang="hr">PNG slika</comment>
+    <comment xml:lang="hu">PNG-kép</comment>
+    <comment xml:lang="ia">Imagine PNG</comment>
+    <comment xml:lang="id">Citra PNG</comment>
+    <comment xml:lang="it">Immagine PNG</comment>
+    <comment xml:lang="ja">PNG 画像</comment>
+    <comment xml:lang="kk">PNG суреті</comment>
+    <comment xml:lang="ko">PNG 그림</comment>
+    <comment xml:lang="lt">PNG paveikslėlis</comment>
+    <comment xml:lang="lv">PNG attēls</comment>
+    <comment xml:lang="ms">Imej PNG</comment>
+    <comment xml:lang="nb">PNG-bilde</comment>
+    <comment xml:lang="nl">PNG-afbeelding</comment>
+    <comment xml:lang="nn">PNG-bilete</comment>
+    <comment xml:lang="oc">imatge PNG</comment>
+    <comment xml:lang="pl">Obraz PNG</comment>
+    <comment xml:lang="pt">imagem PNG</comment>
+    <comment xml:lang="pt-BR">Imagem PNG</comment>
+    <comment xml:lang="ro">Imagine PNG</comment>
+    <comment xml:lang="ru">Изображение PNG</comment>
+    <comment xml:lang="sk">Obrázok PNG</comment>
+    <comment xml:lang="sl">Slikovna datoteka PNG</comment>
+    <comment xml:lang="sq">Figurë PNG</comment>
+    <comment xml:lang="sr">ПНГ слика</comment>
+    <comment xml:lang="sv">PNG-bild</comment>
+    <comment xml:lang="tr">PNG görüntüsü</comment>
+    <comment xml:lang="uk">зображення PNG</comment>
+    <comment xml:lang="vi">Ảnh PNG</comment>
+    <comment xml:lang="zh-CN">PNG 图像</comment>
+    <comment xml:lang="zh-TW">PNG 影像</comment>
+    <magic priority="50">
+      <match type="string" value="\x89PNG" offset="0"/>
+    </magic>
+    <glob pattern="*.png"/>
+  </mime-type>
+</mime-info>

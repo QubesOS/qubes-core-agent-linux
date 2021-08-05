@@ -1,6 +1,7 @@
 #!/usr/bin/python3 --
 
 import sys, os, pwd
+import qubesdb
 from qubesagent.xdg import launch
 from xdg.BaseDirectory import xdg_data_dirs
 
@@ -10,6 +11,14 @@ def main(argv):
     except ValueError:
         print('This service requires an argument', file=sys.stderr)
         sys.exit(1)
+    qubes_db = qubesdb.QubesDB()
+    if qubes_db.read('/qubes-service/app-dispvm.' + arg) is not None:
+        for bad_var in ('XDG_DATA_HOME', 'GNOME_DESKTOP_SESSION_ID'):
+            try:
+                del os.environ[bad_var]
+            except KeyError:
+                pass
+        os.environ['XDG_DATA_DIRS'] = '/usr/share/qubes/xdg-override'
     for path in xdg_data_dirs:
         subpath = os.path.join(path, 'applications')
         for (raw_volume, directories, files) in os.walk(subpath):
