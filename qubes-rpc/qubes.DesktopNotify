@@ -38,7 +38,7 @@ Notification = namedtuple("Notification", ("app_name", "notification_id", "app_i
                                            "expire_timeout"))
 
 def get_logger():
-    log = logging.getLogger(__name__)
+    log = logging.getLogger("qubes.DesktopNotify")
     #NOTE: stderr is forwarded to the local log & the requesting VM (!!!)
     log.addHandler(logging.StreamHandler(sys.stderr))
     log.setLevel(logging.INFO)
