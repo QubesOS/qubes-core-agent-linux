@@ -31,7 +31,8 @@ install:
 	install -d $(DESTDIR)$(BINDIR)
 	install -t $(DESTDIR)$(BINDIR) \
 		qubes-open \
-		qvm-open-in-dvm qvm-open-in-vm qvm-run-vm qvm-sync-clock
+		qvm-open-in-vm qvm-run-vm qvm-sync-clock
+	ln -s qvm-open-in-vm $(DESTDIR)$(BINDIR)/qvm-open-in-dvm
 	install -t $(DESTDIR)$(BINDIR) qvm-copy
 	ln -s qvm-copy $(DESTDIR)$(BINDIR)/qvm-move-to-vm
 	ln -s qvm-copy $(DESTDIR)$(BINDIR)/qvm-move

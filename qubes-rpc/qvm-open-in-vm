@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh --
 #
 # The Qubes OS Project, http://www.qubes-os.org
 #
@@ -17,41 +17,59 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-#
-#
+
+# lack of -e and -u is intentional
+
+# we use “is this variable set” a lot, and use variables that we haven’t set, so
+# unset these variables first, to ensure that values from the environment don’t
+# cause problems.
+unset qopen_opts target filename seen_dashdash i
 
 usage() {
-	echo "Usage: $0 [--view-only] vmname filename"
-	exit 2
+    case $0 in
+    (qvm-open-in-dvm|*/qvm-open-in-dvm)
+        printf 'Usage: %s [--view-only] [--] filename\n' "$0" >&2
+        ;;
+    (*) printf 'Usage: %s [--view-only] [--] vmname filename\n' "$0";;
+    esac >&2
+    exit "${1-2}"
 }
+case $0 in
+(qvm-open-in-dvm|*/qvm-open-in-dvm) target=@dispvm;;
+(qvm-open-in-vm|*/qvm-open-in-vm) :;;
+(*) printf 'Must be invoked as qvm-open-in-vm or qvm-open-in-dvm, not as %s\n' "$0" >&2
+    exit 2;;
+esac
 
-qopen_opts=
-target=
-filename=
-
-while [ $# -gt 0 ]; do
-    if [ "$1" = "--view-only" ]; then
-        qopen_opts=--view-only
-    elif [ -z "$target" ]; then
-        target="$1"
-    elif [ -z "$filename" ]; then
-        filename="$1"
+for i; do
+    if [ -z "$seen_dashdash" ]; then
+        case $i in
+        (--) seen_dashdash=x; continue;;
+        (--help) usage 0;;
+        (--view-only) qopen_opts=--view-only; continue;;
+        (-*) usage;;
+        esac
+    fi
+    if [ -z "${target+x}" ]; then
+        target="$i"
+    elif [ -z "${filename+x}" ]; then
+        filename="$i"
     else
         usage
     fi
-    shift
 done
+set +u
 
 if [ -z "$target" ] || [ -z "$filename" ]; then
     usage
 fi
 
-case "$filename" in
-	*://*)
-        # shellcheck disable=SC2016
-        exec /usr/lib/qubes/qrexec-client-vm "$target" qubes.OpenURL /bin/sh -c 'printf "%s\n" "$0"; cat >/dev/null' "$filename"
-        ;;
-    *)
-        exec /usr/lib/qubes/qrexec-client-vm "$target" qubes.OpenInVM "/usr/lib/qubes/qopen-in-vm" $qopen_opts "$filename"
-        ;;
-esac
+expr "@$filename" : '@[A-Za-z][A-Za-z0-9+]*://'>/dev/null
+# shellcheck disable=SC2016
+case $? in
+(0) exec /usr/lib/qubes/qrexec-client-vm -- "$target" qubes.OpenURL \
+    /bin/sh -c 'printf %s\\n "$1"; exec cat >/dev/null' sh "$filename";;
+(1) exec /usr/lib/qubes/qrexec-client-vm -- "$target" qubes.OpenInVM \
+    /usr/lib/qubes/qopen-in-vm $qopen_opts -- "$filename";;
+(*) exit "$?";;
+esac >/dev/null 2>&1 </dev/null
