@@ -73,9 +73,18 @@ class FirewallWorker(object):
         """Remove tables/chains - reverse work done by init"""
         raise NotImplementedError
 
-    def apply_rules(self, source_addr, rules):
-        """Apply rules in given source address"""
-        raise NotImplementedError
+    def apply_rules(self, source, rules):
+        if self.is_ip6(source):
+            self.apply_rules_family(source, rules, 6)
+        else:
+            self.apply_rules_family(source, rules, 4)
+
+    def apply_forward_rules(self, source, rules):
+        # what do we check here? 
+        if self.is_ip6(source):
+            self.apply_forward_rules_family(source, rules, 6)
+        else:
+            self.apply_forward_rules_family(source, rules, 4)
 
     def update_connected_ips(self, family):
         raise NotImplementedError
@@ -105,6 +114,14 @@ class FirewallWorker(object):
         if os.path.isfile(user_script_path) and \
                 os.access(user_script_path, os.X_OK):
             subprocess.call([user_script_path])
+
+    def get_phys_interfaces():
+        phys = set()
+        with open('/proc/net/route') as f:
+            routes = f.readlines()[1:]
+        for route in routes:
+            phys.add(route.split('\t')[0])
+        return phys
 
     def read_rules(self, target):
         """Read rules from QubesDB and return them as a list of dicts"""
@@ -137,9 +154,10 @@ class FirewallWorker(object):
         entries = dict(((k.split('/')[3], v.decode())
                         for k, v in entries.items()))
         rules = []
+        last =  False
         if 'last' in entries:
             entries.remove('last')
-            rules.append({'last': True})
+            last = True
         for ruleno, rule in sorted(entries.items()):
             if len(ruleno) != 4 or not ruleno.isdigit():
                 raise RuleParseError(
@@ -148,7 +166,7 @@ class FirewallWorker(object):
             if 'action' not in rule_dict:
                 raise RuleParseError('Rule \'{}\' lack action'.format(rule))
             rules.append(rule_dict)
-        return rules
+        return last, rules
 
     def resolve_dns(self, fqdn, family):
         """
@@ -262,10 +280,9 @@ class FirewallWorker(object):
         self.update_handled(addr)
 
     def handle_forward_addr(self, addr):
-        # TODOTODOTODO
         try:
-            rules = self.read_forward_rules(addr)
-            self.apply_forward_rules(addr, rules)
+            last, rules = self.read_forward_rules(addr)
+            self.apply_forward_rules(addr, rules, last)
         
         except RuleParseError as e:
             self.log_error(
@@ -500,7 +517,7 @@ class IptablesWorker(FirewallWorker):
         iptables += 'COMMIT\n'
         return (iptables, ret_dns)
 
-def prepare_forward_rules(self, chain, rules, family, last=False):
+def prepare_forward_rules(self, chain, rules, family):
         """
         Helper function to translate rules list into input for iptables-restore
 
@@ -603,12 +620,6 @@ def prepare_forward_rules(self, chain, rules, family, last=False):
         except subprocess.CalledProcessError as e:
             raise RuleApplyError('\'iptables -F {}\' failed: {}'.format(
                 chain, e.output))
-
-    def apply_rules(self, source, rules):
-        if self.is_ip6(source):
-            self.apply_rules_family(source, rules, 6)
-        else:
-            self.apply_rules_family(source, rules, 4)
 
     def update_connected_ips(self, family):
         ips = self.get_connected_ips(family)
@@ -987,12 +998,6 @@ class NftablesWorker(FirewallWorker):
         (nft, dns) = self.prepare_rules(chain, rules, family)
         self.run_nft(nft)
         self.update_dns_info(source, dns)
-
-    def apply_rules(self, source, rules):
-        if self.is_ip6(source):
-            self.apply_rules_family(source, rules, 6)
-        else:
-            self.apply_rules_family(source, rules, 4)
 
     def init(self):
         nft_init = (
