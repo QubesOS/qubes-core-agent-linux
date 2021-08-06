@@ -643,6 +643,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.InstallUpdatesGUI
 %config(noreplace) /etc/qubes-rpc/qubes.ResizeDisk
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
+%config(noreplace) /etc/qubes-rpc/qubes.Syslog
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
 %config(noreplace) /etc/qubes-rpc/qubes.TemplateSearch

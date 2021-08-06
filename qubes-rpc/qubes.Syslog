@@ -1,0 +1,152 @@
+#!/usr/bin/env python3
+# vim: fileencoding=utf-8
+#
+# The Qubes OS Project, https://www.qubes-os.org/
+#
+# Copyright (C) 2021
+#                   David Hobach <tripleh@hackingthe.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+'''
+Qrexec service to forward logs to. Useful to forward logs from multiple VMs to
+a single VM.
+
+All logs sent to this service are roughly sanitized and then passed over to the
+configured system logger (usually systemd/journald listening at `/dev/log`
+nowadays).
+
+A single log entry must be UTF-8 encoded and fit on a single line ending with `\n`.
+
+Logs may have any of the following two formats:
+1. [message]       (example: `this is a log entry`)
+2. [PRI] [message] (example: `<165>This is another log entry.`)
+
+[PRI]:     As defined in [RFC3164] and [RFC5424].
+[message]: An arbitrary string without newline. This service removes
+           non-printable characters and truncates messages at 1500 characters.
+
+Please note that the internal message structure is not sanitized. So any receiving
+application should perform its own sanitization, if the message is structured
+further.
+
+For example, a user could deploy the following rsyslog configuration in a sending
+VM at `/etc/rsyslog.d/qubes_syslog.conf` (requires `systemctl restart rsyslog`):
+```
+module(load="omprog")
+
+template(name="qubes_syslog" type="string"
+    string="<%PRI%>%TIMESTAMP:::date-rfc3339% %syslogtag%%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%\n")
+
+ruleset(name="qubes") {
+  action(
+    type="omprog"
+    binary="/usr/sbin/runuser -u user -- /usr/bin/qrexec-client-vm work qubes.Syslog"
+    template="qubes_syslog"
+  )
+}
+
+#apply your filtering here (*.* just forwards all logs)
+*.* call qubes
+```
+
+Users can also e.g. pipe stored log files to a VM via
+`qrexec-client-vm vm qubes.Syslog < /path/to/some/logfile`.
+
+References:
+[RFC3164]: https://datatracker.ietf.org/doc/html/rfc3164
+[RFC5424]: https://datatracker.ietf.org/doc/html/rfc5424
+'''
+
+import io
+import sys
+import os
+import logging
+import syslog
+import re
+import unicodedata
+
+def get_logger():
+    log = logging.getLogger("qubes.Syslog")
+    log.setLevel(logging.INFO)
+    return log
+
+#globals
+LOG = get_logger()
+SEV2SYSLOG = {
+    0: syslog.LOG_EMERG,
+    1: syslog.LOG_ALERT,
+    2: syslog.LOG_CRIT,
+    3: syslog.LOG_ERR,
+    4: syslog.LOG_WARNING,
+    5: syslog.LOG_NOTICE,
+    6: syslog.LOG_INFO,
+    7: syslog.LOG_DEBUG,
+}
+
+def extract_priority(pri):
+    severity = pri % 8
+    return SEV2SYSLOG[severity]
+
+def filter_non_printable(string):
+    ret = []
+    for ch in string:
+        cat = unicodedata.category(ch)
+        if cat[0] == "C":
+            ret += "_"
+        else:
+            ret += ch
+    return ''.join(ret)
+
+def sanitize(untrusted):
+    untr = untrusted.rstrip("\n").rstrip("\r")
+
+    #truncate
+    untr = (untr[:1500] + '..') if len(untr) > 1500 else untr
+
+    m = re.match(r"^<([0-9]{1,3})>.*$", untr)
+    if m:
+        prio = extract_priority(int(m.group(1)))
+    else:
+        prio = syslog.LOG_INFO
+
+    return prio, filter_non_printable(untr)
+
+def handle_untrusted(vm):
+    pid = os.getpid()
+    syslog.openlog(ident=f"qubes.Syslog|{vm}[{pid}]", facility=syslog.LOG_USER)
+
+    input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8")
+    for untrusted_line in input_stream:
+        #NOTE: sys.stdin is text-only in python by default (but might give us byte strings?)
+        if not isinstance(untrusted_line, str):
+            LOG.warning(f"Received non-string content from VM {vm}.")
+            continue
+
+        trusted_prio, trusted_msg = sanitize(untrusted_line)
+        syslog.syslog(trusted_prio, trusted_msg)
+
+    syslog.closelog()
+
+def main():
+    vm = os.environ.get("QREXEC_REMOTE_DOMAIN")
+    if not vm:
+        LOG.error("Failed to identify the source VM.")
+        sys.exit(4)
+    handle_untrusted(vm)
+
+if __name__ == "__main__":
+    main()

@@ -26,6 +26,7 @@ etc/qubes-rpc/qubes.SelectDirectory
 etc/qubes-rpc/qubes.SelectFile
 etc/qubes-rpc/qubes.SetDateTime
 etc/qubes-rpc/qubes.StartApp
+etc/qubes-rpc/qubes.Syslog
 etc/qubes-rpc/qubes.SuspendPost
 etc/qubes-rpc/qubes.SuspendPostAll
 etc/qubes-rpc/qubes.SuspendPre

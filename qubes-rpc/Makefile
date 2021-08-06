@@ -68,6 +68,7 @@ install:
 		qubes.InstallUpdatesGUI \
 		qubes.ResizeDisk \
 		qubes.StartApp \
+		qubes.Syslog \
 		qubes.PostInstall \
 		qubes.GetDate \
 		qubes.ShowInTerminal \
