@@ -38,6 +38,9 @@ Logs may have any of the following two formats:
 [PRI]:     As defined in [RFC3164] and [RFC5424].
 [message]: An arbitrary string without newline. This service removes
            non-printable characters and truncates messages at 1500 characters.
+           By default non-ASCII characters are replaced with question marks.
+           To allow unicode, set QubesDB `/qrexec/allow-unicode` to `True`. This
+           infers security risks with unicode parsing bugs in log viewers.
 
 Please note that the internal message structure is not sanitized. So any receiving
 application should perform its own sanitization, if the message is structured
@@ -78,6 +81,7 @@ import logging
 import syslog
 import re
 import unicodedata
+import qubesdb
 
 def get_logger():
     log = logging.getLogger("qubes.Syslog")
@@ -106,12 +110,12 @@ def filter_non_printable(string):
     for ch in string:
         cat = unicodedata.category(ch)
         if cat[0] == "C":
-            ret += "_"
+            ret += "?"
         else:
             ret += ch
     return ''.join(ret)
 
-def sanitize(untrusted):
+def sanitize(untrusted, allow_unicode=False):
     untr = untrusted.rstrip("\n").rstrip("\r")
 
     #truncate
@@ -123,9 +127,12 @@ def sanitize(untrusted):
     else:
         prio = syslog.LOG_INFO
 
+    if not allow_unicode:
+        untr = untr.encode(encoding="ascii", errors="replace").decode()
+
     return prio, filter_non_printable(untr)
 
-def handle_untrusted(vm):
+def handle_untrusted(vm, allow_unicode=False):
     pid = os.getpid()
     syslog.openlog(ident=f"qubes.Syslog|{vm}[{pid}]", facility=syslog.LOG_USER)
 
@@ -136,7 +143,7 @@ def handle_untrusted(vm):
             LOG.warning(f"Received non-string content from VM {vm}.")
             continue
 
-        trusted_prio, trusted_msg = sanitize(untrusted_line)
+        trusted_prio, trusted_msg = sanitize(untrusted_line, allow_unicode=allow_unicode)
         syslog.syslog(trusted_prio, trusted_msg)
 
     syslog.closelog()
@@ -146,7 +153,11 @@ def main():
     if not vm:
         LOG.error("Failed to identify the source VM.")
         sys.exit(4)
-    handle_untrusted(vm)
+
+    qdb = qubesdb.QubesDB()
+    unicode_str = (qdb.read('/qrexec/allow-unicode') or b'False').decode()
+    allow_unicode = True if unicode_str == "True" else False
+    handle_untrusted(vm, allow_unicode=allow_unicode)
 
 if __name__ == "__main__":
     main()
