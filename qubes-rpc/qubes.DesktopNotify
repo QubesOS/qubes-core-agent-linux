@@ -149,7 +149,7 @@ def parse_notification_id(vm, untrusted):
 def parse_expire_timeout(vm, untrusted):
     return int(regex_sanitize(vm, r"^(\-?[0-9]{1,10})$", untrusted, "expire_timeout"))
 
-def assert_printable(vm, untrusted, max_len, allow_unicode=ALLOW_UNICODE):
+def assert_printable(vm, untrusted, max_len):
     l = len(untrusted)
     if l >= max_len:
         raise ParseException(f"Received content of excessive length ({l} >= {max_len}) from VM {vm}.")
@@ -166,7 +166,7 @@ def assert_printable(vm, untrusted, max_len, allow_unicode=ALLOW_UNICODE):
 
     ret = "".join(ret)
 
-    if not allow_unicode:
+    if not ALLOW_UNICODE:
         ret = ret.encode(encoding="ascii", errors="replace").decode("ascii")
 
     return ret
