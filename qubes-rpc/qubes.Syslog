@@ -129,7 +129,7 @@ def sanitize(untrusted, allow_unicode=False):
         prio = syslog.LOG_INFO
 
     if not allow_unicode:
-        untr = untr.encode(encoding="ascii", errors="replace").decode()
+        untr = untr.encode(encoding="ascii", errors="replace").decode("ascii")
 
     return prio, filter_non_printable(untr)
 
