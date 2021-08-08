@@ -21,6 +21,16 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+'''
+Qrexec service for the notification-forwarder service to receive desktop
+notifications.
+
+Users may set `/qrexec/qubes-desktop-notify/allow-unicode` to `True` to
+allow unicode text in notifications (default: replaced with question marks).
+This may have security implications if the receiving desktop notification
+server has issues with unicode input.
+'''
+
 import sys
 import os
 import logging
@@ -32,6 +42,7 @@ import unicodedata
 import dbus
 import dbus.mainloop.glib
 from gi.repository import GLib
+import qubesdb
 
 Notification = namedtuple("Notification", ("app_name", "notification_id", "app_icon",
                                            "summary", "body", "actions", "hints",
@@ -50,6 +61,7 @@ IDS = dict() #calling notification ID --> our notification ID
 BUS_NAME = "org.freedesktop.Notifications"
 BUS_PATH = "/org/freedesktop/Notifications"
 BUS = None
+ALLOW_UNICODE = False
 
 class ParseException(Exception):
     """ Thrown when untrusted content parsing failed and that content should be dropped/ignored. """
@@ -137,18 +149,27 @@ def parse_notification_id(vm, untrusted):
 def parse_expire_timeout(vm, untrusted):
     return int(regex_sanitize(vm, r"^(\-?[0-9]{1,10})$", untrusted, "expire_timeout"))
 
-def assert_printable(vm, untrusted, max_len):
+def assert_printable(vm, untrusted, max_len, allow_unicode=ALLOW_UNICODE):
     l = len(untrusted)
     if l >= max_len:
         raise ParseException(f"Received content of excessive length ({l} >= {max_len}) from VM {vm}.")
 
+    allowed_chars = set(["\t", "\n", "\r"])
+    ret = []
     for ch in untrusted:
         cat = unicodedata.category(ch)
-        if cat[0] == "C" and cat != "Cc":
+        if cat[0] == "C" and ch not in allowed_chars:
             #https://www.unicode.org/reports/tr44/#GC_Values_Table
-            raise ParseException(f"Received content with {cat} control characters from VM {vm}.")
+            ret += "?"
+        else:
+            ret += ch
 
-    return untrusted
+    ret = "".join(ret)
+
+    if not allow_unicode:
+        ret = ret.encode(encoding="ascii", errors="replace").decode("ascii")
+
+    return ret
 
 def parse_app_name(vm, untrusted):
     return assert_printable(vm, untrusted, 50)
@@ -280,12 +301,17 @@ def set_env():
         os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{uid}/bus")
 
 def main():
+    global ALLOW_UNICODE
     set_env()
 
     vm = os.environ.get("QREXEC_REMOTE_DOMAIN")
     if not vm:
         LOG.error("Failed to identify the source VM.")
         sys.exit(4)
+
+    qdb = qubesdb.QubesDB()
+    unicode_str = (qdb.read('/qrexec/qubes-desktop-notify/allow-unicode') or b'False').decode()
+    ALLOW_UNICODE = True if unicode_str == "True" else False
 
     CloseWatcher().start()
     handle_untrusted(vm)
