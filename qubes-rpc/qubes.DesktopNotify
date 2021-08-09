@@ -131,7 +131,7 @@ def close_notification(trusted_id):
     try:
         our_id = IDS.pop(trusted_id)
     except KeyError:
-        LOG.warning("Received a closed request for a notification that's not in our databse. This is unexpected. Ignoring...")
+        LOG.warning("Ignoring a close request for a notification that is not in our database.")
         return
 
     iface = get_iface()
@@ -310,8 +310,8 @@ def main():
         sys.exit(4)
 
     qdb = qubesdb.QubesDB()
-    unicode_str = (qdb.read('/qrexec/qubes-desktop-notify/allow-unicode') or b'False').decode()
-    ALLOW_UNICODE = True if unicode_str == "True" else False
+    unicode_str = qdb.read('/qrexec/qubes-desktop-notify/allow-unicode')
+    ALLOW_UNICODE = (unicode_str == b"True")
 
     CloseWatcher().start()
     handle_untrusted(vm)
