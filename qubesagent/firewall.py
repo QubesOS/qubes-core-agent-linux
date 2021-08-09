@@ -79,12 +79,12 @@ class FirewallWorker(object):
         else:
             self.apply_rules_family(source, rules, 4)
 
-    def apply_forward_rules(self, source, rules):
+    def apply_forward_rules(self, target, rules, last):
         # what do we check here? 
-        if self.is_ip6(source):
-            self.apply_forward_rules_family(source, rules, 6)
+        if 'src6' in rules:
+            self.apply_forward_rules_family(target, rules, 6, last)
         else:
-            self.apply_forward_rules_family(source, rules, 4)
+            self.apply_forward_rules_family(target, rules, 4, last)
 
     def update_connected_ips(self, family):
         raise NotImplementedError
@@ -150,8 +150,8 @@ class FirewallWorker(object):
         """No policy here since they already are in the forward dict, use first/last flags"""
         entries = self.qdb.multiread('/qubes-firewall-forward/')
         assert isinstance(entries, dict)
-        # drop full path
-        entries = dict(((k.split('/')[3], v.decode())
+        # drop full path but add target ip info
+        entries = dict(((k.split('/')[2] + "/" + k.split('/')[3], v.decode())
                         for k, v in entries.items()))
         rules = []
         last =  False
@@ -517,7 +517,7 @@ class IptablesWorker(FirewallWorker):
         iptables += 'COMMIT\n'
         return (iptables, ret_dns)
 
-def prepare_forward_rules(self, chain, rules, family):
+    def prepare_forward_rules(self, chain, rules, family, last):
         """
         Helper function to translate rules list into input for iptables-restore
 
@@ -601,6 +601,35 @@ def prepare_forward_rules(self, chain, rules, family):
         :param source: source address
         :param rules: rules list
         :param family: address family, either 4 or 6
+        :return: None
+        """
+
+        chain = self.chain_for_addr(source)
+        if chain not in self.chains[family]:
+            self.create_chain(source, chain, family)
+
+        (iptables, dns) = self.prepare_rules(chain, rules, family)
+        try:
+            self.run_ipt(family, ['-F', chain])
+            p = self.run_ipt_restore(family, ['-n'])
+            (output, _) = p.communicate(iptables.encode())
+            if p.returncode != 0:
+                raise RuleApplyError(
+                    'iptables-restore failed: {}'.format(output))
+            self.update_dns_info(source, dns)
+        except subprocess.CalledProcessError as e:
+            raise RuleApplyError('\'iptables -F {}\' failed: {}'.format(
+                chain, e.output))
+
+    def apply_forward_rules_family(self, target, rules, family, last):
+        """
+        Apply forward rules for given target address.
+        Handle only rules for given address family (IPv4 or IPv6).
+
+        :param source: source address
+        :param rules: rules list
+        :param family: address family, either 4 or 6
+        :param last: whether this is the border vm or not
         :return: None
         """
 
