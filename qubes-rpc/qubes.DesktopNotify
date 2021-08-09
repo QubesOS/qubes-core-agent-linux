@@ -33,6 +33,7 @@ server has issues with unicode input.
 
 import sys
 import os
+import io
 import logging
 from collections import namedtuple
 from threading import Thread
@@ -47,6 +48,29 @@ import qubesdb
 Notification = namedtuple("Notification", ("app_name", "notification_id", "app_icon",
                                            "summary", "body", "actions", "hints",
                                            "expire_timeout"))
+
+class MarkerClass:
+    pass
+
+class LimitingTextIOWrapper(io.TextIOWrapper):
+    ''' A TextIOWrapper with a limit on chars to read per line. '''
+
+    def __init__(self, *args, limit=-1, **kwargs):
+        self._limit = limit
+        self._accept = True
+        self.LIMIT_REACHED = MarkerClass()
+        super().__init__(*args, **kwargs)
+
+    def readline(self, size=-1):
+        read = super().readline(self._limit)
+        if not read: #EOF
+            return read
+
+        if self._accept:
+            self._accept = (read[-1] == "\n")
+            return read
+        self._accept = (read[-1] == "\n")
+        return self.LIMIT_REACHED
 
 def get_logger():
     log = logging.getLogger("qubes.DesktopNotify")
@@ -245,12 +269,17 @@ def handle_untrusted_message(vm, untrusted):
 
 def handle_untrusted(vm):
     untrusted = []
-    for untrusted_line in sys.stdin:
+    input_stream = LimitingTextIOWrapper(sys.stdin.buffer, limit=1000)
+    for untrusted_line in input_stream:
+        if untrusted_line == input_stream.LIMIT_REACHED:
+            continue
+
         #NOTE: sys.stdin is text-only in python by default (but might give us byte strings?)
         if not isinstance(untrusted_line, str):
             LOG.warning(f"Received non-string content from VM {vm}.")
             continue
         untrusted_line = untrusted_line.rstrip("\n")
+
         if untrusted_line == "<qrexec>":
             untrusted = []
         elif untrusted_line == "</qrexec>":
