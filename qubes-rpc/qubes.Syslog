@@ -84,6 +84,25 @@ import re
 import unicodedata
 import qubesdb
 
+class LimitingTextIOWrapper(io.TextIOWrapper):
+    ''' A TextIOWrapper with a limit on chars to read per line. '''
+
+    def __init__(self, *args, limit=-1, **kwargs):
+        self._limit = limit
+        self._accept = True
+        super().__init__(*args, **kwargs)
+
+    def readline(self, size=-1):
+        read = super().readline(self._limit)
+        if not read: #EOF
+            return read
+
+        if self._accept:
+            self._accept = (read[-1] == "\n")
+            return read
+        self._accept = (read[-1] == "\n")
+        return "\n"
+
 def get_logger():
     log = logging.getLogger("qubes.Syslog")
     log.setLevel(logging.INFO)
@@ -91,6 +110,7 @@ def get_logger():
 
 #globals
 LOG = get_logger()
+MAX_LINE_SIZE = 1500
 SEV2SYSLOG = {
     0: syslog.LOG_EMERG,
     1: syslog.LOG_ALERT,
@@ -116,12 +136,7 @@ def filter_non_printable(string):
             ret += ch
     return ''.join(ret)
 
-def sanitize(untrusted, allow_unicode=False):
-    untr = untrusted.rstrip("\n").rstrip("\r")
-
-    #truncate
-    untr = (untr[:1500] + '..') if len(untr) > 1500 else untr
-
+def sanitize(untr, allow_unicode=False):
     m = re.match(r"^<([0-9]{1,3})>.*$", untr)
     if m:
         prio = extract_priority(int(m.group(1)))
@@ -137,11 +152,15 @@ def handle_untrusted(vm, allow_unicode=False):
     pid = os.getpid()
     syslog.openlog(ident=f"qubes.Syslog|{vm}[{pid}]", facility=syslog.LOG_USER)
 
-    input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8")
+    input_stream = LimitingTextIOWrapper(sys.stdin.buffer, encoding="utf-8", limit=MAX_LINE_SIZE)
     for untrusted_line in input_stream:
         #NOTE: sys.stdin is text-only in python by default (but might give us byte strings?)
         if not isinstance(untrusted_line, str):
             LOG.warning(f"Received non-string content from VM {vm}.")
+            continue
+
+        untrusted_line = untrusted_line.rstrip("\n")
+        if not untrusted_line:
             continue
 
         trusted_prio, trusted_msg = sanitize(untrusted_line, allow_unicode=allow_unicode)
@@ -157,7 +176,7 @@ def main():
 
     qdb = qubesdb.QubesDB()
     unicode_str = (qdb.read('/qrexec/qubes-syslog/allow-unicode') or b'False').decode()
-    allow_unicode = True if unicode_str == "True" else False
+    allow_unicode = (unicode_str == "True")
     handle_untrusted(vm, allow_unicode=allow_unicode)
 
 if __name__ == "__main__":
