@@ -229,7 +229,7 @@ def parse_app_icon(vm, untrusted):
     if m:
         return m.group(1)
 
-    raise ParseException(f"Received an invalid icon from VM {vm}.")
+    return ""
 
 def parse_summary(vm, untrusted):
     return assert_printable(vm, untrusted, 200)
