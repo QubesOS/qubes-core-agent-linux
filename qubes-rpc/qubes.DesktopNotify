@@ -49,16 +49,13 @@ Notification = namedtuple("Notification", ("app_name", "notification_id", "app_i
                                            "summary", "body", "actions", "hints",
                                            "expire_timeout"))
 
-class MarkerClass:
-    pass
-
 class LimitingTextIOWrapper(io.TextIOWrapper):
     ''' A TextIOWrapper with a limit on chars to read per line. '''
 
-    def __init__(self, *args, limit=-1, **kwargs):
+    def __init__(self, *args, limit=-1, limit_marker="\n", **kwargs):
         self._limit = limit
         self._accept = True
-        self.LIMIT_REACHED = MarkerClass()
+        self.limit_marker = limit_marker
         super().__init__(*args, **kwargs)
 
     def readline(self, size=-1):
@@ -70,7 +67,7 @@ class LimitingTextIOWrapper(io.TextIOWrapper):
             self._accept = (read[-1] == "\n")
             return read
         self._accept = (read[-1] == "\n")
-        return self.LIMIT_REACHED
+        return self.limit_marker
 
 def get_logger():
     log = logging.getLogger("qubes.DesktopNotify")
@@ -273,15 +270,16 @@ def handle_untrusted_message(vm, untrusted):
 
 def handle_untrusted(vm):
     untrusted = []
-    input_stream = LimitingTextIOWrapper(sys.stdin.buffer, limit=1000)
+    input_stream = LimitingTextIOWrapper(sys.stdin.buffer, limit=1000, limit_marker="\r")
     for untrusted_line in input_stream:
-        if untrusted_line == input_stream.LIMIT_REACHED:
-            continue
-
         #NOTE: sys.stdin is text-only in python by default (but might give us byte strings?)
         if not isinstance(untrusted_line, str):
             LOG.warning(f"Received non-string content from VM {vm}.")
             continue
+
+        if untrusted_line == input_stream.limit_marker:
+            continue
+
         untrusted_line = untrusted_line.rstrip("\n")
 
         if untrusted_line == "<qrexec>":
