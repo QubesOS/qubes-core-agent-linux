@@ -216,6 +216,10 @@ def parse_app_icon(vm, untrusted):
         if "/tmp/" in untrusted_path:
             return ""
 
+        real_path = os.path.realpath(untrusted_path)
+        if untrusted_path != real_path:
+            raise ParseException(f"The VM {vm} sent us a non-canonical file path for a notification icon. Attempted directory traversal attack?!")
+
         try:
             with open(untrusted_path):
                 pass
