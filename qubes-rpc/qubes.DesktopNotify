@@ -175,9 +175,13 @@ def assert_printable(vm, untrusted, max_len):
     if l >= max_len:
         raise ParseException(f"Received content of excessive length ({l} >= {max_len}) from VM {vm}.")
 
+    untr = untrusted
+    if not ALLOW_UNICODE:
+        untr = untr.encode(encoding="ascii", errors="replace").decode("ascii")
+
     allowed_chars = set(["\t", "\n", "\r"])
     ret = []
-    for ch in untrusted:
+    for ch in untr:
         cat = unicodedata.category(ch)
         if cat[0] == "C" and ch not in allowed_chars:
             #https://www.unicode.org/reports/tr44/#GC_Values_Table
@@ -185,12 +189,7 @@ def assert_printable(vm, untrusted, max_len):
         else:
             ret += ch
 
-    ret = "".join(ret)
-
-    if not ALLOW_UNICODE:
-        ret = ret.encode(encoding="ascii", errors="replace").decode("ascii")
-
-    return ret
+    return "".join(ret)
 
 def parse_app_name(vm, untrusted):
     return assert_printable(vm, untrusted, 50)
@@ -232,11 +231,18 @@ def parse_app_icon(vm, untrusted):
 
     return ""
 
+def strip_markup(untrusted):
+    return re.sub(r"<[^>]*>", "", untrusted)
+
 def parse_summary(vm, untrusted):
     return assert_printable(vm, untrusted, 200)
 
 def parse_body(vm, untrusted):
-    return assert_printable(vm, untrusted, 1000)
+    #NOTE: According to the spec desktop notification servers should only expect markup in
+    #      the body. It is also designed to be easily removed, i.e. only non-conforming clients
+    #      should cause issues when it is removed by us (as we don't trust the server
+    #      implementation to handle markup correctly).
+    return strip_markup(assert_printable(vm, untrusted, 1000))
 
 def handle_untrusted_notification(vm, untrusted):
     if len(untrusted) >= 6 and len(untrusted) < 20:

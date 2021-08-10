@@ -128,17 +128,26 @@ class QrexecWorker(Thread):
         else:
             self.log.error("Unexpected command sent to QrexecWorker.")
 
-    def get_icon(self, notification):
-        icon = notification.app_icon
-        if not icon:
-            icon = notification.hints.get("image-path")
+    def test_icon(self, icon):
+        if not isinstance(icon, str):
+            return ""
 
-        if isinstance(icon, str) and \
-          not "/tmp/" in icon and not "\n" in icon:
-            #only forward image-path to non-temporary locations as
-            #those might exist in the other VM as well
+        #only forward icons that the receiver might be able to use
+        #(regexes copied from qubes.DesktopNotify code)
+        if re.match(r"^file://(/usr/share/[^\0]+\.(?:png|svg|gif))$", icon) \
+        and not "/tmp/" in icon:
             return icon
+        if re.match(r"^([a-z\-]{0,30})$", icon):
+            return icon
+
         return ""
+
+    def get_icon(self, notification):
+        #standard says: image-path has preference
+        icon = self.test_icon(notification.hints.get("image-path"))
+        if icon:
+            return icon
+        return self.test_icon(notification.app_icon)
 
 class NotificationForwarder(dbus.service.Object):
     """
@@ -291,7 +300,7 @@ class NotificationForwarder(dbus.service.Object):
         # We cannot handle actions as they require a backchannel which might not be so wise having from
         # a security point of view. So we handle those locally.
         #
-        # In the future it might be worth loading user-based policies for this decision.
+        # In the future it might be worth letting the user decide per notification via some config files.
         actions = notification.actions
         if not actions:
             return True
@@ -334,6 +343,8 @@ class NotificationForwarder(dbus.service.Object):
     def allocate_id(self):
         """ Allocate a new notification ID. """
         self._id += 1
+        if self._id > 2**31:
+            self._id = 1
         return self._id
 
     def update_id(self, server_id, local_id):
