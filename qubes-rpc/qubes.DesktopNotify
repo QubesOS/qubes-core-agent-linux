@@ -91,7 +91,7 @@ class ParseException(Exception):
         iface = get_iface()
         iface.Notify("qubes.DesktopNotify", 0, "", "Notification dropped.", msg, [], {}, 5000,
                      signature="susssasa{sv}i")
-        super().__init__()
+        super().__init__(msg)
 
 def get_iface():
     global BUS
