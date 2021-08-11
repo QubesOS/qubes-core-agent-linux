@@ -232,7 +232,9 @@ def parse_app_icon(vm, untrusted):
     return ""
 
 def strip_markup(untrusted):
-    return re.sub(r"<[^>]*>", "", untrusted)
+    ret = re.sub(r"<[^>]*>", "", untrusted)
+    ret = re.sub(r"[<>]+", "", ret)
+    return re.sub(r"&[^\s]+;", "", ret) #HTML entities
 
 def parse_summary(vm, untrusted):
     return assert_printable(vm, untrusted, 200)
