@@ -26,10 +26,12 @@ import signal as ossignal
 import sys
 import logging
 import re
+import time
 import subprocess
 import pwd
 from collections import namedtuple
 import argparse
+import traceback
 from threading import Thread
 from queue import Queue
 import dbus
@@ -66,6 +68,13 @@ def remove_newlines(txt, replace=" "):
 Notification = namedtuple("Notification", ("app_name", "notification_id", "app_icon",
                                            "summary", "body", "actions", "hints",
                                            "expire_timeout"))
+
+class WorkerDiedException(Exception):
+    pass
+
+class IdleTimeoutException(Exception):
+    def __init__(self):
+        super().__init__("Idle timeout. Exiting...")
 
 class QrexecWorker(Thread):
     """ Processes incoming qrexec signals synchronously in the order that they come. """
@@ -178,11 +187,14 @@ class NotificationForwarder(dbus.service.Object):
         [3] https://lazka.github.io/pgi-docs/
     """
 
-    def __init__(self, notification_vm, private_dbus_address, verbose=False, local_mode=False, force_mode=False):
+    def __init__(self, notification_vm, private_dbus_address, verbose=False, local_mode=False, force_mode=False, exit_idle=False):
         self._id = 0 #: current server notification ID
         self.notification_vm = notification_vm
         self.local_mode = local_mode
         self.force_mode = force_mode
+        self.exit_idle = exit_idle
+        self.default_expiry = 10000 #: time in ms after which a notification is considered expired (if not specified by the user)
+        self.busy_until = -1 #: unix timestamp until which the forwarder is busy
         self.log = get_logger("qubes-notification-forwarder", verbose)
 
         self.server2local_id = dict() #: server notification ID --> local client ID
@@ -205,6 +217,10 @@ class NotificationForwarder(dbus.service.Object):
         self.qrexec_worker.start()
 
         bus_name = dbus.service.BusName(bn, bus=dbus.SessionBus())
+
+        if self.exit_idle:
+            self.mark_busy(30000)
+            GLib.timeout_add(1000, self.exit_if_idle)
         super().__init__(bus_name, path)
 
     @property
@@ -237,8 +253,26 @@ class NotificationForwarder(dbus.service.Object):
         if worker.is_alive():
             queue.put(content, timeout=5)
         else:
-            self.log.error(f"{worker.__class__.__name__} dead. Exiting...")
-            sys.exit(2)
+            raise WorkerDiedException(f"{worker.__class__.__name__} dead. Exiting...")
+
+    def mark_busy(self, timeout):
+        ''' Mark us as busy for the given time in ms. '''
+        if self.exit_idle:
+            t = timeout
+            if not t or t < 1:
+                t = self.default_expiry
+            now = int(time.time())
+            t = int(t / 1000) +1
+            busy_until = now + t
+            if self.busy_until < busy_until:
+                self.busy_until = busy_until
+
+    def exit_if_idle(self):
+        now = int(time.time())
+        self.log.debug(f"Checking idle status at {now}. We're busy until {self.busy_until}.")
+        if now > self.busy_until:
+            raise IdleTimeoutException()
+        return True
 
     def schedule_qrexec(self, content):
         return self.schedule(self.qrexec_worker, self.qrexec_queue, content)
@@ -287,6 +321,7 @@ class NotificationForwarder(dbus.service.Object):
                                          signature="susssasa{sv}i")
             self.update_id(server_id, local_id)
 
+        self.mark_busy(expire_timeout)
         return server_id
 
     def should_forward(self, notification):
@@ -335,7 +370,7 @@ class NotificationForwarder(dbus.service.Object):
         #schedule close signal
         expire = notification.expire_timeout
         if not expire or expire < 1:
-            expire = 10000
+            expire = self.default_expiry
         GLib.timeout_add(expire, lambda: self.NotificationClosed(ret_id, 2) and False)
 
         return ret_id
@@ -423,9 +458,11 @@ class NotificationForwarder(dbus.service.Object):
 def parse_args():
     parser = argparse.ArgumentParser(description="Daemon to selectively forward desktop notifications to another VM.")
     parser.add_argument("-v", help="Verbose logging.", action="store_true")
+    parser.add_argument("-x", help="Exit the forwarder when it becomes idle.", action="store_true")
     parser.add_argument("-L", help="Local mode: Handle all notifications locally. Useful for debugging.", action="store_true")
     parser.add_argument("-F", help="Force mode: Forward all notifications. Overrides -L. This may cause usability issues.", action="store_true")
     parser.add_argument("--target", help="Target VM to forward notifications to (default: read from QubesDB /desktop-notification-target).")
+    parser.add_argument("--dbus-address", help="Full address of a dedicated dbus instance to be used exclusively by the forwarder (default: start a new dbus instance). Do not use the default user session bus here!")
     return parser.parse_args()
 
 def set_env(qdb):
@@ -438,6 +475,12 @@ def set_env(qdb):
         except KeyError:
             uid = 1000
         os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{uid}/bus")
+
+def glib_error_handler(logger, pid, etype, val, tb):
+    logger.warning("\n".join(traceback.format_exception(etype, val, tb)))
+    if pid:
+        os.kill(pid, ossignal.SIGTERM)
+    sys.exit(1)
 
 def main():
     args = parse_args()
@@ -456,13 +499,14 @@ def main():
     if notification_vm and notification_vm != vm:
         # Trick: We keep the previously running notification server by launching a private
         # dbus instance before launching our own notification server.
-        paddr, ppid = launch_private_dbus()
-        logger.info(f"Launched private dbus. PID: {ppid}, Address: {paddr}")
-        try:
-            NotificationForwarder(notification_vm, paddr, verbose=args.v, local_mode=args.L, force_mode=args.F).run()
-        except:
-            os.kill(ppid, ossignal.SIGTERM)
-            raise
+        paddr = args.dbus_address
+        ppid = None
+        if not paddr:
+            paddr, ppid = launch_private_dbus()
+            logger.info(f"Launched private dbus. PID: {ppid}, Address: {paddr}")
+
+        sys.excepthook = lambda e, v, t: glib_error_handler(logger, ppid, e, v, t) #for some reason GLib otherwise ignores Exceptions / hangs
+        NotificationForwarder(notification_vm, paddr, verbose=args.v, local_mode=args.L, force_mode=args.F, exit_idle=args.x).run()
     else:
         logger.info("Configured to not be used in this VM. Exiting...")
 
