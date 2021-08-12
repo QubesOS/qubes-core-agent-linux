@@ -49,9 +49,9 @@ def get_logger(name, verbose=False):
         log.setLevel(logging.INFO)
     return log
 
-def launch_private_dbus():
+def launch_private_dbus(launch_script):
     """ Launch a private dbus instance. """
-    out = subprocess.check_output(["dbus-launch"]).decode()
+    out = subprocess.check_output(["sudo", launch_script]).decode()
     for line in out.strip().split("\n"):
         key, _, value = line.partition("=")
         if key == "DBUS_SESSION_BUS_ADDRESS":
@@ -477,7 +477,11 @@ def set_env(qdb):
         os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{uid}/bus")
 
 def glib_error_handler(logger, pid, etype, val, tb):
-    logger.warning("\n".join(traceback.format_exception(etype, val, tb)))
+    if isinstance(val, IdleTimeoutException):
+        logger.info("Idle timeout. Exiting...")
+    else:
+        logger.error("\n".join(traceback.format_exception(etype, val, tb)))
+
     if pid:
         os.kill(pid, ossignal.SIGTERM)
     sys.exit(1)
@@ -502,7 +506,8 @@ def main():
         paddr = args.dbus_address
         ppid = None
         if not paddr:
-            paddr, ppid = launch_private_dbus()
+            launch_script = sys.path[0] + '/private-dbus/launch-private-dbus'
+            paddr, ppid = launch_private_dbus(launch_script)
             logger.info(f"Launched private dbus. PID: {ppid}, Address: {paddr}")
 
         sys.excepthook = lambda e, v, t: glib_error_handler(logger, ppid, e, v, t) #for some reason GLib otherwise ignores Exceptions / hangs
