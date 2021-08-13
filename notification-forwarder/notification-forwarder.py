@@ -182,17 +182,19 @@ class NotificationForwarder(dbus.service.Object):
     local desktop notification server handle all notifications.
 
     References:
-        [1] https://developer.gnome.org/notification-spec/
+        [1] https://specifications.freedesktop.org/notification-spec/latest/
         [2] https://dbus.freedesktop.org/doc/dbus-python/
         [3] https://lazka.github.io/pgi-docs/
     """
 
-    def __init__(self, notification_vm, private_dbus_address, verbose=False, local_mode=False, force_mode=False, exit_idle=False):
+    def __init__(self, notification_vm, verbose=False, local_mode=False, force_mode=False, exit_idle=False, private_bus_address=None):
         self._id = 0 #: current server notification ID
         self.notification_vm = notification_vm
+        self.verbose = verbose
         self.local_mode = local_mode
         self.force_mode = force_mode
         self.exit_idle = exit_idle
+        self.private_bus_address = private_bus_address
         self.default_expiry = 10000 #: time in ms after which a notification is considered expired (if not specified by the user)
         self.busy_until = -1 #: unix timestamp until which the forwarder is busy
         self.log = get_logger("qubes-notification-forwarder", verbose)
@@ -200,22 +202,16 @@ class NotificationForwarder(dbus.service.Object):
         self.server2local_id = dict() #: server notification ID --> local client ID
         self.local2server_id = dict() #: local client ID --> server notification ID
 
-        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        #initialized only when needed:
+        self._qrexec_worker = None
+        self._qrexec_queue = None
+        self._private_bus = None
+        self.private_bus_pid = None
 
-        self.private_bus = dbus.bus.BusConnection(private_dbus_address)
-
-        #signal handling
         bn = "org.freedesktop.Notifications"
         path = "/org/freedesktop/Notifications"
-        self.private_bus.add_signal_receiver(self.on_local_closed, signal_name="NotificationClosed", bus_name=bn, path=path)
-        self.private_bus.add_signal_receiver(self.on_local_action, signal_name="ActionInvoked", bus_name=bn, path=path)
 
-        self.capabilities = self.iface.GetCapabilities()
-
-        self.qrexec_queue = Queue(100)
-        self.qrexec_worker = QrexecWorker(self.qrexec_queue, notification_vm, verbose=verbose)
-        self.qrexec_worker.start()
-
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus_name = dbus.service.BusName(bn, bus=dbus.SessionBus())
 
         if self.exit_idle:
@@ -246,6 +242,23 @@ class NotificationForwarder(dbus.service.Object):
         proxy = self.private_bus.get_object("org.freedesktop.Notifications", "/org/freedesktop/Notifications")
         return dbus.Interface(proxy, "org.freedesktop.Notifications")
 
+    @property
+    def private_bus(self):
+        if not self._private_bus:
+            if not self.private_bus_address:
+                launch_script = sys.path[0] + '/private-dbus/launch-private-dbus'
+                self.private_bus_address, self.private_bus_pid = launch_private_dbus(launch_script)
+                self.log.info(f"Launched private dbus. PID: {self.private_bus_pid}, Address: {self.private_bus_address}")
+
+            self._private_bus = dbus.bus.BusConnection(self.private_bus_address)
+
+            #signal handling
+            bn = "org.freedesktop.Notifications"
+            path = "/org/freedesktop/Notifications"
+            self._private_bus.add_signal_receiver(self.on_local_closed, signal_name="NotificationClosed", bus_name=bn, path=path)
+            self._private_bus.add_signal_receiver(self.on_local_action, signal_name="ActionInvoked", bus_name=bn, path=path)
+        return self._private_bus
+
     def run(self):
         GLib.MainLoop().run()
 
@@ -275,14 +288,18 @@ class NotificationForwarder(dbus.service.Object):
         return True
 
     def schedule_qrexec(self, content):
-        return self.schedule(self.qrexec_worker, self.qrexec_queue, content)
+        if not self._qrexec_worker:
+            self._qrexec_queue = Queue(100)
+            self._qrexec_worker = QrexecWorker(self._qrexec_queue, self.notification_vm, verbose=self.verbose)
+            self._qrexec_worker.start()
+
+        return self.schedule(self._qrexec_worker, self._qrexec_queue, content)
 
     @dbus.service.method("org.freedesktop.Notifications", in_signature="",
                          out_signature="as")
     def GetCapabilities(self):
-        #always handle locally
         self.log.debug("GetCapabilities")
-        return self.capabilities
+        return ["actions", "body", "icon-static"]
 
     @dbus.service.method("org.freedesktop.Notifications",
                          in_signature="susssasa{sv}i",
@@ -476,19 +493,22 @@ def set_env(qdb):
             uid = 1000
         os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{uid}/bus")
 
-def glib_error_handler(logger, pid, etype, val, tb):
+def glib_error_handler(logger, forwarder, etype, val, tb):
     if isinstance(val, IdleTimeoutException):
         logger.info("Idle timeout. Exiting...")
+        ecode = 0
     else:
         logger.error("\n".join(traceback.format_exception(etype, val, tb)))
+        ecode = 1
 
-    if pid:
-        os.kill(pid, ossignal.SIGTERM)
-    sys.exit(1)
+    if forwarder.private_bus_pid:
+        logger.debug(f"Terminating {forwarder.private_bus_pid}...")
+        os.kill(forwarder.private_bus_pid, ossignal.SIGTERM)
+    sys.exit(ecode)
 
 def main():
     args = parse_args()
-    logger = get_logger("notification-forwarder")
+    logger = get_logger("notification-forwarder", verbose=args.v)
 
     qdb = qubesdb.QubesDB()
     set_env(qdb)
@@ -501,23 +521,13 @@ def main():
     vm = qdb.read("/name").decode()
 
     if notification_vm and notification_vm != vm:
-        # Trick: We keep the previously running notification server by launching a private
-        # dbus instance before launching our own notification server.
-        paddr = args.dbus_address
-        ppid = None
-        if not paddr:
-            launch_script = sys.path[0] + '/private-dbus/launch-private-dbus'
-            paddr, ppid = launch_private_dbus(launch_script)
-            logger.info(f"Launched private dbus. PID: {ppid}, Address: {paddr}")
-
-        sys.excepthook = lambda e, v, t: glib_error_handler(logger, ppid, e, v, t) #for some reason GLib otherwise ignores Exceptions / hangs
-        NotificationForwarder(notification_vm, paddr, verbose=args.v, local_mode=args.L, force_mode=args.F, exit_idle=args.x).run()
+        forwarder = NotificationForwarder(notification_vm, verbose=args.v, local_mode=args.L, force_mode=args.F, exit_idle=args.x,
+                                          private_bus_address=args.dbus_address)
+        sys.excepthook = lambda e, v, t: glib_error_handler(logger, forwarder, e, v, t) #for some reason GLib otherwise ignores Exceptions / hangs
+        forwarder.run()
     else:
         logger.info("Configured to not be used in this VM. Exiting...")
 
-    # Use the default locally running notification handler (usually the
-    # mate-notification-daemon) otherwise. This is required in the receiving VM to
-    # avoid loops and can also be employed by users to opt out of the functionality.
     sys.exit(0)
 
 if __name__ == "__main__":
