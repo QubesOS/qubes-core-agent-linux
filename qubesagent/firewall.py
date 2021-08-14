@@ -560,14 +560,14 @@ class IptablesWorker(FirewallWorker):
             if 'proto' in rule:
                 protos = [rule['proto']]
             else:
-                protos = None
+                protos = ['tcp', 'udp']
 
             if 'src4' in rule:
-                srchosts = [rule['src4']]
+                srchost = [rule['src4']]
             elif 'src6' in rule:
-                srchosts = [rule['src6']]
+                srchost = [rule['src6']]
             else:
-                srchosts = None
+                raise RuleParseError('src4/src6 is mandatory for forward rules')
 
             # dsthost here is added automatically in the previous functions
             # it is always a /32
@@ -578,44 +578,73 @@ class IptablesWorker(FirewallWorker):
             else:
                 dsthost = None
 
-            if 'dstports' in rule:
-                dstports = rule['dstports'].replace('-', ':')
-            else:
-                dstports = None
-
-            # srcports cannot be a range
-            # a single port can be redirected to multiple ports, but not vice versa
             if 'srcports' in rule:
                 srcports = rule['srcports'].replace('-', ':')
             else:
-                srcports = None
+                raise RuleParseError('srcports is mandatory for forward rules')
 
-            # make them iterable
-            if protos is None:
-                protos = [None]
-            if srchosts is None:
-                srchosts = [None]
+            # dstports cannot be a range
+            # a single port can be redirected to multiple ports, but not vice versa
+            if 'dstports' in rule:
+                if rule['dstports'].split('-')[0] !=  rule['dstports'].split('-')[1]:
+                    raise RuleParseError('dstports must be a single port')
+                dstport = rule['dstports'].split('-')[0]
+            else:
+                raise RuleParseError('dstports is mandatory for forward rules')
 
             if rule['action'] != 'forward':
                 raise RuleParseError(
                     'Invalid rule action {}'.format(rule['action']))
 
+            if rule['last']:
+                interfaces = self.get_phys_interfaces()
+                if len(intarfaces) < 1:
+                    raise RuleApplyError('There are no external interfaces available')
+                for iface in sorted(interfaces):
+                    for proto in sorted(protos):
+                        # first rule
+                        ipt_rule =  ' -t NAT'
+                        ipt_rule += ' -a PREROUTING'
+                        ipt_rule += ' -i {}'.format(iface)
+                        if proto is not None:
+                            ipt_rule += ' -p {}'.format(proto)
+                        if srcports is none None:
+                            ipt_rule += ' --dport {}'.format(srcports)
+                        ipt_rule += ' -j DNAT'
+                        if dsthost is not None:
+                            ipt_rule += ' --to-destination {}\n'.format(dsthost)
+                        iptables += ipt_rule
+
+                        # second rule
+                        ipt_rule =  ' -I FORWARD'
+                        ipt_rule += ' -i {}'.format(iface)
+                        if dsthost is not None:
+                            ipt_rule += ' -d {}'.format(dsthost)
+                        if proto is not None:
+                            ipt_rule += ' -p {}'.format(proto)
+                        if srcports is none None:
+                            ipt_rule += ' --dport {}'.format(srcports)
+                        ipt_rule += ' -m conntrack'
+                        ipt_rule += ' --cstate NEW'
+                        ipt_rule += ' -j ACCEPT\n'
+                        iptables += ipt_rule
+
+'''
             # sorting here is only to ease writing tests
             for proto in sorted(protos):
-                for dstport in sorted(dstports):
-                    ipt_rule = '-A {}'.format(chain)
-                    if dsthost is not None:
-                        ipt_rule += ' -d {}'.format(dsthost)
-                    if proto is not None:
-                        ipt_rule += ' -p {}'.format(proto)
-                    if dstports is not None:
-                        ipt_rule += ' --dport {}'.format(dstports)
-                    ipt_rule += ' -j {}\n'.format(action)
-                    iptables += ipt_rule
-    
+                ipt_rule = 
+                if dsthost is not None:
+                    ipt_rule += ' -d {}'.format(dsthost)
+                if proto is not None:
+                    ipt_rule += ' -p {}'.format(proto)
+                if dstports is not None:
+                    ipt_rule += ' --dport {}'.format(dstports)
+                ipt_rule += ' -j {}\n'.format(action)
+                iptables += ipt_rule
+    '''
 
         iptables += 'COMMIT\n'
-        return (iptables, ret_dns)
+        return iptables
 
     def apply_rules_family(self, source, rules, family):
         """
