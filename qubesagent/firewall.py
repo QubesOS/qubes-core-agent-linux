@@ -81,7 +81,7 @@ class FirewallWorker(object):
 
     def apply_forward_rules(self, target, rules, last):
         # what do we check here? 
-        if 'src6' in rules:
+        if self.is_ip6(target):
             self.apply_forward_rules_family(target, rules, 6, last)
         else:
             self.apply_forward_rules_family(target, rules, 4, last)
@@ -158,15 +158,24 @@ class FirewallWorker(object):
         if 'last' in entries:
             entries.remove('last')
             last = True
-        for ruleno, rule in sorted(entries.items()):
+        for rulename, rule in sorted(entries.items()):
+            ruleno = rulename.split('/')[1]
+            ruletarget = rulename.split('/')[0]
             if len(ruleno) != 4 or not ruleno.isdigit():
                 raise RuleParseError(
                     'Unexpected non-rule found: {}={}'.format(ruleno, rule))
             rule_dict = dict(elem.split('=') for elem in rule.split(' '))
             if 'action' not in rule_dict:
                 raise RuleParseError('Rule \'{}\' lack action'.format(rule))
+            if self.is_ip6(ruletarget):
+                rule_dict['dst6'] = ruletarget
+            else:
+                rule_dict['dst4'] = ruletarget
+            rule_dict['last'] = last
+            if ('dst4' in rule_dict and 'src6' in rule_dict) or ('dst6' in rule_dict and 'src4' in rule_dict):
+                raise RuleParseError('It is not possible to mix IPv4 and IPv6 Networking')
             rules.append(rule_dict)
-        return last, rules
+        return rules
 
     def resolve_dns(self, fqdn, family):
         """
@@ -281,8 +290,8 @@ class FirewallWorker(object):
 
     def handle_forward_addr(self, addr):
         try:
-            last, rules = self.read_forward_rules(addr)
-            self.apply_forward_rules(addr, rules, last)
+            rules = self.read_forward_rules(addr)
+            self.apply_forward_rules(addr, rules)
         
         except RuleParseError as e:
             self.log_error(
@@ -355,8 +364,8 @@ class IptablesWorker(FirewallWorker):
     supported_rule_opts = ['action', 'proto', 'dst4', 'dst6', 'dsthost',
                            'dstports', 'specialtarget', 'icmptype']
 
-    supported_forward_rule_opts = ['action', 'proto', 'src4', 'src6', 'srcports',
-                           'dstports', 'forwardtype']
+    supported_forward_rule_opts = ['action', 'proto', 'src4', 'src6', 'dst4', 'dst6',
+                           'srcports', 'dstports', 'forwardtype']
 
     def __init__(self):
         super(IptablesWorker, self).__init__()
@@ -517,7 +526,7 @@ class IptablesWorker(FirewallWorker):
         iptables += 'COMMIT\n'
         return (iptables, ret_dns)
 
-    def prepare_forward_rules(self, chain, rules, family, last):
+    def prepare_forward_rules(self, chain, rules, family):
         """
         Helper function to translate rules list into input for iptables-restore
 
@@ -540,9 +549,13 @@ class IptablesWorker(FirewallWorker):
                 raise RuleParseError(
                     'Unsupported forward rule option(s): {!s}'.format(unsupported_opts))
             if 'src4' in rule and family == 6:
-                raise RuleParseError('IPv4 rule found for IPv6 address')
+                raise RuleParseError('dst4 rule found for IPv6 address')
             if 'src6' in rule and family == 4:
                 raise RuleParseError('src6 rule found for IPv4 address')
+            if 'dst4' in rule and family == 6:
+                raise RuleParseError('dst4 rule found for IPv6 address')
+            if 'dst6' in rule and family == 4:
+                raise RuleParseError('dst6 rule found for IPv4 address')
 
             if 'proto' in rule:
                 protos = [rule['proto']]
@@ -556,11 +569,22 @@ class IptablesWorker(FirewallWorker):
             else:
                 srchosts = None
 
+            # dsthost here is added automatically in the previous functions
+            # it is always a /32
+            if 'dst4' in rule:
+                dsthost = [rule['dst4']]
+            elif 'dst6' in rule:
+                dsthost = [rule['dst6']]
+            else:
+                dsthost = None
+
             if 'dstports' in rule:
                 dstports = rule['dstports'].replace('-', ':')
             else:
                 dstports = None
 
+            # srcports cannot be a range
+            # a single port can be redirected to multiple ports, but not vice versa
             if 'srcports' in rule:
                 srcports = rule['srcports'].replace('-', ':')
             else:
@@ -621,7 +645,7 @@ class IptablesWorker(FirewallWorker):
             raise RuleApplyError('\'iptables -F {}\' failed: {}'.format(
                 chain, e.output))
 
-    def apply_forward_rules_family(self, target, rules, family, last):
+    def apply_forward_rules_family(self, target, rules, family):
         """
         Apply forward rules for given target address.
         Handle only rules for given address family (IPv4 or IPv6).
@@ -637,7 +661,7 @@ class IptablesWorker(FirewallWorker):
         if chain not in self.chains[family]:
             self.create_chain(source, chain, family)
 
-        (iptables, dns) = self.prepare_rules(chain, rules, family)
+        iptables = self.prepare_forward_rules(chain, rules, family)
         try:
             self.run_ipt(family, ['-F', chain])
             p = self.run_ipt_restore(family, ['-n'])
@@ -645,7 +669,6 @@ class IptablesWorker(FirewallWorker):
             if p.returncode != 0:
                 raise RuleApplyError(
                     'iptables-restore failed: {}'.format(output))
-            self.update_dns_info(source, dns)
         except subprocess.CalledProcessError as e:
             raise RuleApplyError('\'iptables -F {}\' failed: {}'.format(
                 chain, e.output))
@@ -716,8 +739,8 @@ class NftablesWorker(FirewallWorker):
     supported_rule_opts = ['action', 'proto', 'dst4', 'dst6', 'dsthost',
                            'dstports', 'specialtarget', 'icmptype']
 
-    supported_forward_rule_opts = ['action', 'proto', 'src4', 'src6', 'srcports',
-                           'dstports', 'forwardtype']
+    supported_forward_rule_opts = ['action', 'proto', 'src4', 'src6', 'dst4'. 'dst6', 
+                            'srcports', 'dstports', 'forwardtype']
 
     def __init__(self):
         super(NftablesWorker, self).__init__()
