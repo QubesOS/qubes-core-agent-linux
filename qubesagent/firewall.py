@@ -159,8 +159,8 @@ class FirewallWorker(object):
             entries.remove('last')
             last = True
         for rulename, rule in sorted(entries.items()):
-            ruleno = rulename.split('/')[1]
-            ruletarget = rulename.split('/')[0]
+            ruleno = rulename.split('/')[2]
+            ruletarget = rulename.split('/')[1]
             if len(ruleno) != 4 or not ruleno.isdigit():
                 raise RuleParseError(
                     'Unexpected non-rule found: {}={}'.format(ruleno, rule))
@@ -608,7 +608,7 @@ class IptablesWorker(FirewallWorker):
                         ipt_rule += ' -i {}'.format(iface)
                         if proto is not None:
                             ipt_rule += ' -p {}'.format(proto)
-                        if srcports is none None:
+                        if srcports is None:
                             ipt_rule += ' --dport {}'.format(srcports)
                         ipt_rule += ' -j DNAT'
                         if dsthost is not None:
@@ -622,7 +622,7 @@ class IptablesWorker(FirewallWorker):
                             ipt_rule += ' -d {}'.format(dsthost)
                         if proto is not None:
                             ipt_rule += ' -p {}'.format(proto)
-                        if srcports is none None:
+                        if srcports is None:
                             ipt_rule += ' --dport {}'.format(srcports)
                         ipt_rule += ' -m conntrack'
                         ipt_rule += ' --cstate NEW'
@@ -641,8 +641,7 @@ class IptablesWorker(FirewallWorker):
                     ipt_rule += ' --dport {}'.format(dstports)
                 ipt_rule += ' -j {}\n'.format(action)
                 iptables += ipt_rule
-    '''
-
+'''
         iptables += 'COMMIT\n'
         return iptables
 
@@ -768,7 +767,7 @@ class NftablesWorker(FirewallWorker):
     supported_rule_opts = ['action', 'proto', 'dst4', 'dst6', 'dsthost',
                            'dstports', 'specialtarget', 'icmptype']
 
-    supported_forward_rule_opts = ['action', 'proto', 'src4', 'src6', 'dst4'. 'dst6', 
+    supported_forward_rule_opts = ['action', 'proto', 'src4', 'src6', 'dst4', 'dst6', 
                             'srcports', 'dstports', 'forwardtype']
 
     def __init__(self):
