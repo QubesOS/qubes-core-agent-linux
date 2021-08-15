@@ -1034,6 +1034,7 @@ class NftablesWorker(FirewallWorker):
                 raise RuleParseError(
                     'Missing dst address!')
 
+            # if the range is zero nft complains, otherwise a range is ok
             if 'srcports' in rule:
                 if rule['srcports'].split('-')[0] ==  rule['srcports'].split('-')[1]:
                     srcports = rule['srcports'].split('-')[0]
@@ -1043,7 +1044,7 @@ class NftablesWorker(FirewallWorker):
                 raise RuleParseError('srcports is mandatory for forward rules')
 
             # dstports cannot be a range
-            # a single port can be redirected to multiple ports, but not vice versa
+            # multiple ports can be redirected to a single port, but not vice versa
             if 'dstports' in rule:
                 if rule['dstports'].split('-')[0] !=  rule['dstports'].split('-')[1]:
                     raise RuleParseError('dstports must be a single port')
@@ -1055,20 +1056,21 @@ class NftablesWorker(FirewallWorker):
                 raise RuleParseError(
                     'Invalid rule action {}'.format(rule['action']))
 
-            # now duplicate rules for tcp/udp if needed
-            # it isn't possible to specify "tcp dport xx || udp dport xx" in
-            # one rule
-
             if 'last' in rule and rule['last']:
+                # is this the outside facing qubes?
                 interfaces = self.get_phys_interfaces()
                 if len(interfaces) < 1:
                     raise RuleApplyError('There are no external interfaces available')
                 for iface in sorted(interfaces):
                     for proto in sorted(protos):
                         forward_nft_rules.append('meta iifname "{iface}" {family} saddr {srchosts} {proto} dport {{ {srcports} }} dnat to {dsthost}:{dstport}'.format(iface=iface, family=ip_match, srchosts=srchosts, proto=proto, srcports=srcports, dsthost=dsthost, dstport=dstport))
-                        accept_nft_rules.append('meta iifname "{iface}" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept').format(iface=iface, family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
+                        accept_nft_rules.append('meta iifname "{iface}" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(iface=iface, family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
             else:
-                test = 1
+                # here should we limit srchost to the previous hop? if yes how do we gain knowledge of its ip?
+                # internal we always use the dstport for communication between qubes. Maybe it is worth randomizing at a later stage?
+                for proto in sorted(protos):
+                    forward_nft_rules.append('meta iifname "eth0" {family} {proto} dport {{ {dstport} }} dnat to {dsthost}:{dstport}'.format(family=ip_match, proto=proto, srcports=srcports, dstport=dstport))
+                    accept_nft_rules.append('meta iifname "eth0" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
 
         forward_rule = (
             'flush chain {family} {table} {chain}\n'
