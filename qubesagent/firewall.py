@@ -815,6 +815,8 @@ class NftablesWorker(FirewallWorker):
         Create a forwarding chain using nat for forwarding rules
         """
         nft_input = (
+            'flush chain {family} qubes-firewall-forward prerouting\n'
+            'flush chain {family} qubes-firewall-forward postrouting\n'
             'table {family} qubes-firewall-forward {{\n'
             '  chain postrouting {{\n'
             '    type nat hook postrouting priority srcnat; policy accept;\n'
@@ -847,6 +849,7 @@ class NftablesWorker(FirewallWorker):
                 family_name=family_name, addr=addr)
 
             nft_input += (
+                ''
                 'table {family_name} {table} {{\n'
                 '  chain prerouting {{\n'
                 '    {irule}'
@@ -1079,7 +1082,6 @@ class NftablesWorker(FirewallWorker):
                     accept_nft_rules.append('meta iifname "eth0" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
 
         forward_rule = (
-            'flush chain {family} {table} {chain}\n'
             'table {family} {table} {{\n'
             '  chain {chain} {{\n'
             '   {rules}\n'
