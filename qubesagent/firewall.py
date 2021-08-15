@@ -124,6 +124,12 @@ class FirewallWorker(object):
                 phys.add(route.split('\t')[0])
         return phys
 
+    def get_ip(self):
+         return self.qdb.read('/qubes-ip').decode()
+
+    def get_gateway(self):
+         return self.qdb.read('/qubes-gateway').decode()
+
     def read_rules(self, target):
         """Read rules from QubesDB and return them as a list of dicts"""
         entries = self.qdb.multiread('/qubes-firewall/{}/'.format(target))
@@ -1066,10 +1072,10 @@ class NftablesWorker(FirewallWorker):
                         forward_nft_rules.append('meta iifname "{iface}" {family} saddr {srchosts} {proto} dport {{ {srcports} }} dnat to {dsthost}:{dstport}'.format(iface=iface, family=ip_match, srchosts=srchosts, proto=proto, srcports=srcports, dsthost=dsthost, dstport=dstport))
                         accept_nft_rules.append('meta iifname "{iface}" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(iface=iface, family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
             else:
-                # here should we limit srchost to the previous hop? if yes how do we gain knowledge of its ip?
+                # here should we limit srchost to the previous hop? if yes how do we gain knowledge of its ip? get_gateway and get_ip try to address this
                 # internal we always use the dstport for communication between qubes. Maybe it is worth randomizing at a later stage?
                 for proto in sorted(protos):
-                    forward_nft_rules.append('meta iifname "eth0" {family} {proto} dport {{ {dstport} }} dnat to {dsthost}:{dstport}'.format(family=ip_match, proto=proto, srcports=srcports, dstport=dstport))
+                    forward_nft_rules.append('meta iifname "eth0" {family} saddr {gateway} {proto} dport {{ {dstport} }} dnat to {dsthost}:{dstport}'.format(family=ip_match, gateway=self.get_gateway(), proto=proto, dsthost=dsthost, dstport=dstport))
                     accept_nft_rules.append('meta iifname "eth0" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
 
         forward_rule = (
