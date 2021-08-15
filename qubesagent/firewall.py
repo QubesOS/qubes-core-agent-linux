@@ -115,12 +115,13 @@ class FirewallWorker(object):
                 os.access(user_script_path, os.X_OK):
             subprocess.call([user_script_path])
 
-    def get_phys_interfaces():
+    def get_phys_interfaces(self):
         phys = set()
         with open('/proc/net/route') as f:
             routes = f.readlines()[1:]
         for route in routes:
-            phys.add(route.split('\t')[0])
+            if 'vif' not in route:
+                phys.add(route.split('\t')[0])
         return phys
 
     def read_rules(self, target):
@@ -154,14 +155,10 @@ class FirewallWorker(object):
         entries = dict(((k.split('/')[3] + "/" + k.split('/')[4], v.decode())
                         for k, v in entries.items()))
         rules = []
-        last =  False
 
         for rulename, rule in sorted(entries.items()):
             ruleno = rulename.split('/')[1]
             ruletarget = rulename.split('/')[0]
-            if ruleno == 'last':
-                last = True
-                continue
             if len(ruleno) != 4 or not ruleno.isdigit():
                 raise RuleParseError(
                     'Unexpected non-rule found: {}={}'.format(ruleno, rule))
@@ -172,7 +169,6 @@ class FirewallWorker(object):
                 rule_dict['dst6'] = ruletarget
             else:
                 rule_dict['dst4'] = ruletarget
-            rule_dict['last'] = last
             if ('dst4' in rule_dict and 'src6' in rule_dict) or ('dst6' in rule_dict and 'src4' in rule_dict):
                 raise RuleParseError('It is not possible to mix IPv4 and IPv6 Networking')
             rules.append(rule_dict)
@@ -808,6 +804,25 @@ class NftablesWorker(FirewallWorker):
         self.run_nft(nft_input)
         self.chains[family].add(chain)
 
+    def create_forward_chain(self, family):
+        """
+        Create a forwarding chain using nat for forwarding rules
+        """
+        nft_input = (
+            'table {family} qubes-firewall-forward {{\n'
+            '  chain postrouting {{\n'
+            '    type nat hook postrouting priority srcnat; policy accept;\n'
+            '    masquerade;\n'
+            '  }}\n'
+            '  chain prerouting {{\n'
+            '    type nat hook prerouting priority dstnat; policy accept;\n'
+            '  }}\n'
+            '}}\n').format(
+                family=("ip6" if family == 6 else "ip")
+        )
+        self.run_nft(nft_input)
+        self.chains[family].add('qubes-firewall-forward')
+
     def update_connected_ips(self, family):
         family_name = ('ip6' if family == 6 else 'ip')
         table = 'qubes-firewall'
@@ -973,12 +988,14 @@ class NftablesWorker(FirewallWorker):
         """
 
         assert family in (4, 6)
-        nft_rules = []
         ip_match = 'ip6' if family == 6 else 'ip'
 
         fullmask = '/128' if family == 6 else '/32'
 
         chain = 'forward'
+
+        forward_nft_rules = []
+        accept_nft_rules = []
 
         for rule in rules:
             unsupported_opts = set(rule.keys()).difference(
@@ -997,21 +1014,31 @@ class NftablesWorker(FirewallWorker):
             nft_rule = ""
             
             if 'proto' in rule:
-                if family == 4:
-                    nft_rule += ' ip protocol {}'.format(rule['proto'])
-                elif family == 6:
-                    nft_rule += ' ip6 nexthdr {}'.format(rule['proto'])
+                protos = [rule['proto']]
+            else:
+                protos = ['tcp', 'udp']
 
             if 'dst4' in rule:
-                nft_rule += ' ip daddr {}'.format(rule['dst4'])
+                dsthost = rule['dst4']
             elif 'dst6' in rule:
-                nft_rule += ' ip6 daddr {}'.format(rule['dst6'])
+                dsthost = rule['dst6']
+            else:
+                raise RuleParseError(
+                    'Missing dst address!')
+
+            if 'src4' in rule:
+                srchosts = rule['src4']
+            elif 'dst6' in rule:
+                srchosts = rule['src6']
             else:
                 raise RuleParseError(
                     'Missing dst address!')
 
             if 'srcports' in rule:
-                srcports = rule['srcports'].replace('-', ':')
+                if rule['srcports'].split('-')[0] ==  rule['srcports'].split('-')[1]:
+                    srcports = rule['srcports'].split('-')[0]
+                else:
+                    srcports = rule['srcports']
             else:
                 raise RuleParseError('srcports is mandatory for forward rules')
 
@@ -1031,32 +1058,44 @@ class NftablesWorker(FirewallWorker):
             # now duplicate rules for tcp/udp if needed
             # it isn't possible to specify "tcp dport xx || udp dport xx" in
             # one rule
-            if dstports is not None:
-                if 'proto' not in rule:
-                    nft_rules.append(
-                        nft_rule + ' tcp dport {} {}'.format(
-                            dstport, action))
-                    nft_rules.append(
-                        nft_rule + ' udp dport {} {}'.format(
-                            dstport, action))
-                else:
-                    nft_rules.append(
-                        nft_rule + ' {} dport {} {}'.format(
-                            rule['proto'], dstport, action))
-            else:
-                nft_rules.append(nft_rule + ' ' + action)
 
-        '''return 'flush chain {family} {table} {chain}\n'
+            if 'last' in rule and rule['last']:
+                interfaces = self.get_phys_interfaces()
+                if len(interfaces) < 1:
+                    raise RuleApplyError('There are no external interfaces available')
+                for iface in sorted(interfaces):
+                    for proto in sorted(protos):
+                        forward_nft_rules.append('meta iifname "{iface}" {family} saddr {srchosts} {proto} dport {{ {srcports} }} dnat to {dsthost}:{dstport}'.format(iface=iface, family=ip_match, srchosts=srchosts, proto=proto, srcports=srcports, dsthost=dsthost, dstport=dstport))
+                        accept_nft_rules.append('meta iifname "{iface}" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept').format(iface=iface, family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
+            else:
+                test = 1
+
+        forward_rule = (
+            'flush chain {family} {table} {chain}\n'
             'table {family} {table} {{\n'
             '  chain {chain} {{\n'
             '   {rules}\n'
             '  }}\n'
             '}}\n'.format(
-                family=('ip6' if family == 6 else 'ip'),
+                family=ip_match,
+                table='qubes-firewall-forward',
+                chain='prerouting',
+                rules='\n   '.join(forward_nft_rules)
+            ))
+
+        accept_rule = (
+            'table {family} {table} {{\n'
+            '  chain {chain} {{\n'
+            '    {rules}\n'
+            '  }}\n'
+            '}}\n'.format(
+                family=ip_match,
                 table='qubes-firewall',
-                chain=chain,
-                rules='\n   '.join(nft_rules)
-            )'''
+                chain='forward',
+                rules='\n   '.join(accept_nft_rules)
+            ))
+        return forward_rule + accept_rule
+
 
     def apply_rules_family(self, source, rules, family):
         """
@@ -1087,6 +1126,9 @@ class NftablesWorker(FirewallWorker):
         :param family: address family, either 4 or 6
         :return: None
         """
+
+        if 'qubes-firewall-forward' not in self.chains[family]:
+            self.create_forward_chain(family)
 
         nft = self.prepare_forward_rules(rules, family)
         self.run_nft(nft)
