@@ -1077,12 +1077,6 @@ class NftablesWorker(FirewallWorker):
             else:
                 # here should we limit srchost to the previous hop? if yes how do we gain knowledge of its ip? get_gateway and get_ip try to address this
                 # internal we always use the dstport for communication between qubes. Maybe it is worth randomizing at a later stage?
-                if 'forwardtype' in rule and rule['forwardtype'] == 'internal':
-                    srchost = "{}/24".format(self.get_ip())
-                elif 'forwardtype' in rule and rule['forwardtype'] == 'external':
-                    srchost = self.get_gateway()
-                else:
-                    raise RuleParseError('Invalid forwardtype {}'.format(rule['forwardtype']))
                 for proto in sorted(protos):
                     forward_nft_rules.append('meta iifname "eth0" {family} saddr {srchost} {proto} dport {{ {dstport} }} dnat to {dsthost}:{dstport}'.format(family=ip_match, srchost=srchost, proto=proto, dsthost=dsthost, dstport=dstport))
                     accept_nft_rules.append('meta iifname "eth0" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
