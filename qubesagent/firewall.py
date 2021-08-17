@@ -820,7 +820,6 @@ class NftablesWorker(FirewallWorker):
             'table {family} qubes-firewall-forward {{\n'
             '  chain postrouting {{\n'
             '    type nat hook postrouting priority srcnat; policy accept;\n'
-            '    masquerade;\n'
             '  }}\n'
             '  chain prerouting {{\n'
             '    type nat hook prerouting priority dstnat; policy accept;\n'
@@ -1070,15 +1069,16 @@ class NftablesWorker(FirewallWorker):
                 interfaces = self.get_phys_interfaces()
                 if len(interfaces) < 1:
                     raise RuleApplyError('There are no external interfaces available')
+                
                 for iface in sorted(interfaces):
                     for proto in sorted(protos):
                         forward_nft_rules.append('meta iifname "{iface}" {family} saddr {srchosts} {proto} dport {{ {srcports} }} dnat to {dsthost}:{dstport}'.format(iface=iface, family=ip_match, srchosts=srchosts, proto=proto, srcports=srcports, dsthost=dsthost, dstport=dstport))
                         accept_nft_rules.append('meta iifname "{iface}" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(iface=iface, family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
             else:
-                # here should we limit srchost to the previous hop? if yes how do we gain knowledge of its ip? get_gateway and get_ip try to address this
                 # internal we always use the dstport for communication between qubes. Maybe it is worth randomizing at a later stage?
+                # since we removed masquerading we can retain the original srchost for filtering
                 for proto in sorted(protos):
-                    forward_nft_rules.append('meta iifname "eth0" {family} saddr {srchost} {proto} dport {{ {dstport} }} dnat to {dsthost}:{dstport}'.format(family=ip_match, srchost=srchost, proto=proto, dsthost=dsthost, dstport=dstport))
+                    forward_nft_rules.append('meta iifname "eth0" {family} saddr {srchosts} {proto} dport {{ {dstport} }} dnat to {dsthost}:{dstport}'.format(family=ip_match, srchosts=srchosts, proto=proto, dsthost=dsthost, dstport=dstport))
                     accept_nft_rules.append('meta iifname "eth0" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
 
         forward_rule = (
