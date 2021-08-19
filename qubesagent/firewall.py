@@ -1023,9 +1023,15 @@ class NftablesWorker(FirewallWorker):
             if 'dst4' in rule:
                 dstfamily = 4
                 dsthost = rule['dst4']
+                if self.is_ip6(srchosts):
+                    raise RuleParseError(
+                    'Ivalid value supplied as IPv4 address in dst4')
             elif 'dst6' in rule:
                 dstfamily = 6
                 dsthost = rule['dst6']
+                if not self.is_ip6(srchosts):
+                    raise RuleParseError(
+                    'Ivalid value supplied as IPv6 address in dst6')
             else:
                 raise RuleParseError(
                     'Missing dst address!')
@@ -1033,14 +1039,18 @@ class NftablesWorker(FirewallWorker):
             if 'src4' in rule:
                 srcfamily = 4
                 srchosts = rule['src4']
-                family = 4
-            elif 'dst6' in rule:
+                if self.is_ip6(srchosts):
+                    raise RuleParseError(
+                    'Ivalid value supplied as IPv4 address in src4')
+            elif 'src6' in rule:
                 srcfamily = 6
                 srchosts = rule['src6']
+                if not self.is_ip6(srchosts):
+                    raise RuleParseError(
+                    'Ivalid value supplied as IPv6 address in src6')
             else:
                 raise RuleParseError(
                     'Missing dst address!')
-
 
             if srcfamily != dstfamily:
                 raise RuleParseError(
