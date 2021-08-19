@@ -82,9 +82,9 @@ class FirewallWorker(object):
     def apply_forward_rules(self, target, rules):
         # what do we check here? 
         if self.is_ip6(target):
-            self.apply_forward_rules_family(target, rules, 6)
+            self.apply_forward_rules_family(rules, 6)
         else:
-            self.apply_forward_rules_family(target, rules, 4)
+            self.apply_forward_rules_family(rules, 4)
 
     def update_connected_ips(self, family):
         raise NotImplementedError
@@ -152,7 +152,7 @@ class FirewallWorker(object):
         rules.append({'action': policy})
         return rules
 
-    def read_forward_rules(self, target):
+    def read_forward_rules(self):
         """Read forward rules from QubesDB and return them as a list of dicts"""
         """No policy here since they already are in the forward dict, use first/last flags"""
         entries = self.qdb.multiread('/qubes-firewall-forward/')
@@ -291,24 +291,6 @@ class FirewallWorker(object):
 
         self.update_handled(addr)
 
-    def handle_forward_addr(self, addr):
-        try:
-            rules = self.read_forward_rules(addr)
-            self.apply_forward_rules(addr, rules)
-        
-        except RuleParseError as e:
-            self.log_error(
-                'Failed to parse rules for {} ({}), blocking traffic'.format(
-                    addr, str(e)
-                ))
-            self.apply_rules(addr, [{'action': 'drop'}])
-        
-        except RuleApplyError as e:
-            self.log_error(
-                'Failed to apply rules for {} ({}), blocking traffic'.format(
-                    addr, str(e))
-            )
-
     @staticmethod
     def dns_addresses(family=None):
         with open('/etc/resolv.conf') as resolv:
@@ -360,10 +342,28 @@ class FirewallWorker(object):
             pass
 
         self.cleanup()
+        if 'qubes-firewall-forward' in self.chains['4'] or 'qubes-firewall-forward' in self.chains['6']:
+            self.forward_cleanup()
 
     def load_forwarding(self):
-        for target_addr in self.list_forward_targets():
-            self.handle_forward_addr(target_addr)
+        # the only reason for loading the forwarding rules this way is to get the ip and choose the correct family
+        # the address is discared aftern the correct family is chosen
+        try:
+            rules = self.read_forward_rules()
+            self.apply_forward_rules(rules)
+        
+        except RuleParseError as e:
+            self.log_error(
+                'Failed to parse rules for {} ({}), blocking traffic'.format(
+                    addr, str(e)
+                ))
+            self.apply_rules(addr, [{'action': 'drop'}])
+        
+        except RuleApplyError as e:
+            self.log_error(
+                'Failed to apply rules for {} ({}), blocking traffic'.format(
+                    addr, str(e))
+            )
 
     def terminate(self):
         self.terminate_requested = True
@@ -671,7 +671,7 @@ class IptablesWorker(FirewallWorker):
             raise RuleApplyError('\'iptables -F {}\' failed: {}'.format(
                 chain, e.output))
 
-    def apply_forward_rules_family(self, target, rules, family):
+    def apply_forward_rules_family(self, rules, family):
         """
         Apply forward rules for given target address.
         Handle only rules for given address family (IPv4 or IPv6).
@@ -990,7 +990,7 @@ class NftablesWorker(FirewallWorker):
                 rules='\n   '.join(nft_rules)
             ), ret_dns)
 
-    def prepare_forward_rules(self, rules, family):
+    def prepare_forward_rules(self, rules):
         """
         Helper function to translate rules list into input for nft
 
@@ -1001,11 +1001,6 @@ class NftablesWorker(FirewallWorker):
                         during execution)
         :rtype: (str, dict)
         """
-
-        assert family in (4, 6)
-        ip_match = 'ip6' if family == 6 else 'ip'
-
-        fullmask = '/128' if family == 6 else '/32'
 
         chain = 'forward'
 
@@ -1018,14 +1013,6 @@ class NftablesWorker(FirewallWorker):
             if unsupported_opts:
                 raise RuleParseError(
                     'Unsupported forward rule option(s): {!s}'.format(unsupported_opts))
-            if 'src4' in rule and family == 6:
-                raise RuleParseError('dst4 rule found for IPv6 address')
-            if 'src6' in rule and family == 4:
-                raise RuleParseError('src6 rule found for IPv4 address')
-            if 'dst4' in rule and family == 6:
-                raise RuleParseError('dst4 rule found for IPv6 address')
-            if 'dst6' in rule and family == 4:
-                raise RuleParseError('dst6 rule found for IPv4 address')
             nft_rule = ""
             
             if 'proto' in rule:
@@ -1034,20 +1021,45 @@ class NftablesWorker(FirewallWorker):
                 protos = ['tcp', 'udp']
 
             if 'dst4' in rule:
+                dstfamily = 4
                 dsthost = rule['dst4']
             elif 'dst6' in rule:
+                dstfamily = 6
                 dsthost = rule['dst6']
             else:
                 raise RuleParseError(
                     'Missing dst address!')
 
             if 'src4' in rule:
+                srcfamily = 4
                 srchosts = rule['src4']
+                family = 4
             elif 'dst6' in rule:
+                srcfamily = 6
                 srchosts = rule['src6']
             else:
                 raise RuleParseError(
                     'Missing dst address!')
+
+
+            if srcfamily != dstfamily:
+                raise RuleParseError(
+                    'Mixed src and dst ip version family')
+            family = dstfamily
+
+            if 'src4' in rule and family == 6:
+                raise RuleParseError('dst4 rule found for IPv6 address')
+            if 'src6' in rule and family == 4:
+                raise RuleParseError('src6 rule found for IPv4 address')
+            if 'dst4' in rule and family == 6:
+                raise RuleParseError('dst4 rule found for IPv6 address')
+            if 'dst6' in rule and family == 4:
+                raise RuleParseError('dst6 rule found for IPv4 address')
+
+            assert family in (4, 6)
+            ip_match = 'ip6' if family == 6 else 'ip'
+
+            fullmask = '/128' if family == 6 else '/32'
 
             # if the range is zero nft complains, otherwise a range is ok
             if 'srcports' in rule:
@@ -1133,7 +1145,7 @@ class NftablesWorker(FirewallWorker):
         self.run_nft(nft)
         self.update_dns_info(source, dns)
 
-    def apply_forward_rules_family(self, target, rules, family):
+    def apply_forward_rules_family(self, rules):
         """
         Apply rules for given source address.
         Handle only rules for given address family (IPv4 or IPv6).
@@ -1144,10 +1156,13 @@ class NftablesWorker(FirewallWorker):
         :return: None
         """
 
-        if 'qubes-firewall-forward' not in self.chains[family]:
+        if 'qubes-firewall-forward' not in self.chains['4']:
             self.create_forward_chain(family)
 
-        nft = self.prepare_forward_rules(rules, family)
+        if 'qubes-firewall-forward' not in self.chains['6']:
+            self.create_forward_chain(family)
+
+        nft = self.prepare_forward_rules(rules)
         self.run_nft(nft)
 
     def init(self):
@@ -1177,6 +1192,11 @@ class NftablesWorker(FirewallWorker):
         nft_cleanup = (
             'delete table ip qubes-firewall\n'
             'delete table ip6 qubes-firewall\n'
+        )
+        self.run_nft(nft_cleanup)
+
+    def forward_cleanup(self):
+        nft_cleanup = (
             'delete table ip qubes-firewall-forward\n'
             'delete table ip6 qubes-firewall-forward\n'
         )
