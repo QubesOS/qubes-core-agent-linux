@@ -79,13 +79,6 @@ class FirewallWorker(object):
         else:
             self.apply_rules_family(source, rules, 4)
 
-    def apply_forward_rules(self, target, rules):
-        # what do we check here? 
-        if self.is_ip6(target):
-            self.apply_forward_rules_family(rules, 6)
-        else:
-            self.apply_forward_rules_family(rules, 4)
-
     def update_connected_ips(self, family):
         raise NotImplementedError
 
@@ -156,6 +149,10 @@ class FirewallWorker(object):
         """Read forward rules from QubesDB and return them as a list of dicts"""
         """No policy here since they already are in the forward dict, use first/last flags"""
         entries = self.qdb.multiread('/qubes-firewall-forward/')
+        # filter out base empty entry
+        for key in list(entries.keys()):
+            if len(key.split('/')) < 5:
+                del entries[key]
         assert isinstance(entries, dict)
         # drop full path but add target ip info
         entries = dict(((k.split('/')[3] + "/" + k.split('/')[4], v.decode())
@@ -342,27 +339,22 @@ class FirewallWorker(object):
             pass
 
         self.cleanup()
-        if 'qubes-firewall-forward' in self.chains['4'] or 'qubes-firewall-forward' in self.chains['6']:
+        if 'qubes-firewall-forward' in self.chains[4] or 'qubes-firewall-forward' in self.chains[6]:
             self.forward_cleanup()
 
     def load_forwarding(self):
-        # the only reason for loading the forwarding rules this way is to get the ip and choose the correct family
-        # the address is discared aftern the correct family is chosen
         try:
             rules = self.read_forward_rules()
             self.apply_forward_rules(rules)
         
         except RuleParseError as e:
             self.log_error(
-                'Failed to parse rules for {} ({}), blocking traffic'.format(
-                    addr, str(e)
-                ))
-            self.apply_rules(addr, [{'action': 'drop'}])
+                'Failed to parse forwarding rule ({})'.format(str(e))
+                )
         
         except RuleApplyError as e:
             self.log_error(
-                'Failed to apply rules for {} ({}), blocking traffic'.format(
-                    addr, str(e))
+                'Failed to apply forwarding rule ({})'.format(str(e))
             )
 
     def terminate(self):
@@ -822,8 +814,6 @@ class NftablesWorker(FirewallWorker):
         Create a forwarding chain using nat for forwarding rules
         """
         nft_input = (
-            'flush chain {family} qubes-firewall-forward prerouting\n'
-            'flush chain {family} qubes-firewall-forward postrouting\n'
             'table {family} qubes-firewall-forward {{\n'
             '  chain postrouting {{\n'
             '    type nat hook postrouting priority srcnat; policy accept;\n'
@@ -1023,13 +1013,13 @@ class NftablesWorker(FirewallWorker):
             if 'dst4' in rule:
                 dstfamily = 4
                 dsthost = rule['dst4']
-                if self.is_ip6(srchosts):
+                if self.is_ip6(dsthost):
                     raise RuleParseError(
                     'Ivalid value supplied as IPv4 address in dst4')
             elif 'dst6' in rule:
                 dstfamily = 6
                 dsthost = rule['dst6']
-                if not self.is_ip6(srchosts):
+                if not self.is_ip6(dsthost):
                     raise RuleParseError(
                     'Ivalid value supplied as IPv6 address in dst6')
             else:
@@ -1155,7 +1145,7 @@ class NftablesWorker(FirewallWorker):
         self.run_nft(nft)
         self.update_dns_info(source, dns)
 
-    def apply_forward_rules_family(self, rules):
+    def apply_forward_rules(self, rules):
         """
         Apply rules for given source address.
         Handle only rules for given address family (IPv4 or IPv6).
@@ -1166,11 +1156,11 @@ class NftablesWorker(FirewallWorker):
         :return: None
         """
 
-        if 'qubes-firewall-forward' not in self.chains['4']:
-            self.create_forward_chain(family)
+        if 'qubes-firewall-forward' not in self.chains[4]:
+            self.create_forward_chain(4)
 
-        if 'qubes-firewall-forward' not in self.chains['6']:
-            self.create_forward_chain(family)
+        if 'qubes-firewall-forward' not in self.chains[6]:
+            self.create_forward_chain(6)
 
         nft = self.prepare_forward_rules(rules)
         self.run_nft(nft)
