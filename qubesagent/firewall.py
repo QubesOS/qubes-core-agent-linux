@@ -334,8 +334,7 @@ class FirewallWorker(object):
         for source_addr in self.list_targets():
             self.handle_addr(source_addr)
 
-        for target_addr in self.list_forward_targets():
-            self.handle_forward_addr(target_addr)
+        self.load_forwarding()
 
         self.update_connected_ips(4)
         self.update_connected_ips(6)
@@ -353,14 +352,22 @@ class FirewallWorker(object):
                     source_addr = watch_path.split('/')[2]
                     self.handle_addr(source_addr)
 
+                if watch_path.startswith('/qubes-firewall-forward/'):
+                    self.load_forwarding()
+
         except OSError:  # EINTR
             # signal received, don't continue the loop
             pass
 
         self.cleanup()
 
+    def load_forwarding(self):
+        for target_addr in self.list_forward_targets():
+            self.handle_forward_addr(target_addr)
+
     def terminate(self):
         self.terminate_requested = True
+
 
 
 class IptablesWorker(FirewallWorker):
@@ -1170,6 +1177,8 @@ class NftablesWorker(FirewallWorker):
         nft_cleanup = (
             'delete table ip qubes-firewall\n'
             'delete table ip6 qubes-firewall\n'
+            'delete table ip qubes-firewall-forward\n'
+            'delete table ip6 qubes-firewall-forward\n'
         )
         self.run_nft(nft_cleanup)
 
