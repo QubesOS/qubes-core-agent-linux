@@ -997,6 +997,9 @@ class NftablesWorker(FirewallWorker):
         forward_nft_rules = []
         accept_nft_rules = []
 
+        forward_nft_rules_6 = []
+        accept_nft_rules_6 = []
+
         for rule in rules:
             unsupported_opts = set(rule.keys()).difference(
                 set(self.supported_forward_rule_opts))
@@ -1091,14 +1094,21 @@ class NftablesWorker(FirewallWorker):
                 
                 for iface in sorted(interfaces):
                     for proto in sorted(protos):
-                        forward_nft_rules.append('meta iifname "{iface}" {family} saddr {srchosts} {proto} dport {{ {srcports} }} dnat to {dsthost}:{dstport}'.format(iface=iface, family=ip_match, srchosts=srchosts, proto=proto, srcports=srcports, dsthost=dsthost, dstport=dstport))
-                        accept_nft_rules.append('meta iifname "{iface}" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(iface=iface, family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
+                        forward_entry = 'meta iifname "{iface}" {family} saddr {srchosts} {proto} dport {{ {srcports} }} dnat to {dsthost}:{dstport}'.format(iface=iface, family=ip_match, srchosts=srchosts, proto=proto, srcports=srcports, dsthost=dsthost, dstport=dstport)
+                        accept_entry = 'meta iifname "{iface}" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(iface=iface, family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport)
             else:
                 # internal we always use the dstport for communication between qubes. Maybe it is worth randomizing at a later stage?
                 # since we removed masquerading we can retain the original srchost for filtering
                 for proto in sorted(protos):
-                    forward_nft_rules.append('meta iifname "eth0" {family} saddr {srchosts} {proto} dport {{ {dstport} }} dnat to {dsthost}:{dstport}'.format(family=ip_match, srchosts=srchosts, proto=proto, dsthost=dsthost, dstport=dstport))
-                    accept_nft_rules.append('meta iifname "eth0" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport))
+                    forward_entry = 'meta iifname "eth0" {family} saddr {srchosts} {proto} dport {{ {dstport} }} dnat to {dsthost}:{dstport}'.format(family=ip_match, srchosts=srchosts, proto=proto, dsthost=dsthost, dstport=dstport)
+                    accept_entry = 'meta iifname "eth0" {family} daddr {dsthost} {proto} dport {dstport} ct state new counter accept'.format(family=ip_match, proto=proto, dsthost=dsthost, dstport=dstport)
+
+            if family == 4:
+                forward_nft_rules.append(forward_entry)
+                accept_nft_rules.append(accept_entry)
+            elif family == 6:
+                forward_nft_rules_6.append(forward_entry)
+                accept_nft_rules_6.append(accept_entry)
 
         forward_rule = (
             'table {family} {table} {{\n'
@@ -1106,7 +1116,7 @@ class NftablesWorker(FirewallWorker):
             '   {rules}\n'
             '  }}\n'
             '}}\n'.format(
-                family=ip_match,
+                family='ip',
                 table='qubes-firewall-forward',
                 chain='prerouting',
                 rules='\n   '.join(forward_nft_rules)
@@ -1118,11 +1128,36 @@ class NftablesWorker(FirewallWorker):
             '    {rules}\n'
             '  }}\n'
             '}}\n'.format(
-                family=ip_match,
+                family='ip',
                 table='qubes-firewall',
                 chain='forward',
                 rules='\n   '.join(accept_nft_rules)
             ))
+
+        forward_rule += (
+            'table {family} {table} {{\n'
+            '  chain {chain} {{\n'
+            '   {rules}\n'
+            '  }}\n'
+            '}}\n'.format(
+                family='ip6',
+                table='qubes-firewall-forward',
+                chain='prerouting',
+                rules='\n   '.join(forward_nft_rules_6)
+            ))
+
+        accept_rule += (
+            'table {family} {table} {{\n'
+            '  chain {chain} {{\n'
+            '    {rules}\n'
+            '  }}\n'
+            '}}\n'.format(
+                family='ip6',
+                table='qubes-firewall',
+                chain='forward',
+                rules='\n   '.join(accept_nft_rules_6)
+            ))
+
         return forward_rule + accept_rule
 
 
