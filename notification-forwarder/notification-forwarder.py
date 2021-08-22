@@ -476,7 +476,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Daemon to selectively forward desktop notifications to another VM.")
     parser.add_argument("-v", help="Verbose logging.", action="store_true")
     parser.add_argument("-x", help="Exit the forwarder when it becomes idle.", action="store_true")
-    parser.add_argument("-L", help="Local mode: Handle all notifications locally. Useful for debugging.", action="store_true")
+    parser.add_argument("-L", help="Local mode: Handle all notifications locally.", action="store_true")
     parser.add_argument("-F", help="Force mode: Forward all notifications. Overrides -L. This may cause usability issues.", action="store_true")
     parser.add_argument("--target", help="Target VM to forward notifications to (default: read from QubesDB /desktop-notification-target).")
     parser.add_argument("--dbus-address", help="Full address of a dedicated dbus instance to be used exclusively by the forwarder (default: start a new dbus instance). Do not use the default user session bus here!")
@@ -520,19 +520,15 @@ def main():
 
     vm = qdb.read("/name").decode()
 
-    if notification_vm:
-        local_mode = args.L
+    local_mode = args.L
+    if not notification_vm or (vm == notification_vm):
+        logger.info("No notification target specified or we are the target. Handling notifications locally...")
+        local_mode = True
 
-        if vm == notification_vm:
-            logger.info("We appear to be a notification target VM. Switching to local handling only...")
-            local_mode = True
-
-        forwarder = NotificationForwarder(notification_vm, verbose=args.v, local_mode=local_mode, force_mode=args.F, exit_idle=args.x,
-                                          private_bus_address=args.dbus_address)
-        sys.excepthook = lambda e, v, t: glib_error_handler(logger, forwarder, e, v, t) #for some reason GLib otherwise ignores Exceptions / hangs
-        forwarder.run()
-    else:
-        logger.info("Configured to not be used in this VM. Exiting...")
+    forwarder = NotificationForwarder(notification_vm, verbose=args.v, local_mode=local_mode, force_mode=args.F, exit_idle=args.x,
+                                      private_bus_address=args.dbus_address)
+    sys.excepthook = lambda e, v, t: glib_error_handler(logger, forwarder, e, v, t) #for some reason GLib otherwise ignores Exceptions / hangs
+    forwarder.run()
 
     sys.exit(0)
 
