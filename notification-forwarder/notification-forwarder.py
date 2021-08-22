@@ -520,8 +520,14 @@ def main():
 
     vm = qdb.read("/name").decode()
 
-    if notification_vm and notification_vm != vm:
-        forwarder = NotificationForwarder(notification_vm, verbose=args.v, local_mode=args.L, force_mode=args.F, exit_idle=args.x,
+    if notification_vm:
+        local_mode = args.L
+
+        if vm == notification_vm:
+            logger.info("We appear to be a notification target VM. Switching to local handling only...")
+            local_mode = True
+
+        forwarder = NotificationForwarder(notification_vm, verbose=args.v, local_mode=local_mode, force_mode=args.F, exit_idle=args.x,
                                           private_bus_address=args.dbus_address)
         sys.excepthook = lambda e, v, t: glib_error_handler(logger, forwarder, e, v, t) #for some reason GLib otherwise ignores Exceptions / hangs
         forwarder.run()
