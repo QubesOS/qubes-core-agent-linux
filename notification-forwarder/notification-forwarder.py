@@ -343,10 +343,10 @@ class NotificationForwarder(dbus.service.Object):
 
     def should_forward(self, notification):
         """ Returns true, if the given notification is meant to be forwarded to the remote VM. """
-        if self.force_mode:
-            return True
         if self.local_mode:
             return False
+        if self.force_mode:
+            return True
 
         # regular mode
         # We cannot handle actions as they require a backchannel which might not be so wise having from
@@ -477,7 +477,7 @@ def parse_args():
     parser.add_argument("-v", help="Verbose logging.", action="store_true")
     parser.add_argument("-x", help="Exit the forwarder when it becomes idle.", action="store_true")
     parser.add_argument("-L", help="Local mode: Handle all notifications locally.", action="store_true")
-    parser.add_argument("-F", help="Force mode: Forward all notifications. Overrides -L. This may cause usability issues.", action="store_true")
+    parser.add_argument("-F", help="Force mode: Forward all notifications. This may cause usability issues.", action="store_true")
     parser.add_argument("--target", help="Target VM to forward notifications to (default: read from QubesDB /desktop-notification-target).")
     parser.add_argument("--dbus-address", help="Full address of a dedicated dbus instance to be used exclusively by the forwarder (default: start a new dbus instance). Do not use the default user session bus here!")
     return parser.parse_args()
@@ -521,11 +521,17 @@ def main():
     vm = qdb.read("/name").decode()
 
     local_mode = args.L
-    if not notification_vm or (vm == notification_vm):
+    force_mode = args.F
+    if local_mode:
+        if force_mode:
+            logger.warning("Cannot use local mode and force mode at the same time. Exiting...")
+            sys.exit(3)
+    elif not notification_vm or (vm == notification_vm):
         logger.info("No notification target specified or we are the target. Handling notifications locally...")
         local_mode = True
+        force_mode = False
 
-    forwarder = NotificationForwarder(notification_vm, verbose=args.v, local_mode=local_mode, force_mode=args.F, exit_idle=args.x,
+    forwarder = NotificationForwarder(notification_vm, verbose=args.v, local_mode=local_mode, force_mode=force_mode, exit_idle=args.x,
                                       private_bus_address=args.dbus_address)
     sys.excepthook = lambda e, v, t: glib_error_handler(logger, forwarder, e, v, t) #for some reason GLib otherwise ignores Exceptions / hangs
     forwarder.run()
