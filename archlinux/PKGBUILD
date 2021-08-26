@@ -102,7 +102,7 @@ package_qubes-vm-core() {
     cat <<EOF > "$pkgdir/etc/systemd/system/getty@tty1.service.d/autologin.conf"
 [Service]
 ExecStart=
-ExecStart=-/usr/bin/agetty --autologin user --noclear %I 38400 linux
+ExecStart=-/sbin/agetty -o '-f -p -- \\u' --keep-baud 115200,38400,9600 %I linux
 EOF
 
     # Archlinux packaging guidelines: /var/run is a symlink to a tmpfs. Don't create it
