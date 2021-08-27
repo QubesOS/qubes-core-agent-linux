@@ -14,13 +14,13 @@ all:
 	$(MAKE) -C qubes-rpc
 ifdef WITH_SELINUX
 ifeq ($(WITH_SELINUX),1)
-	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile qubes-qfile-unpacker.pp
+	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile qubes-qfile-unpacker.pp qubes-xendriverdomain.pp
 
 install-rh: install-selinux
 
 install-selinux:
 	install -D -m 0644 -t $(DESTDIR)/usr/share/selinux/packages/targeted -- \
-		selinux/qubes-qfile-unpacker.pp
+		selinux/qubes-qfile-unpacker.pp selinux/qubes-xendriverdomain.pp
 .PHONY: install-selinux
 else ifneq ($(WITH_SELINUX),0)
 $(error bad value for WITH_SELINUX)

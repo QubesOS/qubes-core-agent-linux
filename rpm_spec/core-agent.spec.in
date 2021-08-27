@@ -334,6 +334,7 @@ a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 
 %files selinux
 %_datadir/selinux/packages/targeted/qubes-qfile-unpacker.pp
+%_datadir/selinux/packages/targeted/qubes-xendriverdomain.pp
 
 %endif
 
@@ -614,7 +615,7 @@ fi
 %if %{with selinux}
 %post selinux
 
-%selinux_modules_install %{_datadir}/selinux/packages/targeted/qubes-qfile-unpacker.pp
+%selinux_modules_install %{_datadir}/selinux/packages/targeted/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/targeted/qubes-xendriverdomain.pp
 
 contexts='### QUBES START ###\
 /rw/home /home\
