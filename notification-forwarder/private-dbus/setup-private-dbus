@@ -1,0 +1,66 @@
+#!/bin/bash -x
+# Post install and pre removal script for the private dbus.
+# 
+# Post install: Makes org.qubes-os.Notifications.service the only desktop notification server
+#               and moves previously installed ones to the private dbus instance.
+# Pre removal:  Undoes the post install action.
+#
+# Copyright (C) 2021 GPLv2 David Hobach <tripleh@hackingthe.net>
+
+set -e -o pipefail
+
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+SCRIPT_NAME="${BASH_SOURCE[0]##*/}"
+
+DBUS_DIR="/usr/share/dbus-1/services"
+PUBLIC_NOTIFY="$DBUS_DIR/org.qubes-os.Notifications.service"
+PRIVATE_NOTIFY_DIR="$SCRIPT_DIR/services"
+
+function usage {
+  echo "$SCRIPT_NAME postinst|prerm"
+  exit 1
+}
+
+function postinst {
+  local file=
+  while IFS= read -r file ; do
+    [ -z "$file" ] && continue
+    [[ "$file" == "$PUBLIC_NOTIFY" ]] && continue || mv "$file" "$PRIVATE_NOTIFY_DIR"
+  done <<< "$(grep -lE '^[[:space:]]*Name[[:space:]]*=[[:space:]]*org\.freedesktop\.Notifications[[:space:]]*$' "$DBUS_DIR"/*)"
+
+  return 0
+}
+
+function prerm {
+  local file line
+  local re='^[ ]*Exec[ ]*=[ ]*(.+)$'
+
+  for file in "$PRIVATE_NOTIFY_DIR"/* ; do
+    [ -z "$file" ] && continue
+    [[ "$file" == "$PRIVATE_NOTIFY_DIR/*" ]] && continue
+
+    while IFS= read -r line ; do
+      if [[ "$line" =~ $re ]] ; then
+        #heuristic: as packages may have been uninstalled in the meantime, we only move the ones back that will work
+        [ -e "${BASH_REMATCH[1]}" ] && mv "$file" "$DBUS_DIR" || rm -f "$file"
+        break
+      fi
+    done < "$file"
+  done
+
+  return 0
+}
+
+case "$1" in
+  "postinst")
+    postinst
+    ;;
+
+  "prerm")
+    prerm
+    ;;
+
+  *)
+    usage
+    ;;
+esac
