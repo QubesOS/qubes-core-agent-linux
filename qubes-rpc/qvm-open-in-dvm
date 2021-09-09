@@ -20,7 +20,7 @@
 #
 #
 
-if ! [ $# = 1 ] && ! [ $# = 2 ]; then
+if { ! [ $# = 1 ] && ! [ $# = 2 ]; } || { [ $# = 1 ] && [ $1 =~ ^(--help|-h)$ ] ;} then
 	echo "Usage: $0 [--view-only] filename"
 	exit 1
 fi
