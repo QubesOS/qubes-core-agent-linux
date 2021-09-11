@@ -672,6 +672,7 @@ rm -f %{name}-%{version}
 /etc/qubes/post-install.d/README
 /etc/qubes/post-install.d/*.sh
 %config(noreplace) /etc/profile.d/qt_x11_no_mitshm.sh
+%config(noreplace) /etc/profile.d/zqubes_disable_lesspipe.sh
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
 %config(noreplace) /etc/sudoers.d/umask
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
