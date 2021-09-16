@@ -33,7 +33,7 @@ else
     rmdir "$tmpdir"
     exit "$retcode"
   else
-    echo "Invalid command $COMMAND" >&2
+    echo "Invalid file or command: $args" >&2
     exit 2
   fi
 fi
