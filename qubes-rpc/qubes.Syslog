@@ -58,7 +58,7 @@ template(name="qubes_syslog" type="string"
 ruleset(name="qubes") {
   action(
     type="omprog"
-    binary="/usr/sbin/runuser -u user -- /usr/bin/qrexec-client-vm work qubes.Syslog"
+    binary="/usr/sbin/runuser -u user -- /usr/bin/qrexec-client-vm receiving_VM qubes.Syslog"
     template="qubes_syslog"
   )
 }
