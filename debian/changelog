@@ -1,3 +1,35 @@
+qubes-core-agent (4.0.63-1) unstable; urgency=medium
+
+  [ unman ]
+  * Change language for qvm-copy in KDE
+
+  [ Marek Marczykowski-Górecki ]
+  * make shellcheck happy
+
+  [ unman ]
+  * Disable package caching in apt operations
+
+  [ Marek Marczykowski-Górecki ]
+  * Remove haveged service override
+
+  [ 3hhh ]
+  * firewall: make notify-send work
+  * firewall: notify-send with runuser instead of sudo
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes.Restore*: Avoid globbing when handling paths to extract
+
+  [ Marta Marczykowska-Górecka ]
+  * Better message on backup restore data load fail
+
+  [ Gabor Seljan ]
+  * network: also reload DNS on "vpn-up" event from NetworkManager
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix removing haveged service override
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 07 Oct 2021 18:49:05 +0200
+
 qubes-core-agent (4.0.62-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
