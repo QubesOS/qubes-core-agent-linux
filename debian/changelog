@@ -1,3 +1,62 @@
+qubes-core-agent (4.1.27-1) unstable; urgency=medium
+
+  [ 3hhh ]
+  * systemd-logind: disable watchdog
+
+  [ Demi Marie Obenour ]
+  * qvm-{copy,move}: accept -- as end of options
+
+  [ 3hhh ]
+  * firewall: make notify-send work
+  * firewall: notify-send with runuser instead of sudo
+
+  [ Frédéric Pierret (fepitre) ]
+  * Refactor qvm-run-in-vm and support --no-gui opt
+
+  [ Marek Marczykowski-Górecki ]
+  * make shellcheck happy
+  * qubes.Restore*: Avoid globbing when handling paths to extract
+  * qubes.RegisterBackupLocation: use 'trap' to more reliable revoke
+    access
+
+  [ Rusty Bird ]
+  * qvm-copy-to-vm.gnome: use modern @default syntax
+  * qvm-copy-to-vm.gnome: better local variables
+  * qvm-copy-to-vm.gnome: refactor: progress() -> progress_...()
+  * qvm-copy-to-vm.gnome: check qdbus command availability
+  * qvm-copy-to-vm.gnome: fall back to progress_none()
+  * qvm-copy-to-vm.gnome: create zenity window earlier
+  * qvm-copy-to-vm.gnome: avoid useless use of cat
+
+  [ ddevz ]
+  * Adding qvm-open-in-dvm.desktop
+  * Updated documentation
+
+  [ Marek Marczykowski-Górecki ]
+  * add qvm-open-in-dvm.desktop to rpm spec file
+
+  [ Demi Marie Obenour ]
+  * Only call lsb_release once during build
+  * Rewrite qubes.StartApp in Python
+  * Fix qvm-open-in-{vm,dvm} argument parsing
+  * Force certain apps to open files in disposable qubes
+  * Generate desktop file IDs instead of names
+  * Allow user to choose username for qube console login
+  * Disable LESSOPEN and LESSCLOSE
+
+  [ Marta Marczykowska-Górecka ]
+  * Better message on backup restore data load fail
+
+  [ Gabor Seljan ]
+  * network: also reload DNS on "vpn-up" event from NetworkManager
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix removing haveged service override
+  * Disable xfce4-power-manager in qubes-session
+  * qubes-open: wait for children processes too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 08 Oct 2021 18:37:28 +0200
+
 qubes-core-agent (4.1.26-1) unstable; urgency=medium
 
   [ Neowutran ]

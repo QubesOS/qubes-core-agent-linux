@@ -4,9 +4,14 @@ LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
 
 PYTHON ?= /usr/bin/python3
+release := $(shell lsb_release -is)
 
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
+
+all:
+	$(MAKE) -C misc VERSION=$(VERSION)
+	$(MAKE) -C qubes-rpc
 
 clean:
 	make -C misc clean
@@ -19,10 +24,6 @@ clean:
 	rm -rf debian/changelog.*
 	rm -rf pkgs
 	rm -f .coverage
-
-all:
-	$(MAKE) -C misc VERSION=$(VERSION)
-	$(MAKE) -C qubes-rpc
 
 # Dropin Directory
 SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
@@ -44,7 +45,7 @@ SYSTEM_DROPINS_NETWORKING += tinyproxy.service
 USER_DROPINS := pulseaudio.service pulseaudio.socket
 
 # Ubuntu Dropins
-ifeq ($(shell lsb_release -is), Ubuntu)
+ifeq ($(release),Ubuntu)
 
     # 'crond.service' is named 'cron.service in Debian
     SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
@@ -54,10 +55,8 @@ ifeq ($(shell lsb_release -is), Ubuntu)
     SYSTEM_DROPINS += exim4.service
     SYSTEM_DROPINS += avahi-daemon.service
 
-endif
-
 # Debian Dropins
-ifeq ($(shell lsb_release -is), Debian)
+else ifeq ($(release), Debian)
     # 'crond.service' is named 'cron.service in Debian
     SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
 
@@ -161,7 +160,7 @@ install-netvm:
 	install -D network/qubes-setup-dnat-to-ns $(DESTDIR)$(LIBDIR)/qubes/qubes-setup-dnat-to-ns
 
 	install -d $(DESTDIR)/etc/dhclient.d
-	ln -s /usr/lib/qubes/qubes-setup-dnat-to-ns $(DESTDIR)/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
+	ln -s ../../usr/lib/qubes/qubes-setup-dnat-to-ns $(DESTDIR)/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
 	install -D network/vif-qubes-nat.sh $(DESTDIR)/etc/xen/scripts/vif-qubes-nat.sh

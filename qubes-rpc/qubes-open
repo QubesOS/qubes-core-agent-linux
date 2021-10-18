@@ -7,6 +7,10 @@ fi
 
 # gvfs-open, kde-open, and possibly others don't wait for editor to be
 # closed, which is critical behaviour for DisposableVM (which gets destroyed
-# after this process exits)
+# after this process exits).
+# The "| cat" is rather silly hack, to wait for all the children processes too
+# (unless they close their stdout). This is needed on Xfce template, because
+# exo-open starts the application in the background, but keeps the original
+# stdout/err connected.
 export DE=generic
-exec xdg-open "$@"
+exec xdg-open "$@" | cat

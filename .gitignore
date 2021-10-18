@@ -9,3 +9,6 @@ deb/*
 __pycache__
 debian/changelog.*
 pkgs
+misc/mime/[^p]*
+misc/mime/mimeapps.list
+misc/mime/mimeinfo.cache

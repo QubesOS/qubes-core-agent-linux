@@ -46,18 +46,17 @@ for dir in "${apps_dirs_to_consider[@]}"; do
     fi
 done
 
-if [ "${#apps_dirs[@]}" -eq "0" ]; then
-    # nothing to send, exit early to not let `find` browse the current
-    # directory
-    exit 0
-fi
-
-find "${apps_dirs[@]}" -name '*.desktop' -print0 2>/dev/null | \
-         xargs -0 awk '
-         BEGINFILE { if (ERRNO) nextfile; entry="" }
-         /^\[/ { if (tolower($0) != "\[desktop entry\]") nextfile } 
-         /^Exec *=/ { entry = entry FILENAME ":Exec=qubes-desktop-run " FILENAME "\n"; next }
-         /^NoDisplay *= *true$/ { entry=""; nextfile }
-         /=/ { entry = entry FILENAME ":" $0 "\n" }
-         ENDFILE { print entry }
-         ' 2> /dev/null
+for i in "${apps_dirs[@]}"; do
+    case $i in (/*) :;; (*) continue;; esac
+    (cd "$i" &&
+    # Every filename from “find” will start with “./”, so no need to worry about
+    # option injection.
+    exec find . -name '*.desktop' -exec awk -b '
+     BEGINFILE { if (ERRNO) nextfile; entry=""; file = substr(FILENAME, 3); gsub(/\//, "-", file) }
+     /^\[/ { if (tolower($0) != "\[desktop entry\]") nextfile }
+     /^Exec *=/ { entry = entry file ":Exec=qubes-desktop-run " file "\n"; next }
+     /^NoDisplay *= *true$/ { entry=""; nextfile }
+     /=/ { entry = entry file ":" $0 "\n" }
+     ENDFILE { print entry }
+     ' 2> /dev/null '{}' +)
+done

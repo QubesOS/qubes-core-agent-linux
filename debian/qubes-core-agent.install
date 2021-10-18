@@ -8,6 +8,7 @@ etc/default/grub.d/30-qubes.cfg
 etc/fstab
 etc/needrestart/conf.d/50_qubes.conf
 etc/profile.d/qt_x11_no_mitshm.sh
+etc/profile.d/zqubes_disable_lesspipe.sh
 etc/qubes-rpc/qubes.ShowInTerminal
 etc/qubes-rpc/qubes.Backup
 etc/qubes-rpc/qubes.DetachPciDevice
@@ -164,3 +165,9 @@ usr/share/man/man1/qvm-*
 usr/share/qubes/mime-override/globs
 usr/share/qubes/qubes-master-key.asc
 usr/share/qubes/marker-vm
+usr/share/qubes/xdg-override/*
+usr/share/qubes/xdg-override/applications/*
+usr/share/qubes/xdg-override/mime/*
+usr/share/qubes/xdg-override/mime/application/*.xml
+usr/share/qubes/xdg-override/mime/image/*.xml
+usr/share/qubes/xdg-override/mime/packages/*.xml

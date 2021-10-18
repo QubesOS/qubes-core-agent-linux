@@ -23,11 +23,12 @@ START_TIME=$(cut -f 22 -d ' ' /proc/$PID/stat)
 # add process id at the beginning to help verifying if it's still running;
 # record starttime too, to detect PID reuse
 printf "%d %d\n%s\n" "$PID" "$START_TIME" "$backup_location" >"$REGISTRY_FILE"
+# shellcheck disable=SC2064
+trap "rm -f '$REGISTRY_FILE'" EXIT
 # output registered ID to the user
 basename "$REGISTRY_FILE"
 # close stdout
 exec >&-
 # wait for stdin to close
 cat >/dev/null
-# and cleanup
-rm -f "$REGISTRY_FILE"
+# when the script terminates, $REGISTRY_FILE will get removed by the 'trap' above

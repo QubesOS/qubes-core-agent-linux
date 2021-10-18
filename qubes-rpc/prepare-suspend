@@ -15,7 +15,7 @@ if [ -r /rw/config/suspend-module-blacklist ]; then
     MODULES_BLACKLIST="$MODULES_BLACKLIST $(grep -v '^#' /rw/config/suspend-module-blacklist)"
 fi
 
-if [ x"$action" = x"suspend" ]; then
+if [ "$action" = "suspend" ]; then
     if qsvc network-manager ; then
         dbus-send --system --print-reply          \
             --dest=org.freedesktop.NetworkManager \
