@@ -4,7 +4,7 @@
 # shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
-if [ "$2" = "up" ] || [ "$2" = "vpn-up" ]; then
+if [ "$2" = "up" ] || [ "$2" = "vpn-up" ] || [ "$2" = "vpn-down" ]; then
     /usr/lib/qubes/qubes-setup-dnat-to-ns
 
     # FIXME: Tinyproxy does not reload DNS servers.
