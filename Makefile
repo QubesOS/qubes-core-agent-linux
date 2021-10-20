@@ -1,4 +1,4 @@
-VERSION := $(shell cat version)
+VERSION := $(file <version)
 
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
