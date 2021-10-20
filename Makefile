@@ -1,4 +1,4 @@
-VERSION := $(shell cat version)
+VERSION := $(file <version)
 
 ifneq (,$(wildcard /etc/fedora-release))
 DIST = fc$(shell rpm --eval %{fedora})
