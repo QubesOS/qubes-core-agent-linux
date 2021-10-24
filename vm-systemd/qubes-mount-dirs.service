@@ -4,6 +4,7 @@ Description=Initialize and mount /rw and /home
 # mount-dirs.sh calls setup-rwdev.sh which
 # must happen only when /dev/xvdb has appeared.
 After=qubes-sysinit.service dev-xvdb.device
+After=systemd-fsck@dev-xvdb.service
 DefaultDependencies=no
 Before=local-fs.target rw.mount home.mount qubes-gui-agent.service
 
