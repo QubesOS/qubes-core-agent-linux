@@ -48,7 +48,7 @@ done
 
 for i in "${apps_dirs[@]}"; do
     case $i in (/*) :;; (*) continue;; esac
-    (cd "$i" &&
+    ([[ -d "$i" ]] && cd "$i" &&
     # Every filename from “find” will start with “./”, so no need to worry about
     # option injection.
     exec find . -name '*.desktop' -exec awk -b '
