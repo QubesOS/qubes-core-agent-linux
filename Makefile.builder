@@ -9,7 +9,7 @@ ifeq ($(PACKAGE_SET),vm)
   ARCH_BUILD_DIRS := archlinux
 endif
 
-source-debian-quilt-copy-in: VERSION = $(shell cat $(ORIG_SRC)/version)
+source-debian-quilt-copy-in: VERSION = $(file <$(ORIG_SRC)/version)
 source-debian-quilt-copy-in: ORIG_FILE = "$(CHROOT_DIR)/$(DIST_SRC)/../qubes-core-agent_$(VERSION).orig.tar.gz"
 ifneq ($(filter $(DIST), jessie stretch),)
 source-debian-quilt-copy-in: series_ext = -$(DIST)
