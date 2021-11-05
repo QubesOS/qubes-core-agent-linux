@@ -1,3 +1,34 @@
 ## compatibility symlink
 ## https://github.com/QubesOS/qubes-issues/issues/2191
 /usr/lib/qubes/init/bind-dirs.sh /usr/lib/qubes/bind-dirs.sh
+
+## MIME override stuff
+/usr/share/X11 /usr/share/qubes/xdg-override/X11
+/usr/share/aclocal /usr/share/qubes/xdg-override/aclocal
+/usr/share/appdata /usr/share/qubes/xdg-override/appdata
+/usr/share/augeas /usr/share/qubes/xdg-override/augeas
+/usr/share/backgrounds /usr/share/qubes/xdg-override/backgrounds
+/usr/share/bash-completion /usr/share/qubes/xdg-override/bash-completion
+/usr/share/desktop-directories /usr/share/qubes/xdg-override/desktop-directories
+/usr/share/dict /usr/share/qubes/xdg-override/dict
+/usr/share/doc /usr/share/qubes/xdg-override/doc
+/usr/share/empty /usr/share/qubes/xdg-override/empty
+/usr/share/games /usr/share/qubes/xdg-override/games
+/usr/share/glib-2.0 /usr/share/qubes/xdg-override/glib-2.0
+/usr/share/gnome /usr/share/qubes/xdg-override/gnome
+/usr/share/help /usr/share/qubes/xdg-override/help
+/usr/share/icons /usr/share/qubes/xdg-override/icons
+/usr/share/idl /usr/share/qubes/xdg-override/idl
+/usr/share/info /usr/share/qubes/xdg-override/info
+/usr/share/licenses /usr/share/qubes/xdg-override/licenses
+/usr/share/locale /usr/share/qubes/xdg-override/locale
+/usr/share/man /usr/share/qubes/xdg-override/man
+/usr/share/metainfo /usr/share/qubes/xdg-override/metainfo
+/usr/share/mime-info /usr/share/qubes/xdg-override/mime-info
+/usr/share/misc /usr/share/qubes/xdg-override/misc
+/usr/share/omf /usr/share/qubes/xdg-override/omf
+/usr/share/pixmaps /usr/share/qubes/xdg-override/pixmaps
+/usr/share/sounds /usr/share/qubes/xdg-override/sounds
+/usr/share/themes /usr/share/qubes/xdg-override/themes
+/usr/share/wayland-sessions /usr/share/qubes/xdg-override/wayland-sessions
+/usr/share/xsessions /usr/share/qubes/xdg-override/xsessions
