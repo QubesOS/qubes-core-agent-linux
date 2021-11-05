@@ -42,6 +42,10 @@ install:
 		upgrades-installed-check \
 		upgrades-status-notify
 	install -d -m 2775 $(DESTDIR)$(QUBESSTATEDIR)/dom0-updates
+ifneq (,$(filter $(DIST),buster bullseye bookworm))
+	install -D -m 0644 dnf-plugin-download.py \
+		$(DESTDIR)$(QUBESLIBDIR)/dnf-plugins/download.py
+endif
 
 install-apt:
 	install -d $(DESTDIR)$(APTCONFDIR)/sources.list.d
