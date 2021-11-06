@@ -648,8 +648,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
-%config(noreplace) /etc/qubes-rpc/qubes.TemplateSearch
-%config(noreplace) /etc/qubes-rpc/qubes.TemplateDownload
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenInVM
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenURL
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectFile
@@ -743,7 +741,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qubes-sync-clock
 /usr/lib/qubes/resize-rootfs
 /usr/lib/qubes/tinyproxy-wrapper
-/usr/lib/qubes/qvm-template-repo-query
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/bind-dirs.sh
@@ -811,7 +808,10 @@ rm -f %{name}-%{version}
 /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/thunar.xml
 
 %files dom0-updates
+%config(noreplace) /etc/qubes-rpc/qubes.TemplateSearch
+%config(noreplace) /etc/qubes-rpc/qubes.TemplateDownload
 %dir %attr(0755,user,user) /var/lib/qubes/dom0-updates
+/usr/lib/qubes/qvm-template-repo-query
 /usr/lib/qubes/qubes-download-dom0-updates.sh
 
 %files networking

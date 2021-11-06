@@ -112,8 +112,8 @@ Depends:
     dnf | yum,
     dnf | yum-utils,
     qubes-core-qrexec,
-Replaces: qubes-core-agent (<< 4.0.0-1)
-Breaks: qubes-core-agent (<< 4.0.0-1)
+Replaces: qubes-core-agent (<< 4.1.28-1)
+Breaks: qubes-core-agent (<< 4.1.28-1)
 Description: Scripts required to handle dom0 updates.
   Scripts required to handle dom0 updates. This will allow to use the VM as
   "Updates VM".
