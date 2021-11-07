@@ -32,6 +32,12 @@ if [ -d '/usr/lib/qubes/dnf-plugins' ]; then
     OPTS+=("--setopt=pluginpath=/usr/lib/qubes/dnf-plugins")
 fi
 
+if ! command -v dnf >/dev/null; then
+    echo "ERROR: dnf command is missing, please use newer template for your UpdateVM to download templates." >&2
+    echo "You can choose any Fedora version, Debian 11 (or newer), or any other based on those (like Whonix 16)." >&2
+    exit 1
+fi
+
 # This creates the hashfile if it doesn't exist, and keep the ctime and mtime
 # unchanged otherwise.
 # We then copy the {c,m}time to the repo config.
