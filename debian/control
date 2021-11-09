@@ -111,6 +111,7 @@ Depends:
     rpm,
     dnf | yum,
     dnf | yum-utils,
+    curl,
     qubes-core-qrexec,
 Replaces: qubes-core-agent (<< 4.1.28-1)
 Breaks: qubes-core-agent (<< 4.1.28-1)
