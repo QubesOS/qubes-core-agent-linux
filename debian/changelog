@@ -1,3 +1,29 @@
+qubes-core-agent (4.1.28-1) unstable; urgency=medium
+
+  [ Ivan Kardykov ]
+  * network: reload DNS on vpn-down event too
+
+  [ Patrick Schleizer ]
+  * After=systemd-fsck@dev-xvdb.service
+
+  [ Demi Marie Obenour ]
+  * Use $(file <) instead of $(shell cat)
+
+  [ Frédéric Pierret (fepitre) ]
+  * qubes.GetAppmenus: don't cd into non-existing dir
+
+  [ Demi Marie Obenour ]
+  * Add missing symlinks to Debian qubes-core-agent
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: ship download dnf plugin
+  * Move qvm-template related files to -dom0-updates package
+  * qubes_hooks.py: consider transaction items only of some actions
+  * qvm-template: add more actionable error message
+  * debian: add curl dep for downloading packages
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 09 Nov 2021 05:28:54 +0100
+
 qubes-core-agent (4.1.27-1) unstable; urgency=medium
 
   [ 3hhh ]
