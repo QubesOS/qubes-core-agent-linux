@@ -28,6 +28,22 @@ import subprocess
 
 PLUGIN_CONF = 'qubes-hooks'
 
+try:
+    # based on https://github.com/rpm-software-management/dnf/commit/1fcb74dfb
+    import libdnf.transaction
+    RPM_ACTIONS_SET = {libdnf.transaction.TransactionItemAction_INSTALL,
+                       libdnf.transaction.TransactionItemAction_DOWNGRADE,
+                       libdnf.transaction.TransactionItemAction_DOWNGRADED,
+                       libdnf.transaction.TransactionItemAction_OBSOLETE,
+                       libdnf.transaction.TransactionItemAction_OBSOLETED,
+                       libdnf.transaction.TransactionItemAction_UPGRADE,
+                       libdnf.transaction.TransactionItemAction_UPGRADED,
+                       libdnf.transaction.TransactionItemAction_REMOVE,
+                       libdnf.transaction.TransactionItemAction_REINSTALLED}
+except (ImportError, AttributeError):
+    # just in case if libdnf is not importable
+    RPM_ACTIONS_SET = {1, 2, 3, 4, 5, 6, 7, 8, 10}
+
 def is_active(service):
     status = subprocess.call(["systemctl", "is-active", "--quiet", service])
     return status == 0
@@ -75,7 +91,8 @@ class QubesHooks(dnf.Plugin):
             just_installed = self.base.transaction
             # ...and filter them out of available updates
             for item in just_installed:
-                updates.discard(item.pkg)
+                if item.action in RPM_ACTIONS_SET:
+                    updates.discard(item.pkg)
             subprocess.call([
                 '/usr/lib/qubes/qrexec-client-vm',
                 'dom0',
