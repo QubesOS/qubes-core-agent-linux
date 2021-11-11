@@ -1,2 +1,2 @@
 [Desktop Entry]
-OnlyShowIn=GNOME;X-QUBES
+NotShowIn=GNOME;KDE;X-QUBES;
