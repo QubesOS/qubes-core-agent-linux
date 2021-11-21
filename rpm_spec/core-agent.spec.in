@@ -171,7 +171,7 @@ Conflicts:  qubes-gui-agent < 4.1.6
 BuildRequires: gcc
 BuildRequires: desktop-file-utils
 BuildRequires: pandoc
-%if x%{?backend_vmm} == xxen
+%if "%{?backend_vmm}" == "xen"
 BuildRequires: xen-devel
 %endif
 BuildRequires: libX11-devel
