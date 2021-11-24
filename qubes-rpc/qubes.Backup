@@ -4,6 +4,7 @@ echo Starting Backupcopy
 read -r args
 echo Arguments: "$args"
 if [ -d "$args" ] ; then
+  sync --file-system -- "$args"
   echo "Performing backup to directory $args"
   TARGET="$args/qubes-backup-$(date +'%Y-%m-%dT%H%M%S')"
   echo "Copying STDIN data to $TARGET"
@@ -12,6 +13,7 @@ else
   echo "Checking if arguments is matching a command"
   COMMAND=$(echo "$args" | cut -d ' ' -f 1)
   if command -v "$COMMAND" >/dev/null; then
+    sync
     echo "Redirecting STDIN to $args"
     # Parsing args to handle quotes correctly
     # Dangerous method if args are uncontrolled
