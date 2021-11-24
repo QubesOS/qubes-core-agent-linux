@@ -7,7 +7,7 @@ if [ -d "$args" ] ; then
   echo "Performing backup to directory $args"
   TARGET="$args/qubes-backup-$(date +'%Y-%m-%dT%H%M%S')"
   echo "Copying STDIN data to $TARGET"
-  cat > "$TARGET"
+  cat > "$TARGET" && sync -- "$TARGET" "$args"
 else
   echo "Checking if arguments is matching a command"
   COMMAND=$(echo "$args" | cut -d ' ' -f 1)
@@ -16,7 +16,7 @@ else
     # Parsing args to handle quotes correctly
     # Dangerous method if args are uncontrolled
     eval "set -- $args"
-    "$@"
+    "$@" && sync
   else
     echo "Invalid command $COMMAND"
     exit 1
