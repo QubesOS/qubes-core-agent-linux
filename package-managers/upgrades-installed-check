@@ -31,12 +31,10 @@ elif [ -e /etc/debian_version ]; then
     echo "$apt_get_upgrade_output" | awk "/^Inst/{ print $2 }" | [ "$(wc -L)" -eq 0 ] && echo "true" || echo "false"
 elif [ -e /etc/arch-release ]; then
     ## Archlinux
-    set -e
-    set -o pipefail
     checkupdates >/dev/null 2>&1
     exit_code="$?"
     [ "$exit_code" -eq 2 ] && echo "true" && exit 0
-    echo "false"
+    [ "$exit_code" -eq 0 ] && echo "false"
 elif [ -e /etc/gentoo-release ]; then
     ## Gentoo
     set -e
