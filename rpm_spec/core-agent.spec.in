@@ -299,9 +299,7 @@ Thunar support for Qubes VM tools
 
 %build
 %{?set_build_flags}
-for dir in qubes-rpc misc; do
-  make -C $dir BACKEND_VMM=@BACKEND_VMM@
-done
+make BACKEND_VMM=@BACKEND_VMM@
 make -C doc manpages
 
 %pre
