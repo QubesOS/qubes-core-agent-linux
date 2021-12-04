@@ -1,0 +1,4 @@
+`/usr/lib/\.modules_work(/.*)? <<none>>'
+`/usr/lib/modules/[0-9][^/]*/build' -d gen_context(system_u:object_r:usr_t,s0)
+`/usr/lib/modules/[0-9][^/]*/build/.*' gen_context(system_u:object_r:usr_t,s0)
+`/usr/lib/qubes/qfile-unpacker' -- gen_context(system_u:object_r:qubes_qfile_unpacker_exec_t,s0)
