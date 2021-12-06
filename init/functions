@@ -173,6 +173,7 @@ initialize_home() {
     local homedir_gid
     local waitpid
     local waitpids
+    local enable_selinux
 
     home_root="$1"
     mode="$2"
@@ -202,7 +203,8 @@ initialize_home() {
         if ! test -d "$home_root/$homedirwithouthome" || [ "$mode" = "unconditionally" ] ; then
             echo "initialize_home: populating $mode $home_root/$homedirwithouthome from /etc/skel" >&2
             mkdir -p "$home_root/$homedirwithouthome"
-            cp -af -T /etc/skel "$home_root/$homedirwithouthome"
+            if test -d /sys/fs/selinux; then enable_selinux="Z"; else enable_selinux=''; fi
+            cp "-af$enable_selinux" -T /etc/skel "$home_root/$homedirwithouthome"
             echo "initialize_home: adjusting permissions $mode on $home_root/$homedirwithouthome" >&2
             chown -R "$uid" "$home_root/$homedirwithouthome" &
             waitpids="$!"
