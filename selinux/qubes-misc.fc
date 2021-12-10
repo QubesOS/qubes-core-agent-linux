@@ -1,0 +1,12 @@
+define(`slash_run',`dnl
+/var/run/$1     $3       gen_context(system_u:object_r:$2_t,s0)
+/run/$1     $3       gen_context(system_u:object_r:$2_t,s0)
+')dnl
+/usr/lib/modules/firmware(/.*)?         gen_context(system_u:object_r:lib_t,s0)
+/usr/lib/modules/[0-9][^/]*/build    -d gen_context(system_u:object_r:usr_t,s0)
+/usr/lib/modules/[0-9][^/]*/build/.*    gen_context(system_u:object_r:usr_t,s0)
+/usr/lib/qubes(/.*)?                    gen_context(system_u:object_r:bin_t,s0)
+/usr/lib/qubes/init(/.*)?            -d gen_context(system_u:object_r:etc_t,s0)
+/usr/lib/qubes/init(/.*)?            -- gen_context(system_u:object_r:initrc_exec_t,s0)
+slash_run(`qubes(/.*)?',`qubes_var_run')
+slash_run(`qubes-service',`initrc_var_run',`-d')

@@ -320,13 +320,8 @@ License: GPLv2+
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%if 0%fedora
-Requires: selinux-policy >= %fedora
-Requires(post): selinux-policy-base >= %fedora
-%else
 Requires: selinux-policy
 Requires(post): selinux-policy-base
-%endif
 Requires(post): libselinux-utils
 BuildRequires: selinux-policy
 BuildRequires: selinux-policy-devel
@@ -336,8 +331,22 @@ SELinux policy for the Qubes VM tools.  This allows the Qubes VM tools to run in
 a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 
 %files selinux
-%_datadir/selinux/packages/targeted/qubes-qfile-unpacker.pp
-%_datadir/selinux/packages/targeted/qubes-xendriverdomain.pp
+%_datadir/selinux/packages/qubes-qfile-unpacker.pp
+%_datadir/selinux/packages/qubes-xendriverdomain.pp
+%_datadir/selinux/packages/qubes-misc.pp
+
+%postun selinux
+if [ "$1" -eq 0 ]; then
+    %selinux_modules_uninstall \
+        %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp \
+        %{_datadir}/selinux/packages/qubes-xendriverdomain.pp \
+        %{_datadir}/selinux/packages/qubes-misc.pp
+fi || :
+
+%posttrans selinux
+%selinux_relabel_post
+exit 0
+
 
 %endif
 
@@ -349,7 +358,7 @@ a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 
 %build
 %{?set_build_flags}
-make BACKEND_VMM=@BACKEND_VMM@ WITH_SELINUX=%with_selinux
+make BACKEND_VMM=@BACKEND_VMM@ ENABLE_SELINUX=%with_selinux
 make -C doc manpages
 
 %pre
@@ -378,7 +387,7 @@ usermod -L root
 
 %install
 
-make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib WITH_SELINUX=%with_selinux
+make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib ENABLE_SELINUX=%with_selinux
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
@@ -618,7 +627,7 @@ fi
 %if %{with selinux}
 %post selinux
 
-%selinux_modules_install %{_datadir}/selinux/packages/targeted/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/targeted/qubes-xendriverdomain.pp
+%selinux_modules_install %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
 
 contexts='### QUBES START ###\
 /rw/home /home\
@@ -642,7 +651,7 @@ d
 }
 \$a\
 $contexts
-" /etc/selinux/targeted/contexts/files/file_contexts.subs
+" /etc/selinux/*/contexts/files/file_contexts.subs
 
 %preun selinux
 if [ "$1" -eq 0 ] && ! grep -E '^SELINUX=(disabled|permissive)$' /etc/selinux/config; then

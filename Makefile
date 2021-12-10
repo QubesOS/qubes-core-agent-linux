@@ -8,22 +8,23 @@ release := $(shell lsb_release -is)
 
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
+selinux_policies ::= qubes-qfile-unpacker.pp qubes-xendriverdomain.pp \
+	qubes-misc.pp
 
 all:
 	$(MAKE) -C misc VERSION=$(VERSION)
 	$(MAKE) -C qubes-rpc
-ifdef WITH_SELINUX
-ifeq ($(WITH_SELINUX),1)
-	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile qubes-qfile-unpacker.pp qubes-xendriverdomain.pp
+ifdef ENABLE_SELINUX
+ifeq ($(ENABLE_SELINUX),1)
+	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile -- $(selinux_policies)
 
 install-rh: install-selinux
 
 install-selinux:
-	install -D -m 0644 -t $(DESTDIR)/usr/share/selinux/packages/targeted -- \
-		selinux/qubes-qfile-unpacker.pp selinux/qubes-xendriverdomain.pp
+	install -D -m 0644 -t $(DESTDIR)/usr/share/selinux/packages -- $(patsubst %,selinux/%,$(selinux_policies))
 .PHONY: install-selinux
-else ifneq ($(WITH_SELINUX),0)
-$(error bad value for WITH_SELINUX)
+else ifneq ($(ENABLE_SELINUX),0)
+$(error bad value for $$(ENABLE_SELINUX))
 endif
 endif
 
