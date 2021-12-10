@@ -187,6 +187,9 @@ BuildRequires: redhat-lsb
 # for update-mime-database
 BuildRequires: shared-mime-info
 Source0: %{name}-%{version}.tar.gz
+%if %{with selinux}
+Requires: (%{name}-selinux if selinux-policy)
+%endif
 
 %description
 The Qubes core files for installation inside a Qubes VM.
