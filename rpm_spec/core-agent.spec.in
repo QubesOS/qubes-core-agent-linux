@@ -633,6 +633,16 @@ contexts='### QUBES START ###\
 /rw/home /home\
 /rw/config/NM-system-connections /etc/NetworkManager/system-connections\
 /rw/bind-dirs /\
+/rw/usrlocal /usr/local\
+/rw/usrlocal/etc /etc\
+/rw/usrlocal/share /usr/share\
+/rw/usrlocal/libexec /usr/libexec\
+/rw/usrlocal/games /usr/games\
+/rw/usrlocal/bin /usr/bin\
+/rw/usrlocal/lib /usr/lib\
+/rw/usrlocal/src /usr/src\
+/rw/usrlocal/include /usr/include\
+/rw/usrlocal/sbin /usr/sbin\
 /usr/local/etc /etc\
 /usr/local/share /usr/share\
 /usr/local/libexec /usr/libexec\
