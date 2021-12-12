@@ -664,14 +664,16 @@ $contexts
 " /etc/selinux/*/contexts/files/file_contexts.subs
 
 %preun selinux
-if [ "$1" -eq 0 ] && ! grep -E '^SELINUX=(disabled|permissive)$' /etc/selinux/config; then
-  echo 'qubes-core-agent-selinux cannot be uninstalled with SELinux in enforcing mode' >&2
-  exit 1
+if [ "$1" -eq 0 ]; then
+  if ! grep -E '^SELINUX=(disabled|permissive)$' /etc/selinux/config; then
+    echo 'qubes-core-agent-selinux cannot be uninstalled with SELinux in enforcing mode' >&2
+    exit 1
+  fi
+  flock --no-fork -- %_selinux_store_policy_path/semanage.read.LOCK \
+  sed -Ei -- "/^### QUBES START ###\$/,/^### QUBES END ###\$/d" \
+    /etc/selinux/targeted/contexts/files/file_contexts.subs
+  %selinux_modules_uninstall %{_datadir}/selinux/packages/targeted/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/targeted/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
 fi
-flock --no-fork -- %_selinux_store_policy_path/semanage.read.LOCK \
-sed -Ei -- "/^### QUBES START ###\$/,/^### QUBES END ###\$/d" \
-  /etc/selinux/targeted/contexts/files/file_contexts.subs
-%selinux_modules_uninstall %{_datadir}/selinux/packages/targeted/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/targeted/qubes-xendriverdomain.pp
 exit 0
 
 %endif
