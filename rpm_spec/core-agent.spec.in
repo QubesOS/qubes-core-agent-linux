@@ -628,7 +628,11 @@ fi
 %post selinux
 
 %selinux_modules_install %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
-
+{
+flock --no-fork -- 9
+flock --no-fork -- 8
+for i in /etc/selinux/*/contexts/files/file_contexts.subs; do
+if [ -s "$i" ]; then
 contexts='### QUBES START ###\
 /rw/home /home\
 /rw/config/NM-system-connections /etc/NetworkManager/system-connections\
@@ -653,7 +657,7 @@ contexts='### QUBES START ###\
 /usr/local/include /usr/include\
 /usr/local/sbin /usr/sbin\
 ### QUBES END ###'
-flock --no-fork -- %_selinux_store_policy_path/semanage.read.LOCK \
+
 sed -Ei -- "/^### QUBES START ###\$/,/^### QUBES END ###\$/{
 \$c\
 $contexts
@@ -661,7 +665,36 @@ d
 }
 \$a\
 $contexts
-" /etc/selinux/*/contexts/files/file_contexts.subs
+" "$i"
+else
+printf >> "$i" '### QUBES START ###
+/rw/home /home
+/rw/config/NM-system-connections /etc/NetworkManager/system-connections
+/rw/bind-dirs /
+/rw/usrlocal /usr/local
+/rw/usrlocal/etc /etc
+/rw/usrlocal/share /usr/share
+/rw/usrlocal/libexec /usr/libexec
+/rw/usrlocal/games /usr/games
+/rw/usrlocal/bin /usr/bin
+/rw/usrlocal/lib /usr/lib
+/rw/usrlocal/src /usr/src
+/rw/usrlocal/include /usr/include
+/rw/usrlocal/sbin /usr/sbin
+/usr/local/etc /etc
+/usr/local/share /usr/share
+/usr/local/libexec /usr/libexec
+/usr/local/games /usr/games
+/usr/local/bin /usr/bin
+/usr/local/lib /usr/lib
+/usr/local/src /usr/src
+/usr/local/include /usr/include
+/usr/local/sbin /usr/sbin
+### QUBES END ###
+'
+fi
+done
+} 9< %_selinux_store_policy_path/semanage.read.LOCK 8< %_selinux_store_policy_path/semanage.trans.LOCK
 
 %preun selinux
 if [ "$1" -eq 0 ]; then
