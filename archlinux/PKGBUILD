@@ -67,7 +67,7 @@ package_qubes-vm-core() {
              python-dbus xdg-utils notification-daemon gawk sed procps-ng librsvg
              socat pacman-contrib
              # Block updating if there is a major python update as the python API will be in the wrong PYTHONPATH
-             'python<3.10'
+             'python<3.11'
              )
     optdepends=(gnome-keyring gnome-settings-daemon python-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
     install=PKGBUILD.install
