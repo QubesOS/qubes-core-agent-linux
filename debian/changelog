@@ -1,3 +1,18 @@
+qubes-core-agent (4.1.29-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * qubes.Backup: fsync() or sync() before success
+  * qubes.Backup: also syncfs() or sync() before *start*
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: build misc and qubes-rpc dirs via the main makefile
+  * Start nm-applet only when network manager is enabled
+
+  [ Kevin John ]
+  * fix upgrades-installed-check for archlinux
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 13 Dec 2021 04:47:44 +0100
+
 qubes-core-agent (4.1.28-1) unstable; urgency=medium
 
   [ Ivan Kardykov ]
