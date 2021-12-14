@@ -1,6 +1,6 @@
 pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-passwordless-root)
 pkgver=$(cat version) || exit 1
-pkgrel=15
+pkgrel=16
 epoch=
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
