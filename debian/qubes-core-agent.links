@@ -32,3 +32,6 @@
 /usr/share/themes /usr/share/qubes/xdg-override/themes
 /usr/share/wayland-sessions /usr/share/qubes/xdg-override/wayland-sessions
 /usr/share/xsessions /usr/share/qubes/xdg-override/xsessions
+
+## systemd stuff
+/lib/systemd/system/systemd-random-seed.service /lib/systemd/system/sysinit.target.requires/systemd-random-seed.service
