@@ -164,10 +164,6 @@ if [ "${ip}" ]; then
             "$iptables_cmd ! -i vif+ -s ${addr} -j DROP" \
             "COMMIT" |
             ${cmdprefix} "$ipt" --noflush $ipt_arg
-        if [[ "$command" = 'online' ]]; then
-            ip -- neighbour "${ipcmd}" to "${addr}" \
-                dev "${vif}" lladdr "$mac" nud permanent
-        fi
         if ! conntrack_purge -s "$addr" || ! conntrack_purge -d "$addr"; then
             printf 'Cannot purge stale conntrack entries for %q\n' "$addr">&2
             exit 1

@@ -27,12 +27,8 @@ configure_network() {
     local netvm_mac=fe:ff:ff:ff:ff:ff
 
     /sbin/ifconfig "$INTERFACE" "$ip" netmask "$netmask"
-    /sbin/ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
-        lladdr "$netvm_mac" nud permanent
     if [ -n "$ip6" ]; then
         /sbin/ifconfig "$INTERFACE" add "$ip6/$netmask6"
-        /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
-            lladdr "$netvm_mac" nud permanent
     fi
     /sbin/ifconfig "$INTERFACE" up
 
