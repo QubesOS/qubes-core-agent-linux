@@ -81,13 +81,6 @@ is_updateable() {
     [ "$(qubesdb-read /qubes-vm-updateable)" = "True" ]
 }
 
-reload_random_seed() {
-    local seed
-    seed=$(qubesdb-read /qubes-random-seed)
-    echo "$seed" | base64 -d > /dev/urandom
-    qubesdb-rm /qubes-random-seed
-}
-
 is_protected_file() {
     local ret=1
     local pfilelist

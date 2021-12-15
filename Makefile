@@ -79,6 +79,8 @@ install-systemd-dropins:
 	    install -d $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d ;\
 	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
+	install -d $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/sysinit.target.requires
+	ln -sf ../systemd-random-seed.service $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/sysinit.target.requires
 
 	# Install user dropins
 	@for dropin in $(USER_DROPINS); do \

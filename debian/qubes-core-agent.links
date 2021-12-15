@@ -38,3 +38,6 @@
 /usr/share/wayland-sessions /usr/share/qubes/xdg-override/wayland-sessions
 /usr/share/xsessions /usr/share/qubes/xdg-override/xsessions
 /usr/share/zoneinfo /usr/share/qubes/xdg-override/zoneinfo
+
+## systemd stuff
+/lib/systemd/system/systemd-random-seed.service /lib/systemd/system/sysinit.target.requires/systemd-random-seed.service
