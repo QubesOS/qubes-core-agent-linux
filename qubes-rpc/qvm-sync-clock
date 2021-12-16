@@ -19,4 +19,5 @@
 #
 
 # shellcheck disable=SC2016
-qrexec-client-vm '$default' qubes.GetDate /usr/lib/qubes/qubes-sync-clock
+qrexec-client-vm --filter-escape-chars-stderr '@default' \
+    qubes.GetDate+nanoseconds /usr/lib/qubes/qubes-sync-clock

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh --
 #
 # The Qubes OS Project, http://www.qubes-os.org
 #
@@ -16,7 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-#
-#
 
-date -u -Iseconds
+export LC_ALL=C
+case ${1-} in
+'') exec date -u -Iseconds;;
+nanosecond|nanoseconds|ns|*) exec date -u -Ins;;
+esac

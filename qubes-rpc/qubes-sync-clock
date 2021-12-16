@@ -18,20 +18,43 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-import sys
+import os
 import re
 import subprocess
+import sys
 
 def main():
-    stdin = sys.stdin.read(25)
-
-    untrusted_date_out = stdin.strip()
-
-    if not re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:?00$', untrusted_date_out):
+    os.environ['LC_ALL'] = 'C'
+    untrusted_date_out = sys.stdin.buffer.read(36)
+    try:
+        untrusted_date_out.decode('ascii', 'strict')
+    except UnicodeDecodeError:
+        sys.stderr.write('Received non-ASCII date, aborting!\n')
+        sys.exit(1)
+    untrusted_date_len = len(untrusted_date_out)
+    if untrusted_date_len == 36: # new format, nanosecond precision
+        regexp = rb'\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2},[0-9]{9}\+00:00\n\Z'
+        precision = b'ns'
+    elif untrusted_date_len == 26: # old format, second precision
+        regexp = rb'\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00\n\Z'
+        precision = b'seconds'
+    else:
+        sys.stderr.write('Invalid date length (expected 26 or 36 bytes, got {})'
+                         ', aborting!\n'.format(untrusted_date_len))
+        sys.exit(1)
+    if untrusted_date_out[-7:] != b'+00:00\n':
+        sys.stderr.write('Date not in UTC, aborting!\n')
+        sys.exit(1)
+    if not re.match(regexp, untrusted_date_out):
         sys.stderr.write('Invalid date received, aborting!\n')
         sys.exit(1)
+    # this time is arbitrary, something better should be used instead
+    if untrusted_date_out[:19] <= b'2022-07-10T17:08:31':
+        sys.stderr.write('Received a date older than this program, aborting!\n')
+        sys.exit(1)
     date_out = untrusted_date_out
-    subprocess.check_call(['date', '-u', '-Iseconds', '-s', date_out],
+    subprocess.check_call([b'date', b'-u', b'-I' + precision, b'-s',
+                           date_out[:-1]],
         stdout=subprocess.DEVNULL)
 
 if __name__ == '__main__':
