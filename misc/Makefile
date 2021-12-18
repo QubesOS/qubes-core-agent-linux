@@ -27,9 +27,14 @@ install:
 	    marker-vm \
 	    qubes-master-key.asc
 	install -D -m 0644 mime-globs $(DESTDIR)$(QUBESDATADIR)/mime-override/globs
-	for i in X11 aclocal appdata augeas backgrounds bash-completion desktop-directories dict doc empty games gnome help icons idl info licenses locale man metainfo mime-info misc omf pixmaps sounds themes wayland-sessions xsessions; do \
-		ln -sf "../../$$i" $(DESTDIR)$(QUBESMIMEDIR)/"$$i"; \
-	done
+	IFS=; while read -r i; do \
+		case $$i in \
+			(''|'#'*) continue;; \
+			(*[!A-Za-z0-9._-]*) \
+				printf 'ERROR: bad data directory "%s"\n' "$$i" >&2; exit 1;;\
+		esac; \
+		ln -sf "../../$$i" $(DESTDIR)$(QUBESMIMEDIR); \
+	done < data-dirs
 	$(RM) mime/icons
 	umask 022 && cp -r applications mime '$(DESTDIR)$(QUBESMIMEDIR)'
 	install -m 0755 -d $(DESTDIR)$(BINDIR)

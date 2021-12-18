@@ -3,8 +3,12 @@
 /usr/lib/qubes/init/bind-dirs.sh /usr/lib/qubes/bind-dirs.sh
 
 ## MIME override stuff
+/usr/share/GConf /usr/share/qubes/xdg-override/GConf
+/usr/share/ImageMagick-6 /usr/share/qubes/xdg-override/ImageMagick-6
 /usr/share/X11 /usr/share/qubes/xdg-override/X11
 /usr/share/aclocal /usr/share/qubes/xdg-override/aclocal
+/usr/share/alsa /usr/share/qubes/xdg-override/alsa
+/usr/share/alsa-card-profiles /usr/share/qubes/xdg-override/alsa-card-profiles
 /usr/share/appdata /usr/share/qubes/xdg-override/appdata
 /usr/share/augeas /usr/share/qubes/xdg-override/augeas
 /usr/share/backgrounds /usr/share/qubes/xdg-override/backgrounds
@@ -28,7 +32,9 @@
 /usr/share/misc /usr/share/qubes/xdg-override/misc
 /usr/share/omf /usr/share/qubes/xdg-override/omf
 /usr/share/pixmaps /usr/share/qubes/xdg-override/pixmaps
+/usr/share/publicsuffix /usr/share/qubes/xdg-override/publicsuffix
 /usr/share/sounds /usr/share/qubes/xdg-override/sounds
 /usr/share/themes /usr/share/qubes/xdg-override/themes
 /usr/share/wayland-sessions /usr/share/qubes/xdg-override/wayland-sessions
 /usr/share/xsessions /usr/share/qubes/xdg-override/xsessions
+/usr/share/zoneinfo /usr/share/qubes/xdg-override/zoneinfo
