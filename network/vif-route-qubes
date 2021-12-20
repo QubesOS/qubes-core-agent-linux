@@ -177,7 +177,7 @@ if [ "${ip}" ]; then
 fi
 
 if [ "$command" = "online" ]; then
-    ifconfig "${vif}" up
+    ip link set dev "${vif}" up
 fi
 
 if [ "${ip}" ]; then

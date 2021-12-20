@@ -25,11 +25,11 @@ configure_network() {
     local primary_dns="$9"
     local secondary_dns="${10}"
 
-    /sbin/ifconfig "$INTERFACE" "$ip" netmask "$netmask"
+    /sbin/ip address add "$ip/$netmask" dev "$INTERFACE"
     if [ -n "$ip6" ]; then
-        /sbin/ifconfig "$INTERFACE" add "$ip6/$netmask6"
+        /sbin/ip address add "$ip6/$netmask6" dev "$INTERFACE"
     fi
-    /sbin/ifconfig "$INTERFACE" up
+    /sbin/ip link set dev "$INTERFACE" up
 
     if [ -n "$gateway" ]; then
         add_host_route "$gateway" "$INTERFACE"
