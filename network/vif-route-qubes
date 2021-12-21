@@ -227,7 +227,7 @@ $nftables_cmd element $ipt qubes downstream { $addr }"
     # "allowed" map
 fi
 
-if [ "$command" = "online" ]; then
+if [[ "$command" = "online" ]]; then
     ip link set dev "${vif}" group 2 up
 fi
 
@@ -245,7 +245,7 @@ if [ "${ip}" ]; then
         network_hooks "${command}" "${vif}" "${addr}"
     done
     ${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
-    if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]] && [[ "$ipv6_disabled" = '0' ]]; then
+    if [[ -n "${back_ip6}" ]] && [[ "${back_ip6}" != "fe80:"* ]] && [[ "$ipv6_disabled" = '0' ]]; then
         ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
         echo 1 >"/proc/sys/net/ipv6/conf/${vif}/proxy_ndp"
     fi
@@ -254,6 +254,6 @@ else
 fi
 
 log debug "Successful vif-route-qubes $command for $vif."
-if [ "$command" = "online" ]; then
+if [[ "$command" = "online" ]]; then
   success
 fi
