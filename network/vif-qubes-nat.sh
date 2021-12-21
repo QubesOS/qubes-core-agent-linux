@@ -26,7 +26,7 @@ netns_appvm_if="${vif}"
 #               '----------------------------------'
 #
 
-readonly netvm_mac=fe:ff:ff:ff:ff:ff
+readonly netvm_mac=fe:ff:ff:ff:ff:ff mac=00:16:3e:5e:6c:00
 
 function run
 {

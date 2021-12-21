@@ -121,8 +121,6 @@ case "$command" in
         iptables_cmd='-I PREROUTING 1'
         cmdprefix=''
         ipv6_disabled=$(cat "/proc/sys/net/ipv6/conf/$vif/disable_ipv6" || echo 1)
-        # without a MAC address we will fail later with a confusing error
-        mac=$(xenstore-read "backend/vif/$domid/$sub/mac") || exit 1
         ;;
     offline)
         do_without_error ifdown "${vif}"
