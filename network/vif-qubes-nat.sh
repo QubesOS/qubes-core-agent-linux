@@ -47,7 +47,7 @@ function netns
 run ip addr flush dev "$netns_appvm_if"
 run ip netns delete "$netns" || :
 
-if test "$command" = online; then
+if [[ "$command" = online ]]; then
     echo 1 > "/proc/sys/net/ipv6/conf/$netns_appvm_if/disable_ipv6"
     run ip netns add "$netns"
     run ip link set "$netns_appvm_if" netns "$netns"
@@ -63,7 +63,7 @@ if test "$command" = online; then
 
     netns sh -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'
 
-    if test -n "$undetectable_netvm_ips"; then
+    if [[ -n "$undetectable_netvm_ips" ]]; then
         # prevent an AppVM connecting to its own ProxyVM IP because that makes the internal IPs detectable even with no firewall rules
         more_antispoof=" ip daddr != { $netvm_ip, $netvm_gw_ip, $netvm_dns1_ip, $netvm_dns2_ip }"
     else
