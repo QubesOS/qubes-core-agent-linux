@@ -120,7 +120,7 @@ case "$command" in
         ipcmd='add'
         iptables_cmd='-I PREROUTING 1'
         cmdprefix=''
-        ipv6_disabled=$(cat /proc/sys/net/ipv6/conf/"${vif}"/disable_ipv6 || echo 1)
+        ipv6_disabled=$(cat "/proc/sys/net/ipv6/conf/$vif/disable_ipv6" || echo 1)
         # without a MAC address we will fail later with a confusing error
         mac=$(xenstore-read "backend/vif/$domid/$sub/mac") || exit 1
         ;;
@@ -185,7 +185,7 @@ if [ "${ip}" ]; then
     # the guest using those addresses.
     for addr in ${ip};
     do
-        if [[ "$addr" = *:* ]] && [[ "$ipv6_disabled" = 1 ]]; then
+        if [[ "$addr" = *:* ]] && [[ "$ipv6_disabled" != '0' ]]; then
             log error "Cannot set IPv6 route to ${addr}, IPv6 disabled in the kernel"
             continue
         fi
@@ -194,7 +194,7 @@ if [ "${ip}" ]; then
         network_hooks "${command}" "${vif}" "${addr}"
     done
     ${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
-    if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]] && [[ "$ipv6_disabled" != 1 ]]; then
+    if [ "${back_ip6}" ] && [[ "${back_ip6}" != "fe80:"* ]] && [[ "$ipv6_disabled" = '0' ]]; then
         ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
     fi
 else
