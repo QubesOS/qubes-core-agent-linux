@@ -102,7 +102,7 @@ if ! [[ $vif =~ ^vif(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
     exit 1
 fi
 
-domid=${BASH_REMATCH[1]} sub=${BASH_REMATCH[2]}
+domid=${BASH_REMATCH[1]}
 
 # metric must be positive, but prefer later interface
 #  32752 is max XID aka domid
