@@ -20,10 +20,9 @@
 #
 
 from __future__ import absolute_import
-from distutils.version import LooseVersion
+
 import logging
 import dnf
-import dnf.const
 import subprocess
 
 PLUGIN_CONF = 'qubes-hooks'
@@ -44,9 +43,11 @@ except (ImportError, AttributeError):
     # just in case if libdnf is not importable
     RPM_ACTIONS_SET = {1, 2, 3, 4, 5, 6, 7, 8, 10}
 
+
 def is_active(service):
     status = subprocess.call(["systemctl", "is-active", "--quiet", service])
     return status == 0
+
 
 class QubesHooks(dnf.Plugin):
     name = 'qubes-hooks'
@@ -77,10 +78,7 @@ class QubesHooks(dnf.Plugin):
     def transaction(self):
         if not is_active("qubes-qrexec-agent"):
             return
-        if LooseVersion(dnf.const.VERSION) < '2.0.0':
-            config = self.read_config(self.base.conf, PLUGIN_CONF)
-        else:
-            config = self.read_config(self.base.conf)
+        config = self.read_config(self.base.conf)
 
         if config.getboolean('main', 'notify-updates'):
             # Get all updates available _before_ this transaction
