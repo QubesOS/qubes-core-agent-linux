@@ -8,7 +8,7 @@ if [ -d "$args" ] ; then
   echo "Performing backup to directory $args"
   TARGET="$args/qubes-backup-$(date +'%Y-%m-%dT%H%M%S')"
   echo "Copying STDIN data to $TARGET"
-  cat > "$TARGET" && sync -- "$TARGET" "$args"
+  dd bs=128K iflag=fullblock conv=fsync of="$TARGET" && sync -- "$args"
 else
   echo "Checking if arguments is matching a command"
   COMMAND=$(echo "$args" | cut -d ' ' -f 1)
