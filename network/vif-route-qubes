@@ -20,7 +20,7 @@
 #         this script).
 #============================================================================
 
-dir=$(dirname "$0")
+dir=$(dirname "$0") || exit
 # shellcheck disable=SC1091,SC1090
 . "$dir/vif-common.sh"
 
