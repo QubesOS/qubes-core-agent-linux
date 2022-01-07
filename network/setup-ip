@@ -24,6 +24,22 @@ configure_network() {
     local gateway6="$8"
     local primary_dns="$9"
     local secondary_dns="${10}"
+    local i
+
+    for i in all "$INTERFACE"; do
+        echo 0 > "/proc/sys/net/ipv4/conf/$i/accept_source_route"
+        echo 0 > "/proc/sys/net/ipv4/conf/$i/accept_redirects"
+        echo 0 > "/proc/sys/net/ipv4/conf/$i/secure_redirects"
+        echo 0 > "/proc/sys/net/ipv4/conf/$i/send_redirects"
+        echo 1 > "/proc/sys/net/ipv4/conf/$i/drop_unicast_in_l2_multicast"
+        echo -1 > "/proc/sys/net/ipv6/conf/$i/accept_source_route"
+        echo 0 > "/proc/sys/net/ipv6/conf/$i/accept_redirects"
+        echo 0 > "/proc/sys/net/ipv6/conf/$i/accept_ra"
+        echo 0 > "/proc/sys/net/ipv6/conf/$i/accept_dad"
+        echo 0 > "/proc/sys/net/ipv6/conf/$i/autoconf"
+        echo 1 > "/proc/sys/net/ipv6/conf/$i/drop_unicast_in_l2_multicast"
+        echo 1 > "/proc/sys/net/ipv6/conf/$i/drop_unsolicited_na"
+    done
 
     /sbin/ip address add "$ip/$netmask" dev "$INTERFACE"
     if [ -n "$ip6" ]; then
