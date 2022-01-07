@@ -3,7 +3,7 @@
 # Source Qubes library.
 # shellcheck disable=SC1091
 . /usr/lib/qubes/init/functions
-set -uo pipefail
+set -ueo pipefail
 
 add_link_route () {
     /sbin/ip -- route replace to unicast "$1" dev "$2" scope link
