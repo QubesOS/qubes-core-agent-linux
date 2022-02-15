@@ -22,17 +22,18 @@ set -e
 #
 
 unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE
+
 case ${0##*/} in
-(qvm-move) OPERATION_TYPE=move TARGET_TYPE=default MIN_ARGS=1;;
-(qvm-copy) OPERATION_TYPE=copy TARGET_TYPE=default MIN_ARGS=1;;
-(qvm-copy-to-vm) OPERATION_TYPE=copy TARGET_TYPE=vm MIN_ARGS=2;;
-(qvm-move-to-vm) OPERATION_TYPE=move TARGET_TYPE=vm MIN_ARGS=2;;
-(*) printf 'Invoked with unrecognized name %s, cannot determine operation to perform\n' "$0"; exit 1;;
+    (qvm-move) OPERATION_TYPE=move TARGET_TYPE=default MIN_ARGS=1;;
+    (qvm-copy) OPERATION_TYPE=copy TARGET_TYPE=default MIN_ARGS=1;;
+    (qvm-copy-to-vm) OPERATION_TYPE=copy TARGET_TYPE=vm MIN_ARGS=2;;
+    (qvm-move-to-vm) OPERATION_TYPE=move TARGET_TYPE=vm MIN_ARGS=2;;
+    (*) printf 'Invoked with unrecognized name %s, cannot determine operation to perform\n' "$0"; exit 1;;
 esac
 
 if [ "$1" = "--without-progress" ] ; then
-	export PROGRESS_TYPE=none
-	shift
+    export PROGRESS_TYPE=none
+    shift
 else
     export PROGRESS_TYPE=console
 fi
@@ -40,23 +41,23 @@ fi
 if [ "$1" = '--' ]; then shift; fi
 
 if [ "$#" -lt "$MIN_ARGS" ]; then
-	if [ "$TARGET_TYPE" = "vm" ]; then
-		echo "usage: $0 [--without-progress] destination_qube_name FILE [FILE ...]"
-	else
-		echo "usage: $0 [--without-progress] FILE [FILE ...]"
-	fi
+    if [ "$TARGET_TYPE" = "vm" ]; then
+        echo "usage: $0 [--without-progress] destination_qube_name FILE [FILE ...]"
+    else
+        echo "usage: $0 [--without-progress] FILE [FILE ...]"
+    fi
 
-	echo
+    echo
 
-	if [ "$OPERATION_TYPE" = "move" ] ; then
-		echo "Move FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
-	else
-		echo "Copy FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
-	fi
+    if [ "$OPERATION_TYPE" = "move" ] ; then
+        echo "Move FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
+    else
+        echo "Copy FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
+    fi
 
-	echo
-	echo "You will be prompted to select the destination qube. If FILE is a directory, it will be copied recursively."
-	exit 1
+    echo
+    echo "You will be prompted to select the destination qube. If FILE is a directory, it will be copied recursively."
+    exit 1
 fi
 
 if [ "$TARGET_TYPE" = "vm" ]; then
@@ -79,5 +80,5 @@ fi
 /usr/lib/qubes/qrexec-client-vm -- "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
-	rm -rf -- "$@"
+    rm -rf -- "$@"
 fi
