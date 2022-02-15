@@ -73,6 +73,13 @@ if [ "$PROGRESS_TYPE" = console ] ; then
     export FILECOPY_TOTAL_SIZE
 fi
 
+for path in "$@"; do
+    if [ ! -e "$path" ]; then
+        echo "File or directory not found: $path"
+        exit 1
+    fi
+done
+
 /usr/lib/qubes/qrexec-client-vm -- "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
