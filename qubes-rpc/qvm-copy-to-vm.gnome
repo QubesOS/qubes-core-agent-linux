@@ -19,9 +19,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
+set -e -o pipefail
+
 copy() {
-    /usr/lib/qubes/qrexec-client-vm @default qubes.Filecopy \
-                                    /usr/lib/qubes/qfile-agent "$@"
+    /usr/lib/qubes/qrexec-client-vm @default \
+        qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
 }
 
 progress_kdialog() {
@@ -51,7 +53,7 @@ progress_zenity() {
         fi
 
         echo $((100 * pos / SIZE))
-    done | {
+        done | {
         read -r  # ... and throw it away.
         zenity --progress --text="$DESCRIPTION" --auto-close
     }
@@ -59,7 +61,6 @@ progress_zenity() {
 
 
 SIZE=$(du -bcs -- "$@" 2>/dev/null | tail -n 1 | cut -f 1)
-set -e -o pipefail
 
 if [[ ${0##*/} == qvm-move-to-vm.* ]]; then
     DESCRIPTION="Moving files..."
