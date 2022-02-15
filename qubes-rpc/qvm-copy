@@ -57,6 +57,7 @@ if [ "$#" -lt "$MIN_ARGS" ]; then
 
     echo
     echo "You will be prompted to select the destination qube. If FILE is a directory, it will be copied recursively."
+    echo "In order to avoid typing target qube name twice, use qvm-copy/qvm-move instead of qvm-copy-to-vm/qvm-move-to-vm."
     exit 1
 fi
 
@@ -70,11 +71,6 @@ fi
 if [ "$PROGRESS_TYPE" = console ] ; then
     FILECOPY_TOTAL_SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
     export FILECOPY_TOTAL_SIZE
-fi
-
-if [ "$TARGET_TYPE" = "vm" ]; then
-    echo "qvm-copy-to-vm/qvm-move-to-vm tools are deprecated," >&2
-    echo "use qvm-copy/qvm-move to avoid typing target qube name twice" >&2
 fi
 
 /usr/lib/qubes/qrexec-client-vm -- "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
