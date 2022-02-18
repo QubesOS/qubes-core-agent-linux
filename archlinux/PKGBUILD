@@ -35,8 +35,6 @@ build() {
     done
 
     # Fix for network tools paths
-    sed 's:/sbin/ifconfig:ifconfig:g' -i network/*
-    sed 's:/sbin/route:route:g' -i network/*
     sed 's:/sbin/ethtool:ethtool:g' -i network/*
     sed 's:/sbin/ip:ip:g' -i network/*
     sed 's:/bin/grep:grep:g' -i network/*
@@ -61,7 +59,7 @@ package_qubes-vm-core() {
         exit 1
     }
     release=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}
-    depends=(qubes-vm-utils python python-xdg ethtool ntp net-tools
+    depends=(qubes-vm-utils python python-xdg ethtool ntp iproute2
              gnome-packagekit imagemagick fakeroot notification-daemon dconf
              zenity qubes-libvchan qubes-db-vm haveged python-gobject
              python-dbus xdg-utils notification-daemon gawk sed procps-ng librsvg
@@ -119,7 +117,7 @@ EOF
 #
 package_qubes-vm-networking() {
     pkgdesc="Qubes OS tools allowing to use a Qubes VM as a NetVM/ProxyVM"
-    depends=(qubes-vm-core qubes-vm-utils python ethtool net-tools
+    depends=(qubes-vm-core qubes-vm-utils python ethtool iproute2
              qubes-db-vm networkmanager iptables tinyproxy nftables
              conntrack-tools
              )

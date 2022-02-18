@@ -242,7 +242,6 @@ Summary:    Networking support for Qubes VM
 Requires:   ethtool
 Requires:   iptables
 Requires:   conntrack-tools
-Requires:   net-tools
 Requires:   iproute
 Requires:   nftables
 Requires:   socat
