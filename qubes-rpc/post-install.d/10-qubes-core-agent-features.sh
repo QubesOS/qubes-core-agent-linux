@@ -35,7 +35,7 @@ advertise_systemd_service network-manager NetworkManager.service \
 advertise_systemd_service modem-manager ModemManager.service
 advertise_systemd_service avahi avahi-daemon.service
 advertise_systemd_service crond anacron.service cron.service crond.service
-advertise_systemd_service cups cups.service org.cups.cupsd.service
+advertise_systemd_service cups cups.service cups.socket org.cups.cupsd.service
 advertise_systemd_service clocksync chronyd.service qubes-sync-time.service \
                               systemd-timesyncd.service
 advertise_systemd_service exim4 exim4.service
