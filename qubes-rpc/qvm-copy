@@ -57,7 +57,9 @@ if [ "$#" -lt "$MIN_ARGS" ]; then
 
     echo
     echo "You will be prompted to select the destination qube. If FILE is a directory, it will be copied recursively."
-    echo "In order to avoid typing target qube name twice, use qvm-copy/qvm-move instead of qvm-copy-to-vm/qvm-move-to-vm."
+    if [ "$TARGET_TYPE" = "vm" ]; then
+        echo "In order to avoid typing target qube name twice, use qvm-copy/qvm-move instead of qvm-copy-to-vm/qvm-move-to-vm."
+    fi
     exit 1
 fi
 
