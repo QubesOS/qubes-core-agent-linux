@@ -36,7 +36,7 @@ set -e
 # https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html or
 # the debian-policy package
 
-if [ "${1}" = "remove" ] ; then
+if [ "${1}" = "remove" ] || [ "${1}" = "upgrade" ] ; then
   if [ -f /etc/xdg/Thunar/uca.xml ] ; then
     mv /etc/xdg/Thunar/uca.xml /etc/xdg/Thunar/uca.xml.uninstall
     mv /etc/xdg/Thunar/uca.xml.bak /etc/xdg/Thunar/uca.xml
