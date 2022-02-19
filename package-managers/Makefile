@@ -59,6 +59,8 @@ install-apt:
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/70no-unattended
 	install -D -m 0644 apt-conf-10no-cache \
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/10no-cache
+	install -D -m 0644 apt-conf-41error-on-any \
+		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/41error-on-any
 
 install-dnf: install-rpm
 	install -D -m 0644 dnf-qubes-hooks.py \

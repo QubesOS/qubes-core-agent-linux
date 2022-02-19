@@ -1,6 +1,7 @@
 etc/apt/apt.conf.d/00notify-hook
-etc/apt/apt.conf.d/70no-unattended
 etc/apt/apt.conf.d/10no-cache
+etc/apt/apt.conf.d/41error-on-any
+etc/apt/apt.conf.d/70no-unattended
 etc/apt/sources.list.d/qubes-r4.list
 etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 etc/dconf/db/local.d/dpi
