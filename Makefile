@@ -416,6 +416,8 @@ install-deb: install-common install-systemd install-systemd-dropins install-syst
 	install -D -m 0644 misc/grub.qubes $(DESTDIR)/etc/default/grub.d/30-qubes.cfg
 	install -D -m 0644 misc/apt-conf-70no-unattended $(DESTDIR)/etc/apt/apt.conf.d/70no-unattended
 	install -D -m 0644 misc/apt-conf-10no-cache $(DESTDIR)/etc/apt/apt.conf.d/10no-cache
+	install -D -m 0644 misc/apt-conf-41error-on-any $(DESTDIR)$(APTCONFDIR)/apt.conf.d/41error-on-any
+
 
 install-corevm: install-rh install-common install-systemd install-sysvinit install-systemd-dropins install-networking
 
