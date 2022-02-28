@@ -1,3 +1,44 @@
+qubes-core-agent (4.1.32-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * Add parted dependency for debian and archlinux
+
+  [ Demi Marie Obenour ]
+  * qubes.ShowInTerminal: do not exit on Ctrl-O
+
+  [ Reinhard Tartler ]
+  * Unbreak package build on Ubuntu builds
+
+  [ Rusty Bird ]
+  * qubes.Backup: avoid close()+open() before fsync() of file
+
+  [ Demi Marie Obenour ]
+  * Replace net-tools with iproute2
+  * Fix GSettings when XDG_DATA_DIRS is overridden
+
+  [ Frédéric Pierret (fepitre) ]
+  * dnf: drop old dnf support
+
+  [ Mathieu Strypsteen ]
+  * Fix duplicate actions in Thunar
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: harden postrm script a bit
+
+  [ Simon Gaiser ]
+  * Update keys with signatures that don't use SHA1
+
+  [ Patrick Schleizer ]
+  * use common entry point for qvm-sync-clock
+
+  [ Demi Marie Obenour ]
+  * Fail boot if random seed doesn't get initialized
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix advertising cups if it uses socket activation
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 01 Mar 2022 00:12:11 +0100
+
 qubes-core-agent (4.1.31-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
