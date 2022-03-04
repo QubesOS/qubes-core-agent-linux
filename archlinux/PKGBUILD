@@ -59,6 +59,8 @@ package_qubes-vm-core() {
         exit 1
     }
     release=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}
+    # temporarily pretend it is still R4.1, until repository for R4.2 is created
+    release=4.1
     depends=(qubes-vm-utils python python-xdg ethtool ntp iproute2
              gnome-packagekit imagemagick fakeroot notification-daemon dconf
              zenity qubes-libvchan qubes-db-vm haveged python-gobject
