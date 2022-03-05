@@ -1,3 +1,18 @@
+qubes-core-agent (4.1.33-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * qubes-rpc/qvm-copy: fix indentation
+  * qvm-copy-to-vm.gnome: fix indent and reformat
+  * qubes-rpc/qvm-move: put warning into usage
+  * gui-fatal: don't not output GUI notification on PROGRESS_TYPE!=gui
+  * qvm-copy: add message about file/directory not found before qrexec
+  * qvm-copy: restrict duplicate message for vm target
+
+  [ Demi Marie Obenour ]
+  * Make `apt-get update` exit codes reliable
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 05 Mar 2022 06:20:57 +0100
+
 qubes-core-agent (4.1.32-1) unstable; urgency=medium
 
   [ Rusty Bird ]
