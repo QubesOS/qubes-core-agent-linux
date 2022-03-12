@@ -214,9 +214,6 @@ if [ "$ACTION" == "add" ]; then
         secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null) || secondary_dns=
 
         if [ -n "$ip" ]; then
-            /sbin/ethtool -K "$INTERFACE" sg off
-            /sbin/ethtool -K "$INTERFACE" tx off
-
             # If NetworkManager is enabled, let it configure the network
             if qsvc network-manager && [ -e /usr/bin/nmcli ]; then
                 configure_network_nm "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"

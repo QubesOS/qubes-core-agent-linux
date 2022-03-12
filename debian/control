@@ -126,7 +126,6 @@ Depends:
     qubes-core-agent (= ${binary:Version}),
     tinyproxy,
     iptables,
-    ethtool,
     conntrack,
     socat,
     tinyproxy,
