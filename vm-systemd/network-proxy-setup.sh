@@ -28,5 +28,4 @@ if [ "x$network" != "x" ]; then
     if [ -n "$gateway6" ]; then
         echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
     fi
-    /sbin/ethtool -K "$(get_qubes_managed_iface)" sg off || true
 fi
