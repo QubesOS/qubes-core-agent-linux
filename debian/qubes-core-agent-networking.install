@@ -14,6 +14,7 @@ lib/systemd/system/qubes-network.service
 lib/systemd/system/qubes-network-uplink.service
 lib/systemd/system/qubes-network-uplink@.service
 lib/systemd/system/qubes-updates-proxy.service
+lib/systemd/network/80-qubes-vif.link
 usr/lib/qubes/init/network-proxy-setup.sh
 usr/lib/qubes/init/network-proxy-stop.sh
 usr/lib/qubes/init/network-uplink-wait.sh
