@@ -827,6 +827,7 @@ rm -f %{name}-%{version}
 /usr/lib/systemd/system/qubes-network-uplink.service
 /usr/lib/systemd/system/qubes-network-uplink@.service
 /usr/lib/systemd/system/qubes-updates-proxy.service
+/usr/lib/systemd/network/80-qubes-vif.link
 /usr/lib/qubes/init/network-proxy-setup.sh
 /usr/lib/qubes/init/network-proxy-stop.sh
 /usr/lib/qubes/init/network-uplink-wait.sh
