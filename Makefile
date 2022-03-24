@@ -168,7 +168,6 @@ install-netvm:
 	install -D network/vif-qubes-nat.sh $(DESTDIR)/etc/xen/scripts/vif-qubes-nat.sh
 	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
 	install -m 0644 -D network/updates-blacklist $(DESTDIR)/etc/tinyproxy/updates-blacklist
-	install -m 0755 -D network/iptables-updates-proxy $(DESTDIR)$(LIBDIR)/qubes/iptables-updates-proxy
 
 	install -m 0400 -D network/iptables $(DESTDIR)/etc/qubes/iptables.rules
 	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
