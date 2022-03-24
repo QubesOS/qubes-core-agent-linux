@@ -4,9 +4,7 @@ ConditionPathExists=|/var/run/qubes-service/qubes-updates-proxy
 After=qubes-iptables.service
 
 [Service]
-ExecStartPre=/usr/lib/qubes/iptables-updates-proxy start
 ExecStart=/usr/lib/qubes/tinyproxy-wrapper -d -c /etc/tinyproxy/tinyproxy-updates.conf
-ExecStopPost=/usr/lib/qubes/iptables-updates-proxy stop
 Restart=on-failure
 RestartSec=5s
 
