@@ -1,0 +1,13 @@
+# Disable renaming of Xen netfront interfaces, to avoid race conditions during
+# network configuration. systemd / udevd does not provide any way to
+# synchronize against interface rename operation when the device is not
+# detected yet.
+# Furthermore, setting SYSTEMD_WANTS in udev seems to not work when interface
+# is renamed.
+# See https://github.com/QubesOS/qubes-issues/issues/7284 for details.
+
+[Match]
+Driver=vif
+
+[Link]
+NamePolicy=
