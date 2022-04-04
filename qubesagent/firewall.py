@@ -140,13 +140,13 @@ class FirewallWorker(object):
                 ['runuser', '-u', user, '--', 'notify-send', '-t', '8000',
                     '--icon=network-error', msg],
                 env={'DISPLAY': ':0',
-                    'PATH': '/usr/sbin:/usr/bin',
+                    'PATH': '/usr/sbin:/usr/bin:/sbin:/bin',
                     #dbus address is needed on fedora, but optional on debian
                     'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/{}/bus'.format(
                         uid)},
                 stderr=subprocess.STDOUT,
             )
-        except subprocess.SubprocessError as e:
+        except Exception as e:
             self.log.error(
                 'Failed to notify the user about: {} ({})'.format(
                     msg, str(e)
