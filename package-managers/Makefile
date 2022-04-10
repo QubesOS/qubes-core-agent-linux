@@ -52,7 +52,7 @@ install-apt:
 	sed "s/@DIST@/$(DIST)/" apt-qubes-r4.list.in \
 		> $(DESTDIR)$(APTCONFDIR)/sources.list.d/qubes-r4.list
 	install -D -m 0644 apt-qubes-archive-keyring.gpg \
-		$(DESTDIR)$(APTCONFDIR)/trusted.gpg.d/qubes-archive-keyring.gpg
+		$(DESTDIR)/usr/share/keyrings/qubes-archive-keyring.gpg
 	install -D -m 0644 apt-conf-00notify-hook \
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/00notify-hook
 	install -D -m 0644 apt-conf-70no-unattended \
