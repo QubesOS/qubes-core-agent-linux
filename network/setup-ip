@@ -49,6 +49,11 @@ configure_network() {
     fi
 
     if ! is_protected_file /etc/resolv.conf ; then
+        # workaround systemd-resolved stupidity
+        # https://github.com/systemd/systemd/pull/21317
+        if [ -h /etc/resolv.conf ]; then
+            rm -f /etc/resolv.conf
+        fi
         echo > /etc/resolv.conf
         if ! qsvc disable-dns-server ; then
             echo "nameserver $primary_dns" > /etc/resolv.conf
