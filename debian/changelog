@@ -1,3 +1,21 @@
+qubes-core-agent (4.1.34-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Turn on scatter-gather and checksum offload
+
+  [ Marek Marczykowski-Górecki ]
+  * Wait for fully starting user systemd session
+  * Disable renaming Xen's eth0 to enX0
+
+  [ Demi Marie Obenour ]
+  * Rip out the network-based updates proxy
+
+  [ Marek Marczykowski-Górecki ]
+  * Workaround systemd's broken /etc/resolv.conf symlink
+  * Register DNS server in systemd-resolved
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 14 Apr 2022 15:27:55 +0200
+
 qubes-core-agent (4.1.33-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
