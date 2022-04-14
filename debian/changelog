@@ -1,3 +1,51 @@
+qubes-core-agent (4.0.64-1) unstable; urgency=medium
+
+  [ Ivan Kardykov ]
+  * network: reload DNS on vpn-down event too
+
+  [ Marek Marczykowski-Górecki ]
+  * qubes_hooks.py: consider transaction items only of some actions
+
+  [ Rusty Bird ]
+  * qubes.Backup: fsync() or sync() before success
+  * qubes.Backup: also syncfs() or sync() before *start*
+
+  [ Otto Sabart ]
+  * qubes-vm-core: allow python<3.11 as a dependency
+
+  [ Rusty Bird ]
+  * qubes.Backup: avoid close()+open() before fsync() of file
+
+  [ Demi Marie Obenour ]
+  * qubes.ShowInTerminal: do not exit on Ctrl-O
+
+  [ Rusty Bird ]
+  * Add parted dependency for debian and archlinux
+
+  [ Frédéric Pierret (fepitre) ]
+  * dnf: drop old dnf support
+
+  [ Simon Gaiser ]
+  * Update keys with signatures that don't use SHA1
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix advertising cups if it uses socket activation
+
+  [ Demi Marie Obenour ]
+  * Make `apt-get update` exit codes reliable
+
+  [ Marek Marczykowski-Górecki ]
+  * Workaround systemd's broken /etc/resolv.conf symlink
+  * Register DNS server in systemd-resolved
+
+  [ Paweł Marczewski ]
+  * Enable root autologin on serial console
+
+  [ Demi Marie Obenour ]
+  * Allow user to choose username for qube console login
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 14 Apr 2022 18:01:39 +0200
+
 qubes-core-agent (4.0.63-1) unstable; urgency=medium
 
   [ unman ]
