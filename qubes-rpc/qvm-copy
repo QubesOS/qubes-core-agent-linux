@@ -82,7 +82,7 @@ for path in "$@"; do
     fi
 done
 
-/usr/lib/qubes/qrexec-client-vm -- "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
+/usr/lib/qubes/qrexec-client-vm --filter-escape-chars-stderr -- "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
     rm -rf -- "$@"
