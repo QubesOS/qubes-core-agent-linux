@@ -10,4 +10,6 @@ GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX swiotlb=8192"
 # add noresume - to avoid a 30 second hang on Debian HVM boot as it tries to
 # locate swap space for hibernation
 GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX noresume"
+# switch default clocksource to 'tsc' - it's much faster, and safe under Qubes OS
+GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX clocksource=tsc"
 GRUB_TIMEOUT=0
