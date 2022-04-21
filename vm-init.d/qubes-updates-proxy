@@ -52,7 +52,7 @@ start() {
     /sbin/iptables -I INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
     /sbin/iptables -t nat -A PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
 
-    echo -n $"Starting $prog (as Qubes updates proxy): "
+    echo -n "Starting $prog (as Qubes updates proxy): "
     daemon "$exec" -c $config
     retval=$?
     echo
