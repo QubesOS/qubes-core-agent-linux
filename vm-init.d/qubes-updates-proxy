@@ -42,7 +42,7 @@ start() {
     have_qubesdb || return
 
     if qsvc qubes-updates-proxy ; then
-        # Yum proxy disabled
+        # Updates proxy disabled
         exit 0
     fi
 
