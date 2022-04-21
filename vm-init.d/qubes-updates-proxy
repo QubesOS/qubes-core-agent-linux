@@ -48,9 +48,6 @@ start() {
 
     [ -x "$exec" ] || exit 5
     [ -f $config ] || exit 6
-    # setup network redirection
-    /sbin/iptables -I INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
-    /sbin/iptables -t nat -A PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
 
     echo -n "Starting $prog (as Qubes updates proxy): "
     daemon "$exec" -c $config
@@ -65,8 +62,6 @@ stop() {
     killproc -p $pidfile "$prog"
     retval=$?
     echo
-    /sbin/iptables -t nat -D PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
-    /sbin/iptables -D INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
     [ $retval -eq 0 ] && rm -f "$lockfile"
     return $retval
 }
