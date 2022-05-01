@@ -244,6 +244,7 @@ install-common: install-doc
 
 	install -m 0644 network/udev-qubes-network.rules $(DESTDIR)/etc/udev/rules.d/99-qubes-network.rules
 	install -m 0755 network/update-proxy-configs $(DESTDIR)$(LIBDIR)/qubes/
+	install -m 0755 network/get-dns-from-resolved $(DESTDIR)$(LIBDIR)/qubes/
 
 	install -d $(DESTDIR)$(BINDIR)
 	install -m 0755 misc/qubes-session-autostart $(DESTDIR)$(BINDIR)/qubes-session-autostart
