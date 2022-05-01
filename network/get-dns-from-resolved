@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+#
+# The Qubes OS Project, http://www.qubes-os.org
+#
+# Copyright (C) 2022  Marek Marczykowski-Górecki
+#                               <marmarek@invisiblethingslab.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+
+import dbus
+
+
+def get_dns():
+    bus = dbus.SystemBus()
+    resolve1 = bus.get_object('org.freedesktop.resolve1',
+                              '/org/freedesktop/resolve1')
+    resolve1_proxy = dbus.Interface(resolve1,
+                                    dbus_interface='org.freedesktop.resolve1')
+    dns = resolve1.Get('org.freedesktop.resolve1.Manager',
+                       'DNS',
+                       dbus_interface='org.freedesktop.DBus.Properties')
+    return dns
+
+
+def print_ipv4_dns(dns):
+    # filter on IPv4 (family 2) and then sort global DNS first
+    dns_filtered_sorted = sorted((d for d in dns if d[1] == 2),
+                                 key=lambda x: x[0] != 0)
+
+    for dns in dns_filtered_sorted:
+        # take only address array
+        address = dns[2]
+        print('nameserver {:d}.{:d}.{:d}.{:d}'.format(*address))
+
+
+if __name__ == '__main__':
+    print_ipv4_dns(get_dns())

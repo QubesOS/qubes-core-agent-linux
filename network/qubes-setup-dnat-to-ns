@@ -18,7 +18,12 @@ export PATH=$PATH:/sbin:/bin
 if [ "X$NS1" = "X" ] ; then exit ; fi
 iptables -t nat -F PR-QBS
 FIRSTONE=yes
-grep ^nameserver /etc/resolv.conf | grep -v ":.*:" | head -2 |
+if systemctl -q is-active systemd-resolved && \
+        grep -q '^nameserver.*127\.0\.0\.53' /etc/resolv.conf; then
+    /usr/lib/qubes/get-dns-from-resolved
+else
+    grep ^nameserver /etc/resolv.conf
+fi | grep -v ":.*:" | head -2 |
         (
         # shellcheck disable=SC2034
         while read -r x y z ; do
