@@ -1,0 +1,7 @@
+
+# Units below this line will be re-preset on package upgrade
+
+# conflicts with pulseaudio
+disable pipewire.socket
+disable pipewire.service
+disable wireplumber.service
