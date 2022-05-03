@@ -26,8 +26,8 @@ clean:
 	rm -f .coverage
 
 # Dropin Directory
-SYSTEM_DROPIN_DIR ?= "lib/systemd/system"
-USER_DROPIN_DIR ?= "usr/lib/systemd/user"
+SYSTEM_DROPIN_DIR ?= /lib/systemd/system
+USER_DROPIN_DIR ?= /usr/lib/systemd/user
 
 SYSTEM_DROPINS := boot.automount chronyd.service crond.service
 SYSTEM_DROPINS += cups.service cups-browsed.service cups.path cups.socket ModemManager.service
@@ -76,23 +76,23 @@ endif
 install-systemd-dropins:
 	# Install system dropins
 	@for dropin in $(SYSTEM_DROPINS); do \
-	    install -d $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d ;\
-	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
+	    install -d $(DESTDIR)$(SYSTEM_DROPIN_DIR)/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
-	install -d $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/sysinit.target.requires
-	ln -sf ../systemd-random-seed.service $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/sysinit.target.requires
+	install -d $(DESTDIR)$(SYSTEM_DROPIN_DIR)/sysinit.target.requires
+	ln -sf ../systemd-random-seed.service $(DESTDIR)$(SYSTEM_DROPIN_DIR)/sysinit.target.requires
 
 	# Install user dropins
 	@for dropin in $(USER_DROPINS); do \
-	    install -d $(DESTDIR)/$(USER_DROPIN_DIR)/$${dropin}.d ;\
-	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)/$(USER_DROPIN_DIR)/$${dropin}.d/ ;\
+	    install -d $(DESTDIR)$(USER_DROPIN_DIR)/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)$(USER_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
 
 install-systemd-networking-dropins:
 	# Install system dropins
 	@for dropin in $(SYSTEM_DROPINS_NETWORKING); do \
-	    install -d $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d ;\
-	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)/$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
+	    install -d $(DESTDIR)$(SYSTEM_DROPIN_DIR)/$${dropin}.d ;\
+	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
 
 install-init:
