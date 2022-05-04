@@ -28,8 +28,8 @@
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0
 
-exec="$(command -v tinyproxy)"
-prog=$(basename "$exec")
+exec=$(command -v tinyproxy) || exit 2
+prog=$(basename "$exec") || exit 2
 config="/etc/tinyproxy/tinyproxy-updates.conf"
 pidfile="/var/run/tinyproxy-updates/tinyproxy.pid"
 
@@ -47,23 +47,23 @@ start() {
     fi
 
     [ -x "$exec" ] || exit 5
-    [ -f $config ] || exit 6
+    [ -f "$config" ] || exit 6
 
     echo -n "Starting $prog (as Qubes updates proxy): "
-    daemon "$exec" -c $config
+    daemon "$exec" -c "$config"
     retval=$?
     echo
-    [ $retval -eq 0 ] && touch $lockfile
-    return $retval
+    [ "$retval" -eq 0 ] && touch -- "$lockfile"
+    return "$retval"
 }
 
 stop() {
     echo -n $"Stopping $prog: "
-    killproc -p $pidfile "$prog"
+    killproc -p "$pidfile" "$prog"
     retval=$?
     echo
-    [ $retval -eq 0 ] && rm -f "$lockfile"
-    return $retval
+    [ "$retval" -eq 0 ] && rm -f -- "$lockfile"
+    return "$retval"
 }
 
 restart() {
