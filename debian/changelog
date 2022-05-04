@@ -1,3 +1,19 @@
+qubes-core-agent (4.1.35-1) unstable; urgency=medium
+
+  [ juodumas ]
+  * firewall log_error: handle all exceptions, allow runuser to be in
+    /sbin
+
+  [ Frédéric Pierret (fepitre) ]
+  * Drop Travis CI
+
+  [ Marek Marczykowski-Górecki ]
+  * network: extract DNS servers IP from resolved service
+  * Disable pipewire by default
+  * makefile: Fix *_DROPIN_DIR variables
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 05 May 2022 00:04:19 +0200
+
 qubes-core-agent (4.1.34-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
