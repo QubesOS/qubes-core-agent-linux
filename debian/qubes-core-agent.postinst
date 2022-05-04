@@ -26,6 +26,7 @@ debug() {
     fi
 }
 
+# FIXME: add user units support to is_static()/is_masked()/mask()/unmask() functions
 is_static() {
     [ -f "/lib/systemd/system/$1" ] && ! grep -q '^[[].nstall]' "/lib/systemd/system/$1"
 }
@@ -57,6 +58,8 @@ unmask() {
 
 preset_units() {
     local represet=
+    # shellcheck disable=SC2206
+    local extra_opts=( $3 )
     while read -r action unit_name
     do
         if [ "$action" = "#" ] && [ "$unit_name" = "Units below this line will be re-preset on package upgrade" ]
@@ -84,9 +87,9 @@ preset_units() {
                     # We masked this static unit before, now we unmask it.
                     deb-systemd-helper unmask "${unit_name}" > /dev/null 2>&1 || true
                 fi
-                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
+                systemctl --no-reload "${extra_opts[@]}" preset "$unit_name" >/dev/null 2>&1 || :
             else
-                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || :
+                systemctl --no-reload "${extra_opts[@]}" preset "$unit_name" >/dev/null 2>&1 || :
             fi
         fi
     done < "$1"
@@ -137,11 +140,13 @@ case "${1}" in
 
             # Systemd preload-all
             preset_units /lib/systemd/system-preset/75-qubes-vm.preset initial
+            preset_units /usr/lib/systemd/user-preset/75-qubes-vm.preset initial --global
 
             # Maybe install overridden serial.conf init script
             installSerialConf
         else
             preset_units /lib/systemd/system-preset/75-qubes-vm.preset upgrade
+            preset_units /usr/lib/systemd/user-preset/75-qubes-vm.preset upgrade --global
         fi
         systemctl reenable haveged
 

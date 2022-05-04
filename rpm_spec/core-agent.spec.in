@@ -34,6 +34,7 @@
 %define plateform_python3_sitelib %(/usr/libexec/platform-python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
 %endif
 
+# FIXME: add user units support to is_static()/is_masked()/mask()/unmask() functions
 %define scriptletfuns is_static() { \
     [ -f "%{_unitdir}/$1" ] && ! grep -q '^[[].nstall]' "%{_unitdir}/$1" \
 } \
@@ -65,6 +66,7 @@ unmask() { \
 \
 preset_units() { \
     local represet= \
+    local extra_opts="$3" \
     cat "$1" | while read action unit_name \
     do \
         if [ "$action" = "#" -a "$unit_name" = "Units below this line will be re-preset on package upgrade" ] \
@@ -90,15 +92,16 @@ preset_units() { \
                     # We masked this static unit before, now we unmask it. \
                     unmask "$unit_name" \
                 fi \
-                 systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+                 systemctl --no-reload $extra_opts preset "$unit_name" >/dev/null 2>&1 || : \
             else \
-                systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+                systemctl --no-reload $extra_opts preset "$unit_name" >/dev/null 2>&1 || : \
             fi \
         fi \
     done \
 } \
 \
 restore_units() { \
+    local extra_opts="$2" \
     grep '^[[:space:]]*[^#;]' "$1" | while read action unit_name \
     do \
         if is_static "$unit_name" && is_masked "$unit_name" \
@@ -107,7 +110,7 @@ restore_units() { \
             # Otherwise systemctl preset will fail badly. \
             unmask "$unit_name" \
         fi \
-        systemctl --no-reload preset "$unit_name" >/dev/null 2>&1 || : \
+        systemctl --no-reload $extra_opts preset "$unit_name" >/dev/null 2>&1 || : \
     done \
 } \
 
@@ -958,6 +961,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/qubes-updates-proxy-forwarder@.service
 /usr/lib/systemd/system/qubes-updates-proxy-forwarder.socket
 /usr/lib/systemd/system-preset/%qubes_preset_file
+/usr/lib/systemd/user-preset/%qubes_preset_file
 /usr/lib/modules-load.d/qubes-core.conf
 /usr/lib/systemd/system/boot.automount.d/30_qubes.conf
 /usr/lib/systemd/system/chronyd.service.d/30_qubes.conf
@@ -994,9 +998,11 @@ changed=
 if [ $1 -eq 1 ]
 then
     preset_units %{_presetdir}/%qubes_preset_file initial
+    preset_units %{%_userpresetdir}/%qubes_preset_file initial --global
     changed=true
 else
     preset_units %{_presetdir}/%qubes_preset_file upgrade
+    preset_units %{_userpresetdir}/%qubes_preset_file upgrade --global
     changed=true
     # Upgrade path - now qubes-iptables is used instead
     for svc in iptables ip6tables
@@ -1046,6 +1052,8 @@ if [ $1 -eq 0 ] ; then
     # once the Qubes OS preset file is removed.
     mkdir -p %{_rundir}/qubes-uninstall
     cp -f %{_presetdir}/%qubes_preset_file %{_rundir}/qubes-uninstall/
+    cp -f %{_userpresetdir}/%qubes_preset_file \
+        %{_rundir}/qubes-uninstall/user-%qubes_preset_file
 fi
 
 %postun systemd
@@ -1059,6 +1067,7 @@ then
     # We have a saved preset file (or more).
     # Re-preset the units mentioned there.
     restore_units %{_rundir}/qubes-uninstall/%qubes_preset_file
+    restore_units %{_rundir}/qubes-uninstall/user-%qubes_preset_file --global
     rm -rf %{_rundir}/qubes-uninstall
     changed=true
 fi
