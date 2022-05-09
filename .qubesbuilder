@@ -1,6 +1,6 @@
 vm:
   rpm:
-    spec:
+    build:
     - rpm_spec/core-agent.spec
   deb:
     build:
