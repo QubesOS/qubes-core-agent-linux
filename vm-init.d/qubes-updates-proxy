@@ -28,8 +28,8 @@
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0
 
-exec="$(command -v tinyproxy)"
-prog=$(basename "$exec")
+exec=$(command -v tinyproxy) || exit 2
+prog=$(basename "$exec") || exit 2
 config="/etc/tinyproxy/tinyproxy-updates.conf"
 pidfile="/var/run/tinyproxy-updates/tinyproxy.pid"
 
@@ -42,33 +42,28 @@ start() {
     have_qubesdb || return
 
     if qsvc qubes-updates-proxy ; then
-        # Yum proxy disabled
+        # Updates proxy disabled
         exit 0
     fi
 
     [ -x "$exec" ] || exit 5
-    [ -f $config ] || exit 6
-    # setup network redirection
-    /sbin/iptables -I INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
-    /sbin/iptables -t nat -A PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
+    [ -f "$config" ] || exit 6
 
-    echo -n $"Starting $prog (as Qubes updates proxy): "
-    daemon "$exec" -c $config
+    echo -n "Starting $prog (as Qubes updates proxy): "
+    daemon "$exec" -c "$config"
     retval=$?
     echo
-    [ $retval -eq 0 ] && touch $lockfile
-    return $retval
+    [ "$retval" -eq 0 ] && touch -- "$lockfile"
+    return "$retval"
 }
 
 stop() {
     echo -n $"Stopping $prog: "
-    killproc -p $pidfile "$prog"
+    killproc -p "$pidfile" "$prog"
     retval=$?
     echo
-    /sbin/iptables -t nat -D PR-QBS-SERVICES -i vif+ -d 10.137.255.254 -p tcp --dport 8082 -j REDIRECT
-    /sbin/iptables -D INPUT -i vif+ -p tcp --dport 8082 -j ACCEPT
-    [ $retval -eq 0 ] && rm -f "$lockfile"
-    return $retval
+    [ "$retval" -eq 0 ] && rm -f -- "$lockfile"
+    return "$retval"
 }
 
 restart() {
