@@ -1,33 +1,33 @@
 import os
 from subprocess import Popen
 
-from gi.repository import Nautilus, GObject
+from gi.repository import Caja, GObject
 
 
-class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
+class OpenInDvmItemExtension(GObject.GObject, Caja.MenuProvider):
     '''Open File(s) in DisposableVM.
 
-    Uses the nautilus-python api to provide a context menu within Nautilus which
+    Uses the caja-python api to provide a context menu within Caja which
     will enable the user to select file(s) to to open in a disposableVM
     '''
 
     def get_file_items(self, window, files):
-        '''Attaches context menu in Nautilus
+        '''Attaches context menu in Caja
         '''
         if not files:
             return
 
-        menu_item1 = Nautilus.MenuItem(name='QubesMenuProvider::OpenInDvm',
-                                      label='Edit In DisposableVM',
-                                      tip='',
-                                      icon='')
+        menu_item1 = Caja.MenuItem(name='QubesMenuProvider::OpenInDvm',
+                                   label='Edit In DisposableVM',
+                                   tip='',
+                                   icon='')
 
         menu_item1.connect('activate', self.on_menu_item_clicked, files)
 
-        menu_item2 = Nautilus.MenuItem(name='QubesMenuProvider::ViewInDvm',
-                                      label='View In DisposableVM',
-                                      tip='',
-                                      icon='')
+        menu_item2 = Caja.MenuItem(name='QubesMenuProvider::ViewInDvm',
+                                   label='View In DisposableVM',
+                                   tip='',
+                                   icon='')
 
         menu_item2.connect('activate',
                 self.on_menu_item_clicked,
@@ -35,7 +35,7 @@ class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
         return menu_item1, menu_item2,
 
     def on_menu_item_clicked(self, menu, files, view_only=False):
-        '''Called when user chooses files though Nautilus context menu.
+        '''Called when user chooses files though Caja context menu.
         '''
         for file_obj in files:
 
