@@ -72,15 +72,15 @@ fi
 
 mkdir -p $DOM0_UPDATES_DIR/etc
 
-if [ -e /etc/debian_version ]; then
-    # Default rpm configuration on Debian uses ~/.rpmdb for rpm database (as
-    # rpm isn't native package manager there)
-    mkdir -p "$DOM0_UPDATES_DIR$HOME"
-    rm -rf "$DOM0_UPDATES_DIR$HOME/.rpmdb"
-    cp -r "$DOM0_UPDATES_DIR/var/lib/rpm" "$DOM0_UPDATES_DIR$HOME/.rpmdb"
+# Check if we need to copy rpmdb somewhere else
+DBPATH=$(rpm --eval '%{_dbpath}')
+if [ ! "$DBPATH" = "/var/lib/rpm" ]; then
+    mkdir -p "$DOM0_UPDATES_DIR$DBPATH"
+    rm -rf -- "$DOM0_UPDATES_DIR$DBPATH"
+    cp -r "$DOM0_UPDATES_DIR/var/lib/rpm" "$DOM0_UPDATES_DIR$DBPATH"
 fi
 # Rebuild rpm database in case of different rpm version
-rm -f $DOM0_UPDATES_DIR/var/lib/rpm/__*
+rm -f -- "$DOM0_UPDATES_DIR$DBPATH"/__*
 rpm --root=$DOM0_UPDATES_DIR --rebuilddb
 
 if [ "$CLEAN" = "1" ]; then
