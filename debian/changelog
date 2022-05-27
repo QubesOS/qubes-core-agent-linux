@@ -1,3 +1,16 @@
+qubes-core-agent (4.1.36-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Updates proxy is not just for Yum
+
+  [ immeëmosol ]
+  * Write out object & command,`ip l s`=`ip link set`
+
+  [ xaki23 ]
+  * add dynamic support for alternate rpmdb pathes
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 27 May 2022 04:06:49 +0200
+
 qubes-core-agent (4.1.35-1) unstable; urgency=medium
 
   [ juodumas ]
