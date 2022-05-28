@@ -95,6 +95,16 @@ Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for Nautilus
  Nautilus addons for inter-VM file copy/move/open.
 
+Package: qubes-core-agent-caja
+Architecture: any
+Depends:
+    ${pythonver:Depends}-caja,
+    qubes-core-qrexec,
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
+Description: Qubes integration for Caja
+ Caja addons for inter-VM file copy/move/open.
+
 Package: qubes-core-agent-thunar
 Architecture: any
 Depends:
