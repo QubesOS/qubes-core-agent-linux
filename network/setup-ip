@@ -5,8 +5,8 @@
 . /usr/lib/qubes/init/functions
 set -uo pipefail
 
-add_host_route () {
-    /sbin/ip -- route replace to unicast "$1" dev "$2" onlink scope host
+add_link_route () {
+    /sbin/ip -- route replace to unicast "$1" dev "$2" scope link
 }
 
 add_default_route () {
@@ -32,9 +32,9 @@ configure_network() {
     /sbin/ip link set dev "$INTERFACE" up
 
     if [ -n "$gateway" ]; then
-        add_host_route "$gateway" "$INTERFACE"
+        add_link_route "$gateway" "$INTERFACE"
         if [ -n "$gateway6" ] && ! echo "$gateway6" | grep -q "^fe80:"; then
-            add_host_route "$gateway6/$netmask6" "$INTERFACE"
+            add_link_route "$gateway6/$netmask6" "$INTERFACE"
         fi
         if ! qsvc disable-default-route ; then
             add_default_route "$gateway" "$INTERFACE"
