@@ -4,6 +4,10 @@
 # It happens after local-fs.target is reached
 # but before sysinit.target is reached.
 
+if [ -x /rw/config/rc.local-early ] ; then
+    /rw/config/rc.local-early
+fi
+
 # Source Qubes library.
 # shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
