@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+set -eo pipefail
+
 OPTS=()
 SPEC=
 while IFS= read -r line; do
@@ -21,6 +23,7 @@ while IFS= read -r line; do
 done
 
 repodir=$(mktemp -d)
+trap 'rm -r "$repodir"' EXIT
 cat > "$repodir/template.repo"
 
 OPTS+=("--setopt=reposdir=${repodir}")
@@ -57,5 +60,4 @@ elif [ "$1" = "download" ]; then
     RET="$?"
 fi
 
-rm -r "$repodir"
 exit "$RET"
