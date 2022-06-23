@@ -55,9 +55,34 @@ if [ "$1" = "query" ]; then
     dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{reponame}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
     RET="$?"
 elif [ "$1" = "download" ]; then
-    url="$(dnf download "${OPTS[@]}" --url "$SPEC" | shuf -n 1)"
-    curl --silent -L "$url" -o -
-    RET="$?"
+    # Download/retry algorithm: take mirrors in random order. In this order,
+    # try to download from the first one - if download failed but anything was
+    # downloaded - retry from the same one. If download failed and nothing was
+    # downloaded, go to the next one. The intention is to retry on interrupted
+    # connection, but skip mirrors that are not synchronized yet.
+    # FIXME: 'dnf download --url' prints only one URL, not all the mirrors
+    urls="$(dnf download "${OPTS[@]}" --url "$SPEC" | shuf)"
+    readarray -t urls <<<"$urls"
+    downloaded=0
+    status_file="$repodir/download-status.tmp"
+    for url in "${urls[@]}"; do
+        while true; do
+            # pipe data through dd to count bytes for resuming purpose
+            if curl --fail --silent --continue-at "$downloaded" -L "$url" -o - |\
+                    dd bs=1M 2>"$status_file"; then
+                exit 0
+            fi
+            now_downloaded=$(grep '^[0-9]\+ bytes' "$status_file")
+            now_downloaded=${now_downloaded% bytes*}
+            if [ -z "$now_downloaded" ] || [ "$now_downloaded" -eq 0 ]; then
+                # go to the next mirror
+                break
+            fi
+            downloaded=$(( downloaded + now_downloaded ))
+        done
+    done
+    # ran out of mirrors to try
+    RET=1
 fi
 
 exit "$RET"
