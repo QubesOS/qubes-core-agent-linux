@@ -1,0 +1,10 @@
+vm:
+  rpm:
+    build:
+    - rpm_spec/core-agent.spec
+  deb:
+    build:
+    - debian
+  archlinux:
+    build:
+    - archlinux
