@@ -80,7 +80,8 @@ Conflicts:
     qubes-core-agent-linux,
     firewalld,
     qubes-core-vm-sysvinit,
-    qubes-gui-agent (<< 4.1.6-1)
+    qubes-gui-agent (<< 4.1.6-1),
+    pulseaudio-qubes (<< 4.1.27),
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec services.

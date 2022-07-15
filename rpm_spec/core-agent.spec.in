@@ -170,6 +170,8 @@ Obsoletes:  qubes-core-vm < 4.0.0
 Provides:   qubes-core-vm-doc = %{version}-%{release}
 Obsoletes:  qubes-core-vm-doc < 4.0.0
 Conflicts:  qubes-gui-agent < 4.1.6
+# older versions are not prepared for managing PulseAudio via systemd
+Conflicts:  qubes-vm-pulseaudio < 4.1.27
 BuildRequires: gcc
 BuildRequires: desktop-file-utils
 BuildRequires: pandoc
@@ -979,7 +981,6 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/tmp.mount.d/30_qubes.conf
 /usr/lib/systemd/system/sysinit.target.requires/systemd-random-seed.service
 /usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
-/usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
 
 %post systemd
 

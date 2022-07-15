@@ -42,7 +42,7 @@ SYSTEM_DROPINS += systemd-logind.service
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
 SYSTEM_DROPINS_NETWORKING += tinyproxy.service
 
-USER_DROPINS := pulseaudio.service pulseaudio.socket
+USER_DROPINS := pulseaudio.service
 
 # Ubuntu Dropins
 ifeq ($(release),Ubuntu)
