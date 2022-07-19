@@ -812,6 +812,7 @@ rm -f %{name}-%{version}
 %dir %attr(0755,user,user) /var/lib/qubes/dom0-updates
 /usr/lib/qubes/qvm-template-repo-query
 /usr/lib/qubes/qubes-download-dom0-updates.sh
+/usr/lib/qubes/dnf-plugins/downloadurl.py
 
 %files networking
 %config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy

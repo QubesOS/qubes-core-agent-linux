@@ -29,11 +29,9 @@ cat > "$repodir/template.repo"
 OPTS+=("--setopt=reposdir=${repodir}")
 OPTS+=("--quiet")
 
-if [ -d '/usr/lib/qubes/dnf-plugins' ]; then
-    # use vendored 'download' dnf-plugin when available, to not require
-    # dnf-plugins-core package (not available in Debian yet)
-    OPTS+=("--setopt=pluginpath=/usr/lib/qubes/dnf-plugins")
-fi
+# use vendored 'downloadurl' dnf-plugin (fork of 'download' plugin), to print
+# all mirrors
+OPTS+=("--setopt=pluginpath=/usr/lib/qubes/dnf-plugins")
 
 if ! command -v dnf >/dev/null; then
     echo "ERROR: dnf command is missing, please use newer template for your UpdateVM to download templates." >&2
@@ -60,8 +58,7 @@ elif [ "$1" = "download" ]; then
     # downloaded - retry from the same one. If download failed and nothing was
     # downloaded, go to the next one. The intention is to retry on interrupted
     # connection, but skip mirrors that are not synchronized yet.
-    # FIXME: 'dnf download --url' prints only one URL, not all the mirrors
-    urls="$(dnf download "${OPTS[@]}" --url "$SPEC" | shuf)"
+    urls="$(dnf downloadurl "${OPTS[@]}" --url --all-mirrors "$SPEC" | shuf)"
     readarray -t urls <<<"$urls"
     downloaded=0
     status_file="$repodir/download-status.tmp"

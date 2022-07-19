@@ -1,4 +1,4 @@
-# download.py, supplies the 'download' command.
+# download.py, supplies the 'downloadurl' command.
 #
 # Copyright (C) 2013-2015  Red Hat, Inc.
 #
@@ -41,8 +41,8 @@ _, P_ = dnf.i18n.translation('dnf-plugins-core')
 @dnf.plugin.register_command
 class DownloadCommand(dnf.cli.Command):
 
-    aliases = ['download']
-    summary = _('Download package to current directory')
+    aliases = ['downloadurl']
+    summary = _('Download package to current directory or print URLs')
 
     def __init__(self, cli):
         super(DownloadCommand, self).__init__(cli)
@@ -70,6 +70,8 @@ class DownloadCommand(dnf.cli.Command):
         parser.add_argument('--url', '--urls', action='store_true', dest='url',
                             help=_('print list of urls where the rpms '
                                    'can be downloaded instead of downloading'))
+        parser.add_argument('--all-mirrors', action='store_true', dest='all_mirrors',
+                            help=_('with --url, print all mirrors of a single package'))
         parser.add_argument('--urlprotocols', action='append',
                             choices=['http', 'https', 'rsync', 'ftp'],
                             default=[],
@@ -77,6 +79,12 @@ class DownloadCommand(dnf.cli.Command):
                                    'limit to specific protocols'))
 
     def configure(self):
+        if self.opts.all_mirrors and len(self.opts.packages) > 1:
+            raise dnf.exceptions.Error(
+                    "Only one package can be given with --all-mirrors")
+        if self.opts.all_mirrors and self.opts.resolve:
+            raise dnf.exceptions.Error(
+                    "--all-mirrors cannot be used with --resolve")
         # setup sack and populate it with enabled repos
         demands = self.cli.demands
         demands.sack_activation = True
@@ -113,19 +121,38 @@ class DownloadCommand(dnf.cli.Command):
             if self.opts.debugsource:
                 pkgs.extend(self._get_pkg_objs_debugsource(self.opts.packages))
 
+        def schemes_filter(url_list):
+            for url in url_list:
+                if schemes:
+                    s = urllib.parse.urlparse(url)[0]
+                    if s in schemes:
+                        return os.path.join(url, location.lstrip('/'))
+                else:
+                    return os.path.join(url, location.lstrip('/'))
+            return None
+
         # If user asked for just urls then print them and we're done
         if self.opts.url:
             for pkg in pkgs:
                 # command line repo packages do not have .remote_location
                 if pkg.repoid != hawkey.CMDLINE_REPO_NAME:
-                    url = pkg.remote_location(schemes=self.opts.urlprotocols)
-                    if url:
-                        print(url)
+                    if self.opts.all_mirrors:
+                        schemas = self.opts.urlprotocols
+                        # pylint: disable=protected-access
+                        for mirror in pkgs.repo._repo.getMirrors():
+                            if schemas:
+                                if urllib.parse.urlparse(mirror)[0] not in schemas:
+                                    continue
+                            print(os.path.join(url, pkg.location.lstrip('/')))
                     else:
-                        msg = _("Failed to get mirror for package: %s") % pkg.name
-                        if self.base.conf.strict:
-                            raise dnf.exceptions.Error(msg)
-                        logger.warning(msg)
+                        url = pkg.remote_location(schemes=self.opts.urlprotocols)
+                        if url:
+                            print(url)
+                        else:
+                            msg = _("Failed to get mirror for package: %s") % pkg.name
+                            if self.base.conf.strict:
+                                raise dnf.exceptions.Error(msg)
+                            logger.warning(msg)
             return
         else:
             self._do_downloads(pkgs)  # download rpms
