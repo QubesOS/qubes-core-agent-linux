@@ -1,3 +1,14 @@
+qubes-core-agent (4.1.37-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * qvm-copy: Always filter escape characters in stderr
+
+  [ Marek Marczykowski-Górecki ]
+  * qvm-template: move cleanup to 'trap', enable set -eo pipefail
+  * qvm-template: resume failed downloads
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 19 Jul 2022 23:41:15 +0200
+
 qubes-core-agent (4.1.36-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
