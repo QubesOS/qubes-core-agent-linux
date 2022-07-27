@@ -29,7 +29,10 @@ if [ "$action" = "suspend" ]; then
         if [ "$intf" = "lo" ] || [[ "$intf" = "vif"* ]]; then
             continue
         fi
-        if [ "$(cat "/sys/class/net/$intf/device/devtype" 2>/dev/null$)" = "vif" ]; then
+        if ! [ -e "/sys/class/net/$intf/device" ]; then
+            continue
+        fi
+        if [ "$(cat "/sys/class/net/$intf/device/devtype" 2>/dev/null)" = "vif" ]; then
             continue
         fi
         ip link set "$intf" down
