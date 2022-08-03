@@ -16,11 +16,13 @@ while [ ! -e /dev/xen/xenbus ]; do
   sleep 0.1
 done
 
-mkdir -p /var/run/qubes
+[ -d /sys/fs/selinux ] && selinux_flag=Z || selinux_flag=
+
+mkdir "-p$selinux_flag" /var/run/qubes
 chgrp qubes /var/run/qubes
 chmod 0775 /var/run/qubes
-mkdir -p /var/run/qubes-service
-mkdir -p /var/run/xen-hotplug
+mkdir "-p$selinux_flag" /var/run/qubes-service
+mkdir "-p$selinux_flag" /var/run/xen-hotplug
 
 # Set default services depending on VM type
 is_appvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM && touch /var/run/qubes/this-is-appvm
