@@ -18,11 +18,9 @@ done
 
 [ -d /sys/fs/selinux ] && selinux_flag=Z || selinux_flag=
 
-mkdir "-p$selinux_flag" /var/run/qubes
+mkdir "-p$selinux_flag" /var/run/qubes /var/run/qubes-service /var/run/xen-hotplug
 chgrp qubes /var/run/qubes
 chmod 0775 /var/run/qubes
-mkdir "-p$selinux_flag" /var/run/qubes-service
-mkdir "-p$selinux_flag" /var/run/xen-hotplug
 
 # Set default services depending on VM type
 is_appvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM && touch /var/run/qubes/this-is-appvm
