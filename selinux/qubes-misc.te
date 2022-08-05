@@ -1,3 +1,7 @@
 policy_module(qubes-misc,0.0.1)
+require {
+	type systemd_modules_load_t;
+}
 
 type qubes_var_run_t;
+logging_dgram_send(systemd_modules_load_t)
