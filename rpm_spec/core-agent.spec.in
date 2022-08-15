@@ -346,6 +346,7 @@ fi || :
 
 %posttrans selinux
 %selinux_relabel_post
+%systemd_post qubes-relabel-rw.service
 systemctl start selinux-autorelabel-mark.service
 exit 0
 
@@ -699,6 +700,7 @@ done
 } 9< %_selinux_store_policy_path/semanage.read.LOCK 8< %_selinux_store_policy_path/semanage.trans.LOCK
 
 %preun selinux
+%systemd_preun qubes-relabel-rw.service
 if [ "$1" -eq 0 ]; then
   if ! grep -E '^SELINUX=(disabled|permissive)$' /etc/selinux/config; then
     echo 'qubes-core-agent-selinux cannot be uninstalled with SELinux in enforcing mode' >&2
