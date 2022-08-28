@@ -42,21 +42,16 @@ progress_kdialog() {
 }
 
 progress_zenity() {
-    local pos
+    local pos fd
 
-    while read -r pos; do
-        # To avoid a window focus race with the qubes.Filecopy confirmation
-        # dialog, launch zenity *after* the copy has begun: Prepend an empty
-        # first line ...
+    (while read -r pos; do
         if [[ $pos == 0 ]]; then
-            echo
+            trap 'kill -- $!' EXIT  # for this subshell
+            exec {fd}> >(exec zenity --progress --text="$DESCRIPTION")
         fi
 
-        echo $((100 * pos / SIZE))
-        done | {
-        read -r  # ... and throw it away.
-        zenity --progress --text="$DESCRIPTION" --auto-close
-    }
+        echo $((100 * pos / SIZE)) >&$fd
+    done)
 }
 
 
