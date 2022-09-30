@@ -29,7 +29,7 @@ noextract=()
 md5sums=(SKIP)
 
 build() {
-    for source in autostart-dropins applications-dropins app-menu qubes-rpc misc passwordless-root Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent boot; do
+    for source in autostart-dropins applications-dropins app-menu qubes-rpc misc package-managers passwordless-root Makefile vm-init.d vm-systemd network init version doc setup.py qubesagent boot; do
         # shellcheck disable=SC2154
         ln -sf "../$source" "$srcdir"
     done
@@ -94,6 +94,10 @@ package_qubes-vm-core() {
     install -m 644 "$srcdir/PKGBUILD-qubes-pacman-options.conf" "${pkgdir}/etc/pacman.d/10-qubes-options.conf"
     echo "Installing repository for release ${release}"
     install -m 644 "$srcdir/PKGBUILD-qubes-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf.disabled"
+
+    # Install upgrade check scripts
+    install -m 0755 "$srcdir/package-managers/upgrades-installed-check" "${pkgdir}/usr/lib/qubes/"
+    install -m 0755 "$srcdir/package-managers/upgrades-status-notify" "${pkgdir}/usr/lib/qubes/"
 
     # Archlinux specific: enable autologin on tty1
     mkdir -p "$pkgdir/etc/systemd/system/getty@tty1.service.d/"
