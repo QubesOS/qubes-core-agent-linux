@@ -5,4 +5,5 @@ ConditionPathExists=!/var/run/qubes-service/clocksync
 
 [Service]
 ExecStart=/usr/bin/qvm-sync-clock
+Type=oneshot
 User=root
