@@ -73,6 +73,7 @@ else ifeq ($(release), Debian)
     SYSTEM_DROPINS += avahi-daemon.service
 endif
 
+.PHONY: install-systemd-dropins
 install-systemd-dropins:
 	# Install system dropins
 	@for dropin in $(SYSTEM_DROPINS); do \
@@ -88,6 +89,7 @@ install-systemd-dropins:
 	    install -m 0644 vm-systemd/user/$${dropin}.d/*.conf $(DESTDIR)$(USER_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
 
+.PHONY: install-systemd-networking-dropins
 install-systemd-networking-dropins:
 	# Install system dropins
 	@for dropin in $(SYSTEM_DROPINS_NETWORKING); do \
@@ -95,6 +97,7 @@ install-systemd-networking-dropins:
 	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
 
+.PHONY: install-init
 install-init:
 	install -d $(DESTDIR)$(LIBDIR)/qubes/init
 	# FIXME: do a source code move vm-systemd/*.sh to init/
@@ -107,6 +110,7 @@ SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service) vm-systemd/dev-xv
 SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service
 SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES), $(SYSTEMD_ALL_SERVICES))
 
+.PHONY: install-systemd
 install-systemd: install-init
 	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} $(DESTDIR)$(LIBDIR)/qubes/init $(DESTDIR)$(SYSLIBDIR)/modules-load.d $(DESTDIR)/etc/systemd/system $(DESTDIR)$(SYSLIBDIR)/systemd/network
 	install -m 0644 $(SYSTEMD_CORE_SERVICES) $(DESTDIR)$(SYSLIBDIR)/systemd/system/
@@ -118,6 +122,7 @@ install-systemd: install-init
 	install -m 0644 vm-systemd/xendriverdomain.service $(DESTDIR)/etc/systemd/system/
 	install -m 0644 vm-systemd/80-qubes-vif.link $(DESTDIR)$(SYSLIBDIR)/systemd/network/
 
+.PHONY: install-sysvinit
 install-sysvinit: install-init
 	install -d $(DESTDIR)/etc/init.d
 	install vm-init.d/qubes-sysinit $(DESTDIR)/etc/init.d/
@@ -130,11 +135,14 @@ install-sysvinit: install-init
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
 
+.PHONY: install-rh
 install-rh: install-systemd install-systemd-dropins install-sysvinit
 
+.PHONY: install-doc
 install-doc:
 	$(MAKE) -C doc install
 
+.PHONY: install-common
 install-common: install-doc
 	$(MAKE) -C autostart-dropins install
 	$(MAKE) -C applications-dropins install
@@ -146,6 +154,7 @@ install-common: install-doc
 # Networking install target includes:
 # * basic network functionality (setting IP address, DNS, default gateway)
 # * package update proxy client
+.PHONY: install-networking
 install-networking:
 	install -d $(DESTDIR)/etc/sysctl.d
 	install -m 644 network/81-qubes.conf.optional $(DESTDIR)/etc/sysctl.d/
@@ -156,7 +165,8 @@ install-networking:
 # * qubes-firewall service (FirewallVM)
 # * DNS redirection setup
 # * proxy service used by TemplateVMs to download updates
-install-netvm:
+.PHONY: install-netvm
+install-netvm: install-systemd-networking-dropins install-networkmanager
 	install -D -m 0644 $(SYSTEMD_NETWORK_SERVICES) $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 
 	install -D -m 0755 network/qubes-iptables $(DESTDIR)$(LIBDIR)/qubes/init/qubes-iptables
@@ -184,6 +194,7 @@ install-netvm:
 # * make connections config persistent
 # * adjust DNS redirections when needed
 # * show/hide NetworkManager applet icon
+.PHONY: install-networkmanager
 install-networkmanager:
 	install -d $(DESTDIR)$(LIBDIR)/qubes/
 	install network/qubes-fix-nm-conf.sh $(DESTDIR)$(LIBDIR)/qubes/
@@ -200,14 +211,15 @@ install-networkmanager:
 	install -m 0755 network/show-hide-nm-applet.sh $(DESTDIR)$(LIBDIR)/qubes/
 	install -m 0644 network/show-hide-nm-applet.desktop $(DESTDIR)/etc/xdg/autostart/00-qubes-show-hide-nm-applet.desktop
 
+.PHONY: install-deb
 install-deb: install-common install-systemd install-systemd-dropins install-systemd-networking-dropins install-networking install-networkmanager install-netvm
 	install -d $(DESTDIR)/etc/sysctl.d
 	install -m 644 network/80-qubes.conf $(DESTDIR)/etc/sysctl.d/
 	install -d $(DESTDIR)/etc/needrestart/conf.d
 	install -D -m 0644 misc/50_qubes.conf $(DESTDIR)/etc/needrestart/conf.d/50_qubes.conf
 
+.PHONY: install-corevm
 install-corevm: install-rh install-common install-systemd install-sysvinit install-systemd-dropins install-networking
 
-install-netvm: install-systemd-networking-dropins install-networkmanager
-
+.PHONY: install-vm
 install-vm: install-corevm install-netvm
