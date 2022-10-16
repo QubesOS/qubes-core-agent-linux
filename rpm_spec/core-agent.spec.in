@@ -814,6 +814,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qubes-download-dom0-updates.sh
 
 %files networking
+%config /etc/sysctl.d/81-qubes.conf.optional
 %config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
 %config(noreplace) /etc/qubes/ip6tables.rules
 %config(noreplace) /etc/qubes/ip6tables-enabled.rules

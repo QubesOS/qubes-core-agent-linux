@@ -207,5 +207,7 @@ install-deb: install-common install-systemd install-systemd-dropins install-syst
 install-corevm: install-rh install-common install-systemd install-sysvinit install-systemd-dropins install-networking
 
 install-netvm: install-systemd-networking-dropins install-networkmanager
+	install -d $(DESTDIR)/etc/sysctl.d
+	install -m 644 network/81-qubes.conf.optional $(DESTDIR)/etc/sysctl.d/
 
 install-vm: install-corevm install-netvm

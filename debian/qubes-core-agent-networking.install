@@ -3,6 +3,7 @@ etc/qubes-rpc/qubes.UpdatesProxy
 etc/qubes/ip6tables.rules
 etc/qubes/ip6tables-enabled.rules
 etc/qubes/iptables.rules
+etc/sysctl.d/81-qubes.conf.optional
 etc/tinyproxy/tinyproxy-updates.conf
 etc/tinyproxy/updates-blacklist
 etc/udev/rules.d/99-qubes-network.rules
