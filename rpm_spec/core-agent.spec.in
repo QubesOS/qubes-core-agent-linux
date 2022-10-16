@@ -660,18 +660,8 @@ rm -f %{name}-%{version}
 
 # MIME stuff
 %define qubesdata %_datadir/qubes/xdg-override
-%define qubesmime %qubesdata/mime
 %dir %qubesdata
 %qubesdata/*
-%qubesdata/applications/*
-%dir %qubesmime
-%qubesmime/*
-%dir %qubesmime/application
-%qubesmime/application/*
-%dir %qubesmime/packages
-%qubesmime/packages/*
-%dir %qubesmime/image
-%qubesmime/image/*
 
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
