@@ -1,7 +1,10 @@
 policy_module(qubes-misc,0.0.1)
 require {
 	type systemd_modules_load_t;
+	type iptables_t, xen_device_t;
+	class chr_file { read write };
 }
 
 type qubes_var_run_t;
 logging_dgram_send(systemd_modules_load_t)
+allow iptables_t xen_device_t:chr_file { read write };
