@@ -3,7 +3,6 @@ etc/apt/apt.conf.d/10no-cache
 etc/apt/apt.conf.d/41error-on-any
 etc/apt/apt.conf.d/70no-unattended
 etc/apt/sources.list.d/qubes-r4.list
-etc/apt/trusted.gpg.d/qubes-archive-keyring.gpg
 etc/dconf/db/local.d/dpi
 etc/default/grub.d/30-qubes.cfg
 etc/fstab
@@ -159,6 +158,7 @@ usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
 usr/lib/systemd/user-preset/75-qubes-vm.preset
 usr/share/glib-2.0/schemas/*
 usr/share/kde4/services/*.desktop
+usr/share/keyrings/qubes-archive-keyring.gpg
 usr/share/kservices5/ServiceMenus/*.desktop
 usr/share/applications/*.desktop
 usr/share/man/man1/qvm-*
