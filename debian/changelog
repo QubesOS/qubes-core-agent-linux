@@ -1,3 +1,93 @@
+qubes-core-agent (4.2.1-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * temporarily pretend to be 4.1
+
+  [ Frédéric Pierret (fepitre) ]
+  * qubes-rpc/qvm-copy: fix indentation
+  * qvm-copy-to-vm.gnome: fix indent and reformat
+  * qubes-rpc/qvm-move: put warning into usage
+  * gui-fatal: don't not output GUI notification on PROGRESS_TYPE!=gui
+  * qvm-copy: add message about file/directory not found before qrexec
+  * qvm-copy: restrict duplicate message for vm target
+
+  [ Demi Marie Obenour ]
+  * Make `apt-get update` exit codes reliable
+  * Turn on scatter-gather and checksum offload
+
+  [ Marek Marczykowski-Górecki ]
+  * Wait for fully starting user systemd session
+  * Disable renaming Xen's eth0 to enX0
+
+  [ Demi Marie Obenour ]
+  * Rip out the network-based updates proxy
+  * Assume IPv6 is disabled unless proven otherwise
+  * Enable proxy NDP if IPv6 is enabled
+  * Remove the $mac variable from vif-route-qubes
+  * Remove unused variable $sub
+
+  [ Marek Marczykowski-Górecki ]
+  * Workaround systemd's broken /etc/resolv.conf symlink
+  * Register DNS server in systemd-resolved
+
+  [ Frédéric Pierret (fepitre) ]
+  * Drop Travis CI
+
+  [ Marek Marczykowski-Górecki ]
+  * Switch default clocksource to 'tsc'
+  * network: extract DNS servers IP from resolved service
+  * Disable pipewire by default
+  * makefile: Fix *_DROPIN_DIR variables
+
+  [ Demi Marie Obenour ]
+  * qvm-copy: Always filter escape characters in stderr
+
+  [ juodumas ]
+  * firewall log_error: handle all exceptions, allow runuser to be in
+    /sbin
+
+  [ Demi Marie Obenour ]
+  * Updates proxy is not just for Yum
+  * Remove use of bash $""
+  * Rip out network-based update proxy remanents
+  * Clean up the init script
+
+  [ immeëmosol ]
+  * Write out object & command,`ip l s`=`ip link set`
+
+  [ xaki23 ]
+  * add dynamic support for alternate rpmdb pathes
+
+  [ Frédéric Pierret (fepitre) ]
+  * Add Qubes Builder v2 integration
+  * .qubesbuilder: replace 'spec' by 'build'
+
+  [ Marek Marczykowski-Górecki ]
+  * qvm-template: move cleanup to 'trap', enable set -eo pipefail
+  * qvm-template: resume failed downloads
+  * prepare-suspend: typo fix
+  * prepare-suspend: do not disable virtual interfaces before suspend
+
+  [ Demi Marie Obenour ]
+  * Use link scope for routes
+
+  [ Rusty Bird ]
+  * qvm-copy-to-vm.gnome: avoid 'zenity --auto-close'
+
+  [ Demi Marie Obenour ]
+  * Support nanosecond precision for dates
+  * Better error message when 'date' fails
+  * Make qubes-sync-time.service oneshot
+
+  [ unman ]
+  * Cohere with debian guidance on using 3rd party repos
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: update repo definition to R4.2, add new key
+  * deb: update repo to R4.2, including new key
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 26 Oct 2022 23:28:21 +0200
+
 qubes-core-agent (4.2.0-1) unstable; urgency=medium
 
   [ Rusty Bird ]
