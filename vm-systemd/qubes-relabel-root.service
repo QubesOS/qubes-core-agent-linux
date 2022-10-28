@@ -4,6 +4,7 @@ After=qubes-sysinit.service
 Requires=qubes-sysinit.service
 ConditionSecurity=selinux
 ConditionPathExists=!/.qubes-relabeled
+ConditionPathExists=/run/qubes/persistent-full
 ConditionPathExists=/etc/selinux/targeted/contexts/files/file_contexts
 DefaultDependencies=no
 Before=qubes-bind-dirs.service local-fs.target rw.mount home.mount qubes-gui-agent.service qubes-qrexec-agent.service

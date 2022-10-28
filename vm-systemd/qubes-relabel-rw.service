@@ -1,8 +1,10 @@
 [Unit]
 Description=Relabel /rw and /home
-After=qubes-mount-dirs.service
-Requires=qubes-mount-dirs.service
+After=qubes-mount-dirs.service qubes-sysinit.service
+Requires=qubes-mount-dirs.service qubes-sysinit.service
 ConditionSecurity=selinux
+ConditionPathExists=|/run/qubes/persistent-rw-only
+ConditionPathExists=|/run/qubes/persistent-full
 ConditionPathExists=!/rw/.autorelabel
 DefaultDependencies=no
 Before=local-fs.target rw.mount home.mount qubes-gui-agent.service qubes-qrexec-agent.service
