@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash --
+set -euf
 
 # Source Qubes library.
 # shellcheck source=init/functions
@@ -18,32 +19,40 @@ done
 
 [ -d /sys/fs/selinux ] && selinux_flag=Z || selinux_flag=
 
-mkdir "-p$selinux_flag" /var/run/qubes /var/run/qubes-service /var/run/xen-hotplug
-chgrp qubes /var/run/qubes
-chmod 0775 /var/run/qubes
+mkdir "-p$selinux_flag" /run/qubes /run/qubes-service /run/xen-hotplug
+chgrp qubes /run/qubes
+chmod 0775 /run/qubes
 
 # Set default services depending on VM type
-is_appvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM && touch /var/run/qubes/this-is-appvm
-is_netvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM && touch /var/run/qubes/this-is-netvm
-is_proxyvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_PROXYVM && touch /var/run/qubes/this-is-proxyvm
-is_templatevm && DEFAULT_ENABLED=$DEFAULT_ENABLED_TEMPLATEVM && touch /var/run/qubes/this-is-templatevm
+vm_type=$(qubes_vm_type)
+case $vm_type in
+AppVM) DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM; touch /run/qubes/this-is-appvm;;
+NetVM) DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM; touch /run/qubes/this-is-netvm;;
+ProxyVM) DEFAULT_ENABLED=$DEFAULT_ENABLED_PROXYVM; touch /run/qubes/this-is-proxyvm;;
+TemplateVM) DEFAULT_ENABLED=$DEFAULT_ENABLED_TEMPLATEVM; touch /run/qubes/this-is-templatevm;;
+DispVM) :;;
+*) echo "Bad VM type $vm_type!" >&2; exit 1;;
+esac
 
 # Enable default services
 for srv in $DEFAULT_ENABLED; do
-    touch "/var/run/qubes-service/$srv"
+    touch "/run/qubes-service/$srv"
 done
 
-# Enable services
-for srv in $(qubesdb-multiread /qubes-service/ 2>/dev/null |grep ' = 1'|cut -f 1 -d ' '); do
-    touch "/var/run/qubes-service/$srv"
-done
-
-# Disable services
-for srv in $(qubesdb-multiread /qubes-service/ 2>/dev/null |grep ' = 0'|cut -f 1 -d ' '); do
-    rm -f "/var/run/qubes-service/$srv"
+IFS=$'\n'
+services=$(qubesdb-multiread /qubes-service/)
+for i in $services; do
+    # Sanitize and parse service name
+    [[ "$i" =~ ^([[:alnum:]_][[:alnum:]._-]*)\ =\ ([01])$ ]] || continue
+    srv_path=/run/qubes-service/${BASH_REMATCH[1]} enabled=${BASH_REMATCH[2]}
+    if (( enabled )); then
+        touch "$srv_path"
+    else
+        rm -f "$srv_path"
+    fi
 done
 
 # Prepare environment for other services
-echo > /var/run/qubes-service-environment
+echo > /run/qubes-service-environment
 
 exit 0
