@@ -85,6 +85,7 @@ lib/systemd/system/dev-xvdc1-swap.service
 lib/systemd/system/qubes-early-vm-config.service
 lib/systemd/system/qubes-misc-post.service
 lib/systemd/system/qubes-mount-dirs.service
+lib/systemd/system/qubes-relabel-root.service
 lib/systemd/system/qubes-relabel-rw.service
 lib/systemd/system/qubes-rootfs-resize.service
 lib/systemd/system/qubes-sysinit.service

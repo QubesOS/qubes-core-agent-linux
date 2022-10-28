@@ -335,6 +335,7 @@ a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 %_datadir/selinux/packages/qubes-xendriverdomain.pp
 %_datadir/selinux/packages/qubes-misc.pp
 %_unitdir/qubes-relabel-rw.service
+%_unitdir/qubes-relabel-root.service
 
 %postun selinux
 if [ "$1" -eq 0 ]; then
@@ -346,6 +347,7 @@ fi || :
 
 %posttrans selinux
 %selinux_relabel_post
+%systemd_post qubes-relabel-root.service
 %systemd_post qubes-relabel-rw.service
 systemctl start selinux-autorelabel-mark.service
 exit 0
@@ -701,6 +703,7 @@ done
 
 %preun selinux
 %systemd_preun qubes-relabel-rw.service
+%systemd_preun qubes-relabel-root.service
 if [ "$1" -eq 0 ]; then
   if ! grep -E '^SELINUX=(disabled|permissive)$' /etc/selinux/config; then
     echo 'qubes-core-agent-selinux cannot be uninstalled with SELinux in enforcing mode' >&2

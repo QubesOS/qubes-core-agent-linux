@@ -1,0 +1,19 @@
+[Unit]
+Description=Relabel /
+After=qubes-sysinit.service
+Requires=qubes-sysinit.service
+ConditionSecurity=selinux
+ConditionPathExists=!/.qubes-relabeled
+ConditionPathExists=/etc/selinux/targeted/contexts/files/file_contexts
+DefaultDependencies=no
+Before=qubes-bind-dirs.service local-fs.target rw.mount home.mount qubes-gui-agent.service qubes-qrexec-agent.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+BindPaths=/:/mnt:norbind
+ExecStart=/usr/sbin/setfiles -r /mnt -- /etc/selinux/targeted/contexts/files/file_contexts /mnt
+ExecStart=/bin/touch /.qubes-relabeled
+
+[Install]
+WantedBy=multi-user.target

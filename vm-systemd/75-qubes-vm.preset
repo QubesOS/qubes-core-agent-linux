@@ -109,6 +109,7 @@ enable module-load-dummy-psu.service
 enable module-load-dummy-backlight.service
 enable qubes-psu-client@.service default sys-usb
 enable dev-xvdc1-swap.service
+enable qubes-relabel-root.service
 enable qubes-relabel-rw.service
 
 # Disable useless Xen services in Qubes VM
