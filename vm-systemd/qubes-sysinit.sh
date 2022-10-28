@@ -34,6 +34,14 @@ DispVM) :;;
 *) echo "Bad VM type $vm_type!" >&2; exit 1;;
 esac
 
+persistence=$(qubesdb-read /qubes-vm-persistence)
+case $persistence in
+full) touch /run/qubes/persistent-full;;
+rw-only) touch /run/qubes/persistent-rw-only;;
+none) touch /run/qubes/persistent-none;;
+*) echo "Bad VM persistence $persistence" >&2; exit 1;;
+esac
+
 # Enable default services
 for srv in $DEFAULT_ENABLED; do
     touch "/run/qubes-service/$srv"
