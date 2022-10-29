@@ -7,6 +7,7 @@ ConditionPathExists=|/run/qubes/persistent-rw-only
 ConditionPathExists=|/run/qubes/persistent-full
 ConditionPathExists=!/rw/.autorelabel
 DefaultDependencies=no
+Conflicts=selinux-autorelabel.service
 Before=local-fs.target rw.mount home.mount qubes-gui-agent.service qubes-qrexec-agent.service
 
 [Service]
