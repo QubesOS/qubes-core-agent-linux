@@ -706,14 +706,14 @@ fi
 exit 0
 
 %preun selinux
-%systemd_preun qubes-relabel-rw.service
-%systemd_preun qubes-relabel-root.service
 if [ "$1" -eq 0 ]; then
-  rm -f /.qubes-relabeled || exit 1
   if ! grep -E '^SELINUX=(disabled|permissive)$' /etc/selinux/config; then
     echo 'qubes-core-agent-selinux cannot be uninstalled with SELinux in enforcing mode' >&2
     exit 1
   fi
+  rm -f /.qubes-relabeled || exit 1
+  %systemd_preun qubes-relabel-rw.service
+  %systemd_preun qubes-relabel-root.service
   flock --no-fork -- %_selinux_store_policy_path/semanage.read.LOCK \
   sed -Ei -- "/^### QUBES START ###\$/,/^### QUBES END ###\$/d" \
     /etc/selinux/targeted/contexts/files/file_contexts.subs
