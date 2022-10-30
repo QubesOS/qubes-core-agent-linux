@@ -7,7 +7,7 @@ ConditionPathExists=!/.qubes-relabeled
 ConditionPathExists=/run/qubes/persistent-full
 ConditionPathExists=/etc/selinux/targeted/contexts/files/file_contexts
 DefaultDependencies=no
-Conflicts=selinux-autorelabel.service
+Conflicts=selinux-autorelabel.service shutdown.target
 Before=qubes-bind-dirs.service local-fs.target rw.mount home.mount qubes-gui-agent.service qubes-qrexec-agent.service
 
 [Service]
@@ -16,6 +16,8 @@ RemainAfterExit=yes
 BindPaths=/:/mnt:norbind
 ExecStart=/usr/sbin/setfiles -r /mnt -- /etc/selinux/targeted/contexts/files/file_contexts /mnt
 ExecStart=/bin/touch /.qubes-relabeled
+ExecStart=/bin/rm /.autorelabel
+ExecStartPost=/usr/bin/systemctl --force -- poweroff
 
 [Install]
 WantedBy=multi-user.target selinux-autorelabel.target
