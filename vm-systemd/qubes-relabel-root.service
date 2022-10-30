@@ -18,4 +18,4 @@ ExecStart=/usr/sbin/setfiles -r /mnt -- /etc/selinux/targeted/contexts/files/fil
 ExecStart=/bin/touch /.qubes-relabeled
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target selinux-autorelabel.target
