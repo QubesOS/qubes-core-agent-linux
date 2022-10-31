@@ -16,8 +16,8 @@ RemainAfterExit=yes
 BindPaths=/:/mnt:norbind
 ExecStart=/usr/sbin/setfiles -r /mnt -- /etc/selinux/targeted/contexts/files/file_contexts /mnt
 ExecStart=/bin/touch /.qubes-relabeled
-ExecStart=/bin/rm /.autorelabel
-ExecStartPost=/usr/bin/systemctl --force -- poweroff
+ExecStart=/bin/rm -f /.autorelabel
+ExecStart=/usr/bin/systemctl --force poweroff
 
 [Install]
 WantedBy=multi-user.target selinux-autorelabel.target
