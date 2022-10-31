@@ -701,7 +701,10 @@ fi
 done
 } 9< %_selinux_store_policy_path/semanage.read.LOCK 8< %_selinux_store_policy_path/semanage.trans.LOCK
 if [ ! -f /.qubes-relabeled ]; then
-    unshare --mount -- /bin/sh -euc 'mount --bind -- / /mnt && exec "$@"' sh setfiles -r /mnt -- /etc/selinux/targeted/contexts/files/file_contexts /mnt && touch /.qubes-relabeled
+    unshare --mount -- /bin/sh -euc 'mount --bind -- / /mnt && exec "$@"' sh setfiles -r /mnt -- \
+      /etc/selinux/targeted/contexts/files/file_contexts \
+      /mnt/proc /mnt/sys /mnt/dev /mnt/tmp /mnt/rw /mnt/home \
+      /mnt/usr/lib/systemd
 fi
 exit 0
 
