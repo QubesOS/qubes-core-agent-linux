@@ -1132,6 +1132,7 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/ModemManager.service.d/30_qubes.conf
 /usr/lib/systemd/system/NetworkManager.service.d/30_qubes.conf
 /usr/lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
+/usr/lib/systemd/system/selinux-autorelabel.target.d/30_qubes.conf
 /usr/lib/systemd/system/serial-getty@.service.d/30_qubes.conf
 /usr/lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
 /usr/lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
