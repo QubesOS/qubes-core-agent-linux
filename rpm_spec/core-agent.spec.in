@@ -344,6 +344,7 @@ a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 %_datadir/selinux/packages/qubes-misc.pp
 %_unitdir/qubes-relabel-rw.service
 %_unitdir/qubes-relabel-root.service
+%_unitdir/selinux-autorelabel.target.d/30_qubes.conf
 
 %postun selinux
 if [ "$1" -eq 0 ]; then
@@ -1140,7 +1141,6 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/ModemManager.service.d/30_qubes.conf
 /usr/lib/systemd/system/NetworkManager.service.d/30_qubes.conf
 /usr/lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
-/usr/lib/systemd/system/selinux-autorelabel.target.d/30_qubes.conf
 /usr/lib/systemd/system/serial-getty@.service.d/30_qubes.conf
 /usr/lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
 /usr/lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
