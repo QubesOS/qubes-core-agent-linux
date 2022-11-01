@@ -198,6 +198,7 @@ The Qubes core files for installation inside a Qubes VM.
 Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python2-devel
 %{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
+BuildArch: noarch
 
 %description -n python2-dnf-plugins-qubes-hooks
 DNF plugin for Qubes specific post-installation actions:
@@ -208,6 +209,7 @@ DNF plugin for Qubes specific post-installation actions:
 %package -n python3-dnf-plugins-qubes-hooks
 Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python3-devel
+BuildArch: noarch
 
 %description -n python3-dnf-plugins-qubes-hooks
 DNF plugin for Qubes specific post-installation actions:
@@ -217,6 +219,7 @@ DNF plugin for Qubes specific post-installation actions:
 %package -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python%{python3_pkgversion}-devel
+BuildArch: noarch
 %{?python_provide:%python_provide python%{python3_pkgversion}-dnf-plugins-qubes-hooks}
 
 %description -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
@@ -235,6 +238,7 @@ Conflicts:  qubes-core-vm < 4.0.0
 Nautilus addons for inter-VM file copy/move/open.
 
 %package dom0-updates
+BuildArch:  noarch
 Summary:    Scripts required to handle dom0 updates
 Requires:   qubes-core-agent = %{version}
 Requires:   fakeroot
@@ -245,6 +249,7 @@ Requires:   tar
 Scripts required to handle dom0 updates.
 
 %package networking
+BuildArch:  noarch
 Summary:    Networking support for Qubes VM
 Requires:   iptables
 Requires:   conntrack-tools
@@ -266,6 +271,7 @@ qubes-core-agent-network-manager.
 
 %package network-manager
 Summary:    NetworkManager integration for Qubes VM
+BuildArch:  noarch
 # to show/hide nm-applet
 Requires:   NetworkManager >= 0.8.1-1
 Requires:   glib2
@@ -280,6 +286,7 @@ Integration of NetworkManager for Qubes VM:
  * show/hide NetworkManager applet icon
 
 %package passwordless-root
+BuildArch:  noarch
 Summary:    Passwordless root access from normal user
 Conflicts:  qubes-core-vm < 4.0.0
 
@@ -298,8 +305,9 @@ Thunar support for Qubes VM tools
 
 %if %{with selinux}
 %package selinux
-Summary: SELinux policy for Qubes VMs
-License: GPLv2+
+BuildArch: noarch
+Summary:   SELinux policy for Qubes VMs
+License:   GPLv2+
 
 # The following is based on %%selinux_requires, which has the following license:
 # Copyright (C) 2017 Red Hat, Inc. All rights reserved.
