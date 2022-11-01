@@ -20,4 +20,4 @@ ExecStart=/bin/rm -f /.autorelabel
 ExecStart=/usr/bin/systemctl --force poweroff
 
 [Install]
-RequiredBy=multi-user.target selinux-autorelabel.target
+WantedBy=multi-user.target selinux-autorelabel.target
