@@ -73,7 +73,7 @@ ifeq ($(release),Ubuntu)
 
 # Debian Dropins
 else ifeq ($(release), Debian)
-    # 'crond.service' is named 'cron.service in Debian
+    # 'crond.service' is named 'cron.service' in Debian
     SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
 
     # Wheezy System Dropins
