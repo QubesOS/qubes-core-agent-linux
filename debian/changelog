@@ -1,3 +1,9 @@
+qubes-core-agent (4.2.2-1) unstable; urgency=medium
+
+  * Add R4.2 CentOS key too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 04 Nov 2022 17:30:33 +0100
+
 qubes-core-agent (4.2.1-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
