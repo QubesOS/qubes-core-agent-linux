@@ -54,7 +54,7 @@ SYSTEM_DROPINS += tor.service tor@default.service
 SYSTEM_DROPINS += systemd-timesyncd.service
 SYSTEM_DROPINS += systemd-logind.service
 ifeq ($(ENABLE_SELINUX),1)
-SYSTEM_DROPINS += selinux-autorelabel.target
+SYSTEM_DROPINS += selinux-autorelabel.target selinux-autorelabel.service
 endif
 
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
