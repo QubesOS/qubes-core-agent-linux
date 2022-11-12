@@ -360,7 +360,6 @@ fi || :
 %selinux_relabel_post
 %systemd_post qubes-relabel-root.service
 %systemd_post qubes-relabel-rw.service
-systemctl mask selinux-autorelabel.service
 systemctl start selinux-autorelabel-mark.service
 exit 0
 
@@ -579,7 +578,7 @@ exit 0
 
 if ! is_protected_file /etc/selinux/config; then
     echo "--> Disabling SELinux..."
-    sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+    sed -e 's/^SELINUX=.*$/SELINUX=disabled/' </etc/selinux/config >/etc/selinux/config.processed
     mv /etc/selinux/config.processed /etc/selinux/config
     setenforce 0 2>/dev/null
 fi
@@ -675,7 +674,7 @@ contexts='### QUBES START ###\
 /usr/local/sbin /usr/sbin\
 ### QUBES END ###'
 
-sed -Ei -- "/^### QUBES START ###\$/,/^### QUBES END ###\$/{
+sed -Ei "/^### QUBES START ###\$/,/^### QUBES END ###\$/{
 \$c\
 $contexts
 d
@@ -1082,7 +1081,7 @@ for svc in %qubes_services ; do
 done
 
 # TODO: make this not display the silly message about security context...
-sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
+sed -i 's/^id:.:initdefault:/id:3:initdefault:/' /etc/inittab
 
 %preun sysvinit
 if [ "$1" = 0 ] ; then
