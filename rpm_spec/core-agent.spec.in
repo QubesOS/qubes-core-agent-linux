@@ -645,6 +645,7 @@ fi
 
 %selinux_modules_install %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
 {
+set -x
 flock --no-fork -- 9
 flock --no-fork -- 8
 for i in /etc/selinux/*/contexts/files/file_contexts.subs; do
