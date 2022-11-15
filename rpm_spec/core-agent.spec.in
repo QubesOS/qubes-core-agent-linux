@@ -645,7 +645,6 @@ fi
 
 %selinux_modules_install %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
 {
-set -x
 flock --no-fork -- 9
 flock --no-fork -- 8
 for i in /etc/selinux/*/contexts/files/file_contexts.subs; do
@@ -717,7 +716,7 @@ if [ ! -f /.qubes-relabeled ]; then
       /etc/selinux/targeted/contexts/files/file_contexts \
       /mnt/proc /mnt/sys /mnt/dev /mnt/tmp /mnt/rw /mnt/home \
       /mnt/usr/lib/systemd
-    sed -e -i 's/^SELINUX=disabled/SELINUX=permissive/' /etc/selinux/config
+    sed -i -- 's/^SELINUX=disabled/SELINUX=permissive/' /etc/selinux/config
     touch /.autorelabel
 fi
 exit 0
