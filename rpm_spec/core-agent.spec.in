@@ -358,8 +358,7 @@ fi || :
 
 %posttrans selinux
 %selinux_relabel_post
-%systemd_post qubes-relabel-root.service
-%systemd_post qubes-relabel-rw.service
+%systemd_post qubes-relabel-root.service qubes-relabel-rw.service
 systemctl start selinux-autorelabel-mark.service
 exit 0
 
