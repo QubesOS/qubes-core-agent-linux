@@ -1,8 +1,0 @@
-usr/share/selinux/packages/qubes-qfile-unpacker.pp
-usr/share/selinux/packages/qubes-xendriverdomain.pp
-usr/share/selinux/packages/qubes-misc.pp
-lib/systemd/qubes-relabel-rw.service
-lib/systemd/qubes-relabel-root.service
-lib/systemd/selinux-autorelabel.target.d/30_qubes.conf
-lib/systemd/selinux-autorelabel.service.d/30_qubes.conf
-usr/lib/qubes/init/relabel-root.sh
