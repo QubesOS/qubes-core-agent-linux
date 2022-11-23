@@ -294,7 +294,7 @@ Conflicts:  qubes-core-vm < 4.0.0
 Configure sudo, PolicyKit and similar tool to not ask for any password when
 switching from user to root. Since all the user data in a VM is accessible
 already from normal user account, there is not much more to guard there. Qubes
-VM is a single user system.
+VMs are single user systems.
 
 %package thunar
 Summary: Thunar support for Qubes VM tools
