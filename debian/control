@@ -19,6 +19,14 @@ Build-Depends:
     pandoc,
     shared-mime-info,
     desktop-file-utils,
+    selinux-policy-dev,
+# Avoid pulling in a bunch of Python junk
+Build-Conflicts:
+    python3-gdal,
+    python3-matplotlib,
+    python3-pydot,
+    python3-pygraphviz,
+    python3-scipy
 Standards-Version: 4.4.0.1
 Homepage: https://www.qubes-os.org
 Vcs-Git: https://github.com/QubesOS/qubes-core-agent-linux
