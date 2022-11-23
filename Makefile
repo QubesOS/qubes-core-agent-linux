@@ -19,6 +19,7 @@ ifeq ($(ENABLE_SELINUX),1)
 	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile -- $(selinux_policies)
 
 install-rh: install-selinux
+install-deb: install-selinux
 
 install-selinux:
 	install -D -m 0644 -t $(DESTDIR)/usr/share/selinux/packages -- $(patsubst %,selinux/%,$(selinux_policies))
