@@ -123,6 +123,9 @@ install-init:
 	# since those scripts are shared between sysvinit and systemd.
 	install -m 0755 init/*.sh vm-systemd/*.sh $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 init/functions $(DESTDIR)$(LIBDIR)/qubes/init/
+ifneq ($(ENABLE_SELINUX),1)
+	rm -f $(DESTDIR)$(LIBDIR)/qubes/init/relabel-root.sh
+endif
 
 # Systemd service files
 SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service) vm-systemd/dev-xvdc1-swap.service
