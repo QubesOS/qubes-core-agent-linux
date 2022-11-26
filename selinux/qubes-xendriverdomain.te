@@ -1,7 +1,9 @@
 policy_module(``qubes-xendriverdomain'', ``0.0.1'')
 
 require {
+	attribute device_node;
 	type NetworkManager_t, initrc_t, virsh_exec_t, xend_t;
+	class blk_file getattr;
 	class dbus send_msg;
 	class file { entrypoint exec_file_perms };
 }
@@ -11,3 +13,4 @@ iptables_domtrans(xend_t)
 dbus_system_bus_client(xend_t)
 init_domtrans_script(xend_t)
 allow xend_t NetworkManager_t:dbus send_msg;
+allow xend_t device_node:blk_file getattr;
