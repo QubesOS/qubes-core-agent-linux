@@ -9,9 +9,13 @@ class MoveToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
     Uses the nautilus-python api to provide a context menu within Nautilus which
     will enable the user to select file(s) to to move to another AppVM
     '''
-    def get_file_items(self, window, files):
+    def get_file_items(self, *args):
         '''Attaches context menu in Nautilus
+
+        `args` will be `[files: List[Nautilus.FileInfo]]` in Nautilus 4.0 API,
+        and `[window: Gtk.Widget, files: List[Nautilus.FileInfo]]` in Nautilus 3.0 API.
         '''
+        files = args[-1]
         if not files:
             return
 
