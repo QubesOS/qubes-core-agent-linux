@@ -13,7 +13,7 @@ class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
 
     def get_file_items(self, *args):
         '''Attaches context menu in Nautilus
-        
+
         `args` will be `[files: List[Nautilus.FileInfo]]` in Nautilus 4.0 API,
         and `[window: Gtk.Widget, files: List[Nautilus.FileInfo]]` in Nautilus 3.0 API.
         '''
