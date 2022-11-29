@@ -1,3 +1,22 @@
+qubes-core-agent (4.1.38-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * prepare-suspend: typo fix
+  * prepare-suspend: do not disable virtual interfaces before suspend
+
+  [ Rusty Bird ]
+  * qvm-copy-to-vm.gnome: avoid 'zenity --auto-close'
+
+  [ noskb ]
+  * qubes-rpc/nautilus: Add support for Nautilus API 4.0 The
+    get_file_items method of Nautilus.MenuProvider no longer take the
+    window argument.
+
+  [ Demi Marie Obenour ]
+  * Use link scope for routes
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 Nov 2022 05:17:43 +0100
+
 qubes-core-agent (4.1.37-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
