@@ -1,7 +1,4 @@
-import os
-from subprocess import Popen
-
-from gi.repository import Nautilus, GObject
+from gi.repository import Nautilus, GObject, GLib
 
 
 class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
@@ -49,13 +46,10 @@ class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
 
             gio_file = file_obj.get_location()
 
-            # Use subprocess.DEVNULL in python >= 3.3
-            devnull = open(os.devnull, 'wb')
-            command = ['nohup', '/usr/bin/qvm-open-in-dvm']
+            command = ['/usr/bin/qvm-open-in-dvm']
             if view_only:
                 command.append('--view-only')
             command.append(gio_file.get_path())
 
-            # Use Popen instead of subprocess.call to spawn the process
-            Popen(command, stdout=devnull, stderr=devnull)
-            devnull.close()
+            pid = GLib.spawn_async(command)[0]
+            GLib.spawn_close_pid(pid)
