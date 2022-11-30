@@ -61,7 +61,7 @@ package_qubes-vm-core() {
     # temporarily pretend it is still R4.1, until repository for R4.2 is created
     release=4.1
     depends=(qubes-vm-utils python python-xdg ntp iproute2
-             gnome-packagekit imagemagick fakeroot notification-daemon dconf
+             gnome-packagekit graphicsmagick fakeroot notification-daemon dconf
              zenity qubes-libvchan qubes-db-vm haveged python-gobject
              python-dbus xdg-utils notification-daemon gawk sed procps-ng librsvg
              socat pacman-contrib parted

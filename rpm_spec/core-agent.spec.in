@@ -146,7 +146,7 @@ Requires:   python%{python3_pkgversion}-daemon
 Requires:   python%{python3_pkgversion}-qubesdb
 # for qubes.ShowInTerminal RPC service
 Requires:   socat
-Requires:   ImageMagick
+Requires:   GraphicsMagick
 Requires:   librsvg2-tools
 Requires:   zenity
 Requires:   dconf

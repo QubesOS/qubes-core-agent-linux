@@ -30,7 +30,7 @@ Depends:
     dconf-cli,
     dmsetup,
     gawk,
-    imagemagick,
+    graphicsmagick,
     init-system-helpers,
     initscripts | sysvinit-utils,
     librsvg2-bin,

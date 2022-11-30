@@ -21,7 +21,7 @@ elif ! [ -r "${filename}" ]; then
     exit 1
 fi
 
-s="$(identify -format '%w %h %m' "$filename")"
+s="$(gm identify -format '%w %h %m' "$filename")"
 w="$(echo "$s"|cut -d " " -f 1)"
 h="$(echo "$s"|cut -d " " -f 2)"
 m="$(echo "$s"|cut -d " " -f 3)"
@@ -31,16 +31,16 @@ if [ "$m" = SVG ]; then
     # downscale the image if necessary
     if [ -n "$forcemaxsize" ] && \
             { [ "$w" -gt "$forcemaxsize" ] || [ "$h" -gt "$forcemaxsize" ]; }; then
-        convert "$tmpfile2" -scale "${forcemaxsize}x${forcemaxsize}" "$tmpfile2"
+        gm convert "$tmpfile2" -scale "${forcemaxsize}x${forcemaxsize}" "$tmpfile2"
         # read the size again, because icon may not be a square
-        s="$(identify -format '%w %h' "$tmpfile2")"
+        s="$(gm identify -format '%w %h' "$tmpfile2")"
         w="$(echo "$s"|cut -d " " -f 1)"
         h="$(echo "$s"|cut -d " " -f 2)"
     fi
     filename="$tmpfile2"
 fi
 echo "$w $h"
-convert -depth 8 -size "${w}x${h}" "$filename" rgba:-
+gm convert -depth 8 -size "${w}x${h}" "$filename" rgba:-
 
 if [ -n "${tmpfile}" ]; then
     rm -f "${tmpfile}"
