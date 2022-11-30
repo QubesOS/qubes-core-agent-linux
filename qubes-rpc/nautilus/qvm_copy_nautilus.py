@@ -1,6 +1,4 @@
-import subprocess
-
-from gi.repository import Nautilus, GObject
+from gi.repository import Nautilus, GObject, GLib
 
 
 class CopyToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
@@ -35,4 +33,5 @@ class CopyToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
                # Check if file is not gone
                if not file_obj.is_gone()]
         cmd.insert(0, '/usr/lib/qubes/qvm-copy-to-vm.gnome')
-        subprocess.call(cmd)
+        pid = GLib.spawn_async(cmd)[0]
+        GLib.spawn_close_pid(pid)
