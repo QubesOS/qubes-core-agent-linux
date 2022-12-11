@@ -1,18 +1,40 @@
 #!/bin/sh
 
+#### KVM:
+. /usr/lib/qubes/hypervisor.sh
+########
+
 set -e
+
+#### KVM:
+if hypervisor xen; then
+    ROOTDEV_PREFIX="xvd"
+elif hypervisor kvm; then
+    ROOTDEV_PREFIX="vd"
+else
+    exit 0
+fi
+########
 
 dm_major=$(printf %x "$(grep device-mapper /proc/devices | cut -f 1 -d ' ')")
 case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
     ca:0)
         # nothing needed, xvda used directly
         ;;
-    ca:3)
+    ca:3:|fc:3)
         # resize partition table itself and xda3 partition
-        echo ',+' | sfdisk --no-reread --no-tell-kernel -q -N 3 /dev/xvda
+        #### KVM:
+        ##echo ',+' | sfdisk --no-reread --no-tell-kernel -q -N 3 /dev/xvda
+        # ca:3==xvd, fc:3==virtblk (vd)
+        echo ',+' | sfdisk --no-reread --no-tell-kernel -q -N 3 /dev/${ROOTDEV_PREFIX}a
+        ########
+
         # and reload partition table; prefer partprobe over blockdev
         # --rereadpt, as it works on mounted partitions
-        partprobe /dev/xvda
+        #### KVM:
+        ##partprobe /dev/xvda
+        partprobe /dev/${ROOTDEV_PREFIX}a
+        ########
         udevadm settle
         ;;
     ca:*)
@@ -20,13 +42,22 @@ case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
         exit 1
         ;;
     $dm_major:*)
-        new_size=$(cat /sys/block/xvda/size)
-        ro=$(cat /sys/block/xvda/ro)
+        #### KVM:
+        ##new_size=$(cat /sys/block/xvda/size)
+        ##ro=$(cat /sys/block/xvda/ro)
+        ##if [ "$ro" -eq 1 ]; then
+        ##    new_table="0 $new_size snapshot /dev/xvda /dev/xvdc2 N 16"
+        ##else
+        ##    new_table="0 $new_size linear /dev/xvda 0"
+        ##fi
+        new_size=$(cat /sys/block/${ROOTDEV_PREFIX}a/size)
+        ro=$(cat /sys/block/${ROOTDEV_PREFIX}a/ro)
         if [ "$ro" -eq 1 ]; then
-            new_table="0 $new_size snapshot /dev/xvda /dev/xvdc2 N 16"
+            new_table="0 $new_size snapshot /dev/${ROOTDEV_PREFIX}a /dev/${ROOTDEV_PREFIX}c2 N 16"
         else
-            new_table="0 $new_size linear /dev/xvda 0"
+            new_table="0 $new_size linear /dev/${ROOTDEV_PREFIX}a 0"
         fi
+        ########
         dmsetup load dmroot --table "$new_table"
         dmsetup resume dmroot
         ;;

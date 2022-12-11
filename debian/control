@@ -88,7 +88,8 @@ Description: Qubes core agent
 Package: qubes-core-agent-nautilus
 Architecture: any
 Depends:
-    ${pythonver:Depends}-nautilus,
+    ##${pythonver:Depends}-nautilus,
+    python-nautilus,
     qubes-core-qrexec,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)

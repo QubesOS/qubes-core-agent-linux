@@ -22,6 +22,7 @@
 
 %define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
+%define backend_vmm @BACKEND_VMM@
 
 # systemd is used in Fedora and CentOS
 %if 0%{?fedora} || 0%{?rhel}
@@ -173,7 +174,9 @@ Conflicts:  qubes-gui-agent < 4.1.6
 BuildRequires: gcc
 BuildRequires: desktop-file-utils
 BuildRequires: pandoc
+%if "%{?backend_vmm}" == "xen"
 BuildRequires: xen-devel
+%endif
 BuildRequires: libX11-devel
 BuildRequires: qubes-utils-devel >= 3.1.3
 BuildRequires: qubes-libvchan-@BACKEND_VMM@-devel
@@ -988,6 +991,11 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/sysinit.target.requires/systemd-random-seed.service
 /usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
 /usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
+#### KVM:
+/usr/lib/systemd/system/qubes-mount-dirs.service.d/30_qubes-kvm.conf
+/usr/lib/systemd/system/qubes-rootfs-resize.service.d/30_qubes-kvm.conf
+/usr/lib/systemd/system/qubes-sysinit.service.d/30_qubes-kvm.conf
+########
 
 %post systemd
 

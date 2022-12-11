@@ -4,9 +4,22 @@
 # shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
+#### KVM:
+. /usr/lib/qubes/hypervisor.sh
+########
+
 set -e
 
-dev=/dev/xvdb
+#### KVM:
+##dev=/dev/xvdb
+if hypervisor xen; then
+    dev=/dev/xvdb
+elif hypervisor kvm; then
+    dev=/dev/vdb
+else
+    exit 0
+fi
+########
 max_size=10485760  # check at most 10 MiB
 
 if [ -e "$dev" ] ; then
