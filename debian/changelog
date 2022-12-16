@@ -1,3 +1,24 @@
+qubes-core-agent (4.2.3-1) unstable; urgency=medium
+
+  [ noskb ]
+  * qubes-rpc/nautilus: Add support for Nautilus API 4.0 The
+    get_file_items method of Nautilus.MenuProvider no longer take the
+    window argument.
+  * qubes-rpc/nautilus: Execute external commands asynchronously
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "temporarily pretend to be 4.1"
+  * archlinux: update example repo to r4.2 too
+  * ci: fix uploading coverage to codecov
+
+  [ Mateusz Piórkowski ]
+  * Add purging of no longer allowed connections from conntrack
+
+  [ Marek Marczykowski-Górecki ]
+  * firewall: remove debug print
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 16 Dec 2022 18:05:42 +0100
+
 qubes-core-agent (4.2.2-1) unstable; urgency=medium
 
   * Add R4.2 CentOS key too
