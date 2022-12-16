@@ -42,5 +42,3 @@ install:
 
 marker-vm: marker-vm.in
 	printf "$(VERSION)" | cut -f 1,2 -d . | cat $< - > marker-vm
-	# temporarily force 4.1, until repository for 4.2 packages is created
-	printf "4.1" | cut -f 1,2 -d . | cat $< - > marker-vm
