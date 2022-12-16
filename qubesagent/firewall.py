@@ -196,7 +196,6 @@ class FirewallWorker(object):
                              stderr=subprocess.STDOUT) as p:
             while True:
                 line = p.stdout.readline()
-                print(line)
                 if not line:
                     break
 
