@@ -1,8 +1,9 @@
 import logging
 import operator
 import re
+from io import BytesIO
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import qubesagent.firewall
 
@@ -94,6 +95,13 @@ class FirewallWorker(qubesagent.firewall.FirewallWorker):
     def update_connected_ips(self, family):
         self.update_connected_ips_called_with.append(family)
 
+    @staticmethod
+    def dns_addresses(family=None):
+        if family == 4:
+            return ['1.1.1.1', '2.2.2.2']
+        else:
+            return ['2001::1', '2001::2']
+
 
 class IptablesWorker(qubesagent.firewall.IptablesWorker):
     '''Override methods actually modifying system state to only log what
@@ -180,6 +188,7 @@ class WorkerCommon(object):
             raise ValueError()
 
     def test_701_dns_info(self):
+        self.obj.conntrack_get_connections = Mock(return_value=[])
         rules = [
             {'action': 'accept', 'proto': 'tcp',
                 'dstports': '80-80', 'dsthost': 'ripe.net'},
@@ -291,6 +300,7 @@ class TestIptablesWorker(TestCase, WorkerCommon):
         self.assertPrepareRulesDnsRet(ret[1], 'ripe.net', 6)
 
     def test_004_apply_rules4(self):
+        self.obj.conntrack_get_connections = Mock(return_value=[])
         rules = [{'action': 'accept'}]
         chain = 'qbs-10-137-0-1'
         self.obj.apply_rules('10.137.0.1', rules)
@@ -305,6 +315,7 @@ class TestIptablesWorker(TestCase, WorkerCommon):
         self.assertIsNone(self.obj.loaded_iptables[6])
 
     def test_005_apply_rules6(self):
+        self.obj.conntrack_get_connections = Mock(return_value=[])
         rules = [{'action': 'accept'}]
         chain = 'qbs-2000--a'
         self.obj.apply_rules('2000::a', rules)
@@ -519,6 +530,7 @@ class TestNftablesWorker(TestCase, WorkerCommon):
         self.assertPrepareRulesDnsRet(ret[1], 'ripe.net', 6)
 
     def test_004_apply_rules4(self):
+        self.obj.conntrack_get_connections = Mock(return_value=[])
         rules = [{'action': 'accept'}]
         chain = 'qbs-10-137-0-1'
         self.obj.apply_rules('10.137.0.1', rules)
@@ -528,6 +540,7 @@ class TestNftablesWorker(TestCase, WorkerCommon):
              ])
 
     def test_005_apply_rules6(self):
+        self.obj.conntrack_get_connections = Mock(return_value=[])
         rules = [{'action': 'accept'}]
         chain = 'qbs-2000--a'
         self.obj.apply_rules('2000::a', rules)
@@ -726,3 +739,60 @@ class TestFirewallWorker(TestCase):
         self.assertEqual(self.obj.update_connected_ips_called_with, [4, 6])
         self.assertEqual(set(self.obj.rules.keys()), self.obj.list_targets())
         # rules content were already tested
+
+    @patch('subprocess.Popen')
+    def test_conntrack_get_connections(self, mock_subprocess):
+        conntrack_stdout = (
+            b'tcp      6 431963 ESTABLISHED src=10.138.38.13 dst=1.1.1.1 '
+                b'sport=34488 dport=443 src=1.1.1.1 dst=10.138.38.13 sport=443 '
+                b'dport=34488 [ASSURED] mark=0 use=1\n'
+
+            b'udp      17 3 src=10.138.38.13 dst=10.139.1.1 sport=33295 dport=53 '
+                b'src=10.139.1.1 dst=10.138.38.13 sport=53 dport=33295 mark=0 use=1\n'
+        )
+        mock_subprocess().__enter__().stdout = BytesIO(conntrack_stdout)
+        ret = self.obj.conntrack_get_connections(4, "10.138.38.13")
+        self.assertEqual(ret, {
+            ('udp', '10.139.1.1', '53'),
+            ('tcp', '1.1.1.1', '443')
+        })
+
+    def test_is_blocked(self):
+        dns_servers_ipv4 = list(self.obj.dns_addresses(4))
+        dns_servers_ipv6 = list(self.obj.dns_addresses(6))
+        dns = {
+            "example.com": set(["1.2.3.4/32", "4.3.2.1/32"]),
+            "example2.com": set(["2001::1/128", "2001::2/128"])
+        }
+        rules = [
+            {'proto': 'tcp', 'dstports': '80-80', 'action': 'drop'},
+            {'proto': 'tcp', 'dstports': '90-92', 'action': 'drop'},
+            {'proto': 'tcp', 'dsthost': 'example.com', 'action': 'drop'},
+            {'proto': 'tcp', 'dsthost': 'example2.com', 'action': 'drop'},
+            {'dst4': '3.3.3.3/32', 'action': 'drop'},
+            {'dst4': '4.4.4.4/24', 'action': 'drop'},
+            {'dst6': '2002::3/128', 'action': 'drop'},
+            {'dst6': '2003::3/112', 'action': 'drop'},
+            {'proto': 'udp', 'specialtarget': 'dns', 'action': 'drop'},
+            {'action': 'accept'},
+        ]
+
+        self.assertTrue(self.obj.is_blocked({}, ("tcp", "1.1.1.1", "123"), dns))
+
+        self.assertFalse(self.obj.is_blocked(rules, ("tcp", "10.0.0.1", "443"), dns))
+        self.assertFalse(self.obj.is_blocked(rules, ("udp", "10.0.0.1", "80"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "10.0.0.1", "80"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "10.0.0.1", "91"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "1.2.3.4", "123"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "4.3.2.1", "123"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "2003::2", "123"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "3.3.3.3", "123"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "4.4.4.8", "123"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "2002::3", "123"), dns))
+        self.assertTrue(self.obj.is_blocked(rules, ("tcp", "2003::5", "123"), dns))
+
+        for server in dns_servers_ipv4:
+            self.assertTrue(self.obj.is_blocked(rules, ("udp", server, "53"), dns))
+
+        for server in dns_servers_ipv6:
+            self.assertTrue(self.obj.is_blocked(rules, ("udp", server, "53"), dns))

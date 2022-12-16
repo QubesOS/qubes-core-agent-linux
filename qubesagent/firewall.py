@@ -23,6 +23,7 @@
 import logging
 import os
 import socket
+import ipaddress
 import subprocess
 import pwd
 import shutil
@@ -179,6 +180,86 @@ class FirewallWorker(object):
 
     def list_targets(self):
         return set(t.split('/')[2] for t in self.qdb.list('/qubes-firewall/'))
+
+    def conntrack_drop(self, src, con):
+        subprocess.run(['conntrack', '-D', '--src', src, '--dst', con[1],
+                        '--proto', con[0], '--dport', con[2]],
+                       stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT)
+
+    def conntrack_get_connections(self, family, source):
+        connections = set()
+
+        with subprocess.Popen(['conntrack', '-L',
+                               '--family', f'ipv{family}', '--src', source],
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT) as p:
+            while True:
+                line = p.stdout.readline()
+                print(line)
+                if not line:
+                    break
+
+                line_split = line.decode().split(' ')
+
+                proto = line_split[0]
+                dst = None
+                dport = None
+                for i in line_split:
+                    if i.startswith('dst='):
+                        dst = i[len('dst='):]
+                    elif i.startswith('dport='):
+                        dport = i[len('dport='):]
+                        break
+
+                if not dst or not dport:
+                    continue
+
+                connections.add((proto, dst, dport))
+
+        return connections
+
+    def is_blocked(self, rules, con, dns):
+        con_proto, con_dst, con_dport = con
+
+        family = 6 if self.is_ip6(con_dst) else 4
+        dns_servers = list(self.dns_addresses(family))
+        fullmask = '/128' if family == 6 else '/32'
+
+        for rule in rules:
+            if rule.get('proto') and rule['proto'] != con_proto:
+                continue
+
+            if rule.get('dstports'):
+                if '-' in rule['dstports']:
+                    rule_port_range = rule['dstports'].split('-')
+                    if not (rule_port_range[0] <= con_dport and \
+                            con_dport <= rule_port_range[1]):
+                        continue
+                else:
+                    if con_dport != rule['dstports']:
+                        continue
+
+            if family == 4 and rule.get('dst6') or \
+               family == 6 and rule.get('dst4'):
+                continue
+
+            if rule.get(f'dst{family}'):
+                if not ipaddress.ip_address(con_dst) in \
+                   ipaddress.ip_network(rule[f'dst{family}'], False):
+                    continue
+            elif rule.get('dsthost'):
+                if not f'{con_dst}{fullmask}' in dns[rule['dsthost']]:
+                    continue
+
+            if rule.get('specialtarget') == 'dns':
+                if int(con_dport) != 53 or not con_dst in dns_servers:
+                    continue
+
+            return rule['action'] == 'drop'
+
+        # Blocked by default
+        return True
 
     @staticmethod
     def is_ip6(addr):
@@ -474,6 +555,12 @@ class IptablesWorker(FirewallWorker):
             raise RuleApplyError('\'iptables -F {}\' failed: {}'.format(
                 chain, e.output))
 
+        connections = self.conntrack_get_connections(family, source)
+        for con in connections:
+            is_blocked = self.is_blocked(rules, con, dns)
+            if is_blocked:
+                self.conntrack_drop(source, con)
+
     def apply_rules(self, source, rules):
         if self.is_ip6(source):
             self.apply_rules_family(source, rules, 6)
@@ -765,6 +852,12 @@ class NftablesWorker(FirewallWorker):
         (nft, dns) = self.prepare_rules(chain, rules, family)
         self.run_nft(nft)
         self.update_dns_info(source, dns)
+
+        connections = self.conntrack_get_connections(family, source)
+        for con in connections:
+            is_blocked = self.is_blocked(rules, con, dns)
+            if is_blocked:
+                self.conntrack_drop(source, con)
 
     def apply_rules(self, source, rules):
         if self.is_ip6(source):
