@@ -4,7 +4,7 @@
 
 ## MIME override stuff
 /usr/share/GConf /usr/share/qubes/xdg-override/GConf
-/usr/share/ImageMagick-6 /usr/share/qubes/xdg-override/ImageMagick-6
+/usr/share/GraphicsMagick-1.4 /usr/share/qubes/xdg-override/GraphicsMagick-1.4
 /usr/share/X11 /usr/share/qubes/xdg-override/X11
 /usr/share/aclocal /usr/share/qubes/xdg-override/aclocal
 /usr/share/alsa /usr/share/qubes/xdg-override/alsa
