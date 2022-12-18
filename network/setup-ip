@@ -3,7 +3,7 @@
 # Source Qubes library.
 # shellcheck disable=SC1091
 . /usr/lib/qubes/init/functions
-set -uo pipefail
+set -ueo pipefail
 
 add_link_route () {
     /sbin/ip -- route replace to unicast "$1" dev "$2" scope link
@@ -222,6 +222,15 @@ if [ "$ACTION" == "add" ]; then
 
         primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null) || primary_dns=
         secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null) || secondary_dns=
+        /usr/lib/systemd/systemd-sysctl \
+            "--prefix=/net/ipv4/conf/all" \
+            "--prefix=/net/ipv4/neigh/all" \
+            "--prefix=/net/ipv6/conf/all" \
+            "--prefix=/net/ipv6/neigh/all" \
+            "--prefix=/net/ipv4/conf/$INTERFACE" \
+            "--prefix=/net/ipv4/neigh/$INTERFACE" \
+            "--prefix=/net/ipv6/conf/$INTERFACE" \
+            "--prefix=/net/ipv6/neigh/$INTERFACE"
 
         if [ -n "$ip" ]; then
             # If NetworkManager is enabled, let it configure the network

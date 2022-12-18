@@ -20,7 +20,7 @@
 #         this script).
 #============================================================================
 
-dir=$(dirname "$0")
+dir=$(dirname "$0") || exit
 # shellcheck disable=SC1091,SC1090
 . "$dir/vif-common.sh"
 
@@ -145,6 +145,31 @@ case $- in
 (*e*) :;;
 (*) echo '-e not set'>&2; exit 1;;
 esac
+
+qubesdb_read_bool () {
+    local value status=0
+    value=$(qubesdb-read -- "$1" 2>/dev/null) || status=$?
+    case $status in
+    (0) if test -n "$value"; then return 0; else return 1; fi;;
+    (2) return "$2";;
+    (*) echo "unexpected return value $status from qubesdb-read" >&2; exit 1;;
+    esac
+}
+
+# Harden against various attacks if requested
+if qubesdb_read_bool /qubes-service/harden-network-interfaces 1; then
+    /usr/lib/systemd/systemd-sysctl \
+        "--prefix=/net/ipv4/conf/all" \
+        "--prefix=/net/ipv4/neigh/all" \
+        "--prefix=/net/ipv6/conf/all" \
+        "--prefix=/net/ipv6/neigh/all" \
+        "--prefix=/net/ipv4/conf/$vif" \
+        "--prefix=/net/ipv4/neigh/$vif" \
+        "--prefix=/net/ipv6/conf/$vif" \
+        "--prefix=/net/ipv6/neigh/$vif" \
+        -- \
+        /etc/sysctl.d/81-qubes.conf.optional
+fi
 
 # add anti-spoofing rules before enabling the interface
 if [ "${ip}" ]; then

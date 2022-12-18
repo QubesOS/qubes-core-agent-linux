@@ -1,0 +1,18 @@
+# Must be set system-wide
+net.ipv6.max_hbh_opts_length = 0
+net.ipv6.max_dst_opts_length = 0
+net.ipv6.conf.all.accept_dad = 0
+net.ipv4.conf.all.accept_redirects = 0
+
+net.ipv4.conf.*.accept_source_route = 0
+net.ipv4.conf.*.accept_redirects = 0
+net.ipv4.conf.*.secure_redirects = 0
+net.ipv4.conf.*.send_redirects = 0
+net.ipv4.conf.*.drop_unicast_in_l2_multicast = 1
+net.ipv6.conf.*.accept_source_route = -1
+net.ipv6.conf.*.accept_redirects = 0
+net.ipv6.conf.*.accept_ra = 0
+net.ipv6.conf.*.accept_dad = 0
+net.ipv6.conf.*.autoconf = 0
+net.ipv6.conf.*.drop_unicast_in_l2_multicast = 1
+
