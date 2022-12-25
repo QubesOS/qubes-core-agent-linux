@@ -139,11 +139,11 @@ class DownloadCommand(dnf.cli.Command):
                     if self.opts.all_mirrors:
                         schemas = self.opts.urlprotocols
                         # pylint: disable=protected-access
-                        for mirror in pkgs.repo._repo.getMirrors():
+                        for mirror in pkg.repo._repo.getMirrors():
                             if schemas:
                                 if urllib.parse.urlparse(mirror)[0] not in schemas:
                                     continue
-                            print(os.path.join(url, pkg.location.lstrip('/')))
+                            print(os.path.join(mirror, pkg.location.lstrip('/')))
                     else:
                         url = pkg.remote_location(schemes=self.opts.urlprotocols)
                         if url:
