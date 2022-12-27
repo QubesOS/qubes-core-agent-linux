@@ -153,6 +153,8 @@ Requires:   dconf
 Requires:   qubes-core-qrexec-vm
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
+# qubes.Suspend{Pre,Post}
+Requires:   dbus-tools
 %if 0%{?rhel} == 8
 # we need to stick to related DNF python version
 # which is python3.6 by default
