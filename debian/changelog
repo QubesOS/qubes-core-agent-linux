@@ -1,3 +1,30 @@
+qubes-core-agent (4.2.4-1) unstable; urgency=medium
+
+  [ Mateusz Piórkowski ]
+  * Replace ImageMagick with GraphicsMagick
+
+  [ Marek Marczykowski-Górecki ]
+  * qvm-template: fallback to other mirrors
+
+  [ Demi Marie Obenour ]
+  * Harden network interfaces before enabling them
+  * Set -e in setup_ip
+  * Bail out if vif-route-qubes can't find itself
+  * Rely exclusively on systemd-sysctl
+  * Allow controlling hardening with qvm-service
+  * simplify mime packaging
+  * makefile fix
+  * Declare each target (other than .PHONY) only once
+
+  [ Alexander Paetzelt ]
+  * Add upgrades-status-notify and upgrades-installed-check to archlinux
+    package
+
+  [ Marek Marczykowski-Górecki ]
+  * qvm-template: fix dnf download plugin
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 27 Dec 2022 06:30:19 +0100
+
 qubes-core-agent (4.2.3-1) unstable; urgency=medium
 
   [ noskb ]
