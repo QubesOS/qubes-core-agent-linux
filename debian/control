@@ -173,10 +173,3 @@ Description: Passwordless root access from normal user
  switching from user to root. Since all the user data in a VM is accessible
  already from normal user account, there is not much more to guard there. Qubes
  VMs are single user systems.
-
-Package: qubes-core-agent-selinux
-Architecture: any
-Depends: selinux-policy-default
-Description: SELinux policy for Qubes VMs
- SELinux policy for the Qubes VM tools.  This allows the Qubes VM tools to run in
- a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
