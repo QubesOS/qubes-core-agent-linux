@@ -1,3 +1,73 @@
+qubes-core-agent (4.2.5-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: add missing dbus-tool dep
+
+  [ Demi Marie Obenour ]
+  * Enable SELinux support
+  * Set SELinux contexts of home directories
+  * SELinux policies for xendriverdomain.service
+  * Require the SELinux policies if SELinux is present
+  * Move misc policies into their own module
+  * File context substitutions are not recursive
+  * Fix qubes-core-agent-selinux preun scriptlet
+  * Extra file contexts
+  * Fix file equivalency management
+  * Create directories with proper SELinux contexts
+  * Fewer calls to mkdir(1)
+  * Allow systemd-modules-load to log to journal
+  * Perform SELinux relabeling when necessary
+  * Enable qubes-relabel-rw.service
+  * Allow iptables to access Xen device files
+  * Allow local_login_t to start systemd units
+  * Allow RPM commands to write to qrexec stderr fifo
+  * qubes-sysinit.sh: reject bad service names
+  * Add marker file for VM persistence
+  * Relabel root filesystem as needed
+  * Only relabel persistent volumes
+  * Conflict with standard SELinux autorelabeling
+  * SELinux: Forcibly relabel root filesystem on install
+  * Check SELinux is not enforcing before disabling relabeling
+  * Enable qubes-relabel-root for automatic relabeling
+  * Reboot after relabeling root FS
+  * Only relabel a few directories in postinst
+  * Pass -f to rm
+  * Override selinux-autorelabel.target
+  * Force autorelabel after installation
+  * Require relabeling for boot to succeed
+  * Fix typo
+  * install missing file
+  * Revert "Require relabeling for boot to succeed"
+  * Mark a bunch of packages as noarch
+  * Move SELinux stuff to its package
+  * Do not install SELinux stuff with SELinux disabled
+  * Enable SELinux when installing policy
+  * Try to fix autorelabel
+  * Avoid unbootable system
+  * Debug stuff
+  * Fix bogus sed call
+  * Debian fix
+  * minor cleanups
+  * Try to get SELinux policy working for Debian
+  * shut up shellcheck
+  * Enable SELinux in Debian build
+  * Add missing build deps
+  * Drop SELinux on Debian
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix Debian build
+
+  [ Demi Marie Obenour ]
+  * Make SELinux permissive if not yet relabeled
+  * Allow 'xl devd' to get information about all block devices
+  * Allow init_t and unconfined_service_t to transition to anything
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: cleaup remaining selinux package
+  * Move pulseaudio drop-in to pulseaudio-qubes package
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 28 Dec 2022 19:13:17 +0100
+
 qubes-core-agent (4.2.4-1) unstable; urgency=medium
 
   [ Mateusz Piórkowski ]
