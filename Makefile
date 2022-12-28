@@ -8,10 +8,26 @@ release := $(shell lsb_release -is)
 
 # This makefile uses some bash-isms, make uses /bin/sh by default.
 SHELL = /bin/bash
+selinux_policies ::= qubes-qfile-unpacker.pp qubes-xendriverdomain.pp \
+	qubes-misc.pp
 
 all:
 	$(MAKE) -C misc VERSION=$(VERSION)
 	$(MAKE) -C qubes-rpc
+ifdef ENABLE_SELINUX
+ifeq ($(ENABLE_SELINUX),1)
+	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile -- $(selinux_policies)
+
+install-rh: install-selinux
+install-deb: install-selinux
+
+install-selinux:
+	install -D -m 0644 -t $(DESTDIR)/usr/share/selinux/packages -- $(patsubst %,selinux/%,$(selinux_policies))
+.PHONY: install-selinux
+else ifneq ($(ENABLE_SELINUX),0)
+$(error bad value for $$(ENABLE_SELINUX))
+endif
+endif
 
 clean:
 	make -C misc clean
@@ -38,6 +54,9 @@ SYSTEM_DROPINS += systemd-random-seed.service
 SYSTEM_DROPINS += tor.service tor@default.service
 SYSTEM_DROPINS += systemd-timesyncd.service
 SYSTEM_DROPINS += systemd-logind.service
+ifeq ($(ENABLE_SELINUX),1)
+SYSTEM_DROPINS += selinux-autorelabel.target selinux-autorelabel.service
+endif
 
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
 SYSTEM_DROPINS_NETWORKING += tinyproxy.service
@@ -57,7 +76,7 @@ ifeq ($(release),Ubuntu)
 
 # Debian Dropins
 else ifeq ($(release), Debian)
-    # 'crond.service' is named 'cron.service in Debian
+    # 'crond.service' is named 'cron.service' in Debian
     SYSTEM_DROPINS := $(strip $(patsubst crond.service, cron.service, $(SYSTEM_DROPINS)))
 
     # Wheezy System Dropins
@@ -104,6 +123,9 @@ install-init:
 	# since those scripts are shared between sysvinit and systemd.
 	install -m 0755 init/*.sh vm-systemd/*.sh $(DESTDIR)$(LIBDIR)/qubes/init/
 	install -m 0644 init/functions $(DESTDIR)$(LIBDIR)/qubes/init/
+ifneq ($(ENABLE_SELINUX),1)
+	rm -f $(DESTDIR)$(LIBDIR)/qubes/init/relabel-root.sh
+endif
 
 # Systemd service files
 SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service) vm-systemd/dev-xvdc1-swap.service

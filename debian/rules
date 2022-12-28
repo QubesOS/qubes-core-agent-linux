@@ -12,10 +12,10 @@ export DESTDIR=$(shell pwd)/debian/tmp
 	dh $@ --with systemd,python3 --with=config-package
 
 override_dh_auto_build:
-	make all
+	make all ENABLE_SELINUX=0
 
 override_dh_auto_install:
-	make install-deb
+	make install-deb ENABLE_SELINUX=0
 	make -C app-menu install
 	make -C config-overrides install
 	make -C filesystem install

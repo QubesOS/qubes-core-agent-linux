@@ -29,6 +29,7 @@
 %else
 %define with_sysvinit 1
 %endif
+%bcond_without selinux
 
 %if 0%{?rhel} == 8
 %define plateform_python3_sitelib %(/usr/libexec/platform-python -c 'import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())')
@@ -188,6 +189,9 @@ BuildRequires: redhat-lsb
 # for update-mime-database
 BuildRequires: shared-mime-info
 Source0: %{name}-%{version}.tar.gz
+%if %{with selinux}
+Requires: (%{name}-selinux if selinux-policy)
+%endif
 
 %description
 The Qubes core files for installation inside a Qubes VM.
@@ -196,6 +200,7 @@ The Qubes core files for installation inside a Qubes VM.
 Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python2-devel
 %{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
+BuildArch: noarch
 
 %description -n python2-dnf-plugins-qubes-hooks
 DNF plugin for Qubes specific post-installation actions:
@@ -206,6 +211,7 @@ DNF plugin for Qubes specific post-installation actions:
 %package -n python3-dnf-plugins-qubes-hooks
 Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python3-devel
+BuildArch: noarch
 
 %description -n python3-dnf-plugins-qubes-hooks
 DNF plugin for Qubes specific post-installation actions:
@@ -215,6 +221,7 @@ DNF plugin for Qubes specific post-installation actions:
 %package -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python%{python3_pkgversion}-devel
+BuildArch: noarch
 %{?python_provide:%python_provide python%{python3_pkgversion}-dnf-plugins-qubes-hooks}
 
 %description -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
@@ -233,6 +240,7 @@ Conflicts:  qubes-core-vm < 4.0.0
 Nautilus addons for inter-VM file copy/move/open.
 
 %package dom0-updates
+BuildArch:  noarch
 Summary:    Scripts required to handle dom0 updates
 Requires:   qubes-core-agent = %{version}
 Requires:   fakeroot
@@ -243,6 +251,7 @@ Requires:   tar
 Scripts required to handle dom0 updates.
 
 %package networking
+BuildArch:  noarch
 Summary:    Networking support for Qubes VM
 Requires:   iptables
 Requires:   conntrack-tools
@@ -264,6 +273,7 @@ qubes-core-agent-network-manager.
 
 %package network-manager
 Summary:    NetworkManager integration for Qubes VM
+BuildArch:  noarch
 # to show/hide nm-applet
 Requires:   NetworkManager >= 0.8.1-1
 Requires:   glib2
@@ -278,6 +288,7 @@ Integration of NetworkManager for Qubes VM:
  * show/hide NetworkManager applet icon
 
 %package passwordless-root
+BuildArch:  noarch
 Summary:    Passwordless root access from normal user
 Conflicts:  qubes-core-vm < 4.0.0
 
@@ -285,7 +296,7 @@ Conflicts:  qubes-core-vm < 4.0.0
 Configure sudo, PolicyKit and similar tool to not ask for any password when
 switching from user to root. Since all the user data in a VM is accessible
 already from normal user account, there is not much more to guard there. Qubes
-VM is a single user system.
+VMs are single user systems.
 
 %package thunar
 Summary: Thunar support for Qubes VM tools
@@ -293,6 +304,68 @@ Requires: Thunar
 
 %description thunar
 Thunar support for Qubes VM tools
+
+%if %{with selinux}
+%package selinux
+BuildArch: noarch
+Summary:   SELinux policy for Qubes VMs
+License:   GPLv2+
+
+# The following is based on %%selinux_requires, which has the following license:
+# Copyright (C) 2017 Red Hat, Inc. All rights reserved.
+#
+#   Author: Petr Lautrbach <plautrba@redhat.com>
+#   Author: Lukáš Vrabec <lvrabec@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Requires: selinux-policy
+Requires(post): selinux-policy-base
+Requires(post): libselinux-utils
+BuildRequires: selinux-policy
+BuildRequires: selinux-policy-devel
+
+%description selinux
+SELinux policy for the Qubes VM tools.  This allows the Qubes VM tools to run in
+a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
+
+%files selinux
+%_datadir/selinux/packages/qubes-qfile-unpacker.pp
+%_datadir/selinux/packages/qubes-xendriverdomain.pp
+%_datadir/selinux/packages/qubes-misc.pp
+%_unitdir/qubes-relabel-rw.service
+%_unitdir/qubes-relabel-root.service
+%_unitdir/selinux-autorelabel.target.d/30_qubes.conf
+%_unitdir/selinux-autorelabel.service.d/30_qubes.conf
+/usr/lib/qubes/init/relabel-root.sh
+
+%postun selinux
+if [ "$1" -eq 0 ]; then
+    %selinux_modules_uninstall \
+        %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp \
+        %{_datadir}/selinux/packages/qubes-xendriverdomain.pp \
+        %{_datadir}/selinux/packages/qubes-misc.pp
+fi || :
+
+%posttrans selinux
+%selinux_relabel_post
+%systemd_post qubes-relabel-root.service qubes-relabel-rw.service
+systemctl start selinux-autorelabel-mark.service
+exit 0
+
+
+%endif
 
 %define kde_service_dir /usr/share/kde4/services
 %define kde5_service_dir /usr/share/kservices5/ServiceMenus
@@ -302,7 +375,7 @@ Thunar support for Qubes VM tools
 
 %build
 %{?set_build_flags}
-make BACKEND_VMM=@BACKEND_VMM@
+make BACKEND_VMM=@BACKEND_VMM@ ENABLE_SELINUX=%with_selinux
 make -C doc manpages
 
 %pre
@@ -331,7 +404,7 @@ usermod -L root
 
 %install
 
-make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib
+make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib ENABLE_SELINUX=%with_selinux
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
@@ -499,17 +572,19 @@ if [ ! -e /etc/xdg/autostart/notification-daemon.desktop ]; then
 fi
 exit 0
 
+%if %{without selinux}
 %triggerin -- selinux-policy
 
 . /usr/lib/qubes/init/functions
 
 if ! is_protected_file /etc/selinux/config; then
     echo "--> Disabling SELinux..."
-    sed -e s/^SELINUX=.*$/SELINUX=disabled/ </etc/selinux/config >/etc/selinux/config.processed
+    sed -e 's/^SELINUX=.*$/SELINUX=disabled/' </etc/selinux/config >/etc/selinux/config.processed
     mv /etc/selinux/config.processed /etc/selinux/config
     setenforce 0 2>/dev/null
 fi
 exit 0
+%endif
 
 %post network-manager
 
@@ -565,6 +640,105 @@ fi
 %systemd_preun qubes-iptables.service
 %systemd_preun qubes-network.service
 %systemd_preun qubes-updates-proxy.service
+
+%if %{with selinux}
+%post selinux
+
+%selinux_modules_install %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
+{
+flock --no-fork -- 9
+flock --no-fork -- 8
+for i in /etc/selinux/*/contexts/files/file_contexts.subs; do
+if [ -s "$i" ]; then
+contexts='### QUBES START ###\
+/rw/home /home\
+/rw/config/NM-system-connections /etc/NetworkManager/system-connections\
+/rw/bind-dirs /\
+/rw/usrlocal /usr/local\
+/rw/usrlocal/etc /etc\
+/rw/usrlocal/share /usr/share\
+/rw/usrlocal/libexec /usr/libexec\
+/rw/usrlocal/games /usr/games\
+/rw/usrlocal/bin /usr/bin\
+/rw/usrlocal/lib /usr/lib\
+/rw/usrlocal/src /usr/src\
+/rw/usrlocal/include /usr/include\
+/rw/usrlocal/sbin /usr/sbin\
+/usr/local/etc /etc\
+/usr/local/share /usr/share\
+/usr/local/libexec /usr/libexec\
+/usr/local/games /usr/games\
+/usr/local/bin /usr/bin\
+/usr/local/lib /usr/lib\
+/usr/local/src /usr/src\
+/usr/local/include /usr/include\
+/usr/local/sbin /usr/sbin\
+### QUBES END ###'
+
+sed -Ei "/^### QUBES START ###\$/,/^### QUBES END ###\$/{
+\$c\
+$contexts
+d
+}
+\$a\
+$contexts
+" "$i"
+else
+printf >> "$i" '### QUBES START ###
+/rw/home /home
+/rw/config/NM-system-connections /etc/NetworkManager/system-connections
+/rw/bind-dirs /
+/rw/usrlocal /usr/local
+/rw/usrlocal/etc /etc
+/rw/usrlocal/share /usr/share
+/rw/usrlocal/libexec /usr/libexec
+/rw/usrlocal/games /usr/games
+/rw/usrlocal/bin /usr/bin
+/rw/usrlocal/lib /usr/lib
+/rw/usrlocal/src /usr/src
+/rw/usrlocal/include /usr/include
+/rw/usrlocal/sbin /usr/sbin
+/usr/local/etc /etc
+/usr/local/share /usr/share
+/usr/local/libexec /usr/libexec
+/usr/local/games /usr/games
+/usr/local/bin /usr/bin
+/usr/local/lib /usr/lib
+/usr/local/src /usr/src
+/usr/local/include /usr/include
+/usr/local/sbin /usr/sbin
+### QUBES END ###
+'
+fi
+done
+} 9< %_selinux_store_policy_path/semanage.read.LOCK 8< %_selinux_store_policy_path/semanage.trans.LOCK
+if [ ! -f /.qubes-relabeled ]; then
+    unshare --mount -- /bin/sh -euc 'mount --bind -- / /mnt && exec "$@"' sh setfiles -r /mnt -- \
+      /etc/selinux/targeted/contexts/files/file_contexts \
+      /mnt/proc /mnt/sys /mnt/dev /mnt/tmp /mnt/rw /mnt/home \
+      /mnt/usr/lib/systemd
+    sed -i -- 's/^SELINUX=\(disabled\|enforcing\)/SELINUX=permissive/' /etc/selinux/config
+    touch /.autorelabel
+fi
+exit 0
+
+%preun selinux
+if [ "$1" -eq 0 ]; then
+  if ! grep -E '^SELINUX=(disabled|permissive)$' /etc/selinux/config; then
+    echo 'qubes-core-agent-selinux cannot be uninstalled with SELinux in enforcing mode' >&2
+    exit 1
+  fi
+  rm -f /.qubes-relabeled || exit 1
+  %systemd_preun qubes-relabel-rw.service
+  %systemd_preun qubes-relabel-root.service
+  flock --no-fork -- %_selinux_store_policy_path/semanage.read.LOCK \
+  sed -Ei -- "/^### QUBES START ###\$/,/^### QUBES END ###\$/d" \
+    /etc/selinux/targeted/contexts/files/file_contexts.subs
+  %selinux_modules_uninstall %{_datadir}/selinux/packages/targeted/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/targeted/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
+fi
+exit 0
+
+%endif
 
 %postun thunar
 if [ "$1" = 0 ]; then
@@ -908,7 +1082,7 @@ for svc in %qubes_services ; do
 done
 
 # TODO: make this not display the silly message about security context...
-sed -i s/^id:.:initdefault:/id:3:initdefault:/ /etc/inittab
+sed -i 's/^id:.:initdefault:/id:3:initdefault:/' /etc/inittab
 
 %preun sysvinit
 if [ "$1" = 0 ] ; then

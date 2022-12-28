@@ -3,6 +3,7 @@ Description=Init Qubes Services settings
 DefaultDependencies=no
 Before=sysinit.target
 After=systemd-modules-load.service qubes-db.service
+Requires=qubes-db.service
 
 [Service]
 Type=oneshot

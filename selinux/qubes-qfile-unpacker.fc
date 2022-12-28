@@ -1,0 +1,2 @@
+`/usr/lib/\.modules_work(/.*)? <<none>>'
+`/usr/lib/qubes/qfile-unpacker' -- gen_context(system_u:object_r:qubes_qfile_unpacker_exec_t,s0)

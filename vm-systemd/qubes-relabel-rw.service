@@ -1,0 +1,20 @@
+[Unit]
+Description=Relabel /rw and /home
+After=qubes-mount-dirs.service qubes-sysinit.service
+Requires=qubes-mount-dirs.service qubes-sysinit.service
+ConditionSecurity=selinux
+ConditionPathExists=|/run/qubes/persistent-rw-only
+ConditionPathExists=|/run/qubes/persistent-full
+ConditionPathExists=!/rw/.autorelabel
+DefaultDependencies=no
+Conflicts=selinux-autorelabel.service
+Before=local-fs.target rw.mount home.mount qubes-gui-agent.service qubes-qrexec-agent.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/restorecon -RF /rw /home /usr/local
+ExecStart=/bin/touch /rw/.autorelabel
+
+[Install]
+WantedBy=multi-user.target

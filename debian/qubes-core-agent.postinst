@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash --
 # postinst script for core-agent-linux
 #
 # see: dh_installdeb(1)
@@ -20,18 +20,18 @@ set -e
 # the debian-policy package
 
 
-debug() {
+debug () {
     if [ "${DEBDEBUG}" == "1" ]; then
         echo -e "$@"
     fi
 }
 
 # FIXME: add user units support to is_static()/is_masked()/mask()/unmask() functions
-is_static() {
+is_static () {
     [ -f "/lib/systemd/system/$1" ] && ! grep -q '^[[].nstall]' "/lib/systemd/system/$1"
 }
 
-is_masked() {
+is_masked () {
     if [ ! -L /etc/systemd/system/"$1" ]
     then
        return 1
@@ -44,11 +44,11 @@ is_masked() {
     return 1
 }
 
-mask() {
+mask () {
     ln -sf /dev/null /etc/systemd/system/"$1"
 }
 
-unmask() {
+unmask () {
     if ! is_masked "$1"
     then
         return 0
@@ -56,7 +56,7 @@ unmask() {
     rm -f /etc/systemd/system/"$1"
 }
 
-preset_units() {
+preset_units () {
     local represet=
     # shellcheck disable=SC2206
     local extra_opts=( $3 )
@@ -97,7 +97,7 @@ preset_units() {
     systemctl daemon-reload
 }
 
-installSerialConf() {
+installSerialConf () {
     debug "Installing over-ridden serial.conf init script..."
     if [ -e /etc/init/serial.conf ]; then
         cp /usr/share/qubes/serial.conf /etc/init/serial.conf
@@ -117,13 +117,14 @@ case "${1}" in
 
             # ensure that hostname resolves to 127.0.1.1 resp. ::1 and that /etc/hosts is
             # in the form expected by qubes-sysinit.sh
+            hostname=$(hostname)
             if ! is_protected_file /etc/hostname ; then
                 for ip in '127\.0\.1\.1' '::1'; do
                     if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
-                        sed -i "/^${ip}\s/,+0s/\(\s$(hostname)\)\+\(\s\|$\)/\2/g" /etc/hosts || true
-                        sed -i "s/^${ip}\(\s\|$\).*$/\0 $(hostname)/" /etc/hosts || true
+                        sed -i "/^${ip}\s/,+0s/\(\s$hostname\)\+\(\s\|$\)/\2/g" /etc/hosts || true
+                        sed -i "s/^${ip}\(\s\|$\).*$/\0 $hostname/" /etc/hosts || true
                     else
-                        echo "${ip//\\/} $(hostname)" >> /etc/hosts || true
+                        echo "${ip//\\/} $hostname" >> /etc/hosts || true
                     fi
                 done
             fi
@@ -131,7 +132,7 @@ case "${1}" in
             # remove hostname from 127.0.0.1 line (in debian the hostname is by default
             # resolved to 127.0.1.1)
             if ! is_protected_file /etc/hosts ; then
-                sed -i "/^127\.0\.0\.1\s/,+0s/\(\s$(hostname)\)\+\(\s\|$\)/\2/g" /etc/hosts || true
+                sed -i "/^127\.0\.0\.1\s/,+0s/\(\s$hostname\)\+\(\s\|$\)/\2/g" /etc/hosts || true
             fi
 
             # Set default "runlevel"
