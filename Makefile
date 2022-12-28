@@ -61,7 +61,7 @@ endif
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
 SYSTEM_DROPINS_NETWORKING += tinyproxy.service
 
-USER_DROPINS := pulseaudio.service pulseaudio.socket
+USER_DROPINS :=
 
 # Ubuntu Dropins
 ifeq ($(release),Ubuntu)
@@ -138,8 +138,6 @@ install-systemd: install-init
 	install -m 0644 $(SYSTEMD_CORE_SERVICES) $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
-	install -D -m 0644 vm-systemd/75-qubes-vm.user-preset \
-		$(DESTDIR)$(USER_DROPIN_DIR)-preset/75-qubes-vm.preset
 	install -m 0644 vm-systemd/qubes-core.conf $(DESTDIR)$(SYSLIBDIR)/modules-load.d/
 	install -m 0644 vm-systemd/xendriverdomain.service $(DESTDIR)/etc/systemd/system/
 	install -m 0644 vm-systemd/80-qubes-vif.link $(DESTDIR)$(SYSLIBDIR)/systemd/network/

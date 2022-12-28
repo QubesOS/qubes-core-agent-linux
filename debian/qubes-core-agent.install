@@ -155,9 +155,6 @@ usr/lib/qubes/upgrades-status-notify
 usr/lib/qubes/vm-file-editor
 usr/lib/qubes/xdg-icon
 usr/lib/qubes/tinyproxy-wrapper
-usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
-usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
-usr/lib/systemd/user-preset/75-qubes-vm.preset
 usr/share/glib-2.0/schemas/*
 usr/share/kde4/services/*.desktop
 usr/share/keyrings/qubes-archive-keyring.gpg

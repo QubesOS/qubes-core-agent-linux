@@ -221,11 +221,9 @@ configure_systemd() {
     if [ "$1" -eq 1 ]
     then
         preset_units /usr/lib/systemd/system-preset/$qubes_preset_file initial
-        preset_units /usr/lib/systemd/user-preset/$qubes_preset_file initial --global
         changed=true
     else
         preset_units /usr/lib/systemd/system-preset/$qubes_preset_file upgrade
-        preset_units /usr/lib/systemd/user-preset/$qubes_preset_file upgrade --global
         changed=true
         # Upgrade path - now qubes-iptables is used instead
         for svc in iptables ip6tables
@@ -406,8 +404,6 @@ pre_remove() {
         # once the Qubes OS preset file is removed.
         mkdir -p /run/qubes-uninstall
         cp -f /usr/lib/systemd/system-preset/$qubes_preset_file /run/qubes-uninstall/
-        cp -f /usr/lib/systemd/user-preset/$qubes_preset_file \
-            /run/qubes-uninstall/user-$qubes_preset_file
     fi
 }
 
@@ -420,7 +416,6 @@ post_remove() {
         # We have a saved preset file (or more).
         # Re-preset the units mentioned there.
         restore_units /run/qubes-uninstall/$qubes_preset_file
-        restore_units /run/qubes-uninstall/user-$qubes_preset_file --global
         rm -rf /run/qubes-uninstall
         changed=true
     fi

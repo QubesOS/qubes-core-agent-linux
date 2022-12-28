@@ -173,6 +173,7 @@ Obsoletes:  qubes-core-vm < 4.0.0
 Provides:   qubes-core-vm-doc = %{version}-%{release}
 Obsoletes:  qubes-core-vm-doc < 4.0.0
 Conflicts:  qubes-gui-agent < 4.1.6
+Conflicts:  pulseaudio-qubes < 4.2.0
 BuildRequires: gcc
 BuildRequires: desktop-file-utils
 BuildRequires: pandoc
@@ -1129,7 +1130,6 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/qubes-updates-proxy-forwarder@.service
 /usr/lib/systemd/system/qubes-updates-proxy-forwarder.socket
 /usr/lib/systemd/system-preset/%qubes_preset_file
-/usr/lib/systemd/user-preset/%qubes_preset_file
 /usr/lib/modules-load.d/qubes-core.conf
 /usr/lib/systemd/system/boot.automount.d/30_qubes.conf
 /usr/lib/systemd/system/chronyd.service.d/30_qubes.conf
@@ -1154,8 +1154,6 @@ The Qubes core startup configuration for SystemD init.
 /usr/lib/systemd/system/tor@default.service.d/30_qubes.conf
 /usr/lib/systemd/system/tmp.mount.d/30_qubes.conf
 /usr/lib/systemd/system/sysinit.target.requires/systemd-random-seed.service
-/usr/lib/systemd/user/pulseaudio.service.d/30_qubes.conf
-/usr/lib/systemd/user/pulseaudio.socket.d/30_qubes.conf
 
 %post systemd
 
@@ -1166,11 +1164,9 @@ changed=
 if [ $1 -eq 1 ]
 then
     preset_units %{_presetdir}/%qubes_preset_file initial
-    preset_units %{%_userpresetdir}/%qubes_preset_file initial --global
     changed=true
 else
     preset_units %{_presetdir}/%qubes_preset_file upgrade
-    preset_units %{_userpresetdir}/%qubes_preset_file upgrade --global
     changed=true
     # Upgrade path - now qubes-iptables is used instead
     for svc in iptables ip6tables
@@ -1220,8 +1216,6 @@ if [ $1 -eq 0 ] ; then
     # once the Qubes OS preset file is removed.
     mkdir -p %{_rundir}/qubes-uninstall
     cp -f %{_presetdir}/%qubes_preset_file %{_rundir}/qubes-uninstall/
-    cp -f %{_userpresetdir}/%qubes_preset_file \
-        %{_rundir}/qubes-uninstall/user-%qubes_preset_file
 fi
 
 %postun systemd
@@ -1235,7 +1229,6 @@ then
     # We have a saved preset file (or more).
     # Re-preset the units mentioned there.
     restore_units %{_rundir}/qubes-uninstall/%qubes_preset_file
-    restore_units %{_rundir}/qubes-uninstall/user-%qubes_preset_file --global
     rm -rf %{_rundir}/qubes-uninstall
     changed=true
 fi
