@@ -4,6 +4,8 @@ require {
 	role staff_r, sysadm_r, system_r, unconfined_r;
 	attribute sysadm_usertype, staff_usertype, unconfined_usertype, initrc_domain, privfd;
 	type admin_home_t, fs_t, user_home_dir_t, user_home_t, user_tmp_t;
+	type user_devpts_t;
+	class chr_file { read write };
 	class process { transition };
 	class dir { mounton };
 	class capability { sys_admin };
@@ -37,7 +39,11 @@ dontaudit qubes_qfile_unpacker_t { user_home_t admin_home_t }:file read;
 allow qubes_qfile_unpacker_t { user_home_t admin_home_t }:lnk_file { create getattr setattr };
 allow qubes_qfile_unpacker_t self:capability { setgid setuid sys_admin sys_chroot };
 allow qubes_qfile_unpacker_t user_tmp_t:fifo_file write;
-allow qubes_qfile_unpacker_t fs_t:filesystem unmount;
+allow qubes_qfile_unpacker_t fs_t:filesystem { unmount getattr };
 auth_use_nsswitch(qubes_qfile_unpacker_t)
 # FIXME!
 corecmd_exec_bin(qubes_qfile_unpacker_t)
+
+# Do not allow this, as it would allow for a sandbox escape
+# FIXME: right now there is no sandbox
+dontaudit qubes_qfile_unpacker_t user_devpts_t:chr_file { read write };
