@@ -35,5 +35,6 @@ if check_port "$PORT" && check_port "$LOCALPORT"; then
     sudo socat TCP-LISTEN:"$LOCALPORT",reuseaddr,fork EXEC:"qrexec-client-vm \'$DOMAIN\' qubes.ConnectTCP+$PORT" &
 else
     echo "Invalid port provided"
+    print_usage
     exit 1
 fi
