@@ -73,11 +73,15 @@ fi
 mkdir -p $DOM0_UPDATES_DIR/etc
 
 # Check if we need to copy rpmdb somewhere else
+DOM0_DBPATH=/var/lib/rpm
+if [ -d "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm" ] && ! [ -L "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm" ]; then
+    DOM0_DBPATH=/usr/lib/sysimage/rpm
+fi
 DBPATH=$(rpm --eval '%{_dbpath}')
-if [ ! "$DBPATH" = "/var/lib/rpm" ]; then
+if [ ! "$DBPATH" = "$DOM0_DBPATH" ]; then
     mkdir -p "$DOM0_UPDATES_DIR$DBPATH"
     rm -rf -- "$DOM0_UPDATES_DIR$DBPATH"
-    cp -r "$DOM0_UPDATES_DIR/var/lib/rpm" "$DOM0_UPDATES_DIR$DBPATH"
+    cp -r "$DOM0_UPDATES_DIR$DOM0_DBPATH" "$DOM0_UPDATES_DIR$DBPATH"
 fi
 # Rebuild rpm database in case of different rpm version
 rm -f -- "$DOM0_UPDATES_DIR$DBPATH"/__*
