@@ -12,7 +12,7 @@ addrule()
 -A PR-QBS -d $NS2 -p tcp --dport 53 -j DNAT --to $1"
         fi
 }
-export PATH=$PATH:/sbin:/bin
+export PATH="$PATH":/sbin:/bin
 # shellcheck disable=SC1091
 . /var/run/qubes/qubes-ns
 if [ "X$NS1" = "X" ] ; then exit ; fi
