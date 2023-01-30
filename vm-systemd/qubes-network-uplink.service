@@ -1,6 +1,7 @@
 [Unit]
 Description=Qubes network uplink wait
 Before=network.target
+Wants=network.target
 
 [Service]
 Type=oneshot
