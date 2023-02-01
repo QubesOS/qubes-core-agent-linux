@@ -1,3 +1,20 @@
+qubes-core-agent (4.2.6-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Fix restoring backup using DispVM
+
+  [ Marek Marczykowski-Górecki ]
+  * tests: update IP of yum.qubes-os.org
+
+  [ Rusty Bird ]
+  * network: fix uplink setup relation to network.target
+  * Follow ShellCheck suggestions
+
+  [ Marek Marczykowski-Górecki ]
+  * Handle dom0 rpmdb in /usr/lib/sysimage/rpm too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 01 Feb 2023 06:08:49 +0100
+
 qubes-core-agent (4.2.5-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
