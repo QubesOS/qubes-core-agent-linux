@@ -1,3 +1,25 @@
+qubes-core-agent (4.1.39-1) unstable; urgency=medium
+
+  [ Alexander Paetzelt ]
+  * Add upgrades-status-notify and upgrades-installed-check to archlinux
+    package
+
+  [ noskb ]
+  * qubes-rpc/nautilus: Execute external commands asynchronously
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: add missing dbus-tool dep
+  * tests: update IP of yum.qubes-os.org
+
+  [ Rusty Bird ]
+  * network: fix uplink setup relation to network.target
+  * Follow ShellCheck suggestions
+
+  [ Marek Marczykowski-Górecki ]
+  * Handle dom0 rpmdb in /usr/lib/sysimage/rpm too
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 01 Feb 2023 06:08:08 +0100
+
 qubes-core-agent (4.1.38-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
