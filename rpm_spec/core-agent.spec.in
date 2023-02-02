@@ -174,6 +174,7 @@ Provides:   qubes-core-vm-doc = %{version}-%{release}
 Obsoletes:  qubes-core-vm-doc < 4.0.0
 Conflicts:  qubes-gui-agent < 4.1.6
 Conflicts:  pulseaudio-qubes < 4.2.0
+Provides:   group(qubes)
 BuildRequires: gcc
 BuildRequires: desktop-file-utils
 BuildRequires: pandoc
