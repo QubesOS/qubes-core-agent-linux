@@ -2,6 +2,7 @@ VERSION := $(file <version)
 
 LIBDIR ?= /usr/lib
 SYSLIBDIR ?= /lib
+export LIBDIR SYSLIBDIR VERSION
 
 PYTHON ?= /usr/bin/python3
 release := $(shell lsb_release -is)
