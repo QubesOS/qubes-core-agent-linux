@@ -1,0 +1,10 @@
+[Unit]
+Description=Qubes anti-spoofing firewall rules
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/qubes/qubes-antispoof.nft
+
+[Install]
+WantedBy=basic.target

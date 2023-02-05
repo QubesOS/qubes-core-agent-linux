@@ -125,7 +125,7 @@ endif
 
 # Systemd service files
 SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service) vm-systemd/dev-xvdc1-swap.service
-SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service
+SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service vm-systemd/qubes-antispoof.service
 SYSTEMD_SELINUX_SERVICES := vm-systemd/qubes-relabel-root.service vm-systemd/qubes-relabel-rw.service
 SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES) $(SYSTEMD_SELINUX_SERVICES), $(SYSTEMD_ALL_SERVICES))
 
@@ -209,9 +209,10 @@ install-netvm: install-systemd-networking-dropins install-networkmanager
 	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
 	install -m 0644 -D network/updates-blacklist $(DESTDIR)/etc/tinyproxy/updates-blacklist
 
-	install -m 0400 -D network/iptables $(DESTDIR)/etc/qubes/iptables.rules
-	install -m 0400 -D network/ip6tables $(DESTDIR)/etc/qubes/ip6tables.rules
-	install -m 0400 -D network/ip6tables-enabled $(DESTDIR)/etc/qubes/ip6tables-enabled.rules
+	install -m 0400 -D network/qubes-ipv4.nft $(DESTDIR)/etc/qubes/qubes-ipv4.nft
+	install -m 0400 -D network/qubes-ipv6.nft $(DESTDIR)/etc/qubes/qubes-ipv6.nft
+	install -m 0400 -D network/qubes-antispoof.nft $(DESTDIR)/etc/qubes/qubes-antispoof.nft
+	install -m 0400 -D network/qubes-ipv6-disabled.nft $(DESTDIR)/etc/qubes/qubes-ipv6-disabled.nft
 
 	install -m 0755 -D qubes-rpc/qubes.UpdatesProxy $(DESTDIR)/etc/qubes-rpc/qubes.UpdatesProxy
 

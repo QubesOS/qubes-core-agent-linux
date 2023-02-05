@@ -19,7 +19,7 @@ done
 
 [ -d /sys/fs/selinux ] && selinux_flag=Z || selinux_flag=
 
-mkdir "-p$selinux_flag" /run/qubes /run/qubes-service /run/xen-hotplug
+mkdir "-p$selinux_flag" /run/qubes /run/qubes-service /run/xen-hotplug /run/xen
 chgrp qubes /run/qubes
 chmod 0775 /run/qubes
 

@@ -47,7 +47,8 @@ function netns
 run ip addr flush dev "$netns_appvm_if"
 run ip netns delete "$netns" || :
 
-if test "$command" == online; then
+if test "$command" = online; then
+    echo 1 > "/proc/sys/net/ipv6/conf/$netns_appvm_if/disable_ipv6"
     run ip netns add "$netns"
     run ip link set "$netns_appvm_if" netns "$netns"
 
@@ -57,50 +58,37 @@ if test "$command" == online; then
     # as the actual VM, so that our neighbor entry works.
     run ip link add name "$netns_netvm_if" address "$mac" type veth \
         peer name "$netvm_if" address "$netvm_mac"
+    echo 1 > "/proc/sys/net/ipv6/conf/$netns_netvm_if/disable_ipv6"
     run ip link set dev "$netns_netvm_if" netns "$netns"
-
-    netns ip6tables -t raw -I PREROUTING -j DROP
-    netns ip6tables -P INPUT DROP
-    netns ip6tables -P FORWARD DROP
-    netns ip6tables -P OUTPUT DROP
 
     netns sh -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'
 
-    netns iptables -t raw -I PREROUTING -i "$netns_appvm_if" ! -s "$appvm_ip" -j DROP
-
     if test -n "$undetectable_netvm_ips"; then
         # prevent an AppVM connecting to its own ProxyVM IP because that makes the internal IPs detectable even with no firewall rules
-        netns iptables -t raw -I PREROUTING -i "$netns_appvm_if" -d "$netvm_ip" -j DROP
-
-        # same for the gateway/DNS IPs
-        netns iptables -t raw -I PREROUTING -i "$netns_appvm_if" -d "$netvm_gw_ip" -j DROP
-        netns iptables -t raw -I PREROUTING -i "$netns_appvm_if" -d "$netvm_dns1_ip" -j DROP
-        netns iptables -t raw -I PREROUTING -i "$netns_appvm_if" -d "$netvm_dns2_ip" -j DROP
+        more_antispoof=" ip daddr != { $netvm_ip, $netvm_gw_ip, $netvm_dns1_ip, $netvm_dns2_ip }"
+    else
+        more_antispoof=
     fi
 
-    netns iptables -t nat -I PREROUTING -i "$netns_netvm_if" -j DNAT --to-destination "$appvm_ip"
-    netns iptables -t nat -I POSTROUTING -o "$netns_netvm_if" -j SNAT --to-source "$netvm_ip"
-
-    netns iptables -t nat -I PREROUTING -i "$netns_appvm_if" -d "$appvm_gw_ip" -j DNAT --to-destination "$netvm_gw_ip"
-    netns iptables -t nat -I POSTROUTING -o "$netns_appvm_if" -s "$netvm_gw_ip" -j SNAT --to-source "$appvm_gw_ip"
-
-    if test -n "$appvm_dns1_ip"; then
-        netns iptables -t nat -I PREROUTING -i "$netns_appvm_if" -d "$appvm_dns1_ip" -j DNAT --to-destination "$netvm_dns1_ip"
-        netns iptables -t nat -I POSTROUTING -o "$netns_appvm_if" -s "$netvm_dns1_ip" -j SNAT --to-source "$appvm_dns1_ip"
-    fi
-
-    if test -n "$appvm_dns2_ip"; then
-        netns iptables -t nat -I PREROUTING -i "$netns_appvm_if" -d "$appvm_dns2_ip" -j DNAT --to-destination "$netvm_dns2_ip"
-        netns iptables -t nat -I POSTROUTING -o "$netns_appvm_if" -s "$netvm_dns2_ip" -j SNAT --to-source "$appvm_dns2_ip"
-    fi
+    netns nft "
+table netdev antispoof {
+    chain antispoof {
+        type filter hook ingress device $netns_appvm_if priority filter; policy drop;
+        ip saddr $appvm_ip$more_antispoof ip saddr set $netvm_ip fwd to $netns_netvm_if
+        arp htype 1 arp ptype ip arp hlen 6 arp plen 4 arp saddr ether $mac arp saddr ip $appvm_ip accept
+        counter
+    }
+    chain reverse {
+        type filter hook ingress device $netns_netvm_if priority filter; policy drop;
+        ip daddr $netvm_ip ip daddr set $appvm_ip fwd to $netns_appvm_if
+        ether type arp accept
+        counter
+    }
+}"
 
     netns ip addr add "$netvm_ip" dev "$netns_netvm_if"
     netns ip addr add "$appvm_gw_ip" dev "$netns_appvm_if"
 
     netns ip link set "$netns_netvm_if" up
     netns ip link set "$netns_appvm_if" up
-
-    netns ip route add "$appvm_ip" dev "$netns_appvm_if" src "$appvm_gw_ip"
-    netns ip route add "$netvm_gw_ip" dev "$netns_netvm_if" src "$netvm_ip"
-    netns ip route add default via "$netvm_gw_ip" dev "$netns_netvm_if" src "$netvm_ip"
 fi

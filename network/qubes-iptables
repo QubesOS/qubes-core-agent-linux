@@ -21,36 +21,29 @@
 IPTABLES=iptables
 IPTABLES_DATA_DIR=/etc/qubes
 
-if [ ! -x /sbin/$IPTABLES ]; then
+if [ ! -x "/sbin/$IPTABLES" ]; then
     echo $"${IPTABLES}: /sbin/$IPTABLES does not exist."
     exit 5
 fi
 
-start() {
+start () {
     ipt=$1
-    IPTABLES_DATA=$IPTABLES_DATA_DIR/${ipt}.rules
+    IPTABLES_DATA=$IPTABLES_DATA_DIR/qubes-${ipt}.nft
     ipv6_enabled=
     if qubesdb-read /qubes-ip6 >/dev/null 2>&1 || \
         qubesdb-read /qubes-netvm-gateway6 >/dev/null 2>&1; then
         ipv6_enabled=true
     fi
-    # if IPv6 is enabled, load alternative rules file
-    if [ "$ipt" = "ip6tables" ] && [ -n "$ipv6_enabled" ]; then
-        IPTABLES_DATA=$IPTABLES_DATA_DIR/${ipt}-enabled.rules
+    # if IPv6 is disabled, load alternative rules file
+    if [ "$ipt" = "ip6tables" ] && [ -z "$ipv6_enabled" ]; then
+        IPTABLES_DATA=$IPTABLES_DATA_DIR/qubes-${ipt}-disabled.nft
     fi
-    CMD=$ipt
     # Do not start if there is no config file.
     [ ! -f "$IPTABLES_DATA" ] && return 6
 
-    CMD_ARGS=
-    if "$CMD-restore" --help 2>&1 | grep -q wait=; then
-        # 'wait' must be last on command line if secs not specified
-        CMD_ARGS=--wait
-    fi
+    echo -n "nft: Applying firewall rules: "
 
-    echo -n $"${CMD}: Applying firewall rules: "
-
-    "$CMD-restore" "$IPTABLES_DATA" $CMD_ARGS
+    nft -f "$IPTABLES_DATA"
     ret="$?"
     if [ "$ret" -eq 0 ]; then
         echo OK
@@ -63,7 +56,7 @@ start() {
 
 case "$1" in
     start)
-	start iptables && start ip6tables
+	start ipv4 && start ipv6
 	RETVAL=$?
 	;;
     *)

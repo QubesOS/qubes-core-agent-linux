@@ -1,0 +1,13 @@
+#!/usr/sbin/nft -f
+table ip6 qbs-filter {
+   chain input {
+      type filter hook input priority filter; policy drop;
+      iif lo accept
+      counter
+   }
+
+   chain forward {
+      type filter hook forward priority filter; policy drop;
+      counter
+   }
+}

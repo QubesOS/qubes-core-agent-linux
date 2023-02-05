@@ -29,7 +29,7 @@ configure_network() {
     if [ -n "$ip6" ]; then
         /sbin/ip address add "$ip6/$netmask6" dev "$INTERFACE"
     fi
-    /sbin/ip link set dev "$INTERFACE" up
+    /sbin/ip link set dev "$INTERFACE" group 1 up
 
     if [ -n "$gateway" ]; then
         add_link_route "$gateway" "$INTERFACE"
@@ -85,6 +85,7 @@ configure_network_nm() {
     local ip4_nm_config
     local ip6_nm_config
     local uuid
+    /sbin/ip link set dev "$INTERFACE" group 1
 
     prefix="$(get_prefix_from_subnet "$netmask")"
     prefix6="$netmask6"

@@ -615,6 +615,7 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %post networking
 %systemd_post qubes-firewall.service
 %systemd_post qubes-iptables.service
+%systemd_post qubes-antispoof.service
 %systemd_post qubes-network.service
 %systemd_post qubes-network-uplink.service
 %systemd_post qubes-updates-proxy.service
@@ -650,6 +651,7 @@ fi
 %preun networking
 %systemd_preun qubes-firewall.service
 %systemd_preun qubes-iptables.service
+%systemd_preun qubes-antispoof.service
 %systemd_preun qubes-network.service
 %systemd_preun qubes-updates-proxy.service
 
@@ -803,7 +805,7 @@ rm -f %{name}-%{version}
 %{kde5_service_dir}/qvm-copy.desktop
 %{kde5_service_dir}/qvm-move.desktop
 %{kde5_service_dir}/qvm-dvm.desktop
-/etc/fstab
+%config /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 %dir /etc/qubes-rpc
 %config(noreplace) /etc/qubes-rpc/qubes.ShowInTerminal
@@ -1001,9 +1003,10 @@ rm -f %{name}-%{version}
 %files networking
 %config /etc/sysctl.d/81-qubes.conf.optional
 %config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
-%config(noreplace) /etc/qubes/ip6tables.rules
-%config(noreplace) /etc/qubes/ip6tables-enabled.rules
-%config(noreplace) /etc/qubes/iptables.rules
+%config(noreplace) /etc/qubes/qubes-antispoof.nft
+%config(noreplace) /etc/qubes/qubes-ipv4.nft
+%config(noreplace) /etc/qubes/qubes-ipv6.nft
+%config(noreplace) /etc/qubes/qubes-ipv6-disabled.nft
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/tinyproxy/updates-blacklist
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
@@ -1012,6 +1015,7 @@ rm -f %{name}-%{version}
 /etc/xen/scripts/vif-route-qubes
 %_unitdir/qubes-firewall.service
 %_unitdir/qubes-iptables.service
+%_unitdir/qubes-antispoof.service
 %_unitdir/qubes-network.service
 %_unitdir/qubes-network-uplink.service
 %_unitdir/qubes-network-uplink@.service
@@ -1021,7 +1025,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/network-proxy-stop.sh
 /usr/lib/qubes/init/network-uplink-wait.sh
 /usr/lib/qubes/init/qubes-iptables
-/usr/lib/qubes/get-dns-from-resolved
 /usr/lib/qubes/qubes-setup-dnat-to-ns
 /usr/lib/qubes/setup-ip
 %_tmpfilesdir/qubes-core-agent-linux.conf

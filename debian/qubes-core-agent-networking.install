@@ -1,8 +1,9 @@
 etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 etc/qubes-rpc/qubes.UpdatesProxy
-etc/qubes/ip6tables.rules
-etc/qubes/ip6tables-enabled.rules
-etc/qubes/iptables.rules
+etc/qubes/qubes-ipv6-disabled.nft
+etc/qubes/qubes-ipv6.nft
+etc/qubes/qubes-ipv4.nft
+etc/qubes/qubes-antispoof.nft
 etc/sysctl.d/81-qubes.conf.optional
 etc/tinyproxy/tinyproxy-updates.conf
 etc/tinyproxy/updates-blacklist
@@ -11,6 +12,7 @@ etc/xen/scripts/vif-qubes-nat.sh
 etc/xen/scripts/vif-route-qubes
 lib/systemd/system/qubes-firewall.service
 lib/systemd/system/qubes-iptables.service
+lib/systemd/system/qubes-antispoof.service
 lib/systemd/system/qubes-network.service
 lib/systemd/system/qubes-network-uplink.service
 lib/systemd/system/qubes-network-uplink@.service
@@ -20,7 +22,6 @@ usr/lib/qubes/init/network-proxy-setup.sh
 usr/lib/qubes/init/network-proxy-stop.sh
 usr/lib/qubes/init/network-uplink-wait.sh
 usr/lib/qubes/init/qubes-iptables
-usr/lib/qubes/get-dns-from-resolved
 usr/lib/qubes/qubes-setup-dnat-to-ns
 usr/lib/qubes/setup-ip
 usr/lib/tmpfiles.d/qubes-core-agent-linux.conf

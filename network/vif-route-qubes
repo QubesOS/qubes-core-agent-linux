@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash --
 #============================================================================
 # /etc/xen/vif-route-qubes
 #
@@ -20,6 +20,7 @@
 #         this script).
 #============================================================================
 
+set -e
 dir=$(dirname "$0") || exit
 # shellcheck disable=SC1091,SC1090
 . "$dir/vif-common.sh"
@@ -54,12 +55,6 @@ conntrack_purge () {
     output=$(LC_ALL=C exec conntrack -D "$@" 2>&1 >/dev/null) || :
     [[ "$output" =~ $deleted ]]
 }
-
-ipt_arg=
-if "iptables-restore" --help 2>&1 | grep -q wait=; then
-    # 'wait' must be last on command line if secs not specified
-    ipt_arg=--wait
-fi
 
 # shellcheck disable=SC2154
 if [ "${ip}" ]; then
@@ -118,14 +113,40 @@ case "$command" in
     online)
         echo 1 >"/proc/sys/net/ipv4/conf/${vif}/proxy_arp"
         ipcmd='add'
-        iptables_cmd='-I PREROUTING 1'
+        nftables_cmd=add
         cmdprefix=''
         ipv6_disabled=$(cat "/proc/sys/net/ipv6/conf/$vif/disable_ipv6" || echo 1)
+        interfaces=''
+        separator=''
+
+        for i in /proc/sys/net/ipv4/conf/*; do
+            i=${i:24}
+            case $i in (all|default|*[!A-Za-z0-9._]*) continue;; esac
+            interfaces+="$separator$i"
+            separator=', '
+        done
+        if [[ -n "$separator" ]]; then
+            nft "
+add table inet qubes-nat-accel
+delete table inet qubes-nat-accel
+table inet qubes-nat-accel {
+   flowtable qubes-accel {
+      hook ingress priority filter
+      devices = { $interfaces }
+   }
+   chain qubes-accel {
+      # run after other filter hooks
+      type filter hook forward priority filter + 5; policy accept;
+      meta l4proto { tcp, udp } iifgroup 2 oifgroup 1 flow add @qubes-accel
+      counter
+   }
+}"
+        fi
         ;;
     offline)
         do_without_error ifdown "${vif}"
         ipcmd='del'
-        iptables_cmd='-D PREROUTING'
+        nftables_cmd=delete
         cmdprefix='do_without_error'
         # cleanup IPv6 config even if _now_ it is disabled
         ipv6_disabled=0
@@ -152,12 +173,13 @@ qubesdb_read_bool () {
     case $status in
     (0) if test -n "$value"; then return 0; else return 1; fi;;
     (2) return "$2";;
-    (*) echo "unexpected return value $status from qubesdb-read" >&2; exit 1;;
+    (*) fatal "unexpected return value $status from qubesdb-read";;
     esac
 }
 
 # Harden against various attacks if requested
-if qubesdb_read_bool /qubes-service/harden-network-interfaces 1; then
+if [[ "$command" = 'online' ]] &&
+    qubesdb_read_bool /qubes-service/harden-network-interfaces 1; then
     /usr/lib/systemd/systemd-sysctl \
         "--prefix=/net/ipv4/conf/all" \
         "--prefix=/net/ipv4/neigh/all" \
@@ -173,34 +195,35 @@ fi
 
 # add anti-spoofing rules before enabling the interface
 if [ "${ip}" ]; then
+    peer_mac=$(xenstore-read -- "$XENBUS_PATH/mac") ||
+        fatal 'cannot obtain peer MAC from Xenstore'
+    readonly peer_mac
+    [[ "$peer_mac" =~ ^[0-9a-f]{2}(:[0-9a-f]{2}){5}$ ]] ||
+        fatal "bad mac address $peer_mac"
+
     # If we’ve been given a list of IP addresses, then add routes from us to
     # the VMs we serve using those addresses.
     for addr in ${ip};
     do
         if [[ "$addr" = *:* ]]; then
-            ipt=ip6tables-restore
+            ipt=ip6
         else
-            ipt=iptables-restore
+            ipt=ip
         fi
-        printf '%s\n' "*raw" \
-            "$iptables_cmd -i ${vif} ! -s ${addr} -j DROP" \
-            "$iptables_cmd ! -i vif+ -s ${addr} -j DROP" \
-            "COMMIT" |
-            ${cmdprefix} "$ipt" --noflush $ipt_arg
         if ! conntrack_purge -s "$addr" || ! conntrack_purge -d "$addr"; then
             printf 'Cannot purge stale conntrack entries for %q\n' "$addr">&2
             exit 1
         fi
+        nft "$nftables_cmd element $ipt qubes allowed { \"$vif\" . $addr }
+$nftables_cmd element $ipt qubes downstream { $addr }"
     done
-    # if no IPv6 is assigned, block all IPv6 traffic on that interface
-    if ! [[ "$ip" = *:* ]]; then
-        echo -e "*raw\\n$iptables_cmd -i ${vif} -j DROP\\nCOMMIT" |
-            ${cmdprefix} ip6tables-restore --noflush $ipt_arg
-    fi
+    # if no IPv6 is assigned, IPv6 traffic on the interface is
+    # implicitly considered spoofed as there is no entry in the
+    # "allowed" map
 fi
 
 if [ "$command" = "online" ]; then
-    ip link set dev "${vif}" up
+    ip link set dev "${vif}" group 2 up
 fi
 
 if [ "${ip}" ]; then

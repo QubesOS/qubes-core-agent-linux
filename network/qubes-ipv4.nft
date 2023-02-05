@@ -1,0 +1,35 @@
+#!/usr/sbin/nft -f
+table ip qubes {
+   chain postrouting {
+      type nat hook postrouting priority srcnat; policy accept;
+      oifgroup 2 accept
+      oif lo accept
+      masquerade
+   }
+
+   chain input {
+      type filter hook input priority filter; policy drop;
+      jump custom-input
+      ct state invalid counter drop
+      iifgroup 2 meta l4proto udp udp dport 68 counter drop
+      ct state related,established accept
+      iifgroup 2 meta l4proto icmp accept
+      iif lo accept
+      iifgroup 2 counter reject with icmp type host-prohibited
+      counter
+   }
+
+   chain forward {
+      type filter hook forward priority filter; policy accept;
+      jump custom-forward
+      ct state invalid counter drop
+      ct state related,established accept
+      iifgroup != 2 counter drop
+      oifgroup 2 counter drop
+   }
+
+   # These chains are reserved for end-users.  Qubes OS itself will
+   # never modify them.
+   chain custom-input {}
+   chain custom-forward {}
+}

@@ -1,5 +1,7 @@
 [Unit]
 Description=Qubes base firewall settings
+Requires=qubes-antispoof.service
+After=qubes-antispoof.service
 
 [Service]
 Type=oneshot

@@ -1,0 +1,40 @@
+#!/usr/sbin/nft -f
+table ip6 qubes {
+   chain postrouting {
+      type nat hook postrouting priority srcnat; policy accept;
+      oifgroup 2 accept
+      oif lo accept
+      masquerade
+   }
+
+   chain _icmpv6 {
+      meta l4proto != ipv6-icmp counter reject with icmpv6 type admin-prohibited
+      icmpv6 type { nd-router-advert, nd-redirect } counter drop
+      accept
+   }
+
+   chain input {
+      type filter hook input priority filter; policy drop;
+      jump custom-input
+      ct state invalid counter drop
+      ct state related,established accept
+      iifgroup 2 goto _icmpv6
+      iif lo accept
+      meta l4proto udp ip6 saddr fe80::/64 ip6 daddr fe80::/64 udp dport 546 accept
+      meta l4proto ipv6-icmp accept
+      counter
+   }
+
+   chain forward {
+      type filter hook forward priority filter; policy accept;
+      ct state invalid counter drop
+      ct state related,established accept
+      iifgroup != 2 counter drop
+      oifgroup 2 counter drop
+   }
+
+   # These chains are reserved for end-users.  Qubes OS itself will
+   # never modify them.
+   chain custom-input {}
+   chain custom-forward {}
+}
