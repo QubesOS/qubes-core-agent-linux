@@ -2,6 +2,9 @@
 
 # announce features supported by this template
 
+version=$(grep "^[0-9]" /usr/share/qubes/marker-vm | head -1)
+qvm-features-request "qubes-agent-version=$version"
+
 qvm-features-request qrexec=1
 qvm-features-request os=Linux
 qvm-features-request vmexec=1
