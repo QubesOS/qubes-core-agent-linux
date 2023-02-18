@@ -11,22 +11,17 @@ SHELL = /bin/bash
 selinux_policies ::= qubes-qfile-unpacker.pp qubes-xendriverdomain.pp \
 	qubes-misc.pp
 
+ifdef ENABLE_SELINUX
+ifeq (,$(filter $(ENABLE_SELINUX),0 1))
+$(error bad value for $$(ENABLE_SELINUX))
+endif
+endif
+
 all:
 	$(MAKE) -C misc VERSION=$(VERSION)
 	$(MAKE) -C qubes-rpc
-ifdef ENABLE_SELINUX
 ifeq ($(ENABLE_SELINUX),1)
 	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile -- $(selinux_policies)
-
-install-rh: install-selinux
-install-deb: install-selinux
-
-install-selinux:
-	install -D -m 0644 -t $(DESTDIR)/usr/share/selinux/packages -- $(patsubst %,selinux/%,$(selinux_policies))
-.PHONY: install-selinux
-else ifneq ($(ENABLE_SELINUX),0)
-$(error bad value for $$(ENABLE_SELINUX))
-endif
 endif
 
 clean:
@@ -130,7 +125,8 @@ endif
 # Systemd service files
 SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service) vm-systemd/dev-xvdc1-swap.service
 SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service
-SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES), $(SYSTEMD_ALL_SERVICES))
+SYSTEMD_SELINUX_SERVICES := vm-systemd/qubes-relabel-root.service vm-systemd/qubes-relabel-rw.service
+SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES) $(SYSTEMD_SELINUX_SERVICES), $(SYSTEMD_ALL_SERVICES))
 
 .PHONY: install-systemd
 install-systemd: install-init
@@ -155,8 +151,16 @@ install-sysvinit: install-init
 	install -D vm-init.d/qubes-core.modules $(DESTDIR)/etc/sysconfig/modules/qubes-core.modules
 	install network/qubes-iptables $(DESTDIR)/etc/init.d/
 
+install-selinux:
+	install -D -m 0644 -t $(DESTDIR)/usr/share/selinux/packages -- $(patsubst %,selinux/%,$(selinux_policies))
+	install -m 0644 $(SYSTEMD_SELINUX_SERVICES) $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+.PHONY: install-selinux
+
 .PHONY: install-rh
 install-rh: install-systemd install-systemd-dropins install-sysvinit
+ifeq ($(ENABLE_SELINUX),1)
+install-rh: install-selinux
+endif
 
 .PHONY: install-doc
 install-doc:
