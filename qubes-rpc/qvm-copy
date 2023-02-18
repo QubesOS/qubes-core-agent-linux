@@ -31,16 +31,7 @@ case ${0##*/} in
     (*) printf 'Invoked with unrecognized name %s, cannot determine operation to perform\n' "$0"; exit 1;;
 esac
 
-if [ "$1" = "--without-progress" ] ; then
-    export PROGRESS_TYPE=none
-    shift
-else
-    export PROGRESS_TYPE=console
-fi
-
-if [ "$1" = '--' ]; then shift; fi
-
-if [ "$#" -lt "$MIN_ARGS" ]; then
+usage () {
     if [ "$TARGET_TYPE" = "vm" ]; then
         echo "usage: $0 [--without-progress] destination_qube_name FILE [FILE ...]"
     else
@@ -49,7 +40,7 @@ if [ "$#" -lt "$MIN_ARGS" ]; then
 
     echo
 
-    if [ "$OPERATION_TYPE" = "move" ] ; then
+    if [ "$OPERATION_TYPE" = "move" ]; then
         echo "Move FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
     else
         echo "Copy FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
@@ -60,8 +51,21 @@ if [ "$#" -lt "$MIN_ARGS" ]; then
     if [ "$TARGET_TYPE" = "vm" ]; then
         echo "In order to avoid typing target qube name twice, use qvm-copy/qvm-move instead of qvm-copy-to-vm/qvm-move-to-vm."
     fi
-    exit 1
-fi
+    exit "$1"
+}
+
+export PROGRESS_TYPE=console
+while [ "$#" -gt 0 ]; do
+    case $1 in
+        (--without-progress) export PROGRESS_TYPE=none; shift;;
+        (-h|--help) usage 0;;
+        (--) shift; break;;
+        (-*) usage 1;;
+        (*) break;;
+    esac
+done
+
+if [ "$#" -lt "$MIN_ARGS" ]; then usage 1; fi
 
 if [ "$TARGET_TYPE" = "vm" ]; then
   VM="$1"
@@ -75,7 +79,7 @@ if [ "$PROGRESS_TYPE" = console ] ; then
     export FILECOPY_TOTAL_SIZE
 fi
 
-for path in "$@"; do
+for path; do
     if [ ! -e "$path" ]; then
         echo "File or directory not found: $path"
         exit 1
