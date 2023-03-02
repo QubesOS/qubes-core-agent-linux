@@ -232,6 +232,15 @@ DNF plugin for Qubes specific post-installation actions:
  * refresh applications shortcut list
 %endif
 
+%package caja
+Summary:    Qubes integration for Caja
+Requires:   qubes-core-agent = %{version}
+Requires:   python3-caja
+Conflicts:  qubes-core-vm < 4.0.0
+
+%description caja
+Caja addons for inter-VM file copy/move/open.
+
 %package nautilus
 Summary:    Qubes integration for Nautilus
 Requires:   qubes-core-agent = %{version}
@@ -415,6 +424,7 @@ make -C misc DESTDIR=$RPM_BUILD_ROOT install
 make -C network DESTDIR=$RPM_BUILD_ROOT install
 make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install install-rh
 make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
+make -C qubes-rpc/caja DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
@@ -962,6 +972,12 @@ rm -f %{name}-%{version}
 %files -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
 %endif
+
+%files caja
+/usr/share/caja-python/extensions/qvm_copy_caja.py*
+/usr/share/caja-python/extensions/qvm_move_caja.py*
+/usr/share/caja-python/extensions/qvm_dvm_caja.py*
+/usr/lib/qubes/qvm_caja_bookmark.sh
 
 %files nautilus
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*

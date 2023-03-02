@@ -67,7 +67,7 @@ package_qubes-vm-core() {
              # Block updating if there is a major python update as the python API will be in the wrong PYTHONPATH
              'python<3.11'
              )
-    optdepends=(gnome-keyring gnome-settings-daemon python-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
+    optdepends=(gnome-keyring gnome-settings-daemon python-caja python-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
     install=PKGBUILD.install
 
 
@@ -77,6 +77,7 @@ package_qubes-vm-core() {
     make -C app-menu install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
     make -C misc install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
     make -C qubes-rpc DESTDIR="$pkgdir" install
+    make -C qubes-rpc/caja DESTDIR="$pkgdir" install
     make -C qubes-rpc/kde DESTDIR="$pkgdir" install
     make -C qubes-rpc/nautilus DESTDIR="$pkgdir" install
     make -C qubes-rpc/thunar DESTDIR="$pkgdir" install
