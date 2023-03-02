@@ -1,3 +1,36 @@
+qubes-core-agent (4.2.8-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Enable IPv6 Privacy Extension by default
+  * Do not install SELinux-related services on Debian
+
+  [ Maja Kądziołka ]
+  * qvm-connect-tcp: print usage on invalid parameters
+
+  [ Demi Marie Obenour ]
+  * Add -h and --help to qvm-copy
+
+  [ makoshinra ]
+  * Make new directory for caja and copy nautilus scripts
+  * qvm-copy: convert nautilus script to work with caja
+  * qvm-dvm: convert nautilus script to work with caja
+  * qvm-move: convert nautilus script to work with caja
+  * Rename qvm_nautilus_bookmark.sh to qvm_caja_bookmark.sh
+  * Update Makefile to install in caja extensions directory
+  * Update debian control file for caja plugin
+  * Update debian rules file to run caja plugin makefile
+  * Add qubes-core-agent-caja install file
+  * Update archlinux packagebuild to include caja dependencies and run
+    Makefile
+  * Update rpm spec to include caja and run Makefile
+  * Update debian rules file to include pythonver for caja
+
+  [ Marek Marczykowski-Górecki ]
+  * Advertise supported RPC services
+  * Announce qubes agent version to dom0
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 02 Mar 2023 03:10:30 +0100
+
 qubes-core-agent (4.2.7-1) unstable; urgency=medium
 
   * rpm: mark package as providing qubes group
