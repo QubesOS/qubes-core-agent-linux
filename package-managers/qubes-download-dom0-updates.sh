@@ -72,6 +72,15 @@ fi
 
 mkdir -p $DOM0_UPDATES_DIR/etc
 
+# remove converted sqlite db if legacy db is newer, to force conversion again
+# legacy db could be only in the /var/lib/rpm location, but sqlite could be in any
+if [ "$DOM0_UPDATES_DIR/var/lib/rpm/Packages" -nt "$DOM0_UPDATES_DIR/var/lib/rpm/rpmdb.sqlite" ]; then
+    rm -f -- "$DOM0_UPDATES_DIR/var/lib/rpm/rpmdb.sqlite"*
+elif [ "$DOM0_UPDATES_DIR/var/lib/rpm/Packages" -nt "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm/rpmdb.sqlite" ]; then
+    # remove the whole directory, to make the logic below happy
+    rm -rf -- "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm"
+fi
+
 # Check if we need to copy rpmdb somewhere else
 DOM0_DBPATH=/var/lib/rpm
 if [ -d "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm" ] && ! [ -L "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm" ]; then
