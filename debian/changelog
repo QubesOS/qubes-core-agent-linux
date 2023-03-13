@@ -1,3 +1,16 @@
+qubes-core-agent (4.1.40-1) unstable; urgency=medium
+
+  [ Maja Kądziołka ]
+  * qvm-connect-tcp: print usage on invalid parameters
+
+  [ Demi Marie Obenour ]
+  * Add -h and --help to qvm-copy
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: force refreshing sqlite rpmdb if legacy one is newer
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 13 Mar 2023 01:14:25 +0100
+
 qubes-core-agent (4.1.39-1) unstable; urgency=medium
 
   [ Alexander Paetzelt ]
