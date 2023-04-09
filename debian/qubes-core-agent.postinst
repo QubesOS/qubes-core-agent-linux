@@ -211,12 +211,16 @@ case "${1}" in
         ;;
 
     triggered)
+        post_install_done=
         for trigger in ${2}; do
             case "${trigger}" in
 
-                /usr/share/applications)
+                /usr/share/applications|/etc/qubes/post-install.d|/etc/qubes-rpc)
                     debug "Updating Qubes App Menus and advertising features..."
-                    /etc/qubes-rpc/qubes.PostInstall || true
+                    if [ -z "$post_install_done" ]; then
+                        /etc/qubes-rpc/qubes.PostInstall || true
+                        post_install_done=1
+                    fi
                     ;;
 
                 # Install overridden serial.conf init script

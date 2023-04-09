@@ -1,2 +1,4 @@
 interest-noawait /usr/share/applications
 interest-noawait /etc/init/serial.conf
+interest-noawait /etc/qubes/post-install.d
+interest-noawait /etc/qubes-rpc
