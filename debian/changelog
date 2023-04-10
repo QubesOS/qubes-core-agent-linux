@@ -1,3 +1,11 @@
+qubes-core-agent (4.2.9-1) unstable; urgency=medium
+
+  * dom0-updates: force refreshing sqlite rpmdb if legacy one is newer
+  * debian: re-announce services when some is installed
+  * Workaround Fedora selinux preventing shutdown
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 10 Apr 2023 14:30:11 +0200
+
 qubes-core-agent (4.2.8-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
