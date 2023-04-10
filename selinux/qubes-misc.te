@@ -1,6 +1,10 @@
 policy_module(qubes-misc,0.0.1)
 require {
 	attribute domain;
+	type kernel_systemctl_t;
+	type system_dbusd_t;
+	type system_dbusd_var_run_t;
+	type systemd_logind_t;
 	type systemd_modules_load_t;
 	type iptables_t, xen_device_t;
 	type local_login_t, init_t;
@@ -9,6 +13,10 @@ require {
 	class service { start };
 	class fifo_file { write };
 	class process { transition };
+	class dir search;
+	class sock_file write;
+	class unix_stream_scoket connectto;
+	class dbus send_msg;
 }
 
 type qubes_var_run_t;
@@ -17,3 +25,10 @@ allow iptables_t xen_device_t:chr_file { read write };
 allow local_login_t init_t: service { start };
 allow rpmdb_t user_tmp_t:fifo_file { write };
 allow { init_t unconfined_service_t } domain:process transition;
+
+# workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2185490
+allow kernel_systemctl_t system_dbusd_var_run_t:dir search;
+allow kernel_systemctl_t system_dbusd_var_run_t:sock_file write;
+allow kernel_systemctl_t system_dbusd_t:unix_stream_socket connectto;
+allow kernel_systemctl_t system_dbusd_t:dbus send_msg;
+allow kernel_systemctl_t systemd_logind_t:dbus send_msg;
