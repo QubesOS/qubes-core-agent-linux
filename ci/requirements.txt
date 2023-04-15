@@ -2,6 +2,6 @@
 # they SHOULD NOT be used under normal conditions; use system package manager
 docutils
 pylint
-codecov
+coverage
 python-daemon
 pyxdg

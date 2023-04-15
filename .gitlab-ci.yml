@@ -1,6 +1,5 @@
 checks:tests:
   after_script:
-  - PATH=$PATH:$HOME/.local/bin
   - ci/codecov-wrapper
   before_script:
   - sudo dnf install -y python3-pip python3-gobject-base ShellCheck
