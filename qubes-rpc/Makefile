@@ -26,7 +26,7 @@ qfile-unpacker: qfile-unpacker.o gui-fatal.o
 tar2qfile: tar2qfile.o gui-fatal.o
 
 clean:
-	-$(RM) qopen-in-vm qfile-agent qfile-unpacker tar2qfile vm-file-editor *.o
+	-$(RM) -- qopen-in-vm qfile-agent qfile-unpacker tar2qfile vm-file-editor *.o
 
 install:
 	install -d $(DESTDIR)$(BINDIR)
