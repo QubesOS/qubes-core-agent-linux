@@ -1,7 +1,6 @@
 policy_module(qubes-misc,0.0.1)
 require {
 	attribute domain;
-	type kernel_systemctl_t;
 	type system_dbusd_t;
 	type system_dbusd_var_run_t;
 	type systemd_logind_t;
@@ -27,8 +26,13 @@ allow rpmdb_t user_tmp_t:fifo_file { write };
 allow { init_t unconfined_service_t } domain:process transition;
 
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2185490
-allow kernel_systemctl_t system_dbusd_var_run_t:dir search;
-allow kernel_systemctl_t system_dbusd_var_run_t:sock_file write;
-allow kernel_systemctl_t system_dbusd_t:unix_stream_socket connectto;
-allow kernel_systemctl_t system_dbusd_t:dbus send_msg;
-allow kernel_systemctl_t systemd_logind_t:dbus send_msg;
+optional {
+	require {
+		type kernel_systemctl_t;
+	}
+	allow kernel_systemctl_t system_dbusd_var_run_t:dir search;
+	allow kernel_systemctl_t system_dbusd_var_run_t:sock_file write;
+	allow kernel_systemctl_t system_dbusd_t:unix_stream_socket connectto;
+	allow kernel_systemctl_t system_dbusd_t:dbus send_msg;
+	allow kernel_systemctl_t systemd_logind_t:dbus send_msg;
+}
