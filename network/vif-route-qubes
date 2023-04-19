@@ -115,7 +115,7 @@ case "$command" in
         ipcmd='add'
         nftables_cmd=add
         cmdprefix=''
-        ipv6_disabled=$(cat "/proc/sys/net/ipv6/conf/$vif/disable_ipv6" || echo 1)
+        read -r ipv6_disabled < "/proc/sys/net/ipv6/conf/$vif/disable_ipv6" || ipv6_disabled=1
         interfaces=''
         separator=''
 
