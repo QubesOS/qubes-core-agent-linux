@@ -979,7 +979,6 @@ rm -f %{name}-%{version}
 /usr/share/caja-python/extensions/qvm_copy_caja.py*
 /usr/share/caja-python/extensions/qvm_move_caja.py*
 /usr/share/caja-python/extensions/qvm_dvm_caja.py*
-/usr/lib/qubes/qvm_caja_bookmark.sh
 %endif
 
 %files nautilus
