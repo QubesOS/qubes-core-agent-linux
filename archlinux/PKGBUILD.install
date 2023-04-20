@@ -6,15 +6,17 @@ qubes_preset_file="75-qubes-vm.preset"
 ###########################
 
 update_default_user() {
+    local user
     # Make sure there is a qubes group
     groupadd --force --system --gid 98 qubes
 
+    user=$(qubesdb-read /default-user) || user=user
     # Archlinux bash version has a 'bug' when running su -c, /etc/profile is not loaded because bash consider there is no interactive pty when running 'su - user -c' or something like this.
     # See https://bugs.archlinux.org/task/31831
-    id -u 'user' >/dev/null 2>&1 || {
-        useradd --user-group --create-home --shell /bin/bash user
+    id -u -- "$user" >/dev/null 2>&1 || {
+        useradd --user-group --create-home --shell /bin/bash -- "$user"
     }
-    usermod -a --groups qubes user
+    usermod -a --groups qubes -- "$user"
 }
 
 ## arg 1:  the new package version
@@ -339,7 +341,7 @@ post_install() {
         cp /etc/init/serial.conf /var/lib/qubes/serial.orig
     fi
 
-    chgrp user /var/lib/qubes/dom0-updates
+    chgrp qubes /var/lib/qubes/dom0-updates
 
     # Remove most of the udev scripts to speed up the VM boot time
     # Just leave the xen* scripts, that are needed if this VM was

@@ -396,11 +396,12 @@ make -C doc manpages
 
 %pre
 # Make sure there is a qubes group
+set -e
+user=$(qubesdb-read /default-user) || user=user
 groupadd --force --system --gid 98 qubes
-id -u 'user' >/dev/null 2>&1 || {
-  useradd --user-group --create-home --shell /bin/bash user
-}
-usermod -a --groups qubes user
+id -u -- "$user" >/dev/null 2>&1 ||
+  useradd --user-group --create-home --shell /bin/bash -- "$user"
+usermod -a -L --groups qubes -- "$user"
 
 if [ "$1" !=  1 ] ; then
 # do this whole %%pre thing only when updating for the first time...
@@ -411,8 +412,6 @@ mkdir -p /var/lib/qubes
 if [ -e /etc/fstab ] ; then
 mv /etc/fstab /var/lib/qubes/fstab.orig
 fi
-
-usermod -L user
 
 %pre passwordless-root
 
@@ -487,7 +486,7 @@ for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
     fi
 done
 
-chgrp user /var/lib/qubes/dom0-updates
+chgrp qubes /var/lib/qubes/dom0-updates
 
 # Remove old firmware updates link
 if [ -L /lib/firmware/updates ]; then
@@ -997,7 +996,7 @@ rm -f %{name}-%{version}
 %files dom0-updates
 %config(noreplace) /etc/qubes-rpc/qubes.TemplateSearch
 %config(noreplace) /etc/qubes-rpc/qubes.TemplateDownload
-%dir %attr(0755,user,user) /var/lib/qubes/dom0-updates
+%dir %attr(0775,root,qubes) /var/lib/qubes/dom0-updates
 /usr/lib/qubes/qvm-template-repo-query
 /usr/lib/qubes/qubes-download-dom0-updates.sh
 /usr/lib/qubes/dnf-plugins/downloadurl.py
