@@ -41,10 +41,6 @@ if [ "${1}" = "remove" ] || [ "${1}" = "upgrade" ] ; then
     mv /etc/xdg/Thunar/uca.xml /etc/xdg/Thunar/uca.xml.uninstall
     mv /etc/xdg/Thunar/uca.xml.bak /etc/xdg/Thunar/uca.xml
   fi
-  if [ -f /home/user/.config/Thunar/uca.xml ] && [ -f /home/user/.config/Thunar/uca.xml.bak ]; then
-    mv /home/user/.config/Thunar/uca.xml /home/user/.config/Thunar/uca.xml.uninstall
-    mv /home/user/.config/Thunar/uca.xml.bak /home/user/.config/Thunar/uca.xml
-  fi
 fi
 
 # dh_installdeb will replace this with shell code automatically
