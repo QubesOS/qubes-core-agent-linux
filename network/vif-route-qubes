@@ -214,6 +214,11 @@ if [ "${ip}" ]; then
             printf 'Cannot purge stale conntrack entries for %q\n' "$addr">&2
             exit 1
         fi
+        # Add neighbour entries
+        if [[ "$command" = 'online' ]]; then
+            ip -- neighbour add to "$addr" \
+                dev "$vif" lladdr "$peer_mac" nud permanent
+        fi
         nft "$nftables_cmd element $ipt qubes allowed { \"$vif\" . $addr }
 $nftables_cmd element $ipt qubes downstream { $addr }"
     done
