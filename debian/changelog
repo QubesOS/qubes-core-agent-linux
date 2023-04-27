@@ -1,3 +1,15 @@
+qubes-core-agent (4.2.10-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Switch to new codecov uploader
+  * Revert "Workaround Fedora selinux preventing shutdown"
+
+  [ Frédéric Pierret (fepitre) ]
+  * Rework Archlinux packaging
+  * archlinux: support for new packaging in legacy builder
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 27 Apr 2023 14:31:47 +0200
+
 qubes-core-agent (4.2.9-1) unstable; urgency=medium
 
   * dom0-updates: force refreshing sqlite rpmdb if legacy one is newer
