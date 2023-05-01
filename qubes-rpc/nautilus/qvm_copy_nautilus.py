@@ -18,7 +18,7 @@ class CopyToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
             return
 
         menu_item = Nautilus.MenuItem(name='QubesMenuProvider::CopyToAppvm',
-                                      label='Copy To Other AppVM...',
+                                      label='Copy to other qube...',
                                       tip='',
                                       icon='')
 

@@ -16,7 +16,7 @@ class CopyToAppvmItemExtension(GObject.GObject, Caja.MenuProvider):
             return
 
         menu_item = Caja.MenuItem(name='QubesMenuProvider::CopyToAppvm',
-                                  label='Copy To Other AppVM...',
+                                  label='Copy to other qube...',
                                   tip='',
                                   icon='')
 

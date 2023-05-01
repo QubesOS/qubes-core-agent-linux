@@ -16,7 +16,7 @@ class MoveToAppvmItemExtension(GObject.GObject, Caja.MenuProvider):
             return
 
         menu_item = Caja.MenuItem(name='QubesMenuProvider::MoveToAppvm',
-                                  label='Move To Other AppVM...',
+                                  label='Move to other qube...',
                                   tip='',
                                   icon='')
 
