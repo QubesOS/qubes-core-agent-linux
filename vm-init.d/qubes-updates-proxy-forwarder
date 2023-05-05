@@ -57,7 +57,7 @@ start() {
         --background \
         --start \
         -- \
-        -k -l -e 'qrexec-client-vm $default qubes.UpdatesProxy'
+        -k -l -e 'qrexec-client-vm @default qubes.UpdatesProxy'
     retval=$?
     echo
     [ $retval -eq 0 ] && touch $lockfile

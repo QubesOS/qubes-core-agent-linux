@@ -34,7 +34,7 @@ case "$action" in
         for file in "$@"
         do
             #shellcheck disable=SC2016
-            qvm-open-in-vm '$default' "$file" | zenity --notification --text "Opening $file in qube..." --timeout 3 &
+            qvm-open-in-vm '@default' "$file" | zenity --notification --text "Opening $file in qube..." --timeout 3 &
         done
         ;;
     opendvm)
