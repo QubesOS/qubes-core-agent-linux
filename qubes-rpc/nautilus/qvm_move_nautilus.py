@@ -18,7 +18,7 @@ class MoveToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
             return
 
         menu_item = Nautilus.MenuItem(name='QubesMenuProvider::MoveToAppvm',
-                                      label='Move To Other AppVM...',
+                                      label='Move to other qube...',
                                       tip='',
                                       icon='')
 

@@ -73,8 +73,8 @@ void recv_file_nowrite(const char *fname)
         return;
     }
     if (asprintf(&errmsg,
-         "The file %s has been edited in Disposable VM and the modified content has been received, "
-         "but this file is in nonwritable directory and thus cannot be modified safely. The edited file has been "
+         "The file %s has been edited in a disposable qube and the modified content has been received, "
+         "but this file is in read-only directory and thus cannot be modified safely. The edited file has been "
          "saved to %s", fname, tempfile) != -1)
         gui_nonfatal(errmsg);
 }

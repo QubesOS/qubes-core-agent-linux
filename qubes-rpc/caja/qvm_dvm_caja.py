@@ -18,14 +18,14 @@ class OpenInDvmItemExtension(GObject.GObject, Caja.MenuProvider):
             return
 
         menu_item1 = Caja.MenuItem(name='QubesMenuProvider::OpenInDvm',
-                                   label='Edit In DisposableVM',
+                                   label='Edit in disposable qube',
                                    tip='',
                                    icon='')
 
         menu_item1.connect('activate', self.on_menu_item_clicked, files)
 
         menu_item2 = Caja.MenuItem(name='QubesMenuProvider::ViewInDvm',
-                                   label='View In DisposableVM',
+                                   label='View in disposable qube',
                                    tip='',
                                    icon='')
 

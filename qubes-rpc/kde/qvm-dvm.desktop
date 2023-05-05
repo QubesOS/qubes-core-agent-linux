@@ -6,10 +6,10 @@ X-KDE-ServiceTypes=KonqPopupMenu/Plugin,all/allfiles
 [Desktop Action QvmDvm]
 Exec=/usr/bin/qvm-open-in-dvm %U
 Icon=kget
-Name=Edit In DisposableVM
+Name=Edit in disposable qube
 
 [Desktop Action QvmViewDvm]
 Exec=/usr/bin/qvm-open-in-dvm --view-only %U
 Icon=kget
-Name=View In DisposableVM
+Name=View in disposable qube
 

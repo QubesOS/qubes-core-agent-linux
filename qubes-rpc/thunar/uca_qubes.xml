@@ -1,6 +1,6 @@
 <action>
 	<icon>stock_folder-copy</icon>
-	<name>Copy to VM</name>
+	<name>Copy to other qube</name>
 	<unique-id>1507455450991127-4</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh copy %F</command>
 	<description></description>
@@ -14,7 +14,7 @@
 </action>
 <action>
 	<icon>stock_folder-move</icon>
-	<name>Move to VM</name>
+	<name>Move to other qube</name>
 	<unique-id>1507455437157027-3</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh move %F</command>
 	<description></description>
@@ -28,7 +28,7 @@
 </action>
 <action>
 	<icon>document-open</icon>
-	<name>Open in VM</name>
+	<name>Open in other qube</name>
 	<unique-id>1507455471075266-5</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh openvm %F</command>
 	<description></description>
@@ -41,7 +41,7 @@
 </action>
 <action>
 	<icon>gtk-convert</icon>
-	<name>Convert in DisposableVM</name>
+	<name>Convert in disposable qube</name>
 	<unique-id>1507455488971315-6</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh pdf %F</command>
 	<description></description>
@@ -50,7 +50,7 @@
 </action>
 <action>
 	<icon>gtk-convert</icon>
-	<name>Convert in DisposableVM</name>
+	<name>Convert in disposable qube</name>
 	<unique-id>1507455503129941-7</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh img %F</command>
 	<description></description>
@@ -59,7 +59,7 @@
 </action>
 <action>
 	<icon>document-open</icon>
-	<name>Edit in DisposableVM</name>
+	<name>Edit in disposable qube</name>
 	<unique-id>1507455559234996-8</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh opendvm %F</command>
 	<description></description>
@@ -72,7 +72,7 @@
 </action>
 <action>
 	<icon>document-open</icon>
-	<name>View in DisposableVM</name>
+	<name>View in disposable qube</name>
 	<unique-id>1507455559234997-9</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh viewdvm %F</command>
 	<description></description>
