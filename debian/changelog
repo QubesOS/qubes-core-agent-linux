@@ -1,3 +1,28 @@
+qubes-core-agent (4.2.11-1) unstable; urgency=medium
+
+  [ Marta Marczykowska-Górecka ]
+  * Unify and improve wording on copy/move to other qube
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not use deprecated '$default' keyword
+
+  [ Ludovic Bellier ]
+  * Update archlinux python version dependency to <3.12
+
+  [ Demi Marie Obenour ]
+  * Xen hotplug scripts should be initrc_exec_t
+  * Use appropriate rpm macros
+  * Replace iptables with nftables
+  * Add permanent neighbor entries again
+  * Remove an unneded use of cat
+
+  [ Marek Marczykowski-Górecki ]
+  * A wrapper for starting a process conditionally on qvm-service
+  * qubes-session-autostart: fix processing drop-ins
+  * Disable blueman applet by default
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 07 May 2023 15:00:31 +0200
+
 qubes-core-agent (4.2.10-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
