@@ -909,6 +909,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qvm-copy-to-vm.kde
 /usr/lib/qubes/qvm-move-to-vm.gnome
 /usr/lib/qubes/qvm-move-to-vm.kde
+/usr/lib/qubes/qvm-service-wrapper
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
 /usr/lib/qubes/xdg-icon

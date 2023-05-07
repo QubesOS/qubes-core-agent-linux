@@ -1,6 +1,8 @@
 BINDIR ?= /usr/bin
 DATADIR ?= /usr/share
 SYSLIBDIR ?= /lib
+LIBDIR ?= /usr/lib
+QUBESLIBDIR := $(LIBDIR)/qubes
 UDEVRULESDIR := $(SYSLIBDIR)/udev/rules.d
 QUBESDATADIR := $(DATADIR)/qubes
 QUBESMIMEDIR := $(QUBESDATADIR)/xdg-override
@@ -39,6 +41,8 @@ install:
 	umask 022 && cp -r applications mime '$(DESTDIR)$(QUBESMIMEDIR)'
 	install -m 0755 -d $(DESTDIR)$(BINDIR)
 	install -m 0755 -t $(DESTDIR)$(BINDIR) qvm-features-request
+	install -m 0755 -d $(DESTDIR)$(QUBESLIBDIR)
+	install -m 0755 -t $(DESTDIR)$(QUBESLIBDIR) qvm-service-wrapper
 
 marker-vm: marker-vm.in
 	printf "$(VERSION)" | cut -f 1,2 -d . | cat $< - > marker-vm
