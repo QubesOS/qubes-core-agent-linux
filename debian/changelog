@@ -1,3 +1,19 @@
+qubes-core-agent (4.1.41-1) unstable; urgency=medium
+
+  [ Ludovic Bellier ]
+  * Update archlinux python version dependency to <3.12
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not use deprecated '$default' keyword
+  * A wrapper for starting a process conditionally on qvm-service
+  * qubes-session-autostart: fix processing drop-ins
+  * Disable blueman applet by default
+
+  [ unman ]
+  * Add support for Ubuntu 2204, jammy
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 07 May 2023 15:56:30 +0200
+
 qubes-core-agent (4.1.40-1) unstable; urgency=medium
 
   [ Maja Kądziołka ]
