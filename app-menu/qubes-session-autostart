@@ -78,7 +78,7 @@ def process_autostart(environments):
                 else:
                     entry = DesktopEntry(entry_path)
                 if entry_should_be_started(entry, environments):
-                    launch(entry_path, wait=False)
+                    launch(entry, wait=False)
             except Exception as e:
                 print("Failed to process '{}': {}".format(
                     entry_name, str(e)),
