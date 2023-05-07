@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Start an application given as $2 only if qvm-service $1 is enabled
+
+service="$1"
+shift
+if ! [ -r "/run/qubes-service/$service" ]; then
+    echo "Not starting '$1', qvm-service '$service' is not enabled" >&2
+    exit 0
+fi
+
+exec "$@"

@@ -21,6 +21,10 @@ fi
 
 qvm-features-request supported-service.meminfo-writer=1
 
+if [ -e /etc/xdg/autostart/blueman.desktop ]; then
+    qvm-features-request supported-service.blueman=1
+fi
+
 # native services plugged into qubes-services with systemd drop-ins, list them
 # only when actual service is installed
 advertise_systemd_service() {

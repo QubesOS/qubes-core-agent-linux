@@ -38,7 +38,10 @@ def make_launcher(filename, dropins_dir=DROPINS_DIR):
         return Gio.DesktopAppInfo.new_from_filename(filename)
 
     desktop_entry = load_desktop_entry_with_dropins(filename, dropins)
+    return make_launcher_from_entry(desktop_entry)
 
+
+def make_launcher_from_entry(desktop_entry):
     data = GLib.Bytes(ini_to_string(desktop_entry).encode('utf-8'))
     keyfile = GLib.KeyFile()
     keyfile.load_from_bytes(data, 0)
@@ -77,9 +80,12 @@ def dbus_name_change(loop, service_id, name, old_owner, new_owner):
         loop.quit()
 
 
-def launch(filename, *files, **kwargs):
+def launch(filename_or_entry, *files, **kwargs):
     wait = kwargs.pop('wait', True)
-    launcher = make_launcher(filename)
+    if isinstance(filename_or_entry, str):
+        launcher = make_launcher(filename_or_entry)
+    else:
+        launcher = make_launcher_from_entry(filename_or_entry)
     loop = None
     try:
         import dbus
