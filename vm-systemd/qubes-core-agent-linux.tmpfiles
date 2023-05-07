@@ -1,1 +1,2 @@
 d /run/tinyproxy-updates 0755 tinyproxy tinyproxy
+d /run/xen 0700 root root

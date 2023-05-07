@@ -1,0 +1,42 @@
+#!/usr/sbin/nft -f
+table ip qubes {
+   set downstream {
+      type ipv4_addr
+   }
+
+   set allowed {
+      type ifname . ipv4_addr
+   }
+
+   chain prerouting {
+      type filter hook prerouting priority raw; policy accept;
+      iifgroup 2 goto antispoof
+      ip saddr @downstream counter drop
+   }
+
+   chain antispoof {
+      iifname . ip saddr @allowed accept
+      counter drop
+   }
+}
+
+table ip6 qubes {
+   set downstream {
+      type ipv6_addr
+   }
+
+   set allowed {
+      type ifname . ipv6_addr
+   }
+
+   chain antispoof {
+      iifname . ip6 saddr @allowed accept
+      counter drop
+   }
+
+   chain prerouting {
+      type filter hook prerouting priority raw; policy accept;
+      iifgroup 2 goto antispoof
+      ip6 saddr @downstream counter drop
+   }
+}

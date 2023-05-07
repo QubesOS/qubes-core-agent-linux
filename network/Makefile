@@ -12,7 +12,6 @@ install:
 	install -t $(DESTDIR)$(QUBESLIBDIR) \
 		setup-ip \
 		tinyproxy-wrapper \
-		get-dns-from-resolved \
 		update-proxy-configs
 	install -d $(DESTDIR)$(BINDIR)
 	install -t $(DESTDIR)$(BINDIR) \

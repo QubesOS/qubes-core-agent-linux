@@ -415,12 +415,12 @@ usermod -L root
 
 %install
 
-make install-vm PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib ENABLE_SELINUX=%with_selinux
+make install-vm PYTHON=%{__python3} "DESTDIR=$RPM_BUILD_ROOT" SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib ENABLE_SELINUX=%with_selinux
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
 make -C filesystem DESTDIR=$RPM_BUILD_ROOT install
-make -C misc DESTDIR=$RPM_BUILD_ROOT install
+make -C misc "DESTDIR=$RPM_BUILD_ROOT" UDEVRULESDIR=%_udevrulesdir SYSLIBDIR=/usr/lib install
 make -C network DESTDIR=$RPM_BUILD_ROOT install
 make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install install-rh
 make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
@@ -615,6 +615,7 @@ sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
 %post networking
 %systemd_post qubes-firewall.service
 %systemd_post qubes-iptables.service
+%systemd_post qubes-antispoof.service
 %systemd_post qubes-network.service
 %systemd_post qubes-network-uplink.service
 %systemd_post qubes-updates-proxy.service
@@ -650,6 +651,7 @@ fi
 %preun networking
 %systemd_preun qubes-firewall.service
 %systemd_preun qubes-iptables.service
+%systemd_preun qubes-antispoof.service
 %systemd_preun qubes-network.service
 %systemd_preun qubes-updates-proxy.service
 
@@ -803,7 +805,7 @@ rm -f %{name}-%{version}
 %{kde5_service_dir}/qvm-copy.desktop
 %{kde5_service_dir}/qvm-move.desktop
 %{kde5_service_dir}/qvm-dvm.desktop
-/etc/fstab
+%config /etc/fstab
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 %dir /etc/qubes-rpc
 %config(noreplace) /etc/qubes-rpc/qubes.ShowInTerminal
@@ -879,25 +881,25 @@ rm -f %{name}-%{version}
 %endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %config(noreplace) /etc/dconf/db/local.d/dpi
-/lib/udev/rules.d/50-qubes-mem-hotplug.rules
-/usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
+%_udevrulesdir/50-qubes-mem-hotplug.rules
+%_unitdir/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
-/usr/bin/qvm-copy-to-vm
-/usr/bin/qvm-move-to-vm
-/usr/bin/qvm-copy
-/usr/bin/qvm-move
-/usr/bin/qvm-open-in-dvm
-/usr/bin/qvm-open-in-vm
-/usr/bin/qvm-run-vm
-/usr/bin/qvm-features-request
-/usr/bin/qvm-sync-clock
-/usr/bin/qubes-desktop-run
-/usr/bin/qubes-run-terminal
-/usr/bin/qubes-run-gnome-terminal
-/usr/bin/qubes-open
-/usr/bin/qubes-session-autostart
-/usr/bin/qvm-connect-tcp
-/usr/bin/qubes-vmexec
+%_bindir/qvm-copy-to-vm
+%_bindir/qvm-move-to-vm
+%_bindir/qvm-copy
+%_bindir/qvm-move
+%_bindir/qvm-open-in-dvm
+%_bindir/qvm-open-in-vm
+%_bindir/qvm-run-vm
+%_bindir/qvm-features-request
+%_bindir/qvm-sync-clock
+%_bindir/qubes-desktop-run
+%_bindir/qubes-run-terminal
+%_bindir/qubes-run-gnome-terminal
+%_bindir/qubes-open
+%_bindir/qubes-session-autostart
+%_bindir/qvm-connect-tcp
+%_bindir/qubes-vmexec
 %dir /usr/lib/qubes
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent
@@ -1001,31 +1003,32 @@ rm -f %{name}-%{version}
 %files networking
 %config /etc/sysctl.d/81-qubes.conf.optional
 %config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
-%config(noreplace) /etc/qubes/ip6tables.rules
-%config(noreplace) /etc/qubes/ip6tables-enabled.rules
-%config(noreplace) /etc/qubes/iptables.rules
+%config(noreplace) /etc/qubes/qubes-antispoof.nft
+%config(noreplace) /etc/qubes/qubes-ipv4.nft
+%config(noreplace) /etc/qubes/qubes-ipv6.nft
+%config(noreplace) /etc/qubes/qubes-ipv6-disabled.nft
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/tinyproxy/updates-blacklist
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
 /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 /etc/xen/scripts/vif-qubes-nat.sh
 /etc/xen/scripts/vif-route-qubes
-/usr/lib/systemd/system/qubes-firewall.service
-/usr/lib/systemd/system/qubes-iptables.service
-/usr/lib/systemd/system/qubes-network.service
-/usr/lib/systemd/system/qubes-network-uplink.service
-/usr/lib/systemd/system/qubes-network-uplink@.service
-/usr/lib/systemd/system/qubes-updates-proxy.service
+%_unitdir/qubes-firewall.service
+%_unitdir/qubes-iptables.service
+%_unitdir/qubes-antispoof.service
+%_unitdir/qubes-network.service
+%_unitdir/qubes-network-uplink.service
+%_unitdir/qubes-network-uplink@.service
+%_unitdir/qubes-updates-proxy.service
 /usr/lib/systemd/network/80-qubes-vif.link
 /usr/lib/qubes/init/network-proxy-setup.sh
 /usr/lib/qubes/init/network-proxy-stop.sh
 /usr/lib/qubes/init/network-uplink-wait.sh
 /usr/lib/qubes/init/qubes-iptables
-/usr/lib/qubes/get-dns-from-resolved
 /usr/lib/qubes/qubes-setup-dnat-to-ns
 /usr/lib/qubes/setup-ip
-/usr/lib/tmpfiles.d/qubes-core-agent-linux.conf
-/usr/bin/qubes-firewall
+%_tmpfilesdir/qubes-core-agent-linux.conf
+%_bindir/qubes-firewall
 
 %files network-manager
 /etc/NetworkManager/dispatcher.d/30-qubes-external-ip
@@ -1134,43 +1137,43 @@ The Qubes core startup configuration for SystemD init.
 %files systemd
 %defattr(-,root,root,-)
 /etc/systemd/system/xendriverdomain.service
-/usr/lib/systemd/system/dev-xvdc1-swap.service
-/usr/lib/systemd/system/qubes-misc-post.service
-/usr/lib/systemd/system/qubes-mount-dirs.service
-/usr/lib/systemd/system/qubes-rootfs-resize.service
-/usr/lib/systemd/system/qubes-sysinit.service
-/usr/lib/systemd/system/qubes-early-vm-config.service
-/usr/lib/systemd/system/qubes-update-check.service
-/usr/lib/systemd/system/qubes-update-check.timer
-/usr/lib/systemd/system/qubes-sync-time.service
-/usr/lib/systemd/system/qubes-sync-time.timer
-/usr/lib/systemd/system/qubes-updates-proxy-forwarder@.service
-/usr/lib/systemd/system/qubes-updates-proxy-forwarder.socket
-/usr/lib/systemd/system-preset/%qubes_preset_file
-/usr/lib/modules-load.d/qubes-core.conf
-/usr/lib/systemd/system/boot.automount.d/30_qubes.conf
-/usr/lib/systemd/system/chronyd.service.d/30_qubes.conf
-/usr/lib/systemd/system/crond.service.d/30_qubes.conf
-/usr/lib/systemd/system/cups.service.d/30_qubes.conf
-/usr/lib/systemd/system/cups.socket.d/30_qubes.conf
-/usr/lib/systemd/system/cups.path.d/30_qubes.conf
-/usr/lib/systemd/system/cups-browsed.service.d/30_qubes.conf
-/usr/lib/systemd/system/org.cups.cupsd.service.d/30_qubes.conf
-/usr/lib/systemd/system/org.cups.cupsd.socket.d/30_qubes.conf
-/usr/lib/systemd/system/org.cups.cupsd.path.d/30_qubes.conf
-/usr/lib/systemd/system/getty@tty.service.d/30_qubes.conf
-/usr/lib/systemd/system/ModemManager.service.d/30_qubes.conf
-/usr/lib/systemd/system/NetworkManager.service.d/30_qubes.conf
-/usr/lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
-/usr/lib/systemd/system/serial-getty@.service.d/30_qubes.conf
-/usr/lib/systemd/system/systemd-random-seed.service.d/30_qubes.conf
-/usr/lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
-/usr/lib/systemd/system/systemd-logind.service.d/30_qubes.conf
-/usr/lib/systemd/system/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
-/usr/lib/systemd/system/tor.service.d/30_qubes.conf
-/usr/lib/systemd/system/tor@default.service.d/30_qubes.conf
-/usr/lib/systemd/system/tmp.mount.d/30_qubes.conf
-/usr/lib/systemd/system/sysinit.target.requires/systemd-random-seed.service
+%_unitdir/dev-xvdc1-swap.service
+%_unitdir/qubes-misc-post.service
+%_unitdir/qubes-mount-dirs.service
+%_unitdir/qubes-rootfs-resize.service
+%_unitdir/qubes-sysinit.service
+%_unitdir/qubes-early-vm-config.service
+%_unitdir/qubes-update-check.service
+%_unitdir/qubes-update-check.timer
+%_unitdir/qubes-sync-time.service
+%_unitdir/qubes-sync-time.timer
+%_unitdir/qubes-updates-proxy-forwarder@.service
+%_unitdir/qubes-updates-proxy-forwarder.socket
+%{_unitdir}-preset/%qubes_preset_file
+%_modulesloaddir/qubes-core.conf
+%_unitdir/boot.automount.d/30_qubes.conf
+%_unitdir/chronyd.service.d/30_qubes.conf
+%_unitdir/crond.service.d/30_qubes.conf
+%_unitdir/cups.service.d/30_qubes.conf
+%_unitdir/cups.socket.d/30_qubes.conf
+%_unitdir/cups.path.d/30_qubes.conf
+%_unitdir/cups-browsed.service.d/30_qubes.conf
+%_unitdir/org.cups.cupsd.service.d/30_qubes.conf
+%_unitdir/org.cups.cupsd.socket.d/30_qubes.conf
+%_unitdir/org.cups.cupsd.path.d/30_qubes.conf
+%_unitdir/getty@tty.service.d/30_qubes.conf
+%_unitdir/ModemManager.service.d/30_qubes.conf
+%_unitdir/NetworkManager.service.d/30_qubes.conf
+%_unitdir/NetworkManager-wait-online.service.d/30_qubes.conf
+%_unitdir/serial-getty@.service.d/30_qubes.conf
+%_unitdir/systemd-random-seed.service.d/30_qubes.conf
+%_unitdir/systemd-timesyncd.service.d/30_qubes.conf
+%_unitdir/systemd-logind.service.d/30_qubes.conf
+%_unitdir/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
+%_unitdir/tor.service.d/30_qubes.conf
+%_unitdir/tor@default.service.d/30_qubes.conf
+%_unitdir/tmp.mount.d/30_qubes.conf
+%_unitdir/sysinit.target.requires/systemd-random-seed.service
 
 %post systemd
 

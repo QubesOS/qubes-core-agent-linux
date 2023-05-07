@@ -13,7 +13,8 @@ add_default_route () {
     /sbin/ip -- route replace to unicast default via "$1" dev "$2" onlink
 }
 
-configure_network() {
+readonly netvm_mac=fe:ff:ff:ff:ff:ff
+configure_network () {
     local MAC="$1"
     local INTERFACE="$2"
     local ip="$3"
@@ -24,12 +25,21 @@ configure_network() {
     local gateway6="$8"
     local primary_dns="$9"
     local secondary_dns="${10}"
+    local custom="${11}"
 
-    /sbin/ip address add "$ip/$netmask" dev "$INTERFACE"
-    if [ -n "$ip6" ]; then
-        /sbin/ip address add "$ip6/$netmask6" dev "$INTERFACE"
+    /sbin/ip -- address add "$ip/$netmask" dev "$INTERFACE"
+    if [[ "$custom" = false ]]; then
+        /sbin/ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
+            lladdr "$netvm_mac" nud permanent
     fi
-    /sbin/ip link set dev "$INTERFACE" up
+    if [ -n "$ip6" ]; then
+        /sbin/ip -- address add "$ip6/$netmask6" dev "$INTERFACE"
+        if [[ "$custom" = false ]]; then
+            /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
+                lladdr "$netvm_mac" nud permanent
+        fi
+    fi
+    /sbin/ip link set dev "$INTERFACE" group 1 up
 
     if [ -n "$gateway" ]; then
         add_link_route "$gateway" "$INTERFACE"
@@ -67,7 +77,7 @@ configure_network() {
     fi
 }
 
-configure_network_nm() {
+configure_network_nm () {
     local MAC="$1"
     local INTERFACE="$2"
     local ip="$3"
@@ -78,6 +88,7 @@ configure_network_nm() {
     local gateway6="$8"
     local primary_dns="$9"
     local secondary_dns="${10}"
+    local custom="${11}"
 
     local prefix
     local prefix6
@@ -85,6 +96,7 @@ configure_network_nm() {
     local ip4_nm_config
     local ip6_nm_config
     local uuid
+    /sbin/ip link set dev "$INTERFACE" group 1
 
     prefix="$(get_prefix_from_subnet "$netmask")"
     prefix6="$netmask6"
@@ -154,6 +166,16 @@ __EOF__
     chmod 600 "$nm_config"
     # reload connection
     nmcli connection load "$nm_config" || :
+    if [[ "$custom" = false ]]; then
+        /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
+            lladdr "$netvm_mac" nud permanent
+    fi
+    if [ -n "$ip6" ]; then
+        if [[ "$custom" = false ]]; then
+            /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
+                lladdr "$netvm_mac" nud permanent
+        fi
+    fi
 }
 
 configure_qubes_ns() {
@@ -188,36 +210,36 @@ fi
 
 if [ "$ACTION" == "add" ]; then
     MAC="$(get_mac_from_iface "$INTERFACE")"
-    if [ -n "$MAC" ]; then
-        ip="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip" 2> /dev/null)" || ip=
-        ip6="$(/usr/bin/qubesdb-read "/net-config/$MAC/ip6" 2> /dev/null)" || ip6=
-        netmask="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask" 2> /dev/null)" || netmask=
-        netmask6="$(/usr/bin/qubesdb-read "/net-config/$MAC/netmask6" 2> /dev/null)" || netmask6=
-        gateway="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway" 2> /dev/null)" || gateway=
-        gateway6="$(/usr/bin/qubesdb-read "/net-config/$MAC/gateway6" 2> /dev/null)" || gateway6=
-
-        # Handle legacy values
-        LEGACY_MAC="$(/usr/bin/qubesdb-read /qubes-mac 2> /dev/null)" || LEGACY_MAC=
-        if [ "$MAC" == "$LEGACY_MAC" ] || [ -z "$LEGACY_MAC" ]; then
-            if [ -z "$ip" ]; then
-                ip="$(/usr/bin/qubesdb-read /qubes-ip 2> /dev/null)" || ip=
-            fi
-            if [ -z "$ip6" ]; then
-                ip6="$(/usr/bin/qubesdb-read /qubes-ip6 2> /dev/null)" || ip6=
-            fi
-            if [ -z "$gateway" ]; then
-                gateway="$(/usr/bin/qubesdb-read /qubes-gateway 2> /dev/null)" || gateway=
-            fi
-            if [ -z "$gateway6" ]; then
-                gateway6="$(/usr/bin/qubesdb-read /qubes-gateway6 2> /dev/null)" || gateway6=
-            fi
+    prefix="/net-config/$MAC"
+    if [[ -n "$MAC" ]]; then
+        # prefix begins with / so -- is not needed
+        if /usr/bin/qubesdb-read "${prefix}custom" >/dev/null 2>&1; then
+            custom=true
+        elif [[ "$?" = '2' ]]; then
+            custom=false
+        else
+            echo "Could not check if ${prefix}custom exists!" >&2
+            exit 1
         fi
-
-        if [ -z "$netmask" ]; then
-            netmask="255.255.255.255"
+        if ip4=$(exec /usr/bin/qubesdb-read "${prefix}ip" 2>/dev/null); then
+            :
+        elif [[ "$?" = '2' ]]; then
+            prefix=/qubes-
+            ip4=$(exec /usr/bin/qubesdb-read "${prefix}ip")
+        else
+            echo "Could not check if /net-config/$MAC/ip exists!" >&2
+            exit 1
         fi
-        if [ -z "$netmask6" ]; then
-            netmask6="128"
+        netmask=$(exec /usr/bin/qubesdb-read --default=255.255.255.255 "${prefix}netmask")
+        gateway=$(exec /usr/bin/qubesdb-read "${prefix}gateway")
+        if ip6=$(exec /usr/bin/qubesdb-read "${prefix}ip6" 2>/dev/null); then
+            netmask6=$(exec /usr/bin/qubesdb-read --default=128 "${prefix}netmask6")
+            gateway6=$(exec /usr/bin/qubesdb-read "${prefix}gateway6")
+        elif [[ "$?" != '2' ]]; then
+            echo 'Could not check if IPv6 is enabled' >&2
+            exit 1
+        else
+            ip6='' netmask6=128 gateway6=''
         fi
 
         primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null) || primary_dns=
@@ -232,12 +254,12 @@ if [ "$ACTION" == "add" ]; then
             "--prefix=/net/ipv6/conf/$INTERFACE" \
             "--prefix=/net/ipv6/neigh/$INTERFACE"
 
-        if [ -n "$ip" ]; then
+        if [ -n "$ip4" ]; then
             # If NetworkManager is enabled, let it configure the network
             if qsvc network-manager && [ -e /usr/bin/nmcli ]; then
-                configure_network_nm "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
+                configure_network_nm "$MAC" "$INTERFACE" "$ip4" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns" "$custom"
             else
-                configure_network "$MAC" "$INTERFACE" "$ip" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns"
+                configure_network "$MAC" "$INTERFACE" "$ip4" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns" "$custom"
             fi
 
             network=$(qubesdb-read /qubes-netvm-network 2>/dev/null) || network=

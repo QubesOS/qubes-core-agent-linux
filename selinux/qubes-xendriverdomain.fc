@@ -1,1 +1,5 @@
-# Intentionally left blank
+define(`slash_run',`dnl
+/var/run/$1     $3       gen_context(system_u:object_r:$2_t,s0)
+/run/$1     $3       gen_context(system_u:object_r:$2_t,s0)
+')dnl
+slash_run(`xen(/.*)?',`xend_var_run')
