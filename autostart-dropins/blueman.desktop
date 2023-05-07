@@ -1,0 +1,2 @@
+[Desktop Entry]
+Exec=/usr/lib/qubes/qvm-service-wrapper blueman blueman-applet
