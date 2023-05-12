@@ -7,6 +7,6 @@ do
     sleep 0.1
 done
 
-systemctl --machine="$USERNAME"@.host --user --wait --quiet is-system-running
+systemctl --user --wait --quiet is-system-running
 
 exit 0
