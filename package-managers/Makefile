@@ -11,16 +11,21 @@ YUMCONFDIR = $(SYSCONFDIR)/yum.conf.d
 QUBESLIBDIR = $(LIBDIR)/qubes
 QUBESSTATEDIR = $(STATEDIR)/qubes
 
+DIST_NAME =
 ifneq (,$(wildcard /etc/fedora-release))
 DIST = fc$(shell rpm --eval %{fedora})
+DIST_NAME = fedora
 else ifneq (,$(wildcard /etc/centos-release))
 ifeq (CentOSStream, $(shell lsb_release -is))
 DIST = centos-stream
+DIST_NAME = centos-stream
 else
 DIST = centos
+DIST_NAME = centos
 endif
 else ifneq (,$(wildcard /etc/os-release))
 DIST = $(shell grep VERSION_CODENAME= /etc/os-release | cut -d'=' -f2)
+DIST_NAME = $(shell grep NAME= /etc/os-release | cut -d'=' -f2)
 endif
 
 ifeq (,$(DIST))
@@ -28,6 +33,7 @@ ifeq (,$(DIST))
 # it means we are on sid
 ifneq (,$(wildcard /etc/debian_version))
 DIST = $(shell cut -d'/' -f1 /etc/debian_version)
+DIST_NAME = debian
 endif
 endif
 
@@ -47,10 +53,17 @@ install:
 
 install-apt:
 	install -d $(DESTDIR)$(APTCONFDIR)/sources.list.d
+ifeq ($(DIST_NAME),Ubuntu)
+	sed "s/@DIST@/$(DIST)/" apt-qubes-r4-ubuntu.list.in \
+		> $(DESTDIR)$(APTCONFDIR)/sources.list.d/qubes-r4.list
+else
 	sed "s/@DIST@/$(DIST)/" apt-qubes-r4.list.in \
 		> $(DESTDIR)$(APTCONFDIR)/sources.list.d/qubes-r4.list
+endif
 	install -D -m 0644 apt-qubes-archive-keyring.gpg \
 		$(DESTDIR)/usr/share/keyrings/qubes-archive-keyring.gpg
+	install -D -m 0644 apt-qubes-ubuntu-archive-keyring.gpg \
+		$(DESTDIR)/usr/share/keyrings/qubes-ubuntu-archive-keyring.gpg
 	install -D -m 0644 apt-conf-00notify-hook \
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/00notify-hook
 	install -D -m 0644 apt-conf-70no-unattended \
