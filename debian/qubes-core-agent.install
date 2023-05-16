@@ -88,6 +88,7 @@ lib/systemd/system/qubes-mount-dirs.service
 lib/systemd/system/qubes-rootfs-resize.service
 lib/systemd/system/qubes-sysinit.service
 lib/systemd/system/qubes-update-check.service
+lib/systemd/system/qubes-remount-lib-modules.service
 lib/systemd/system/qubes-update-check.timer
 lib/systemd/system/qubes-updates-proxy-forwarder@.service
 lib/systemd/system/qubes-updates-proxy-forwarder.socket
@@ -129,6 +130,7 @@ usr/lib/qubes/init/misc-post-stop.sh
 usr/lib/qubes/init/misc-post.sh
 usr/lib/qubes/init/mount-dirs.sh
 usr/lib/qubes/init/qubes-early-vm-config.sh
+usr/lib/qubes/init/qubes-remount-lib-modules.sh
 usr/lib/qubes/init/qubes-random-seed.sh
 usr/lib/qubes/init/qubes-sysinit.sh
 usr/lib/qubes/init/resize-rootfs-if-needed.sh
