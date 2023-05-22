@@ -5,6 +5,7 @@ require {
 	type iptables_t, xen_device_t;
 	type local_login_t, init_t;
 	type rpmdb_t, unconfined_service_t, user_tmp_t;
+	type kernel_t;
 	class chr_file { read write };
 	class service { start };
 	class fifo_file { write };
@@ -17,3 +18,5 @@ allow iptables_t xen_device_t:chr_file { read write };
 allow local_login_t init_t: service { start };
 allow rpmdb_t user_tmp_t:fifo_file { write };
 allow { init_t unconfined_service_t } domain:process transition;
+domain_obj_id_change_exemption(kernel_t)
+files_unconfined(kernel_t)
