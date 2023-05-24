@@ -371,6 +371,9 @@ if [ "$1" -eq 0 ]; then
         %{_datadir}/selinux/packages/qubes-misc.pp
 fi || :
 
+%pre selinux
+%selinux_relabel_pre
+
 %posttrans selinux
 %selinux_relabel_post
 %systemd_post qubes-relabel-root.service qubes-relabel-rw.service
