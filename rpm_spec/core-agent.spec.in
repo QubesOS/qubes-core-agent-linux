@@ -941,7 +941,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/init/qubes-sysinit.sh
 /usr/lib/qubes/init/resize-rootfs-if-needed.sh
 /usr/lib/qubes/init/setup-rw.sh
-/usr/lib/qubes/init/qubes-remount-lib-modules.sh
 /usr/lib/qubes/init/setup-rwdev.sh
 %dir /usr/lib/qubes-bind-dirs.d
 /usr/lib/qubes-bind-dirs.d/30_cron.conf
@@ -1031,7 +1030,6 @@ rm -f %{name}-%{version}
 %_unitdir/qubes-network-uplink.service
 %_unitdir/qubes-network-uplink@.service
 %_unitdir/qubes-updates-proxy.service
-%_unitdir/qubes-remount-lib-modules.service
 /usr/lib/systemd/network/80-qubes-vif.link
 /usr/lib/qubes/init/network-proxy-setup.sh
 /usr/lib/qubes/init/network-proxy-stop.sh
