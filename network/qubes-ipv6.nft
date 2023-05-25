@@ -29,7 +29,6 @@ table ip6 qubes {
       type filter hook forward priority filter; policy accept;
       ct state invalid counter drop
       ct state related,established accept
-      iifgroup != 2 counter drop
       oifgroup 2 counter drop
    }
 

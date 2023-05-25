@@ -24,7 +24,6 @@ table ip qubes {
       jump custom-forward
       ct state invalid counter drop
       ct state related,established accept
-      iifgroup != 2 counter drop
       oifgroup 2 counter drop
    }
 
