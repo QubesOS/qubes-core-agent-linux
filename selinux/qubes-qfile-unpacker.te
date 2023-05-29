@@ -14,10 +14,11 @@ require {
 	class filesystem { unmount };
 }
 
-# TODO: use a private type for ~/QubesIncoming
 type qubes_qfile_unpacker_t;
 type qubes_qfile_unpacker_exec_t;
-corecmd_executable_file(qubes_qfile_unpacker_exec_t);
+type qubes_unpacked_file_t;
+files_type(qubes_unpacked_file_t)
+corecmd_executable_file(qubes_qfile_unpacker_exec_t)
 domain_type(qubes_qfile_unpacker_t)
 role system_r types qubes_qfile_unpacker_t;
 role staff_r types qubes_qfile_unpacker_t;
@@ -28,19 +29,24 @@ type_transition { sysadm_usertype staff_usertype unconfined_usertype initrc_doma
 allow { sysadm_usertype staff_usertype unconfined_usertype initrc_domain qubes_qfile_unpacker_t } qubes_qfile_unpacker_exec_t:file mmap_exec_file_perms;
 allow { sysadm_usertype staff_usertype unconfined_usertype initrc_domain } qubes_qfile_unpacker_t:process transition;
 allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertype initrc_domain privfd }:fd use;
+
 # ioctl isn't strictly needed, but it is harmless and could be helpful later
 allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertype initrc_domain privfd }:unix_stream_socket { read write ioctl };
 allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertype initrc_domain }:fifo_file rw_inherited_fifo_file_perms;
-allow qubes_qfile_unpacker_t { user_home_dir_t user_home_t admin_home_t }:dir { add_name search write };
-allow qubes_qfile_unpacker_t { user_home_t admin_home_t }:dir { create getattr mounton open read setattr };
-type_transition qubes_qfile_unpacker_t user_home_dir_t:dir user_home_t "QubesIncoming";
-allow qubes_qfile_unpacker_t { user_home_t admin_home_t }:file { append create getattr link open setattr write };
+
+# to create ~/QubesIncoming
+allow qubes_qfile_unpacker_t { user_home_dir_t admin_home_t }:dir { add_name search write };
+allow qubes_qfile_unpacker_t qubes_unpacked_file_t:dir { add_name search write create getattr mounton open read setattr };
+type_transition qubes_qfile_unpacker_t { user_home_dir_t admin_home_t }:dir qubes_unpacked_file_t "QubesIncoming";
+allow qubes_qfile_unpacker_t qubes_unpacked_file_t:file { append create getattr link open setattr write };
 dontaudit qubes_qfile_unpacker_t { user_home_t admin_home_t }:file read;
-allow qubes_qfile_unpacker_t { user_home_t admin_home_t }:lnk_file { create getattr setattr };
+allow qubes_qfile_unpacker_t qubes_unpacked_file_t:lnk_file { create getattr setattr };
+
 allow qubes_qfile_unpacker_t self:capability { setgid setuid sys_admin sys_chroot };
 allow qubes_qfile_unpacker_t user_tmp_t:fifo_file write;
 allow qubes_qfile_unpacker_t fs_t:filesystem { unmount getattr };
 auth_use_nsswitch(qubes_qfile_unpacker_t)
+
 # FIXME!
 corecmd_exec_bin(qubes_qfile_unpacker_t)
 
