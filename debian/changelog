@@ -1,3 +1,15 @@
+qubes-core-agent (4.2.13-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Label Xen hotplug scripts correctly
+  * Run %selinux_relabel_pre in %pre
+  * Allow kernel threads to set arbitrary SELinux labels
+  * Revert "Remount /lib/modules in early boot"
+  * Allow forwarding traffic that did not originate from netback
+  * Jail qfile-unpacker in an SELinux sandbox
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 29 May 2023 19:21:27 +0200
+
 qubes-core-agent (4.2.12-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
