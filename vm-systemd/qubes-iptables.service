@@ -2,6 +2,7 @@
 Description=Qubes base firewall settings
 Requires=qubes-antispoof.service
 After=qubes-antispoof.service
+Before=network-pre.target
 
 [Service]
 Type=oneshot
@@ -9,4 +10,4 @@ RemainAfterExit=yes
 ExecStart=/usr/lib/qubes/init/qubes-iptables start
 
 [Install]
-WantedBy=basic.target
+RequiredBy=network-pre.target
