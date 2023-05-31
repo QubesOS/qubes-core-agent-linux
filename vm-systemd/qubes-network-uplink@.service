@@ -1,8 +1,6 @@
 [Unit]
 Description=Qubes network uplink (%i) setup
 After=network-pre.target qubes-iptables.service
-After=sys-subsystem-net-devices-%i.device
-BindsTo=sys-subsystem-net-devices-%i.device
 Before=network.target
 Wants=network.target
 
