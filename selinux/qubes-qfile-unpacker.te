@@ -37,7 +37,7 @@ allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertyp
 # to create ~/QubesIncoming
 allow qubes_qfile_unpacker_t { user_home_dir_t admin_home_t }:dir { add_name search write };
 allow qubes_qfile_unpacker_t qubes_unpacked_file_t:dir { add_name search write create getattr mounton open read setattr };
-type_transition qubes_qfile_unpacker_t { user_home_dir_t admin_home_t }:dir qubes_unpacked_file_t "QubesIncoming";
+type_transition { sysadm_usertype staff_usertype unconfined_usertype initrc_domain qubes_qfile_unpacker_t } { user_home_dir_t admin_home_t }:dir qubes_unpacked_file_t "QubesIncoming";
 allow qubes_qfile_unpacker_t qubes_unpacked_file_t:file { append create getattr link open setattr write };
 dontaudit qubes_qfile_unpacker_t { user_home_t admin_home_t }:file read;
 allow qubes_qfile_unpacker_t qubes_unpacked_file_t:lnk_file { create getattr setattr };
