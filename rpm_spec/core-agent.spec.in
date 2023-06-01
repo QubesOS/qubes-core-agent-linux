@@ -703,6 +703,7 @@ rm -f %{name}-%{version}
 %endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %config(noreplace) /etc/dconf/db/local.d/dpi
+%config(noreplace) /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-notifyd.xml
 /lib/udev/rules.d/50-qubes-mem-hotplug.rules
 /usr/lib/systemd/system/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
