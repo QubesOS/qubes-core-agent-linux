@@ -149,7 +149,7 @@ case "${1}" in
         fi
         systemctl reenable haveged || :
 
-        chgrp user /var/lib/qubes/dom0-updates
+        chgrp qubes /var/lib/qubes/dom0-updates
 
         debug "UPDATE..."
         # disable some Upstart services
@@ -186,8 +186,8 @@ case "${1}" in
             rm /etc/systemd/system/multi-user.target.wants/qubes-mount-home.service
         fi
 
-        if ! dpkg-statoverride --list /var/lib/qubes/dom0-updates >/dev/null 2>&1; then
-            dpkg-statoverride --update --add user user 775 /var/lib/qubes/dom0-updates
+        if ! dpkg-statoverride --list /var/lib/qubes/dom0-updates >/dev/null 2>&1 && { user=$(qubesdb-read /default-user) || user=user;} ; then
+            dpkg-statoverride --update --add -- "$user" qubes 775 /var/lib/qubes/dom0-updates
         fi
 
         glib-compile-schemas /usr/share/glib-2.0/schemas || true
