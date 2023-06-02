@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-notifyd" version="1.0">
+  <property name="compat" type="empty">
+    <property name="use-override-redirect-windows" type="bool" value="true"/>
+  </property>
+</channel>
+
