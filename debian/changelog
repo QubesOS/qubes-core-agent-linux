@@ -1,3 +1,20 @@
+qubes-core-agent (4.2.14-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Fix rapid network uplink disconnect and reconnect
+  * Ensure correct labeling of ~/QubesIncoming
+
+  [ Marek Marczykowski-Górecki ]
+  * (Re-)enable override-redirect windows in xfce4-notifyd
+
+  [ Demi Marie Obenour ]
+  * Stop modifying user home directories
+  * Obtain default user from QubesDB
+  * Remove an unused define
+  * Remove qvm_caja_bookmark.sh
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 02 Jun 2023 05:20:00 +0200
+
 qubes-core-agent (4.2.13-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
