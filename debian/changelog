@@ -1,3 +1,9 @@
+qubes-core-agent (4.1.42-1) unstable; urgency=medium
+
+  * (Re-)enable override-redirect windows in xfce4-notifyd
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 22 Jun 2023 05:29:52 +0200
+
 qubes-core-agent (4.1.41-1) unstable; urgency=medium
 
   [ Ludovic Bellier ]
