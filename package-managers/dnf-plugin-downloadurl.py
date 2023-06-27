@@ -136,15 +136,18 @@ class DownloadCommand(dnf.cli.Command):
             for pkg in pkgs:
                 # command line repo packages do not have .remote_location
                 if pkg.repoid != hawkey.CMDLINE_REPO_NAME:
+                    mirrors = []
                     if self.opts.all_mirrors:
                         schemas = self.opts.urlprotocols
                         # pylint: disable=protected-access
-                        for mirror in pkg.repo._repo.getMirrors():
+                        mirrors = pkg.repo._repo.getMirrors()
+                        for mirror in mirrors:
                             if schemas:
                                 if urllib.parse.urlparse(mirror)[0] not in schemas:
                                     continue
                             print(os.path.join(mirror, pkg.location.lstrip('/')))
-                    else:
+                    # either not self.opts.all_mirrors, or no metalink was set
+                    if not mirrors:
                         url = pkg.remote_location(schemes=self.opts.urlprotocols)
                         if url:
                             print(url)
