@@ -178,19 +178,29 @@ initialize_home() {
     home_root="$1"
     mode="$2"
 
-    if [ -z "$home_root" ] ; then
+    case $home_root in
+    (/*)
+        ;;
+    ('')
         echo "initialize_home() needs a target home root directory, such as /rw/home, as first parameter" >&2
         return 64
-    fi
+        ;;
+    (*)
+        echo 'initialize_home target root home directory must be an absolute path' >&2
+        return 64
+        ;;
+    esac
 
     if [ "$mode" != "unconditionally" ] && [ "$mode" != "ifneeded" ] ; then
         echo "initialize_home() second parameter must be 'unconditionally' or 'ifneeded'" >&2
         return 64
     fi
 
+    if test -d /sys/fs/selinux; then enable_selinux="Z"; else enable_selinux=''; fi
+
     if ! [ -d "$home_root" ] ; then
         echo "initialize_home: populating $home_root" >&2
-        mkdir -p "$home_root"
+        mkdir "-${enable_selinux}m0755" -- "$home_root" || return 73
     fi
 
     # Chown home if users' UIDs have changed - can be the case on template switch.
@@ -202,7 +212,6 @@ initialize_home() {
         homedirwithouthome=${homedir#/home/}
         if ! test -d "$home_root/$homedirwithouthome" || [ "$mode" = "unconditionally" ] ; then
             echo "initialize_home: populating $mode $home_root/$homedirwithouthome from /etc/skel" >&2
-            if test -d /sys/fs/selinux; then enable_selinux="Z"; else enable_selinux=''; fi
             if [ "$mode" = unconditionally ]; then
                 mkdir "-p${enable_selinux}" -- "$home_root/$homedirwithouthome" || return 73
             else

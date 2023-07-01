@@ -13,11 +13,17 @@ if mountpoint -q /rw ; then
         echo "Private device size management: resize2fs $dev failed:" >&2
         echo "$content" >&2
     fi
+    if [ -d /sys/fs/selinux ]; then
+        enable_selinux=-Z
+        chcon -t system_u:object_r:root_t:s0 /rw
+    else
+        enable_selinux=
+    fi
 
     if ! [ -d /rw/config ] ; then
         echo "Virgin boot of the VM: populating /rw/config" >&2
 
-        mkdir -p /rw/config
+        mkdir /rw/config || exit
         touch /rw/config/rc.local
         cat > /rw/config/rc.local <<EOF
 #!/bin/sh
@@ -55,15 +61,19 @@ EOF
 # file is used only if the VM has any PCI device assigned. Modules will be
 # automatically re-loaded after resume.
 EOF
+        if [ -n "$enable_selinux" ] && [ -d /rw/usrlocal ]; then
+            restorecon -RF /rw/config
+        fi
     fi
 
     if ! [ -d /rw/usrlocal ] ; then
+        if [ -n "$enable_selinux" ]; then restorecon -RF /rw; touch /rw/.autorelabel; fi
         if [ -d /usr/local.orig ] ; then
             echo "Virgin boot of the VM: populating /rw/usrlocal from /usr/local.orig" >&2
-            cp -af /usr/local.orig /rw/usrlocal
+            cp ${enable_selinux:+-Z} -af -- /usr/local.orig /rw/usrlocal
         else
             echo "Virgin boot of the VM: creating /rw/usrlocal" >&2
-            mkdir -p /rw/usrlocal
+            mkdir ${enable_selinux:+-Z} -- /rw/usrlocal
         fi
     fi
 

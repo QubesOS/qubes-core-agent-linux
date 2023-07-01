@@ -4,10 +4,11 @@
 # shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
 
+if test -d /sys/fs/selinux; then enable_selinux=Z; else enable_selinux=''; fi
 NM_CONFIG_DIR=/etc/NetworkManager/system-connections
 if [ -d $NM_CONFIG_DIR ] && [ ! -h $NM_CONFIG_DIR ]; then
-    mkdir -p /rw/config/NM-system-connections
-    mv $NM_CONFIG_DIR/* /rw/config/NM-system-connections/ 2> /dev/null || true
+    mkdir "-p$enable_selinux" /rw/config/NM-system-connections
+    mv ${enable_selinux:+-Z} $NM_CONFIG_DIR/* /rw/config/NM-system-connections/ 2> /dev/null || true
     rmdir $NM_CONFIG_DIR
     ln -s /rw/config/NM-system-connections $NM_CONFIG_DIR
 fi
