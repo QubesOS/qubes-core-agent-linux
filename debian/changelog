@@ -1,3 +1,9 @@
+qubes-core-agent (4.2.15-1) unstable; urgency=medium
+
+  * qvm-template: fix handling repos with just baseurl set
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 02 Jul 2023 03:45:14 +0200
+
 qubes-core-agent (4.2.14-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
