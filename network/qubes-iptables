@@ -18,7 +18,7 @@
 # Description: Loads Qubes base iptables firewall
 ### END INIT INFO
 
-IPTABLES=iptables
+IPTABLES=nft
 IPTABLES_DATA_DIR=/etc/qubes
 
 if [ ! -x "/sbin/$IPTABLES" ]; then
@@ -60,7 +60,7 @@ case "$1" in
 	RETVAL=$?
 	;;
     *)
-	echo $"Usage: ${IPTABLES} start"
+	echo $"Usage: iptables start"
 	RETVAL=2
 	;;
 esac

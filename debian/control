@@ -136,15 +136,13 @@ Architecture: any
 Depends:
     qubes-core-agent (= ${binary:Version}),
     tinyproxy,
-    iptables,
+    nftables,
     conntrack,
     socat,
     tinyproxy,
     iproute2,
     ${python3:Depends},
     ${misc:Depends}
-Suggests:
-    nftables,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Networking support for Qubes VM
