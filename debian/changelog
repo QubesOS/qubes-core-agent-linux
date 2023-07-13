@@ -1,3 +1,18 @@
+qubes-core-agent (4.2.16-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Use network-pre.target to order firewall before network uplink
+  * Fix a few bugs in vm-file-editor
+  * Run SELinux relabling in all Fedora VMs
+
+  [ Marek Marczykowski-Górecki ]
+  * Hide ibus icon by default
+
+  [ Demi Marie Obenour ]
+  * Drop requirement on iptables
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 13 Jul 2023 15:49:41 +0200
+
 qubes-core-agent (4.2.15-1) unstable; urgency=medium
 
   * qvm-template: fix handling repos with just baseurl set
