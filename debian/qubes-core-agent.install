@@ -160,6 +160,7 @@ usr/share/kde4/services/*.desktop
 usr/share/keyrings/qubes-archive-keyring.gpg
 usr/share/keyrings/qubes-archive-keyring-4.2.gpg
 usr/share/keyrings/qubes-ubuntu-archive-keyring.gpg
+usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg
 usr/share/kservices5/ServiceMenus/*.desktop
 usr/share/applications/*.desktop
 usr/share/man/man1/qvm-*

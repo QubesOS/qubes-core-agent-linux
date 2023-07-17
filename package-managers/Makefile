@@ -64,7 +64,9 @@ endif
 		$(DESTDIR)/usr/share/keyrings/qubes-archive-keyring-4.2.gpg
 	ln -s qubes-archive-keyring-4.2.gpg \
 		$(DESTDIR)/usr/share/keyrings/qubes-archive-keyring.gpg
-	install -D -m 0644 apt-qubes-ubuntu-archive-keyring.gpg \
+	install -D -m 0644 apt-qubes-ubuntu-archive-keyring-4.2.gpg \
+		$(DESTDIR)/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg
+	ln -s qubes-ubuntu-archive-keyring-4.2.gpg \
 		$(DESTDIR)/usr/share/keyrings/qubes-ubuntu-archive-keyring.gpg
 	install -D -m 0644 apt-conf-00notify-hook \
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/00notify-hook
