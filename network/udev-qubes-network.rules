@@ -1,8 +1,8 @@
 # new udev has DRIVERS
-SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", DRIVERS=="vif", RUN+="/usr/bin/systemctl restart --job-mode=replace qubes-network-uplink@%k.service", GOTO="QUBES-NET-END"
+SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", DRIVERS=="vif", RUN+="/usr/bin/systemctl start --job-mode=replace qubes-network-uplink@%k.service", GOTO="QUBES-NET-END"
 SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="remove", DRIVERS=="vif", RUN+="/usr/bin/systemctl stop --job-mode=replace qubes-network-uplink@%k.service", GOTO="QUBES-NET-END"
 # old udev has ENV{NET_ID_DRIVER}
-SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", ENV{NET_ID_DRIVER}=="vif", RUN+="/usr/bin/systemctl restart --job-mode=replace qubes-network-uplink@%k.service", GOTO="QUBES-NET-END"
+SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="add", ENV{NET_ID_DRIVER}=="vif", RUN+="/usr/bin/systemctl start --job-mode=replace qubes-network-uplink@%k.service", GOTO="QUBES-NET-END"
 SUBSYSTEMS=="xen", KERNEL=="eth*", ACTION=="remove", ENV{NET_ID_DRIVER}=="vif", RUN+="/usr/bin/systemctl stop --job-mode=replace qubes-network-uplink@%k.service", GOTO="QUBES-NET-END"
 
 LABEL="QUBES-NET-END"
