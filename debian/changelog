@@ -1,3 +1,17 @@
+qubes-core-agent (4.2.17-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: put keyring archive into version-specific file
+  * ubuntu: put keyring archive into version-specific file
+
+  [ Demi Marie Obenour ]
+  * Do not fail if address already exists
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix qubes-antispoof.service
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 21 Jul 2023 05:19:30 +0200
+
 qubes-core-agent (4.2.16-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
