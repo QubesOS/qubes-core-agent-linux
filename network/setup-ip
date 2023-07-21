@@ -27,13 +27,13 @@ configure_network () {
     local secondary_dns="${10}"
     local custom="${11}"
 
-    /sbin/ip -- address add "$ip/$netmask" dev "$INTERFACE"
+    /sbin/ip -- address replace "$ip/$netmask" dev "$INTERFACE"
     if [[ "$custom" = false ]]; then
         /sbin/ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
             lladdr "$netvm_mac" nud permanent
     fi
     if [ -n "$ip6" ]; then
-        /sbin/ip -- address add "$ip6/$netmask6" dev "$INTERFACE"
+        /sbin/ip -- address replace "$ip6/$netmask6" dev "$INTERFACE"
         if [[ "$custom" = false ]]; then
             /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
                 lladdr "$netvm_mac" nud permanent
