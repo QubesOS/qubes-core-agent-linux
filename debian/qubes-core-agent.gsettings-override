@@ -3,3 +3,4 @@ theme='slider'
 
 [org.freedesktop.ibus.panel]
 show-icon-on-systray=false
+version='1.5.27'
