@@ -1,3 +1,10 @@
+qubes-core-agent (4.1.43-1) unstable; urgency=medium
+
+  * Include R4.2 key for Debian packages
+  * Include R4.2 key for Fedora and CentOS packages
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 24 Jul 2023 04:06:27 +0200
+
 qubes-core-agent (4.1.42-1) unstable; urgency=medium
 
   * (Re-)enable override-redirect windows in xfce4-notifyd
