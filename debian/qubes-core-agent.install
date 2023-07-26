@@ -103,6 +103,12 @@ lib/systemd/system/tor@default.service.d/30_qubes.conf
 lib/systemd/system/sysinit.target.requires
 lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 lib/systemd/system/systemd-logind.service.d/30_qubes.conf
+usr/lib/systemd/user/tracker-extract-3.service.d/30_qubes.conf
+usr/lib/systemd/user/tracker-miner-fs-3.service.d/30_qubes.conf
+usr/lib/systemd/user/tracker-miner-fs-control-3.service.d/30_qubes.conf
+usr/lib/systemd/user/tracker-miner-rss-3.service.d/30_qubes.conf
+usr/lib/systemd/user/tracker-writeback-3.service.d/30_qubes.conf
+usr/lib/systemd/user/tracker-xdg-portal-3.service.d/30_qubes.conf
 lib/udev/rules.d/50-qubes-mem-hotplug.rules
 usr/bin/qubes-desktop-run
 usr/bin/qubes-open

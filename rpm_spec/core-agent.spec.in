@@ -1178,6 +1178,12 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/tor@default.service.d/30_qubes.conf
 %_unitdir/tmp.mount.d/30_qubes.conf
 %_unitdir/sysinit.target.requires/systemd-random-seed.service
+%_userunitdir/tracker-extract-3.service.d/30_qubes.conf
+%_userunitdir/tracker-miner-fs-3.service.d/30_qubes.conf
+%_userunitdir/tracker-miner-fs-control-3.service.d/30_qubes.conf
+%_userunitdir/tracker-miner-rss-3.service.d/30_qubes.conf
+%_userunitdir/tracker-writeback-3.service.d/30_qubes.conf
+%_userunitdir/tracker-xdg-portal-3.service.d/30_qubes.conf
 
 %post systemd
 

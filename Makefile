@@ -57,7 +57,13 @@ endif
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
 SYSTEM_DROPINS_NETWORKING += tinyproxy.service
 
-USER_DROPINS :=
+USER_DROPINS := \
+	tracker-xdg-portal-3.service \
+	tracker-writeback-3.service \
+	tracker-miner-rss-3.service \
+	tracker-miner-fs-control-3.service \
+	tracker-miner-fs-3.service \
+	tracker-extract-3.service
 
 # Ubuntu Dropins
 ifeq ($(release),Ubuntu)
