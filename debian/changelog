@@ -1,3 +1,9 @@
+qubes-core-agent (4.1.44-1) unstable; urgency=medium
+
+  * dom0-update: fix rpmdb migration logic
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 26 Jul 2023 18:24:33 +0200
+
 qubes-core-agent (4.1.43-1) unstable; urgency=medium
 
   * Include R4.2 key for Debian packages
