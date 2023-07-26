@@ -1184,6 +1184,10 @@ The Qubes core startup configuration for SystemD init.
 %_userunitdir/tracker-miner-rss-3.service.d/30_qubes.conf
 %_userunitdir/tracker-writeback-3.service.d/30_qubes.conf
 %_userunitdir/tracker-xdg-portal-3.service.d/30_qubes.conf
+%_userunitdir/evolution-addressbook-factory.service.d/30_qubes.conf
+%_userunitdir/evolution-calendar-factory.service.d/30_qubes.conf
+%_userunitdir/evolution-source-registry.service.d/30_qubes.conf
+%_userunitdir/evolution-user-prompter.service.d/30_qubes.conf
 
 %post systemd
 

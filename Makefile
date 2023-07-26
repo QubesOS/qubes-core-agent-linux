@@ -63,7 +63,11 @@ USER_DROPINS := \
 	tracker-miner-rss-3.service \
 	tracker-miner-fs-control-3.service \
 	tracker-miner-fs-3.service \
-	tracker-extract-3.service
+	tracker-extract-3.service \
+	evolution-addressbook-factory.service \
+	evolution-calendar-factory.service \
+	evolution-source-registry.service \
+	evolution-user-prompter.service
 
 # Ubuntu Dropins
 ifeq ($(release),Ubuntu)

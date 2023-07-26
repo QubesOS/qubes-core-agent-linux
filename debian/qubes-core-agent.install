@@ -109,6 +109,10 @@ usr/lib/systemd/user/tracker-miner-fs-control-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-miner-rss-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-writeback-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-xdg-portal-3.service.d/30_qubes.conf
+usr/lib/systemd/user/evolution-addressbook-factory.service.d/30_qubes.conf
+usr/lib/systemd/user/evolution-calendar-factory.service.d/30_qubes.conf
+usr/lib/systemd/user/evolution-source-registry.service.d/30_qubes.conf
+usr/lib/systemd/user/evolution-user-prompter.service.d/30_qubes.conf
 lib/udev/rules.d/50-qubes-mem-hotplug.rules
 usr/bin/qubes-desktop-run
 usr/bin/qubes-open
