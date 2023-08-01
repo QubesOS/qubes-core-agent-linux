@@ -1,0 +1,56 @@
+#!/bin/sh
+
+text_plain_app=$(xdg-mime query default text/plain)
+
+if [ -n "$text_plain_app" ] && 
+   [ -e "/usr/share/applications/$text_plain_app" ] &&
+   [ "$text_plain_app" != "libreoffice-writer.desktop" ]; then
+    # not set to libreoffice, nothing to do
+    exit 0
+fi
+
+text_plain_apps=$(
+    grep -rl '^MimeType=.*text/plain;' "/usr/share/applications" |
+    LC_ALL=C sort |
+    while read -r app; do
+        app_name=$(basename "$app")
+        if grep -q '^Terminal=[tT]' "$app"; then
+            continue
+        elif [ "$app_name" = "libreoffice-writer.desktop" ]; then
+            continue
+        fi
+        printf "%s" "$app_name;"
+    done
+)
+
+if [ -z "$text_plain_apps" ]; then
+    echo "No application handle text/plain, do not set default" >&2
+    exit 0
+fi
+
+mimeapps_file="/usr/share/applications/mimeapps.list"
+touch "$mimeapps_file"
+awk -v apps="$text_plain_apps" '
+/^\[/ {
+    if (indefault && !added) {
+        print "text/plain=" apps
+            added=1
+    }
+    indefault=0
+}
+/^\[Default Applications\]/ { indefault=1 }
+/^text\/plain=/ {
+    if (indefault) { print "text/plain=" apps; added=1 }
+    else { print }
+    next
+}
+/./ { print }
+END {
+    if (!added) {
+        if (!indefault) { print "[Default Applications]" }
+        print "text/plain=" apps
+    }
+}
+' < "$mimeapps_file" > "$mimeapps_file.new" && \
+    mv "$mimeapps_file.new" "$mimeapps_file"
+

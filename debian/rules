@@ -7,6 +7,7 @@ export PYTHON_PREFIX_ARG=--install-layout=deb
 
 include /usr/share/dpkg/default.mk
 export DESTDIR=$(shell pwd)/debian/tmp
+DISTRIBUTION := $(shell lsb_release -is)
 
 %:
 	dh $@ --with systemd,python3 --with=config-package
@@ -38,6 +39,9 @@ override_dh_systemd_start:
 	dh_systemd_start --no-restart-on-upgrade
 
 override_dh_install:
+	if [ "$(DISTRIBUTION)" = "Ubuntu" ]; then \
+		sed -i '/defaults.list/d' debian/qubes-core-agent.install; \
+	fi
 	dh_install --fail-missing
 
 override_dh_gencontrol:

@@ -202,6 +202,8 @@ case "${1}" in
             dconf update
         fi
 
+        /usr/lib/qubes/set-default-text-editor
+
         # tell dom0 about installed updates (applications, features etc)
         /etc/qubes-rpc/qubes.PostInstall || true
         ;;

@@ -102,6 +102,8 @@ update_qubesconfig() {
 
     dconf update &> /dev/null || :
 
+    /usr/lib/qubes/set-default-text-editor
+
     # Location of files which contains list of protected files
     mkdir -p /etc/qubes/protected-files.d
     # shellcheck source=init/functions

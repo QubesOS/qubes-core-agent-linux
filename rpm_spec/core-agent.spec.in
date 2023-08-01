@@ -522,6 +522,8 @@ dconf update &> /dev/null || :
 # And actually setup the proxy usage in package managers
 /usr/lib/qubes/update-proxy-configs
 
+/usr/lib/qubes/set-default-text-editor
+
 # Location of files which contains list of protected files
 mkdir -p /etc/qubes/protected-files.d
 . /usr/lib/qubes/init/functions
@@ -918,6 +920,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/upgrades-status-notify
 /usr/lib/qubes/qubes-sync-clock
 /usr/lib/qubes/resize-rootfs
+/usr/lib/qubes/set-default-text-editor
 /usr/lib/qubes/tinyproxy-wrapper
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
 %dir /usr/lib/qubes/init
@@ -938,6 +941,7 @@ rm -f %{name}-%{version}
 /usr/share/applications/qubes-run-terminal.desktop
 /usr/share/applications/qubes-open-file-manager.desktop
 /usr/share/applications/qvm-open-in-dvm.desktop
+/usr/share/applications/defaults.list
 /usr/share/qubes/serial.conf
 /usr/share/qubes/marker-vm
 /usr/share/glib-2.0/schemas/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override

@@ -7,6 +7,8 @@ UDEVRULESDIR := $(SYSLIBDIR)/udev/rules.d
 QUBESDATADIR := $(DATADIR)/qubes
 QUBESMIMEDIR := $(QUBESDATADIR)/xdg-override
 
+release := $(shell lsb_release -is)
+
 .PHONY: all clean install
 
 all: marker-vm
@@ -39,10 +41,14 @@ install:
 	done < data-dirs
 	$(RM) mime/icons
 	umask 022 && cp -r applications mime '$(DESTDIR)$(QUBESMIMEDIR)'
+	if [ "$(release)" != "Ubuntu" ]; then \
+		ln -s mimeapps.list $(DESTDIR)/usr/share/applications/defaults.list; \
+	fi
 	install -m 0755 -d $(DESTDIR)$(BINDIR)
 	install -m 0755 -t $(DESTDIR)$(BINDIR) qvm-features-request
 	install -m 0755 -d $(DESTDIR)$(QUBESLIBDIR)
 	install -m 0755 -t $(DESTDIR)$(QUBESLIBDIR) qvm-service-wrapper
+	install -m 0755 -t $(DESTDIR)$(QUBESLIBDIR) set-default-text-editor
 	install -m 0755 -d $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
 	install -m 0644 -t $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml xfce4-notifyd.xml
 
