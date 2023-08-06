@@ -202,8 +202,15 @@ initialize_home() {
         homedirwithouthome=${homedir#/home/}
         if ! test -d "$home_root/$homedirwithouthome" || [ "$mode" = "unconditionally" ] ; then
             echo "initialize_home: populating $mode $home_root/$homedirwithouthome from /etc/skel" >&2
-            mkdir -p "$home_root/$homedirwithouthome"
             if test -d /sys/fs/selinux; then enable_selinux="Z"; else enable_selinux=''; fi
+            if [ "$mode" = unconditionally ]; then
+                mkdir "-p${enable_selinux}" -- "$home_root/$homedirwithouthome" || return 73
+            else
+                case $homedirwithouthome in
+                (*/*) mkdir "-p${enable_selinux}" -- "$home_root/${homedirwithouthome%/*}";;
+                esac
+                mkdir "${enable_selinux+-Z}" -- "$home_root/$homedirwithouthome" || return 73
+            fi
             cp "-af$enable_selinux" -T /etc/skel "$home_root/$homedirwithouthome"
             echo "initialize_home: adjusting permissions $mode on $home_root/$homedirwithouthome" >&2
             chown -R "$uid" "$home_root/$homedirwithouthome" &
