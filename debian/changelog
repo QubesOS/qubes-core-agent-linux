@@ -1,3 +1,14 @@
+qubes-core-agent (4.2.19-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Disable Tracker (GNOME desktop search) by default
+  * Disable evolution-data-server by default
+  * Avoid reinitializing /home if a transient I/O error happens
+  * Set correct SELinux contexts on /rw
+  * Clean up network/network-manager-prepare-conf-dir
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 07 Aug 2023 22:41:20 +0200
+
 qubes-core-agent (4.2.18-1) unstable; urgency=medium
 
   * dom0-update: fix rpmdb migration logic
