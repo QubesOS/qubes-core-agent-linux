@@ -26,8 +26,7 @@ repodir=$(mktemp -d)
 trap 'rm -r "$repodir"' EXIT
 cat > "$repodir/template.repo"
 
-OPTS+=("--setopt=reposdir=${repodir}")
-OPTS+=("--quiet")
+OPTS+=(-y "--setopt=reposdir=${repodir}" --quiet)
 
 # use vendored 'downloadurl' dnf-plugin (fork of 'download' plugin), to print
 # all mirrors
