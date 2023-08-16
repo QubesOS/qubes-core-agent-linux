@@ -26,8 +26,7 @@ repodir=$(mktemp -d)
 trap 'rm -r "$repodir"' EXIT
 cat > "$repodir/template.repo"
 
-OPTS+=("--setopt=reposdir=${repodir}")
-OPTS+=("--quiet")
+OPTS+=(-y "--setopt=reposdir=${repodir}" --quiet)
 
 if [ -d '/usr/lib/qubes/dnf-plugins' ]; then
     # use vendored 'download' dnf-plugin when available, to not require

@@ -238,6 +238,7 @@ Requires:   qubes-core-agent = %{version}
 Requires:   fakeroot
 Conflicts:  qubes-core-vm < 4.0.0
 Requires:   tar
+Requires:   qubes-repo-templates
 
 %description dom0-updates
 Scripts required to handle dom0 updates.
