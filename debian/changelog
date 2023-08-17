@@ -1,3 +1,11 @@
+qubes-core-agent (4.2.20-1) unstable; urgency=medium
+
+  * Increase default grant table reclaim speed
+  * Update R4.2 release signing key
+  * Do not disable tracker and evolution-data-server in AppVMs
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 17 Aug 2023 18:09:02 +0200
+
 qubes-core-agent (4.2.19-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
