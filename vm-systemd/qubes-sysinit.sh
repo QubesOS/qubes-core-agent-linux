@@ -22,6 +22,10 @@ chmod 0775 /var/run/qubes
 mkdir -p /var/run/qubes-service
 mkdir -p /var/run/xen-hotplug
 
+if [ -e /sys/module/grant_table/parameters/free_per_iteration ]; then
+    echo 1000 > /sys/module/grant_table/parameters/free_per_iteration
+fi
+
 # Set default services depending on VM type
 is_appvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_APPVM && touch /var/run/qubes/this-is-appvm
 is_netvm && DEFAULT_ENABLED=$DEFAULT_ENABLED_NETVM && touch /var/run/qubes/this-is-netvm
