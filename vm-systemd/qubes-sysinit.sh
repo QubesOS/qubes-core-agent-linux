@@ -23,6 +23,10 @@ mkdir "-p$selinux_flag" /run/qubes /run/qubes-service /run/xen-hotplug /run/xen
 chgrp qubes /run/qubes
 chmod 0775 /run/qubes
 
+if [ -e /sys/module/grant_table/parameters/free_per_iteration ]; then
+    echo 1000 > /sys/module/grant_table/parameters/free_per_iteration
+fi
+
 # Set default services depending on VM type
 vm_type=$(qubes_vm_type)
 case $vm_type in
