@@ -210,7 +210,7 @@ fi
 
 if [ "$ACTION" == "add" ]; then
     MAC="$(get_mac_from_iface "$INTERFACE")"
-    prefix="/net-config/$MAC"
+    prefix="/net-config/$MAC/"
     if [[ -n "$MAC" ]]; then
         # prefix begins with / so -- is not needed
         if /usr/bin/qubesdb-read "${prefix}custom" >/dev/null 2>&1; then
