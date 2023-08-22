@@ -103,6 +103,7 @@ lib/systemd/system/tor@default.service.d/30_qubes.conf
 lib/systemd/system/sysinit.target.requires
 lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 lib/systemd/system/systemd-logind.service.d/30_qubes.conf
+lib/systemd/resolved.conf.d/30_resolved-no-mdns-or-llmnr.conf
 usr/lib/systemd/user/tracker-extract-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-miner-fs-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-miner-fs-control-3.service.d/30_qubes.conf
