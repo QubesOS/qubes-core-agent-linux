@@ -1,3 +1,16 @@
+qubes-core-agent (4.1.45-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * qubes.WaitForSession: no need to specify machine
+
+  [ Marek Marczykowski-Górecki ]
+  * debian: fix postinst script in chroot
+  * Hide ibus icon by default
+  * Increase default grant table reclaim speed
+  * Update R4.2 release signing key
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 24 Aug 2023 03:41:44 +0200
+
 qubes-core-agent (4.1.44-1) unstable; urgency=medium
 
   * dom0-update: fix rpmdb migration logic
