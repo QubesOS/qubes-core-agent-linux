@@ -125,6 +125,7 @@ Depends:
     dnf | yum-utils,
     curl,
     qubes-core-qrexec,
+    qubes-repo-templates,
 Replaces: qubes-core-agent (<< 4.1.28-1)
 Breaks: qubes-core-agent (<< 4.1.28-1)
 Description: Scripts required to handle dom0 updates.
