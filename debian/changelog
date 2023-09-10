@@ -1,3 +1,19 @@
+qubes-core-agent (4.2.21-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Disable multicast DNS and link-local multicast name resolution
+
+  [ Jonne Mickelin Sätherblom ]
+  * Fix missing path separator for /net-config qubesdb prefix
+
+  [ Andrew David Wong ]
+  * Remove outdated comment
+
+  [ Demi Marie Obenour ]
+  * Fix qubes.TemplateSearch with repo_gpgcheck=1
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 10 Sep 2023 13:21:11 +0200
+
 qubes-core-agent (4.2.20-1) unstable; urgency=medium
 
   * Increase default grant table reclaim speed
