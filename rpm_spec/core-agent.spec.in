@@ -783,6 +783,7 @@ rm -f %{name}-%{version}
 %{python3_sitelib}/qubesagent/test_vmexec.py*
 %{python3_sitelib}/qubesagent/xdg.py*
 %{python3_sitelib}/qubesagent/test_xdg.py*
+%{python3_sitelib}/qubesagent/test_tools.py*
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc

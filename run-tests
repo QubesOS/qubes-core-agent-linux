@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 : "${PYTHON:=python3}"
 : "${ROOTDIR:=.}"
@@ -6,6 +6,13 @@
 
 PYTHONPATH="${TESTPYTHONPATH}:${PYTHONPATH}"
 export PYTHONPATH
+
+make=( make -C "${ROOTDIR}"/qubes-rpc all )
+if ! "${make[@]}" --question; then
+    deps=( qubes-utils-libs qubes-utils-devel )
+    rpm --query --quiet "${deps[@]}" || sudo dnf -y install "${deps[@]}"
+    "${make[@]}"
+fi
 
 [ -r version ] || ln -s ${ROOTDIR}/version ./
 [ -r setup.py ] || ln -s ${ROOTDIR}/setup.py ./
