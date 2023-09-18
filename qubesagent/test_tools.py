@@ -46,7 +46,6 @@ class TestFilecopy(unittest.TestCase):
         self._local_filecopy(fn_abs)
         self.assertTrue(os.path.exists(fn_dst))
 
-    @unittest.expectedFailure
     def test_10_shadowed_by_mount(self):
         fn_rel = 'file'
         fn_abs = os.path.join(self.source, fn_rel)
