@@ -9,6 +9,10 @@ checks:tests:
   before_script:
     - sudo dnf install -y python3-pip python3-gobject-base ShellCheck
     - pip3 install --quiet -r ci/requirements.txt
+    - git clone https://github.com/QubesOS/qubes-linux-utils ~/qubes-linux-utils
+    - make -C ~/qubes-linux-utils/qrexec-lib all
+    - sudo make -C ~/qubes-linux-utils/qrexec-lib install
+        LIBDIR=/usr/lib64 INCLUDEDIR=/usr/include
   script:
     - ./run-tests
     - shellcheck -e SC1117 $(grep -l '^#!/bin/\(ba\)\?sh' $(git ls-files))
