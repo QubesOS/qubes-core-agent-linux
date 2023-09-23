@@ -905,6 +905,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
+%attr(4755,root,root) %_bindir/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
 /usr/lib/qubes/qrun-in-vm
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
