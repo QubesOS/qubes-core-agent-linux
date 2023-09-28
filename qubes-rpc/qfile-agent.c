@@ -30,7 +30,7 @@ void do_notify_progress(long long total, int flag)
     if (!strcmp(progress_type_env, "console") && du_size_env) {
         char msg[256];
         snprintf(msg, sizeof(msg), "sent %lld/%lld KB\r",
-             total / 1024, strtoull(du_size_env, NULL, 10));
+             (total + 1023) / 1024, strtoull(du_size_env, NULL, 10));
         ignore = write(2, msg, strlen(msg));
         if (flag == PROGRESS_FLAG_DONE)
             ignore = write(2, "\n", 1);
