@@ -75,7 +75,15 @@ else
 fi
 
 if [ "$PROGRESS_TYPE" = console ] ; then
-    FILECOPY_TOTAL_SIZE=$(du --apparent-size -c -- "$@" 2> /dev/null | tail -1 | cut -f 1)
+    FILECOPY_TOTAL_SIZE=$(
+        # shellcheck disable=SC2185
+        printf '%s\0' "$@" |
+        find -files0-from - -type f -print0 2>/dev/null |
+        du  --files0-from - -c --apparent-size -k |
+        tail -n 1 |
+        cut -f 1 |
+        grep -xE '[0-9]+'
+    ) || FILECOPY_TOTAL_SIZE=0
     export FILECOPY_TOTAL_SIZE
 fi
 
