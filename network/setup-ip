@@ -167,7 +167,7 @@ __EOF__
     # reload connection
     nmcli connection load "$nm_config" || :
     if [[ "$custom" = false ]]; then
-        /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
+        /sbin/ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
             lladdr "$netvm_mac" nud permanent
     fi
     if [ -n "$gateway6" ]; then
