@@ -27,6 +27,7 @@ table ip6 qubes {
 
    chain forward {
       type filter hook forward priority filter; policy accept;
+      jump custom-forward
       ct state invalid counter drop
       ct state related,established accept
       oifgroup 2 counter drop
