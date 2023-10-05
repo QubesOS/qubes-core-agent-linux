@@ -55,7 +55,15 @@ progress_zenity() {
 }
 
 
-SIZE=$(du -bcs -- "$@" 2>/dev/null | tail -n 1 | cut -f 1)
+SIZE=$(
+    # shellcheck disable=SC2185
+    printf '%s\0' "$@" |
+    find -files0-from - -type f -print0 2>/dev/null |
+    du  --files0-from - -c --apparent-size -b |
+    tail -n 1 |
+    cut -f 1 |
+    grep -xE '[0-9]+'
+) || SIZE=0
 
 if [[ ${0##*/} == qvm-move-to-vm.* ]]; then
     DESCRIPTION="Moving files..."
