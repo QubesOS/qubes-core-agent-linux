@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
+#include <libgen.h>
 #include <sys/stat.h>
 #include <signal.h>
 #include <fcntl.h>
@@ -63,58 +64,51 @@ void notify_progress(int size, int flag)
     }
 }
 
-
-char *get_abs_path(const char *cwd, const char *pathname)
-{
-    char *ret;
-    if (pathname[0] == '/')
-        return strdup(pathname);
-    if (asprintf(&ret, "%s/%s", cwd, pathname) < 0)
-        return NULL;
-    else
-        return ret;
-}
-
 int main(int argc, char **argv)
 {
     int i;
-    char *entry;
-    char *cwd;
-    char *sep;
     int ignore_symlinks = 0;
+    int invocation_cwd_fd;
+    char *arg_dirname_in;
+    char *arg_dirname;
+    char *arg_basename_in;
+    char *arg_basename;
 
     qfile_pack_init();
     register_error_handler(qfile_gui_fatal);
     register_notify_progress(&notify_progress);
     notify_progress(0, PROGRESS_FLAG_INIT);
-    cwd = getcwd(NULL, 0);
+    invocation_cwd_fd = open(".", O_PATH | O_DIRECTORY);
+    if (invocation_cwd_fd < 0)
+        gui_fatal("open \".\"");
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--ignore-symlinks")==0) {
             ignore_symlinks = 1;
             continue;
         }
+        if (!*argv[i])
+            gui_fatal("Invalid empty argument %i", i);
 
-        entry = get_abs_path(cwd, argv[i]);
+        arg_dirname_in = strdup(argv[i]);
+        if (!arg_dirname_in)
+            gui_fatal("strdup for dirname of %s", argv[i]);
+        arg_dirname = dirname(arg_dirname_in);
 
-        do {
-            sep = rindex(entry, '/');
-            if (!sep)
-                gui_fatal
-                    ("Internal error: nonabsolute filenames not allowed");
-            *sep = 0;
-        } while (sep[1] == 0);
-        if (entry[0] == 0) {
-            if (chdir("/") < 0) {
-                gui_fatal("Internal error: chdir(\"/\") failed?!");
-            }
-        } else if (chdir(entry))
-            gui_fatal("chdir to %s", entry);
-        do_fs_walk(sep + 1, ignore_symlinks);
-        free(entry);
+        arg_basename_in = strdup(argv[i]);
+        if (!arg_basename_in)
+            gui_fatal("strdup for basename of %s", argv[i]);
+        arg_basename = basename(arg_basename_in);
+
+        if (fchdir(invocation_cwd_fd))
+            gui_fatal("fchdir to %i", invocation_cwd_fd);
+        if (chdir(arg_dirname))
+            gui_fatal("chdir to %s", arg_dirname);
+        do_fs_walk(arg_basename, ignore_symlinks);
+
+        free(arg_dirname_in);
+        free(arg_basename_in);
     }
     notify_end_and_wait_for_result();
     notify_progress(0, PROGRESS_FLAG_DONE);
     return 0;
 }
-
-
