@@ -23,7 +23,7 @@ from __future__ import annotations
 import dbus
 import qubesdb
 from typing import List
-from ipaddress import IPv4Address
+from ipaddress import ip_address, IPv4Address, IPv6Address
 import os
 
 def get_dns_resolv_conf():
@@ -38,7 +38,7 @@ def get_dns_resolv_conf():
             if len(tokens) < 2 or tokens[0] != "nameserver":
                 continue
             try:
-                nameservers.append(IPv4Address(tokens[1]))
+                nameservers.append(ip_address(tokens[1]))
             except ValueError:
                 pass
     return nameservers
@@ -69,9 +69,7 @@ def get_dns_resolved():
         raise
     # Use global entries first
     dns.sort(key=lambda x: x[0] != 0)
-    # Only keep IPv4 entries. systemd-resolved is trusted to return valid
-    # addresses.
-    return [IPv4Address(bytes(addr)) for _g, family, addr in dns if family == 2]
+    return [IPv4Address(bytes(addr)) for _g, addr in dns]
 
 def install_firewall_rules(dns):
     qdb = qubesdb.QubesDB()
@@ -81,7 +79,7 @@ def install_firewall_rules(dns):
         if ns_maybe is None:
             continue
         try:
-            qubesdb_dns.append(IPv4Address(ns_maybe.decode("ascii", "strict")))
+            qubesdb_dns.append(ip_address(ns_maybe.decode("ascii", "strict")))
         except (UnicodeDecodeError, ValueError):
             pass
     res = [
@@ -98,13 +96,37 @@ def install_firewall_rules(dns):
         'chain dnat-dns {',
         'type nat hook prerouting priority dstnat; policy accept;',
     ]
-    for vm_nameserver, dest in zip(qubesdb_dns, get_dns_resolved()):
+    for vm_nameserver, dest in zip([dns_ip for dns_ip in qubesdb_dns if type(dns_ip) is IPv4Address],
+                                   [dns_ip for dns_ip in dns if type(dns_ip) is IPv4Address]):
         dns_ = str(dest)
         res += [
             f"ip daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
             f"ip daddr {vm_nameserver} tcp dport 53 dnat to {dns_}",
         ]
     res += ["}\n}\n"]
+    if qdb.read('/qubes-ip6') is not None:
+        res += [
+            'add table ip6 qubes',
+            # Add the chain so that the subsequent delete will work. If the chain already
+            # exists this is a harmless no-op.
+            'add chain ip6 qubes dnat-dns',
+            # Delete the chain so that if the chain already exists, it will be removed.
+            # The removal of the old chain and addition of the new one happen as a single
+            # atomic operation, so there is no period where neither chain is present or
+            # where both are present.
+            'delete chain ip6 qubes dnat-dns',
+            'table ip6 qubes {',
+            'chain dnat-dns {',
+            'type nat hook prerouting priority dstnat; policy accept;',
+        ]
+        for vm_nameserver, dest in zip([dns_ip for dns_ip in qubesdb_dns if type(dns_ip) is IPv6Address],
+                                       [dns_ip for dns_ip in dns if type(dns_ip) is IPv6Address]):
+            dns_ = str(dest)
+            res += [
+                f"ip6 daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
+                f"ip6 daddr {vm_nameserver} tcp dport 53 dnat to {dns_}",
+            ]
+        res += ["}\n}\n"]
     os.execvp("nft", ("nft", "--", "\n".join(res)))
 
 if __name__ == '__main__':
