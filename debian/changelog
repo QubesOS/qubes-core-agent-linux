@@ -1,3 +1,28 @@
+qubes-core-agent (4.2.22-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix partial IPv6 setup
+  * Typo fix in setup-ip script
+
+  [ Rusty Bird ]
+  * tests: add test_tools.py to test the tools in qubes-rpc/
+  * qfile-agent: use a dirfd instead of getcwd()
+  * ci: clone qubes-linux-utils, build and install its qrexec-lib
+
+  [ Demi Marie Obenour ]
+  * Provide a alternate qfile-unpacker that is not SELinux-confined
+
+  [ Rusty Bird ]
+  * qfile-agent: $FILECOPY_TOTAL_SIZE, $SAVED_FD_1 are in base 10
+  * qfile-agent: fix progress rounding mismatch
+  * qvm-copy(-to-vm.gnome): fix size calculation for directories
+
+  [ 1cho1ce ]
+  * Add missing nft rule for ipv6 that is present for ipv4.
+  * Add missing nft rule for ipv6 that is present for ipv4
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 05 Oct 2023 05:28:34 +0200
+
 qubes-core-agent (4.2.21-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
