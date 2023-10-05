@@ -50,6 +50,9 @@ install:
 	# Install qfile-unpacker as SUID, because it will fail to receive
 	# files from other vm.
 	install -t $(DESTDIR)$(QUBESLIBDIR) -m 4755 qfile-unpacker
+	# This version isn't confined by SELinux, so it supports other
+	# home directories.
+	install -t $(DESTDIR)$(BINDIR) -m 4755 qfile-unpacker
 	install -d $(DESTDIR)$(QUBESRPCCMDDIR)
 	install -t $(DESTDIR)$(QUBESRPCCMDDIR) \
 		qubes.Filecopy qubes.OpenInVM qubes.VMShell \
