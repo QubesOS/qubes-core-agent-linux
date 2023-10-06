@@ -26,6 +26,10 @@ from typing import List
 from ipaddress import ip_address, IPv4Address, IPv6Address
 import os
 
+QUBES_IPV4_VIRT_NS1 = "10.139.1.1"
+QUBES_IPV4_VIRT_NS2 = "10.139.1.2"
+QUBES_IPV6_VIRT_NS1 = "fd09:24ef:4179::a8b:1"
+
 def get_dns_resolv_conf():
     nameservers = []
     try:
@@ -69,7 +73,7 @@ def get_dns_resolved():
         raise
     # Use global entries first
     dns.sort(key=lambda x: x[0] != 0)
-    return [IPv4Address(bytes(addr)) for _g, addr in dns]
+    return [ip_address(bytes(addr)) for _g, addr in dns]
 
 def install_firewall_rules(dns):
     qdb = qubesdb.QubesDB()
@@ -82,6 +86,8 @@ def install_firewall_rules(dns):
             qubesdb_dns.append(ip_address(ns_maybe.decode("ascii", "strict")))
         except (UnicodeDecodeError, ValueError):
             pass
+    dns_ipv4_found = False
+    dns_ipv6_found = False
     res = [
         'add table ip qubes',
         # Add the chain so that the subsequent delete will work. If the chain already
@@ -98,10 +104,18 @@ def install_firewall_rules(dns):
     ]
     for vm_nameserver, dest in zip([dns_ip for dns_ip in qubesdb_dns if type(dns_ip) is IPv4Address],
                                    [dns_ip for dns_ip in dns if type(dns_ip) is IPv4Address]):
+        dns_ipv4_found = True
         dns_ = str(dest)
         res += [
             f"ip daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
             f"ip daddr {vm_nameserver} tcp dport 53 dnat to {dns_}",
+        ]
+    if not dns_ipv4_found:
+        res += [
+            f"ip daddr {QUBES_IPV4_VIRT_NS1} tcp dport 53 reject with icmp type host-unreachable",
+            f"ip daddr {QUBES_IPV4_VIRT_NS1} udp dport 53 reject with icmp type host-unreachable",
+            f"ip daddr {QUBES_IPV4_VIRT_NS2} tcp dport 53 reject with icmp type host-unreachable",
+            f"ip daddr {QUBES_IPV4_VIRT_NS2} udp dport 53 reject with icmp type host-unreachable",
         ]
     res += ["}\n}\n"]
     if qdb.read('/qubes-ip6') is not None:
@@ -121,10 +135,16 @@ def install_firewall_rules(dns):
         ]
         for vm_nameserver, dest in zip([dns_ip for dns_ip in qubesdb_dns if type(dns_ip) is IPv6Address],
                                        [dns_ip for dns_ip in dns if type(dns_ip) is IPv6Address]):
+            dns_ipv6_found = True
             dns_ = str(dest)
             res += [
                 f"ip6 daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
                 f"ip6 daddr {vm_nameserver} tcp dport 53 dnat to {dns_}",
+            ]
+        if not dns_ipv6_found:
+            res += [
+                f"ip6 daddr {QUBES_IPV6_VIRT_NS1} tcp dport 53 reject with icmpv6 type addr-unreachable",
+                f"ip6 daddr {QUBES_IPV6_VIRT_NS1} udp dport 53 reject with icmpv6 type addr-unreachable",
             ]
         res += ["}\n}\n"]
     os.execvp("nft", ("nft", "--", "\n".join(res)))
