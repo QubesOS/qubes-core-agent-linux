@@ -117,6 +117,12 @@ def launch(filename_or_entry, *files, **kwargs):
                     print(e)
                     # fallback to non-dbus version
                     pass
+                except ValueError as e:
+                    if str(e).startswith('Invalid bus name'):
+                        # fallback to non-dbus version
+                        pass
+                    else:
+                        raise e
                 else:
                     if wait:
                         loop.run()
