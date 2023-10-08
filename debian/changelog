@@ -1,3 +1,9 @@
+qubes-core-agent (4.2.24-1) unstable; urgency=medium
+
+  * Increase grant table reclaim speed even more
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 08 Oct 2023 03:34:57 +0200
+
 qubes-core-agent (4.2.23-1) unstable; urgency=medium
 
   * Workaround broken desktop files
