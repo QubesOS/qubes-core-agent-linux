@@ -24,7 +24,7 @@ chgrp qubes /run/qubes
 chmod 0775 /run/qubes
 
 if [ -e /sys/module/grant_table/parameters/free_per_iteration ]; then
-    echo 1000 > /sys/module/grant_table/parameters/free_per_iteration
+    echo 10000 > /sys/module/grant_table/parameters/free_per_iteration
 fi
 
 # Set default services depending on VM type
