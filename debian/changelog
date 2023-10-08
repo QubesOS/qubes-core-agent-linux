@@ -1,3 +1,25 @@
+qubes-core-agent (4.1.46-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Fix qubes.TemplateSearch with repo_gpgcheck=1
+
+  [ Andrew David Wong ]
+  * Remove outdated comment
+
+  [ Rusty Bird ]
+  * tests: add test_tools.py to test the tools in qubes-rpc/
+  * qfile-agent: use a dirfd instead of getcwd()
+  * ci: clone qubes-linux-utils, build and install its qrexec-lib
+  * qfile-agent: $FILECOPY_TOTAL_SIZE, $SAVED_FD_1 are in base 10
+  * qfile-agent: fix progress rounding mismatch
+  * qvm-copy(-to-vm.gnome): fix size calculation for directories
+
+  [ Marek Marczykowski-Górecki ]
+  * Workaround broken desktop files
+  * Increase grant table reclaim speed even more
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 08 Oct 2023 04:29:28 +0200
+
 qubes-core-agent (4.1.45-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
