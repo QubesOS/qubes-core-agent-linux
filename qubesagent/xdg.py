@@ -94,6 +94,7 @@ def launch(filename_or_entry, *files, **kwargs):
         DBusGMainLoop(set_as_default=True)
         if hasattr(launcher, 'get_boolean'):
             activatable = launcher.get_boolean('DBusActivatable')
+            proxy = None
             if activatable:
                 bus = dbus.SessionBus()
                 service_id = launcher.get_id()
@@ -104,6 +105,10 @@ def launch(filename_or_entry, *files, **kwargs):
                     replace('-', '_')
                 try:
                     proxy = bus.get_object(service_id, object_path)
+                except ValueError as e:
+                    print(e, file=sys.stderr)
+            if proxy:
+                try:
                     match = bus.add_signal_receiver(
                         functools.partial(dbus_name_change, loop, service_id),
                         'NameOwnerChanged')
