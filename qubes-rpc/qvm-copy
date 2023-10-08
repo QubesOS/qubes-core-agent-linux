@@ -1,5 +1,4 @@
-#!/bin/sh --
-set -e
+#!/bin/bash --
 #
 # The Qubes OS Project, https://www.qubes-os.org#
 #
@@ -19,7 +18,8 @@ set -e
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-#
+
+set -e -o pipefail
 
 unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE
 
@@ -75,11 +75,17 @@ else
 fi
 
 if [ "$PROGRESS_TYPE" = console ] ; then
+    find_paths=( )
+    for path; do
+        case "$path" in
+            (-*) find_paths+=( ./"$path" ) ;;
+            (*)  find_paths+=(   "$path" ) ;;
+        esac
+    done
+
     FILECOPY_TOTAL_SIZE=$(
-        # shellcheck disable=SC2185
-        printf '%s\0' "$@" |
-        find -files0-from - -type f -print0 2>/dev/null |
-        du  --files0-from - -c --apparent-size -k |
+        find "${find_paths[@]}" -type f -print0 2>/dev/null |
+        du --files0-from - -c --apparent-size -k |
         tail -n 1 |
         cut -f 1 |
         grep -xE '[0-9]+'

@@ -55,11 +55,17 @@ progress_zenity() {
 }
 
 
+find_paths=( )
+for path; do
+    case "$path" in
+        (-*) find_paths+=( ./"$path" ) ;;
+        (*)  find_paths+=(   "$path" ) ;;
+    esac
+done
+
 SIZE=$(
-    # shellcheck disable=SC2185
-    printf '%s\0' "$@" |
-    find -files0-from - -type f -print0 2>/dev/null |
-    du  --files0-from - -c --apparent-size -b |
+    find "${find_paths[@]}" -type f -print0 2>/dev/null |
+    du --files0-from - -c --apparent-size -b |
     tail -n 1 |
     cut -f 1 |
     grep -xE '[0-9]+'
