@@ -23,13 +23,17 @@ if [ "x$network" != "x" ]; then
     secondary_dns6=$(qubesdb-read /qubes-netvm-secondary-dns6 ||:)
     modprobe netbk 2> /dev/null || modprobe xen-netback || "${modprobe_fail_cmd}"
     if [ -n "$primary_dns6" ]; then
-        echo "NS1=$primary_dns6" > /var/run/qubes/qubes-ns
-        echo "NS2=$secondary_dns6" >> /var/run/qubes/qubes-ns
-        echo "NS3=$primary_dns" >> /var/run/qubes/qubes-ns
-        echo "NS4=$secondary_dns" >> /var/run/qubes/qubes-ns
+        cat > /var/run/qubes/qubes-ns<< EOF
+NS1=$primary_dns6
+NS1=$secondary_dns6
+NS3=$primary_dns
+NS4=$secondary_dns
+EOF
     else
-        echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
-        echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
+        cat > /var/run/qubes/qubes-ns<< EOF
+NS1=$primary_dns
+NS1=$secondary_dns
+EOF
     fi
     /usr/lib/qubes/qubes-setup-dnat-to-ns
     echo "1" > /proc/sys/net/ipv4/ip_forward
