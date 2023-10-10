@@ -1,3 +1,13 @@
+qubes-core-agent (4.2.25-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * qvm-copy(-to-vm.gnome): avoid 'find -files0-from' for bullseye
+
+  [ Marek Marczykowski-Górecki ]
+  * Make gnome-software work a bit better in a template
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 10 Oct 2023 21:31:05 +0200
+
 qubes-core-agent (4.2.24-1) unstable; urgency=medium
 
   * Increase grant table reclaim speed even more
