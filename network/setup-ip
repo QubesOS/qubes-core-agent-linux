@@ -36,7 +36,7 @@ configure_network () {
     fi
     if [ -n "$ip6" ]; then
         /sbin/ip -- address replace "$ip6/$netmask6" dev "$INTERFACE"
-        if [[ "$custom" = false ]] && [ -n "$gateway6" ]; then
+        if [ -n "$gateway6" ] && [[ "$custom" = false ]]; then
             /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
                 lladdr "$netvm_mac" nud permanent
         fi
@@ -179,11 +179,11 @@ __EOF__
     # reload connection
     nmcli connection load "$nm_config" || :
     if [[ "$custom" = false ]]; then
-        /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
+        /sbin/ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
             lladdr "$netvm_mac" nud permanent
     fi
-    if [ -n "$ip6" ]; then
-        if [[ "$custom" = false ]] && [ -n "$gateway6" ]; then
+    if [ -n "$gateway6" ]; then
+        if [[ "$custom" = false ]]; then
             /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
                 lladdr "$netvm_mac" nud permanent
         fi
@@ -255,7 +255,7 @@ if [ "$ACTION" == "add" ]; then
         gateway=$(exec /usr/bin/qubesdb-read "${prefix}gateway")
         if ip6=$(exec /usr/bin/qubesdb-read "${prefix}ip6" 2>/dev/null); then
             netmask6=$(exec /usr/bin/qubesdb-read --default=128 "${prefix}netmask6")
-            gateway6=$(/usr/bin/qubesdb-read "${prefix}gateway6" 2>/dev/null ||:)
+            gateway6=$(exec /usr/bin/qubesdb-read --default="" "${prefix}gateway6")
         elif [[ "$?" != '2' ]]; then
             echo 'Could not check if IPv6 is enabled' >&2
             exit 1

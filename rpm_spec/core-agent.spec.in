@@ -905,6 +905,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
+%attr(4755,root,root) %_bindir/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
 /usr/lib/qubes/qrun-in-vm
 /usr/lib/qubes/qubes-trigger-sync-appmenus.sh
@@ -963,6 +964,7 @@ rm -f %{name}-%{version}
 %{python3_sitelib}/qubesagent/test_vmexec.py*
 %{python3_sitelib}/qubesagent/xdg.py*
 %{python3_sitelib}/qubesagent/test_xdg.py*
+%{python3_sitelib}/qubesagent/test_tools.py*
 
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc
