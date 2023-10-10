@@ -103,8 +103,10 @@ def install_firewall_rules(dns):
         # where both are present.
         'delete chain ip qubes dnat-dns',
         'table ip qubes {',
+        'chain custom-dnat-dns {}',
         'chain dnat-dns {',
         'type nat hook prerouting priority dstnat; policy accept;',
+        'jump custom-dnat-dns',
     ]
     for i, (vm_nameserver, dest) in enumerate(zip_longest(qubesdb_dns,
         [dns_ip for dns_ip in dns if type(dns_ip) is IPv4Address])):
@@ -134,8 +136,10 @@ def install_firewall_rules(dns):
         # where both are present.
         'delete chain ip6 qubes dnat-dns',
         'table ip6 qubes {',
+        'chain custom-dnat-dns {}',
         'chain dnat-dns {',
         'type nat hook prerouting priority dstnat; policy accept;',
+        'jump custom-dnat-dns',
     ]
     for i, (vm_nameserver, dest) in enumerate(zip_longest(qubesdb_dns6,
         [dns_ip for dns_ip in dns if type(dns_ip) is IPv6Address])):
