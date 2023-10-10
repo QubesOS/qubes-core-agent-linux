@@ -37,10 +37,7 @@ advertise_systemd_service() {
     done
 }
 
-if [ "$(cat /sys/module/ipv6/parameters/disable_ipv6 2>/dev/null)" = "0" ] &&
-   [ "$(cat /proc/sys/net/ipv6/conf/all/disable_ipv6 2>/dev/null)" = "0" ] ; then
-    qvm-features-request supported-feature.ipv6=1
-fi
+qvm-features-request supported-feature.ipv6dns=1
 
 advertise_systemd_service network-manager NetworkManager.service \
                               network-manager.service
