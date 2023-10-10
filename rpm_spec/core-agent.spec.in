@@ -925,6 +925,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/set-default-text-editor
 /usr/lib/qubes/tinyproxy-wrapper
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
+/usr/lib/environment.d/60-gnome-software-fix.conf
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/bind-dirs.sh
 /usr/lib/qubes/init/control-printer-icon.sh
