@@ -70,8 +70,10 @@ if [ "${ip}" ]; then
     netvm_ip="$ip4"
     netvm_gw_ip=$(qubesdb-read /qubes-netvm-gateway)
     netvm_gw_ip6=$(qubesdb-read /qubes-netvm-gateway6 || :)
-    netvm_dns1_ip=$(qubesdb-read /qubes-netvm-primary-dns || :)
-    netvm_dns2_ip=$(qubesdb-read /qubes-netvm-secondary-dns || :)
+    netvm_dns1_ip=$(qubesdb-read /qubes-netvm-primary-dns)
+    netvm_dns2_ip=$(qubesdb-read /qubes-netvm-secondary-dns)
+    netvm_dns61_ip=$(qubesdb-read /qubes-netvm-primary-dns || :)
+    netvm_dns62_ip=$(qubesdb-read /qubes-netvm-secondary-dns || :)
 
     back_ip="$netvm_gw_ip"
     back_ip6="$netvm_gw_ip6"

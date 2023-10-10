@@ -25,7 +25,9 @@ configure_network () {
     local gateway6="$8"
     local primary_dns="$9"
     local secondary_dns="${10}"
-    local custom="${11}"
+    local primary_dns6="${11}"
+    local secondary_dns6="${12}"
+    local custom="${13}"
 
     /sbin/ip -- address replace "$ip/$netmask" dev "$INTERFACE"
     if [[ "$custom" = false ]]; then
@@ -34,7 +36,7 @@ configure_network () {
     fi
     if [ -n "$ip6" ]; then
         /sbin/ip -- address replace "$ip6/$netmask6" dev "$INTERFACE"
-        if [[ "$custom" = false ]]; then
+        if [[ "$custom" = false ]] && [ -n "$gateway6" ]; then
             /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
                 lladdr "$netvm_mac" nud permanent
         fi
@@ -64,16 +66,21 @@ configure_network () {
         if [ -h /etc/resolv.conf ]; then
             rm -f /etc/resolv.conf
         fi
-        echo > /etc/resolv.conf
+        echo -n > /etc/resolv.conf
         if ! qsvc disable-dns-server ; then
-            echo "nameserver $primary_dns" > /etc/resolv.conf
+            if [ -n "$primary_dns6" ]; then
+                echo "nameserver $primary_dns6" >> /etc/resolv.conf
+                echo "nameserver $secondary_dns6" >> /etc/resolv.conf
+            fi
+            echo "nameserver $primary_dns" >> /etc/resolv.conf
             echo "nameserver $secondary_dns" >> /etc/resolv.conf
         fi
     fi
     if [ -x /usr/bin/resolvectl ] && \
             systemctl is-enabled -q systemd-resolved.service && \
             ! qsvc disable-dns-server ; then
-        resolvectl dns "$INTERFACE" "$primary_dns" "$secondary_dns"
+        resolvectl dns "$INTERFACE" "$primary_dns6" "$secondary_dns6" \
+            "$primary_dns" "$secondary_dns"
     fi
 }
 
@@ -88,7 +95,9 @@ configure_network_nm () {
     local gateway6="$8"
     local primary_dns="$9"
     local secondary_dns="${10}"
-    local custom="${11}"
+    local primary_dns6="${11}"
+    local secondary_dns6="${12}"
+    local custom="${13}"
 
     local prefix
     local prefix6
@@ -119,6 +128,9 @@ __EOF__
     if ! qsvc disable-dns-server ; then
         ip4_nm_config="${ip4_nm_config}
 dns=${primary_dns};${secondary_dns}"
+        if [ -n "$primary_dns6" ]; then
+            ip6_nm_config="${ip6_nm_config}
+dns=${primary_dns6};${secondary_dns6}"
     fi
     if ! qsvc disable-default-route ; then
         ip4_nm_config="${ip4_nm_config}
@@ -171,7 +183,7 @@ __EOF__
             lladdr "$netvm_mac" nud permanent
     fi
     if [ -n "$ip6" ]; then
-        if [[ "$custom" = false ]]; then
+        if [[ "$custom" = false ]] && [ -n "$gateway6" ]; then
             /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
                 lladdr "$netvm_mac" nud permanent
         fi
@@ -183,8 +195,17 @@ configure_qubes_ns() {
     #netmask=$(qubesdb-read /qubes-netvm-netmask)
     primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
     secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
-    echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
-    echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
+    primary_dns6=$(qubesdb-read /qubes-netvm-primary-dns6 ||:)
+    secondary_dns6=$(qubesdb-read /qubes-netvm-secondary-dns6 ||:)
+    if [ -n "$primary_dns6" ]; then
+        echo "NS1=$primary_dns6" > /var/run/qubes/qubes-ns
+        echo "NS2=$secondary_dns6" >> /var/run/qubes/qubes-ns
+        echo "NS3=$primary_dns" >> /var/run/qubes/qubes-ns
+        echo "NS4=$secondary_dns" >> /var/run/qubes/qubes-ns
+    else
+        echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
+        echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
+    fi
     /usr/lib/qubes/qubes-setup-dnat-to-ns
 }
 
@@ -234,7 +255,7 @@ if [ "$ACTION" == "add" ]; then
         gateway=$(exec /usr/bin/qubesdb-read "${prefix}gateway")
         if ip6=$(exec /usr/bin/qubesdb-read "${prefix}ip6" 2>/dev/null); then
             netmask6=$(exec /usr/bin/qubesdb-read --default=128 "${prefix}netmask6")
-            gateway6=$(exec /usr/bin/qubesdb-read "${prefix}gateway6")
+            gateway6=$(/usr/bin/qubesdb-read "${prefix}gateway6" 2>/dev/null ||:)
         elif [[ "$?" != '2' ]]; then
             echo 'Could not check if IPv6 is enabled' >&2
             exit 1
@@ -244,6 +265,8 @@ if [ "$ACTION" == "add" ]; then
 
         primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null) || primary_dns=
         secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null) || secondary_dns=
+        primary_dns6=$(/usr/bin/qubesdb-read /qubes-primary-dns6 2>/dev/null ||:) || primary_dns6=
+        secondary_dns6=$(/usr/bin/qubesdb-read /qubes-secondary-dns6 2>/dev/null ||:) || secondary_dns6=
         /usr/lib/systemd/systemd-sysctl \
             "--prefix=/net/ipv4/conf/all" \
             "--prefix=/net/ipv4/neigh/all" \
@@ -257,9 +280,9 @@ if [ "$ACTION" == "add" ]; then
         if [ -n "$ip4" ]; then
             # If NetworkManager is enabled, let it configure the network
             if qsvc network-manager && [ -e /usr/bin/nmcli ]; then
-                configure_network_nm "$MAC" "$INTERFACE" "$ip4" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns" "$custom"
+                configure_network_nm "$MAC" "$INTERFACE" "$ip4" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns" "$primary_dns6" "$secondary_dns6" "$custom"
             else
-                configure_network "$MAC" "$INTERFACE" "$ip4" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns" "$custom"
+                configure_network "$MAC" "$INTERFACE" "$ip4" "$ip6" "$netmask" "$netmask6" "$gateway" "$gateway6" "$primary_dns" "$secondary_dns" "$primary_dns6" "$secondary_dns6" "$custom"
             fi
 
             network=$(qubesdb-read /qubes-netvm-network 2>/dev/null) || network=
