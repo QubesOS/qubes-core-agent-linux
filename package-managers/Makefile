@@ -50,6 +50,8 @@ install:
 	install -d -m 2775 $(DESTDIR)$(QUBESSTATEDIR)/dom0-updates
 	install -D -m 0644 dnf-plugin-downloadurl.py \
 		$(DESTDIR)$(QUBESLIBDIR)/dnf-plugins/downloadurl.py
+	install -D -m 0644 gnome-software-fix.conf \
+		$(DESTDIR)/usr/lib/environment.d/60-gnome-software-fix.conf
 
 install-apt:
 	install -d $(DESTDIR)$(APTCONFDIR)/sources.list.d
