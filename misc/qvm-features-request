@@ -35,6 +35,16 @@ def is_active(service):
     return status == 0
 
 
+def is_chroot():
+    try:
+        root1 = os.stat("/")
+        root2 = os.stat("/proc/1/root")
+        return root1 != root2
+    except PermissionError:
+        # can't check, return safe option
+        return False
+
+
 class FeatureRequestAction(argparse.Action):
     '''Action for argument parser that stores a property.'''
     # pylint: disable=redefined-builtin,too-few-public-methods
@@ -72,6 +82,9 @@ parser.add_argument('features',
 
 def main(args=None):
     args = parser.parse_args(args)
+    if is_chroot():
+        print("Running in chroot, ignoring request", file=sys.stderr)
+        return
     if not is_active("qubes-qrexec-agent"):
         return
     qdb = qubesdb.QubesDB()
