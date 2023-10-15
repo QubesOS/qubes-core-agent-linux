@@ -88,14 +88,24 @@ def main(args=None):
     if not is_active("qubes-qrexec-agent"):
         return
     qdb = qubesdb.QubesDB()
+    any_error = False
     for feature, value in args.features.items():
-        qdb.write('/features-request/' + feature, value)
+        path = '/features-request/' + feature
+        if len(path) > 63:
+            print(f"Feature '{feature}' too long, ignoring", file=sys.stderr)
+            any_error = True
+            continue
+        qdb.write(path, value)
 
     if args.commit:
         devnull = os.open(os.devnull, os.O_RDWR)
         subprocess.check_call(
             ['qrexec-client-vm', 'dom0', 'qubes.FeaturesRequest'],
             stdin=devnull, stdout=devnull)
+
+    if any_error:
+        return 1
+    return 0
 
 if __name__ == '__main__':
     sys.exit(main())
