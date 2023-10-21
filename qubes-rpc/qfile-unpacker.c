@@ -20,6 +20,9 @@
 char *prepare_creds_return_dir(int uid)
 {
     const struct passwd *pwd;
+    uid_t myuid = getuid();
+    if (myuid != 0 && myuid != (uid_t)uid)
+        gui_fatal("Refusing to change to UID other than the caller's UID");
     pwd = getpwuid(uid);
     if (!pwd) {
         perror("getpwuid");

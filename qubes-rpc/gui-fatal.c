@@ -35,9 +35,12 @@ static void produce_message(const char *type, const char *fmt, va_list args)
         case -1:
             exit(1); // what else
         case 0:
-            if (geteuid() == 0)
-                if (setuid(getuid()) != 0)
-                    perror("setuid failed, calling kdialog/zenity as root");
+            if (geteuid() == 0) {
+                if (setuid(getuid()) != 0) {
+                    perror("setuid failed, not calling kdialog/zenity");
+                    exit(1);
+                }
+            }
             fix_display();
 #ifdef USE_KDIALOG
             execlp("/usr/bin/kdialog", "kdialog", "--sorry", dialog_msg, NULL);
