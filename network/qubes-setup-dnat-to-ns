@@ -70,6 +70,7 @@ def get_dns_resolved():
         raise
     # Use global entries first
     dns.sort(key=lambda x: x[0] != 0)
+    # systemd-resolved is trusted to return valid addresses.
     return [ip_address(bytes(addr)) for _g, family, addr in dns]
 
 def install_firewall_rules(dns):
