@@ -37,6 +37,8 @@ advertise_systemd_service() {
     done
 }
 
+qvm-features-request supported-feature.ipv6dns=1
+
 advertise_systemd_service network-manager NetworkManager.service \
                               network-manager.service
 advertise_systemd_service modem-manager ModemManager.service
