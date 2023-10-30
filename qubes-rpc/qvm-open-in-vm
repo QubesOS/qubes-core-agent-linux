@@ -64,6 +64,24 @@ if [ -z "$target" ] || [ -z "$filename" ]; then
     usage
 fi
 
+prompt_text='Are you sure you want to create another disposable VM?'
+case $target in
+(@dispvm|@dispvm:*)
+    case ${QREXEC_SERVICE_FULL_NAME-} in
+    (qubes.OpenInVM+*|qubes.OpenURL+*)
+        if [ -f /usr/bin/zenity ]; then
+            zenity --question "--text=$prompt_text" || exit "$?"
+        elif [ -f /usr/bin/kdialog ]; then
+            kdialog "--yesno=$prompt_text" || exit "$?"
+        else
+            printf 'Cannot prompt user, exiting to avoid possible infinite VM creation loop.\n' >&2
+            exit 1
+        fi
+        ;;
+    esac
+    ;;
+esac
+
 expr "@$filename" : '@[A-Za-z][A-Za-z0-9+]*://'>/dev/null
 # shellcheck disable=SC2016
 case $? in
