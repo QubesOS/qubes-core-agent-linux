@@ -24,7 +24,7 @@
 %define qubes_preset_file 75-qubes-vm.preset
 
 # systemd is used in Fedora and CentOS
-%if 0%{?fedora} || 0%{?rhel}
+%if 0%{?fedora} || 0%{?rhel} || 0%{?is_opensuse}
 %define with_sysvinit 0
 %else
 %define with_sysvinit 1
