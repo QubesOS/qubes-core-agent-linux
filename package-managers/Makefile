@@ -80,8 +80,6 @@ endif
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/41error-on-any
 
 install-dnf: install-rpm
-	install -D -m 0644 dnf-qubes-hooks.py \
-		$(DESTDIR)$(PYTHON2_SITELIB)/dnf-plugins/qubes-hooks.py
 ifeq ($(shell rpm --eval %{centos_ver} 2>/dev/null),8)
 # we need to stick to related DNF python version
 # which is given by platform-python

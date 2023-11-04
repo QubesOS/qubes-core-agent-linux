@@ -200,17 +200,6 @@ Requires: (%{name}-selinux if selinux-policy)
 %description
 The Qubes core files for installation inside a Qubes VM.
 
-%package -n python2-dnf-plugins-qubes-hooks
-Summary: DNF plugin for Qubes specific post-installation actions
-BuildRequires: python2-devel
-%{?python_provide:%python_provide python2-dnf-plugins-qubes-hooks}
-BuildArch: noarch
-
-%description -n python2-dnf-plugins-qubes-hooks
-DNF plugin for Qubes specific post-installation actions:
- * notify dom0 that updates were installed
- * refresh applications shortcut list
-
 %if 0%{?rhel} == 8
 %package -n python3-dnf-plugins-qubes-hooks
 Summary: DNF plugin for Qubes specific post-installation actions
@@ -966,9 +955,6 @@ rm -f %{name}-%{version}
 /usr/share/qubes/qubes-master-key.asc
 %dir /mnt/removable
 %dir /rw
-
-%files -n python2-dnf-plugins-qubes-hooks
-%{python2_sitelib}/dnf-plugins/*
 
 %if 0%{?rhel} == 8
 %files -n python3-dnf-plugins-qubes-hooks
