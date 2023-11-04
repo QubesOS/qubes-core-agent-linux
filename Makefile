@@ -50,6 +50,7 @@ SYSTEM_DROPINS += systemd-random-seed.service
 SYSTEM_DROPINS += tor.service tor@default.service
 SYSTEM_DROPINS += systemd-timesyncd.service
 SYSTEM_DROPINS += systemd-logind.service
+SYSTEM_DROPINS += sysinit.target
 ifeq ($(ENABLE_SELINUX),1)
 SYSTEM_DROPINS += selinux-autorelabel.target selinux-autorelabel.service
 endif
@@ -105,8 +106,6 @@ install-systemd-dropins:
 	    install -d $(DESTDIR)$(SYSTEM_DROPIN_DIR)/$${dropin}.d ;\
 	    install -m 0644 vm-systemd/$${dropin}.d/*.conf $(DESTDIR)$(SYSTEM_DROPIN_DIR)/$${dropin}.d/ ;\
 	done
-	install -d $(DESTDIR)$(SYSTEM_DROPIN_DIR)/sysinit.target.requires
-	ln -sf ../systemd-random-seed.service $(DESTDIR)$(SYSTEM_DROPIN_DIR)/sysinit.target.requires
 
 	# Install user dropins
 	@for dropin in $(USER_DROPINS); do \
