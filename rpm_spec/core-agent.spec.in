@@ -502,6 +502,11 @@ install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
 %endif
 
 %if 0%{?is_opensuse}
+# no dhclient there
+rm -f $RPM_BUILD_ROOT/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
+%endif
+
+%if 0%{?is_opensuse}
 # /usr/share/qubes/xdg-overrides ships a bunch of symlinks not present during build
 # FIXME: add appropriate BR: for openSUSE
 export NO_BRP_STALE_LINK_ERROR=yes
@@ -1069,7 +1074,9 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/tinyproxy/updates-blacklist
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
+%if !0%{?is_opensuse}
 /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
+%endif
 /etc/xen/scripts/vif-qubes-nat.sh
 /etc/xen/scripts/vif-route-qubes
 %_unitdir/qubes-firewall.service
