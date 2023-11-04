@@ -190,6 +190,18 @@ BuildRequires: systemd
 %if 0%{?rhel} >= 8
 BuildRequires: redhat-lsb
 %endif
+%if 0%{?is_opensuse}
+# for directory ownership
+BuildRequires: xen-tools
+BuildRequires: dconf
+BuildRequires: dnf
+BuildRequires: xfconf
+BuildRequires: glib2-devel
+BuildRequires: sudo
+BuildRequires: dracut
+BuildRequires: ca-certificates
+BuildRequires: qubes-core-qrexec
+%endif
 # for update-mime-database
 BuildRequires: shared-mime-info
 Source0: %{name}-%{version}.tar.gz
@@ -214,6 +226,11 @@ DNF plugin for Qubes specific post-installation actions:
 %package -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 Summary: DNF plugin for Qubes specific post-installation actions
 BuildRequires: python%{python3_pkgversion}-devel
+%if 0%{?is_opensuse}
+# for directory ownership
+# it is really python3-dnf, not python311-dnf this time...
+BuildRequires: python3-dnf
+%endif
 BuildArch: noarch
 %{?python_provide:%python_provide python%{python3_pkgversion}-dnf-plugins-qubes-hooks}
 
@@ -227,8 +244,16 @@ DNF plugin for Qubes specific post-installation actions:
 %package caja
 Summary:    Qubes integration for Caja
 Requires:   qubes-core-agent = %{version}
+%if 0%{?is_opensuse}
+Requires:   python-caja
+%else
 Requires:   python3-caja
+%endif
 Conflicts:  qubes-core-vm < 4.0.0
+%if 0%{?is_opensuse}
+# for directory ownership
+BuildRequires: python-caja
+%endif
 
 %description caja
 Caja addons for inter-VM file copy/move/open.
@@ -237,8 +262,16 @@ Caja addons for inter-VM file copy/move/open.
 %package nautilus
 Summary:    Qubes integration for Nautilus
 Requires:   qubes-core-agent = %{version}
+%if 0%{?is_opensuse}
+Requires:   python-nautilus-common-files
+%else
 Requires:   nautilus-python
+%endif
 Conflicts:  qubes-core-vm < 4.0.0
+%if 0%{?is_opensuse}
+# for directory ownership
+BuildRequires: python-nautilus-common-files
+%endif
 
 %description nautilus
 Nautilus addons for inter-VM file copy/move/open.
@@ -265,6 +298,12 @@ Requires:   socat
 Requires:   qubes-core-agent = %{version}
 Requires:   tinyproxy
 Conflicts:  qubes-core-vm < 4.0.0
+%if 0%{?is_opensuse}
+# for directory ownership
+BuildRequires: tinyproxy
+BuildRequires: udev
+BuildRequires: tinyproxy
+%endif
 
 %description networking
 This package provides:
@@ -284,6 +323,10 @@ Requires:   glib2
 Requires:   polkit
 Requires:   qubes-core-agent-networking = %{version}
 Conflicts:  qubes-core-vm < 4.0.0
+%if 0%{?is_opensuse}
+# for directory ownership
+BuildRequires: NetworkManager
+%endif
 
 %description network-manager
 Integration of NetworkManager for Qubes VM:
@@ -296,6 +339,11 @@ BuildArch:  noarch
 Summary:    Passwordless root access from normal user
 Conflicts:  qubes-core-vm < 4.0.0
 Requires(pre): shadow
+%if 0%{?is_opensuse}
+# for directory ownership
+BuildRequires: sudo
+BuildRequires: polkit
+%endif
 
 %description passwordless-root
 Configure sudo, PolicyKit and similar tool to not ask for any password when
@@ -351,7 +399,9 @@ a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 %_datadir/selinux/packages/qubes-misc.pp
 %_unitdir/qubes-relabel-rw.service
 %_unitdir/qubes-relabel-root.service
+%dir %_unitdir/selinux-autorelabel.target.d
 %_unitdir/selinux-autorelabel.target.d/30_qubes.conf
+%dir %_unitdir/selinux-autorelabel.service.d
 %_unitdir/selinux-autorelabel.service.d/30_qubes.conf
 /usr/lib/qubes/init/relabel-root.sh
 
@@ -786,10 +836,13 @@ rm -f %{name}-%{version}
 %{kde_service_dir}/qvm-copy.desktop
 %{kde_service_dir}/qvm-move.desktop
 %{kde_service_dir}/qvm-dvm.desktop
+%dir /usr/share/kservices5
+%dir %{kde5_service_dir}
 %{kde5_service_dir}/qvm-copy.desktop
 %{kde5_service_dir}/qvm-move.desktop
 %{kde5_service_dir}/qvm-dvm.desktop
 %config /etc/fstab
+%dir /etc/pki/rpm-gpg
 /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes*
 %dir /etc/qubes-rpc
 %config(noreplace) /etc/qubes-rpc/qubes.ShowInTerminal
@@ -834,14 +887,18 @@ rm -f %{name}-%{version}
 
 # MIME stuff
 %define qubesdata %_datadir/qubes/xdg-override
+%dir %_datadir/qubes
 %dir %qubesdata
 %qubesdata/*
 
+%dir /etc/qubes
 %dir /etc/qubes/autostart
 /etc/qubes/autostart/README.txt
+%dir /etc/qubes/autostart/*.desktop.d
 %config /etc/qubes/autostart/*.desktop.d/30_qubes.conf
 %dir /etc/qubes/applications
 /etc/qubes/applications/README.txt
+%dir /etc/qubes/applications/*.desktop.d
 %config /etc/qubes/applications/*.desktop.d/30_qubes.conf
 %dir /etc/qubes/suspend-pre.d
 /etc/qubes/suspend-pre.d/README
@@ -857,13 +914,16 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sudoers.d/umask
 %config(noreplace) /etc/sysctl.d/20_tcp_timestamps.conf
 %config(noreplace) /etc/qubes-suspend-module-blacklist
+%dir /etc/yum.conf.d
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
+%dir /etc/yum.repos.d
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo
 %if 0%{?rhel} == 7
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 %endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
+%dir /etc/dconf/db/local.d
 %config(noreplace) /etc/dconf/db/local.d/dpi
 %config(noreplace) /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-notifyd.xml
 %_udevrulesdir/50-qubes-mem-hotplug.rules
@@ -936,6 +996,8 @@ rm -f %{name}-%{version}
 /usr/share/glib-2.0/schemas/20_org.mate.NotificationDaemon.qubes.gschema.override
 /usr/share/glib-2.0/schemas/20_org.gnome.desktop.wm.preferences.qubes.gschema.override
 %{_mandir}/man1/qvm-*.1*
+# should be owned by systemd-network, but it isn't
+%dir /usr/lib/systemd/resolved.conf.d
 /usr/lib/systemd/resolved.conf.d/30_resolved-no-mdns-or-llmnr.conf
 
 %dir %{python3_sitelib}/qubesagent-*-py*.egg-info
@@ -951,6 +1013,7 @@ rm -f %{name}-%{version}
 %{python3_sitelib}/qubesagent/test_xdg.py*
 %{python3_sitelib}/qubesagent/test_tools.py*
 
+%dir /usr/share/qubes/mime-override
 /usr/share/qubes/mime-override/globs
 /usr/share/qubes/qubes-master-key.asc
 %dir /mnt/removable
@@ -988,6 +1051,7 @@ rm -f %{name}-%{version}
 %dir %attr(0775,root,qubes) /var/lib/qubes/dom0-updates
 /usr/lib/qubes/qvm-template-repo-query
 /usr/lib/qubes/qubes-download-dom0-updates.sh
+%dir /usr/lib/qubes/dnf-plugins
 /usr/lib/qubes/dnf-plugins/downloadurl.py
 
 %files networking
@@ -1143,15 +1207,21 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/qubes-updates-proxy-forwarder.socket
 %{_unitdir}-preset/%qubes_preset_file
 %_modulesloaddir/qubes-core.conf
+%dir %_unitdir/boot.automount.d
 %_unitdir/boot.automount.d/30_qubes.conf
+%dir %_unitdir/*.service.d
 %_unitdir/chronyd.service.d/30_qubes.conf
 %_unitdir/crond.service.d/30_qubes.conf
 %_unitdir/cups.service.d/30_qubes.conf
+%dir %_unitdir/cups.socket.d
 %_unitdir/cups.socket.d/30_qubes.conf
+%dir %_unitdir/cups.path.d
 %_unitdir/cups.path.d/30_qubes.conf
 %_unitdir/cups-browsed.service.d/30_qubes.conf
 %_unitdir/org.cups.cupsd.service.d/30_qubes.conf
+%dir %_unitdir/org.cups.cupsd.socket.d
 %_unitdir/org.cups.cupsd.socket.d/30_qubes.conf
+%dir %_unitdir/org.cups.cupsd.path.d
 %_unitdir/org.cups.cupsd.path.d/30_qubes.conf
 %_unitdir/getty@tty.service.d/30_qubes.conf
 %_unitdir/ModemManager.service.d/30_qubes.conf
@@ -1164,8 +1234,11 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/tinyproxy.service.d/30_not_needed_in_qubes_by_default.conf
 %_unitdir/tor.service.d/30_qubes.conf
 %_unitdir/tor@default.service.d/30_qubes.conf
+%dir %_unitdir/tmp.mount.d
 %_unitdir/tmp.mount.d/30_qubes.conf
+%dir %_unitdir/sysinit.target.d
 %_unitdir/sysinit.target.d/30_qubes.conf
+%dir %_userunitdir/*.service.d
 %_userunitdir/tracker-extract-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-control-3.service.d/30_qubes.conf
