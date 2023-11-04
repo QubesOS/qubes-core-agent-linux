@@ -411,10 +411,12 @@ if [ "$1" !=  1 ] ; then
 exit 0
 fi
 
+%if !0%{?is_opensuse}
 mkdir -p /var/lib/qubes
 if [ -e /etc/fstab ] ; then
 mv /etc/fstab /var/lib/qubes/fstab.orig
 fi
+%endif
 
 %pre passwordless-root
 
@@ -652,9 +654,11 @@ fi
 %preun
 if [ "$1" = 0 ] ; then
     # no more packages left
+%if !0%{?is_opensuse}
     if [ -e /var/lib/qubes/fstab.orig ] ; then
     mv /var/lib/qubes/fstab.orig /etc/fstab
     fi
+%endif
     mv /var/lib/qubes/removed-udev-scripts/* /etc/udev/rules.d/
     if [ -e /var/lib/qubes/serial.orig ] ; then
     mv /var/lib/qubes/serial.orig /etc/init/serial.conf
