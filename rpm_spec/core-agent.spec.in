@@ -175,6 +175,8 @@ Obsoletes:  qubes-core-vm-doc < 4.0.0
 Conflicts:  qubes-gui-agent < 4.1.6
 Conflicts:  pulseaudio-qubes < 4.2.0
 Provides:   group(qubes)
+Requires(pre): shadow
+Requires(pre): qubes-db
 BuildRequires: gcc
 BuildRequires: desktop-file-utils
 BuildRequires: pandoc
@@ -304,6 +306,7 @@ Integration of NetworkManager for Qubes VM:
 BuildArch:  noarch
 Summary:    Passwordless root access from normal user
 Conflicts:  qubes-core-vm < 4.0.0
+Requires(pre): shadow
 
 %description passwordless-root
 Configure sudo, PolicyKit and similar tool to not ask for any password when
