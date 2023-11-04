@@ -117,7 +117,7 @@ restore_units() { \
 
 Name:       qubes-core-agent
 Version:    @VERSION@
-Release:    1%{dist}
+Release:    1%{?dist}
 Summary:    The QubesOS core files for VMs
 
 Group:      Qubes
