@@ -1128,9 +1128,11 @@ Summary:        Qubes unit files for SystemD init style
 License:        GPL v2 only
 Group:          Qubes
 Requires:       systemd
+%if !0%{?is_opensuse}
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
+%endif
 Requires:       qubes-core-agent = %{version}
 Provides:       qubes-core-agent-init-scripts
 Conflicts:      qubes-core-agent-sysvinit
