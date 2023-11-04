@@ -475,7 +475,10 @@ make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
 %if 0%{?rhel} != 7
 make -C qubes-rpc/caja DESTDIR=$RPM_BUILD_ROOT install
 %endif
-make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install
+%if !0%{?is_opensuse}
+make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install-kde4
+%endif
+make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install-kde5
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
 
@@ -833,9 +836,11 @@ rm -f %{name}-%{version}
 %files
 %defattr(-,root,root,-)
 %dir /var/lib/qubes
+%if !0%{?is_opensuse}
 %{kde_service_dir}/qvm-copy.desktop
 %{kde_service_dir}/qvm-move.desktop
 %{kde_service_dir}/qvm-dvm.desktop
+%endif
 %dir /usr/share/kservices5
 %dir %{kde5_service_dir}
 %{kde5_service_dir}/qvm-copy.desktop
