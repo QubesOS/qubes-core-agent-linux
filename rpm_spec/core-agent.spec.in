@@ -454,6 +454,12 @@ install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
     rm -rf $RPM_BUILD_ROOT/etc/init.d/qubes-* $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
 %endif
 
+%if 0%{?is_opensuse}
+# /usr/share/qubes/xdg-overrides ships a bunch of symlinks not present during build
+# FIXME: add appropriate BR: for openSUSE
+export NO_BRP_STALE_LINK_ERROR=yes
+%endif
+
 %triggerin -- initscripts
 if [ -e /etc/init/serial.conf ]; then
     cp /usr/share/qubes/serial.conf /etc/init/serial.conf
