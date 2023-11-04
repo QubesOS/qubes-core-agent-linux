@@ -1107,7 +1107,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/show-hide-nm-applet.sh
 
 %files passwordless-root
-%config(noreplace) /etc/polkit-1/localauthority/50-local.d/qubes-allow-all.pkla
 %config(noreplace) /etc/polkit-1/rules.d/00-qubes-allow-all.rules
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/pam.d/su.qubes

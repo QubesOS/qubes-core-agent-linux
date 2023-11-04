@@ -1,6 +1,0 @@
-[Qubes allow all]
-Identity=unix-group:qubes
-Action=*
-ResultAny=yes
-ResultInactive=yes
-ResultActive=yes

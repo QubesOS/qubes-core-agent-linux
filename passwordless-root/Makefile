@@ -14,7 +14,6 @@ install:
 		sed -E '/^[^#]/s/\<(ROLE|TYPE)=[A-Za-z0-9_]+[[:space:]]+//g' qubes.sudoers | \
 		install -D -m 0440 /dev/stdin $(DESTDIR)$(SUDOERSDIR)/qubes; \
 	fi
-	install -D -m 0644 polkit-1-qubes-allow-all.pkla $(DESTDIR)$(POLKIT1DIR)/localauthority/50-local.d/qubes-allow-all.pkla
 	install -d -m 0750 $(DESTDIR)$(POLKIT1DIR)/rules.d
 	install -D -m 0644 polkit-1-qubes-allow-all.rules $(DESTDIR)$(POLKIT1DIR)/rules.d/00-qubes-allow-all.rules
 
