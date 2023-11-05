@@ -544,8 +544,6 @@ for F in plymouth-shutdown prefdm splash-manager start-ttys tty ; do
     fi
 done
 
-chgrp qubes /var/lib/qubes/dom0-updates
-
 # Remove old firmware updates link
 if [ -L /lib/firmware/updates ]; then
   rm -f /lib/firmware/updates
@@ -581,7 +579,9 @@ dconf update &> /dev/null || :
 # And actually setup the proxy usage in package managers
 /usr/lib/qubes/update-proxy-configs
 
-/usr/lib/qubes/set-default-text-editor
+if command -v xdg-mime >/dev/null; then
+    /usr/lib/qubes/set-default-text-editor
+fi
 
 # Location of files which contains list of protected files
 mkdir -p /etc/qubes/protected-files.d
@@ -647,6 +647,10 @@ fi
 exit 0
 %endif
 
+%post dom0-updates
+
+chgrp qubes /var/lib/qubes/dom0-updates
+
 %post network-manager
 
 # Create NetworkManager configuration if we do not have it
@@ -656,8 +660,10 @@ echo 'plugins = keyfile' >> /etc/NetworkManager/NetworkManager.conf
 echo '[keyfile]' >> /etc/NetworkManager/NetworkManager.conf
 fi
 
-# Remove ip_forward setting from sysctl, so NM will not reset it
-sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+if [ -f /etc/sysctl.conf ]; then
+    # Remove ip_forward setting from sysctl, so NM will not reset it
+    sed 's/^net.ipv4.ip_forward.*/#\0/'  -i /etc/sysctl.conf
+fi
 
 /usr/lib/qubes/qubes-fix-nm-conf.sh
 
