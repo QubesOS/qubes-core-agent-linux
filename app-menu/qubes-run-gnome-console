@@ -1,0 +1,11 @@
+#!/bin/sh
+# Wrapper around gnome-console that runs it with --wait option
+# (if supoported).
+
+# Check if our gnome-console version supports --wait
+# (we can't just run it and check exit code, because if it works, it will
+# return the exit code of the child process)
+case "$(kgx --help)" in
+    *--wait\ *) exec kgx --wait "$@" ;;
+    *)          exec kgx "$@" ;;
+esac
