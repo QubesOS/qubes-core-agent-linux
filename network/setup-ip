@@ -244,7 +244,7 @@ if [ "$ACTION" == "add" ]; then
 
         primary_dns=$(/usr/bin/qubesdb-read /qubes-primary-dns 2>/dev/null) || primary_dns=
         secondary_dns=$(/usr/bin/qubesdb-read /qubes-secondary-dns 2>/dev/null) || secondary_dns=
-        /usr/lib/systemd/systemd-sysctl \
+        /lib/systemd/systemd-sysctl \
             "--prefix=/net/ipv4/conf/all" \
             "--prefix=/net/ipv4/neigh/all" \
             "--prefix=/net/ipv6/conf/all" \
