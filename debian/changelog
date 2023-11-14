@@ -1,3 +1,41 @@
+qubes-core-agent (4.2.26-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Add chroot detection to qvm-features-request
+  * qvm-features-request: gracefuly handle too long features
+
+  [ Demi Marie Obenour ]
+  * qfile-unpacker should not be an easy root hole
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: prefer qubes_backend_vmm rpm macro over BACKEND_VMM placeholder
+  * rpm: do not depend on systemd-units on openSUSE
+  * Use sysinit.target.d instead of sysinit.target.requires
+  * rpm: disable symlink checker on openSUSE for now
+  * rpm: do not build sysvinit subpackage on openSUSE
+  * rpm: add missing pre scripts dependencies
+  * rpm: skip moving original fstab on openSUSE
+  * rpm: fix dist macro usage
+  * rpm: drop old udev cleanup code
+  * rpm: drop python2-dnf-plugins-qubes-hooks package
+  * rpm: add missing directory ownerships and BR satisfying them
+  * rpm: do not install kde4 files on openSUSE
+  * rpm: do not install dhclient files on openSUSE
+  * Drop configuration for PolKit<0.106
+  * rpm: adjust post-install scripts
+  * rpm: adjust dependencies for openSUSE
+
+  [ Patrick Schleizer ]
+  * improve formatting of /etc/fstab
+
+  [ Frédéric Pierret (fepitre) ]
+  * setup-ip: adapt path for Gentoo compat
+
+  [ Demi Marie Obenour ]
+  * Detect and terminate infinite qrexec launch chains
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 14 Nov 2023 05:32:25 +0100
+
 qubes-core-agent (4.2.25-1) unstable; urgency=medium
 
   [ Rusty Bird ]
