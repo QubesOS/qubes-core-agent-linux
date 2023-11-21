@@ -31,7 +31,12 @@ if mountpoint -q /rw ; then
 # This script will be executed at every VM startup, you can place your own
 # custom commands here. This includes overriding some configuration in /etc,
 # starting services etc.
-
+#
+# Executable scripts located in /rw/config/rc.local.d with the extension
+# '.rc' are executed immediately before this rc.local.
+# Example:
+#  /rw/config/rc.local.d/custom.rc
+#
 # Example for overriding the whole CUPS configuration:
 #  rm -rf /etc/cups
 #  ln -s /rw/config/cups /etc/cups
@@ -49,7 +54,7 @@ EOF
 #
 # It is a good place for custom rules and actions that should occur when the
 # firewall service is started.
-# 
+#
 # Executable scripts located in /rw/config/qubes-firewall.d are executed
 # immediately before this qubes-firewall-user-script.
 EOF
