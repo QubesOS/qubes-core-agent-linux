@@ -22,7 +22,7 @@
 set -e -o pipefail
 
 copy() {
-    /usr/lib/qubes/qrexec-client-vm @default \
+    PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm @default \
         qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
 }
 
@@ -79,11 +79,11 @@ else
 fi
 
 if [[ $SIZE == 0 ]]; then
-    PROGRESS_TYPE=none copy "$@"
+    copy "$@" >/dev/null
 elif [[ $0 == *.kde ]] && type kdialog qdbus >/dev/null; then
-    PROGRESS_TYPE=gui  copy "$@" | progress_kdialog
+    copy "$@" | progress_kdialog
 elif type zenity >/dev/null; then
-    PROGRESS_TYPE=gui  copy "$@" | progress_zenity
+    copy "$@" | progress_zenity
 else
-    PROGRESS_TYPE=none copy "$@"
+    copy "$@" >/dev/null
 fi
