@@ -45,10 +45,9 @@ progress_kdialog() {
             # shellcheck disable=SC2207
             ref=( $(kdialog --progressbar "$DESCRIPTION") )
             trap '"$qdbus" "${ref[@]}" close' EXIT  # for this subshell
-            "$qdbus" "${ref[@]}" maximum "$SIZE"
         fi
 
-        "$qdbus" "${ref[@]}" value "$pos"
+        "$qdbus" "${ref[@]}" value $((100 * pos / SIZE))
     done) >/dev/null  # hide qdbus's empty output lines
 }
 
