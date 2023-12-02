@@ -37,16 +37,13 @@ static void produce_message(const char *type, const char *fmt, va_list args)
         case 0:
             if (geteuid() == 0) {
                 if (setuid(getuid()) != 0) {
-                    perror("setuid failed, not calling kdialog/zenity");
+                    perror("setuid failed, not calling zenity/kdialog");
                     exit(1);
                 }
             }
             fix_display();
-#ifdef USE_KDIALOG
-            execlp("/usr/bin/kdialog", "kdialog", "--sorry", dialog_msg, NULL);
-#else
             execlp("/usr/bin/zenity", "zenity", "--error", "--text", dialog_msg, NULL);
-#endif
+            execlp("/usr/bin/kdialog", "kdialog", "--sorry", dialog_msg, NULL);
             exit(1);
         default:;
         }
