@@ -78,7 +78,8 @@ install:
 		qubes.ShowInTerminal \
 		qubes.ConnectTCP \
 		qubes.TemplateSearch \
-		qubes.TemplateDownload
+		qubes.TemplateDownload \
+		qubes.PESign
 	$(LN) qubes.VMExec $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.VMExecGUI
 	for config in *.config; do \
 		install -D -m 0644 "$$config" "$(DESTDIR)$(QUBESRPCCONFDIR)/$${config%.config}"; \

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -x -e -o pipefail
+
+CERTIFICATE="$1"
+[[ -z "$CERTIFICATE" ]] && { echo "Please provide certificate name"; exit 1; };
+
+PAYLOAD_DIR="$(mktemp -d)"
+
+cleanup() {
+    local payload_dir="$1"
+    if [ -n "${payload_dir}" ]; then
+        rm -rf "${payload_dir}"
+    fi
+}
+
+trap "cleanup ${PAYLOAD_DIR}" EXIT
+
+payload="${PAYLOAD_DIR}/payload"
+
+# Limit stdin size
+head --bytes=100MB > "$payload"
+
+# We don't allow payload being at least 100MB
+actual_size="$(wc -c < "$payload")"
+if [ "$actual_size" -eq $((100 * 1024 * 1024)) ]; then
+    echo "Input size is at least 100MB. Aborting."
+    exit 1
+fi
+
+pesign -s -c "${CERTIFICATE//__/ }" -i "$payload" -o "$payload".signed
+
+cat "$payload".signed
