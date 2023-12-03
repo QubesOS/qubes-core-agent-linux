@@ -15,6 +15,10 @@ if is_command gnome-terminal; then
     exec qubes-run-gnome-terminal
 fi
 
+if is_command kgx; then
+    exec qubes-run-gnome-console
+fi
+
 for terminal in xfce4-terminal konsole urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal mate-terminal terminology st xterm; do
     if is_command "$terminal" ; then
         exec "$terminal"

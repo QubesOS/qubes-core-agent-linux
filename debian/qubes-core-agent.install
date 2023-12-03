@@ -120,6 +120,7 @@ usr/bin/qubes-desktop-run
 usr/bin/qubes-open
 usr/bin/qubes-session-autostart
 usr/bin/qubes-run-terminal
+usr/bin/qubes-run-gnome-console
 usr/bin/qubes-run-gnome-terminal
 usr/bin/qubes-vmexec
 usr/bin/qvm-copy

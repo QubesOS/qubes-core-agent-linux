@@ -972,6 +972,7 @@ rm -f %{name}-%{version}
 %_bindir/qvm-sync-clock
 %_bindir/qubes-desktop-run
 %_bindir/qubes-run-terminal
+%_bindir/qubes-run-gnome-console
 %_bindir/qubes-run-gnome-terminal
 %_bindir/qubes-open
 %_bindir/qubes-session-autostart
