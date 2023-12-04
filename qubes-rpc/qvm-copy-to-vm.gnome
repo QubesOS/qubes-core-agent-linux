@@ -21,8 +21,19 @@
 
 set -e -o pipefail
 
+set_qdbus() {
+    for cmd in qdbus qdbus-qt{6,5}; do
+        type "$cmd" >&2 || continue
+        qdbus=$cmd
+        return 0
+    done
+
+    unset qdbus
+    return 1
+}
+
 copy() {
-    /usr/lib/qubes/qrexec-client-vm @default \
+    PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm @default \
         qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
 }
 
@@ -33,11 +44,10 @@ progress_kdialog() {
         if [[ $pos == 0 ]]; then
             # shellcheck disable=SC2207
             ref=( $(kdialog --progressbar "$DESCRIPTION") )
-            trap 'qdbus "${ref[@]}" close' EXIT  # for this subshell
-            qdbus "${ref[@]}" Set "" maximum "$SIZE"
+            trap '"$qdbus" "${ref[@]}" close' EXIT  # for this subshell
         fi
 
-        qdbus "${ref[@]}" Set "" value "$pos"
+        "$qdbus" "${ref[@]}" value $((100 * pos / SIZE))
     done) >/dev/null  # hide qdbus's empty output lines
 }
 
@@ -79,11 +89,11 @@ else
 fi
 
 if [[ $SIZE == 0 ]]; then
-    PROGRESS_TYPE=none copy "$@"
-elif [[ $0 == *.kde ]] && type kdialog qdbus >/dev/null; then
-    PROGRESS_TYPE=gui  copy "$@" | progress_kdialog
+    copy "$@" >/dev/null
+elif [[ $0 == *.kde ]] && type kdialog >/dev/null && set_qdbus; then
+    copy "$@" | progress_kdialog
 elif type zenity >/dev/null; then
-    PROGRESS_TYPE=gui  copy "$@" | progress_zenity
+    copy "$@" | progress_zenity
 else
-    PROGRESS_TYPE=none copy "$@"
+    copy "$@" >/dev/null
 fi
