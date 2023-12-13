@@ -51,6 +51,7 @@ install:
 	install -m 0755 -t $(DESTDIR)$(QUBESLIBDIR) set-default-text-editor
 	install -m 0755 -d $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
 	install -m 0644 -t $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml xfce4-notifyd.xml
+	install -m 0644 -t $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml displays.xml
 
 marker-vm: marker-vm.in
 	printf "$(VERSION)" | cut -f 1,2 -d . | cat $< - > marker-vm

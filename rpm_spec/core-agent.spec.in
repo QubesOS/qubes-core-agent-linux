@@ -958,6 +958,7 @@ rm -f %{name}-%{version}
 %dir /etc/dconf/db/local.d
 %config(noreplace) /etc/dconf/db/local.d/dpi
 %config(noreplace) /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-notifyd.xml
+%config(noreplace) /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/displays.xml
 %_udevrulesdir/50-qubes-mem-hotplug.rules
 %_unitdir/user@.service.d/90-session-stop-timeout.conf
 /usr/sbin/qubes-serial-login
