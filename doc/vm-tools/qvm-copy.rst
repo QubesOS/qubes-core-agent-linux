@@ -4,7 +4,7 @@ qvm-copy
 
 NAME
 ====
-qvm-copy - copy specified files to a destination VM. Prompt user to select a destination VM.
+qvm-copy - copy specified files to a destination VM. Prompt user to select a destination VM. Does not work in dom0.
 
 SYNOPSIS
 ========
@@ -23,7 +23,7 @@ qvm-copy-to-vm
 
 NAME
 ====
-qvm-copy-to-vm - copy specified files to specified destination VM
+qvm-copy-to-vm - copy specified files to specified destination VM. Deprecated outside of dom0.
 
 SYNOPSIS
 ========
