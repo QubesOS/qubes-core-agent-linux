@@ -61,6 +61,7 @@ etc/sysctl.d/20_tcp_timestamps.conf
 etc/sysctl.d/80-qubes.conf
 etc/systemd/system/xendriverdomain.service
 etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-notifyd.xml
+etc/xdg/xfce4/xfconf/xfce-perchannel-xml/displays.xml
 lib/modules-load.d/qubes-core.conf
 lib/systemd/system-preset/75-qubes-vm.preset
 lib/systemd/system/boot.automount.d/30_qubes.conf
