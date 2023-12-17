@@ -1,3 +1,24 @@
+qubes-core-agent (4.2.27-1) unstable; urgency=medium
+
+  [ Yanase Yuki ]
+  * qubes-run-terminal: add gnome-console support
+
+  [ Rusty Bird ]
+  * gui-fatal: dynamically fall back on kdialog after trying zenity
+  * qvm-copy-to-vm.gnome: always pass PROGRESS_TYPE=gui to qfile-agent
+  * qvm-copy-to-vm.gnome: update qdbus syntax
+  * qvm-copy-to-vm.gnome: qdbus can have a -qt5/6 suffix (Fedora)
+  * qvm-copy-to-vm.gnome: fix progress_kdialog() for large transfers
+
+  [ Ben Grande ]
+  * Parse '.rc' files in rc.local.d directory on boot
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not show "Displays" prompt in every VM when new display is
+    connected
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 17 Dec 2023 02:08:57 +0100
+
 qubes-core-agent (4.2.26-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
