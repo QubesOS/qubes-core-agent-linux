@@ -19,7 +19,7 @@ OPTIONS
 ==============
 qvm-copy-to-vm
 ==============
-**DEPRECATED**
+For use in scripting; for interactive use, use qvm-copy.
 
 NAME
 ====
