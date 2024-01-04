@@ -3,7 +3,7 @@ checks:tests:
   - ci/codecov-wrapper
   before_script:
   - sudo dnf install -y python3-pip python3-gobject-base ShellCheck
-      'pkgconfig(icu-uc)'
+      'pkgconfig(icu-uc)' sequoia-sqv
   - pip3 install --quiet -r ci/requirements.txt
   - git clone https://github.com/QubesOS/qubes-linux-utils ~/qubes-linux-utils
   - make -C ~/qubes-linux-utils/qrexec-lib all
