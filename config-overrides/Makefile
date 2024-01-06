@@ -19,3 +19,4 @@ install:
 		20_org.gnome.nautilus.qubes.gschema.override \
 		20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override \
 		20_org.mate.NotificationDaemon.qubes.gschema.override
+	install -D -m 0644 portals.conf $(DESTDIR)/usr/share/xdg-desktop-portal/portals.conf
