@@ -190,3 +190,4 @@ usr/share/qubes/xdg-override/mime/*
 usr/share/qubes/xdg-override/mime/application/*.xml
 usr/share/qubes/xdg-override/mime/image/*.xml
 usr/share/qubes/xdg-override/mime/packages/*.xml
+usr/share/xdg-desktop-portal/portals.conf
