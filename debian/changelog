@@ -1,3 +1,14 @@
+qubes-core-agent (4.2.28-1) unstable; urgency=medium
+
+  [ Marta Marczykowska-Górecka ]
+  * Do not deprecate qvm-copy-to-vm, just explain how to use it
+  * Minor docs fix
+
+  [ Demi Marie Obenour ]
+  * Ensure XDG secrets portal is available
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 11 Jan 2024 03:37:48 +0100
+
 qubes-core-agent (4.2.27-1) unstable; urgency=medium
 
   [ Yanase Yuki ]
