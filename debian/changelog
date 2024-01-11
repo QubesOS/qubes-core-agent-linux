@@ -1,3 +1,18 @@
+qubes-core-agent (4.1.47-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * qvm-copy(-to-vm.gnome): avoid 'find -files0-from' for bullseye
+
+  [ Marek Marczykowski-Górecki ]
+  * Add chroot detection to qvm-features-request
+  * qvm-features-request: gracefuly handle too long features
+
+  [ Demi Marie Obenour ]
+  * qfile-unpacker should not be an easy root hole
+  * Ensure XDG secrets portal is available
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 11 Jan 2024 03:44:25 +0100
+
 qubes-core-agent (4.1.46-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
