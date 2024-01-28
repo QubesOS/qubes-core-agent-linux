@@ -5,6 +5,28 @@
 version=$(grep "^[0-9]" /usr/share/qubes/marker-vm | head -1)
 qvm-features-request "qubes-agent-version=$version"
 
+if [ -r /etc/os-release ]; then
+    distro=$(grep ^ID= /etc/os-release)
+    distro=${distro#ID=}
+    qvm-features-request os-distribution="$distro"
+
+    version=$(grep ^VERSION_ID= /etc/os-release)
+    version=${version#VERSION_ID=}
+    version=${version#\"}
+    version=${version%\"}
+    qvm-features-request os-version="$version"
+
+    eol=$(grep ^SUPPORT_END= /etc/os-release)
+    eol=${eol#SUPPORT_END=}
+    # Debian/Ubuntu have it elsewhere:
+    if [ -z "$eol" ] && [ -f "/usr/share/distro-info/$distro.csv" ]; then
+        # debian: version,codename,series,created,release,eol,eol-lts,eol-elts
+        # ubuntu: version,codename,series,created,release,eol,eol-server,eol-esm
+        eol=$(grep "^$version," "/usr/share/distro-info/$distro.csv" | cut -f 6 -d ,)
+    fi
+    qvm-features-request os-eol="$eol"
+fi
+
 qvm-features-request qrexec=1
 qvm-features-request os=Linux
 qvm-features-request vmexec=1
