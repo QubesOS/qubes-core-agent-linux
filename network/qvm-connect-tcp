@@ -32,7 +32,11 @@ if check_port "$PORT" && check_port "$LOCALPORT"; then
         msg="Binding TCP '@default:$PORT' to 'localhost:$LOCALPORT'..."
     fi
     echo "$msg"
-    sudo socat TCP-LISTEN:"$LOCALPORT",reuseaddr,fork EXEC:"qrexec-client-vm \'$DOMAIN\' qubes.ConnectTCP+$PORT" &
+    su=""
+    if test "$LOCALPORT" -le 1023; then
+        su="sudo"
+    fi
+    ${su} socat TCP-LISTEN:"$LOCALPORT",reuseaddr,fork EXEC:"qrexec-client-vm \'$DOMAIN\' qubes.ConnectTCP+$PORT" &
 else
     echo "Invalid port provided"
     print_usage
