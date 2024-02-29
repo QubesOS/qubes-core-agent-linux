@@ -224,6 +224,9 @@ Source0: %{name}-%{version}.tar.gz
 %if %{with selinux}
 Requires: (%{name}-selinux if selinux-policy)
 %endif
+# Ensure that gnome-keyring is always available, so that changing
+# TemplateVMs doesn't break stuff that uses the secrets portal.
+Requires: (gnome-keyring if xdg-desktop-portal)
 
 %description
 The Qubes core files for installation inside a Qubes VM.
