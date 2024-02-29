@@ -174,7 +174,7 @@ main()
             dup2(null_fd, 0);
             close(null_fd);
 
-            log_fd = open("/tmp/mimeopen.log", O_CREAT | O_APPEND, 0666);
+            log_fd = open("/tmp/mimeopen.log", O_CREAT | O_APPEND | O_NOFOLLOW, 0666);
             if (log_fd == -1) {
                 perror("open /tmp/mimeopen.log");
                 exit(1);
