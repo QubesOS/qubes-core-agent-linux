@@ -271,7 +271,7 @@ class TestIptablesWorker(TestCase, WorkerCommon):
         expected_iptables = (
             "*filter\n"
             "-A chain -d a::b/128 -p tcp --dport 80:80 -j ACCEPT\n"
-            "-A chain -d 2001:67c:2e8:22::c100:68b/128 -p tcp -j ACCEPT\n"
+            "-A chain -d 2001:67c:2e8:25::c100:b33/128 -p tcp -j ACCEPT\n"
             "-A chain -d 2001::1/128 -p tcp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 2001::2/128 -p tcp --dport 53:53 -j ACCEPT\n"
             "-A chain -d 2001::1/128 -p udp --dport 53:53 -j ACCEPT\n"
@@ -502,7 +502,7 @@ class TestNftablesWorker(TestCase, WorkerCommon):
             'table ip6 qubes-firewall {\n'
             '  chain chain {\n'
             '    ip6 nexthdr tcp ip6 daddr a::b/128 tcp dport 80 accept\n'
-            '    ip6 nexthdr tcp ip6 daddr { 2001:67c:2e8:22::c100:68b/128 } '
+            '    ip6 nexthdr tcp ip6 daddr { 2001:67c:2e8:25::c100:b33/128 } '
             'accept\n'
             '    ip6 daddr { 2001::1/128, 2001::2/128 } tcp dport 53 accept\n'
             '    ip6 daddr { 2001::1/128, 2001::2/128 } udp dport 53 accept\n'
