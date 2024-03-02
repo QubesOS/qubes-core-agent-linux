@@ -44,18 +44,6 @@ is_masked () {
     return 1
 }
 
-mask () {
-    ln -sf /dev/null /etc/systemd/system/"$1"
-}
-
-unmask () {
-    if ! is_masked "$1"
-    then
-        return 0
-    fi
-    rm -f /etc/systemd/system/"$1"
-}
-
 preset_units () {
     local represet=
     # shellcheck disable=SC2206
