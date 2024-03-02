@@ -11,7 +11,7 @@ make=( make -C "${ROOTDIR}"/qubes-rpc all )
 "${make[@]}" ||
 { sudo dnf -y install qubes-utils-libs qubes-utils-devel && "${make[@]}"; }
 
-[ -r version ] || ln -s ${ROOTDIR}/version ./
-[ -r setup.py ] || ln -s ${ROOTDIR}/setup.py ./
+[ -r version ] || ln -s "${ROOTDIR}/version" ./
+[ -r setup.py ] || ln -s "${ROOTDIR}/setup.py" ./
 "${PYTHON}" ./setup.py egg_info --egg-base "${TESTPYTHONPATH}"
 "${PYTHON}" -m coverage run -m unittest discover -p 'test_*.py' -v "$@"
