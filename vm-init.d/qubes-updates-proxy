@@ -76,12 +76,6 @@ restart() {
     start
 }
 
-reload() {
-    echo -n $"Reloading $prog: "
-    killproc -p $pidfile "$prog" -HUP
-    echo
-}
-
 force_reload() {
     restart
 }
