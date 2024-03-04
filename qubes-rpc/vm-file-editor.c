@@ -192,7 +192,7 @@ main(void)
             if (close(null_fd))
                 err(1, "close()");
 
-            log_fd = open("/tmp/mimeopen.log", O_CREAT | O_APPEND, 0666);
+            log_fd = open("/tmp/mimeopen.log", O_CREAT | O_APPEND | O_NOFOLLOW, 0666);
             if (log_fd == -1) {
                 perror("open /tmp/mimeopen.log");
                 _exit(1);
