@@ -74,6 +74,13 @@ else
   VM="@default"
 fi
 
+for path; do
+    case $path in
+        (.|..) printf 'Refusing to copy "." or "..".
+Try copying from the parent directory.\n' >&2; exit 1;;
+    esac
+done
+
 if [ "$PROGRESS_TYPE" = console ] ; then
     find_paths=( )
     for path; do
