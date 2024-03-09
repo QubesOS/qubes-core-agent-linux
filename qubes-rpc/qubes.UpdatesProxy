@@ -1,2 +1,2 @@
 #!/bin/sh
-exec socat STDIO TCP:localhost:8082
+exec socat STDIO TCP4:127.0.0.1:8082
