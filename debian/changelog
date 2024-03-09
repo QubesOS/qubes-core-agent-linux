@@ -1,3 +1,23 @@
+qubes-core-agent (4.1.48-1) unstable; urgency=medium
+
+  [ Ben Grande ]
+  * Skip sudo for unprivileged ports binds
+
+  [ Jan Hustak ]
+  * #8991 - support for the dhcp4-change event in qubes-nmhook
+
+  [ Demi Marie Obenour ]
+  * Use O_NOFOLLOW for the log file
+
+  [ Marek Marczykowski-Górecki ]
+  * tests: update IP address used in firewall test
+  * debian: remove unused code from postinst
+  * Remove unused code from vm-init.d/qubes-updates-proxy
+  * fix issues found by shellcheck in run-tests script
+  * Force using 127.0.0.1 when connecting to updates proxy
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 09 Mar 2024 20:29:23 +0100
+
 qubes-core-agent (4.1.47-1) unstable; urgency=medium
 
   [ Rusty Bird ]
