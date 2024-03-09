@@ -1,3 +1,28 @@
+qubes-core-agent (4.2.29-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Switch to sequoia for codecov signature check
+  * tests: update IP address used in firewall test
+  * debian: remove unused code from postinst
+  * Remove unused code from vm-init.d/qubes-updates-proxy
+  * fix issues found by shellcheck in run-tests script
+
+  [ Ben Grande ]
+  * Skip sudo for unprivileged ports binds
+
+  [ Demi Marie Obenour ]
+  * Refuse to copy "." or ".."
+  * Ensure gnome-keyring always available
+  * Use O_NOFOLLOW for the log file
+
+  [ Jan Hustak ]
+  * #8991 - support for the dhcp4-change event in qubes-nmhook
+
+  [ Marek Marczykowski-Górecki ]
+  * Force using 127.0.0.1 when connecting to updates proxy
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 09 Mar 2024 18:15:54 +0100
+
 qubes-core-agent (4.2.28-1) unstable; urgency=medium
 
   [ Marta Marczykowska-Górecka ]
