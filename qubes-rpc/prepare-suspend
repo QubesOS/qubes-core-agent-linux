@@ -7,6 +7,11 @@
 action=$1
 [ -z "$action" ] && action=suspend
 
+s0ix=
+if grep -q qubes_exp_pm_use_suspend=1 /proc/cmdline; then
+    s0ix=true
+fi
+
 MODULES_BLACKLIST=""
 if [ -r /etc/qubes-suspend-module-blacklist ]; then
     MODULES_BLACKLIST="$MODULES_BLACKLIST $(grep -v '^#' /etc/qubes-suspend-module-blacklist)"
@@ -23,6 +28,13 @@ if [ "$action" = "suspend" ]; then
             org.freedesktop.NetworkManager.Sleep boolean:true ||  \
             service NetworkManager stop
     fi
+    echo -n > /var/run/qubes-suspend-pci-devs-detached
+    echo -n > /var/run/qubes-suspend-modules-loaded
+    if [ -n "$s0ix" ]; then
+        # skip remaining workarounds, not needed with S0ix
+        exit
+    fi
+
     # Force interfaces down, just in case when NM didn't done it
     for intf in /sys/class/net/*; do
         intf=$(basename "$intf")
@@ -39,7 +51,6 @@ if [ "$action" = "suspend" ]; then
     done
 
     # detach all drivers from PCI devices (the real ones, not emulated by qemu)
-    echo -n > /var/run/qubes-suspend-pci-devs-detached
     for dev_path in /sys/bus/pci/devices/*; do
         subsystem_vendor=$(cat "$dev_path/subsystem_vendor")
         vendor=$(cat "$dev_path/vendor")
