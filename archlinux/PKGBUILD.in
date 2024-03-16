@@ -111,7 +111,7 @@ package_qubes-vm-core() {
     mkdir -p -m 0755 "${pkgdir}/etc/pacman.d"
     install -m 644 "archlinux/PKGBUILD-qubes-pacman-options.conf" "${pkgdir}/etc/pacman.d/10-qubes-options.conf"
     echo "Installing repository for release ${release}"
-    install -m 644 "archlinux/PKGBUILD-qubes-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf.disabled"
+    install -m 644 "archlinux/PKGBUILD-qubes-repo-${release}.conf" "${pkgdir}/etc/pacman.d/99-qubes-repository-${release}.conf"
 
     # Install upgrade check scripts
     install -m 0755 "package-managers/upgrades-installed-check" "${pkgdir}/usr/lib/qubes/"
