@@ -120,19 +120,16 @@ command to generate the output files.
     <acronym>SVG</acronym>
     <expanded-acronym>Scalable Vector Graphics</expanded-acronym>
     <sub-class-of type="application/xml"/>
-    <!-- The original database includes this at offsets 0 through 256; we only
-         allow it at offset 0 -->
     <magic priority="80">
-      <match type="string" value="&lt;!DOCTYPE svg" offset="0"/>
+      <match type="string" value="&lt;!DOCTYPE svg" offset="0:256"/>
+    </magic>
+    <magic priority="80">
       <match type="string" value="&lt;!-- Created with Inkscape" offset="0"/>
       <match type="string" value="&lt;svg" offset="0"/>
     </magic>
-    <!-- The original database includes this at offsets 1 through 256; we only
-         allow it at offset 0 -->
-    <!--
     <magic priority="45">
       <match type="string" value="&lt;svg" offset="1:256"/>
-    </magic> -->
+    </magic>
     <glob pattern="*.svg"/>
     <!-- this is from the original database; it is disabled in QubesOS to reduce
          attack surface -->
