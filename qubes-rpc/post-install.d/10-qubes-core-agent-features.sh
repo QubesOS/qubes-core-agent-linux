@@ -8,12 +8,18 @@ qvm-features-request "qubes-agent-version=$version"
 if [ -r /etc/os-release ]; then
     distro=$(grep ^ID= /etc/os-release)
     distro=${distro#ID=}
+    if [ -f /usr/share/whonix/marker ]; then
+        distro="whonix"
+    fi
     qvm-features-request os-distribution="$distro"
 
     version=$(grep ^VERSION_ID= /etc/os-release)
     version=${version#VERSION_ID=}
     version=${version#\"}
     version=${version%\"}
+    if [ "$distro" = "whonix" ]; then
+        version=$(cat /etc/whonix_version)
+    fi
     qvm-features-request os-version="$version"
 
     eol=$(grep ^SUPPORT_END= /etc/os-release)
