@@ -8,6 +8,9 @@ qvm-features-request "qubes-agent-version=$version"
 if [ -r /etc/os-release ]; then
     distro=$(grep ^ID= /etc/os-release)
     distro=${distro#ID=}
+    if [ -f /usr/share/kicksecure/marker ]; then
+        distro="kicksecure"
+    fi
     if [ -f /usr/share/whonix/marker ]; then
         distro="whonix"
     fi
@@ -19,6 +22,8 @@ if [ -r /etc/os-release ]; then
     version=${version%\"}
     if [ "$distro" = "whonix" ]; then
         version=$(cat /etc/whonix_version)
+    elif [ "$distro" = "kicksecure" ]; then
+        version=$(cat /etc/kicksecure_version)
     fi
     qvm-features-request os-version="$version"
 
