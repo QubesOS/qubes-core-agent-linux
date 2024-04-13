@@ -521,6 +521,7 @@ sed -i \
 %endif
 
 install -D -m 0644 boot/dracut-qubes.conf $RPM_BUILD_ROOT/usr/lib/dracut/dracut.conf.d/30-qubes.conf
+install -D -m 0755 boot/module-setup.sh $RPM_BUILD_ROOT/usr/lib/dracut/modules.d/99qubes/module-setup.sh
 install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
 
 %if ! %with_sysvinit
@@ -1021,6 +1022,12 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/set-default-text-editor
 /usr/lib/qubes/tinyproxy-wrapper
 /usr/lib/dracut/dracut.conf.d/30-qubes.conf
+# Ensure that dracut is not a hard requirement.
+# It is only needed with in-VM initramfs, not
+# dom0-provided initramfs.
+%dir /usr/lib/dracut/modules.d/99qubes
+/usr/lib/dracut/modules.d/99qubes/module-setup.sh
+
 /usr/lib/environment.d/60-gnome-software-fix.conf
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/bind-dirs.sh
@@ -1298,6 +1305,10 @@ The Qubes core startup configuration for SystemD init.
 %dir %_unitdir/sysinit.target.d
 %_unitdir/sysinit.target.d/30_qubes.conf
 %dir %_userunitdir/*.service.d
+%dir %_unitdir/rescue.service.d
+%dir %_unitdir/emergency.service.d
+%_unitdir/emergency.service.d/30_qubes.conf
+%_unitdir/rescue.service.d/30_qubes.conf
 %_userunitdir/tracker-extract-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-control-3.service.d/30_qubes.conf
