@@ -134,6 +134,7 @@ Requires:   sed
 Requires:   util-linux
 Requires:   e2fsprogs
 Requires:   hostname
+Requires:   (%{name}-dracut if dracut)
 # for Qubes Manager VM updater
 Requires:   xterm
 # for qubes-desktop-run
@@ -373,6 +374,19 @@ switching from user to root. Since all the user data in a VM is accessible
 already from normal user account, there is not much more to guard there. Qubes
 VMs are single user systems.
 
+%package dracut
+Summary:        Dracut configuration needed in Qubes OS
+License:        GPL
+Group:          Qubes
+Requires:       dracut
+Requires:       qubes-core-agent = %{version}
+
+%description dracut
+Dracut configuration useful for Qubes OS.  This enables
+passwordless login in rescue and emergency modes.  Unlike the
+configuration in qubes-kernel-vm-support, it isn't needed to
+boot a VM, but it does make recovery of broken VMs easier.
+
 %package thunar
 Summary: Thunar support for Qubes VM tools
 Requires: Thunar
@@ -520,6 +534,10 @@ sed -i \
         -e 's:/fc:/centos:' \
         $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
 %endif
+
+install -D -m 0644 boot/dracut-qubes.conf $RPM_BUILD_ROOT/usr/lib/dracut/dracut.conf.d/30-qubes.conf
+install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
+install -D -m 0755 boot/module-setup.sh $RPM_BUILD_ROOT/usr/lib/dracut/modules.d/99qubes/module-setup.sh
 
 %if ! %with_sysvinit
     rm -rf $RPM_BUILD_ROOT/etc/init.d/qubes-* $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
@@ -1026,7 +1044,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/resize-rootfs
 /usr/lib/qubes/set-default-text-editor
 /usr/lib/qubes/tinyproxy-wrapper
-/usr/lib/dracut/dracut.conf.d/30-qubes.conf
+
 /usr/lib/environment.d/60-gnome-software-fix.conf
 %dir /usr/lib/qubes/init
 /usr/lib/qubes/init/bind-dirs.sh
@@ -1095,6 +1113,11 @@ rm -f %{name}-%{version}
 /usr/share/caja-python/extensions/qvm_move_caja.py*
 /usr/share/caja-python/extensions/qvm_dvm_caja.py*
 %endif
+
+%files dracut
+/usr/lib/dracut/dracut.conf.d/30-qubes.conf
+%dir /usr/lib/dracut/modules.d/99qubes
+/usr/lib/dracut/modules.d/99qubes/module-setup.sh
 
 %files nautilus
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
@@ -1304,6 +1327,10 @@ The Qubes core startup configuration for SystemD init.
 %dir %_unitdir/sysinit.target.d
 %_unitdir/sysinit.target.d/30_qubes.conf
 %dir %_userunitdir/*.service.d
+%dir %_unitdir/rescue.service.d
+%dir %_unitdir/emergency.service.d
+%_unitdir/emergency.service.d/30_qubes.conf
+%_unitdir/rescue.service.d/30_qubes.conf
 %_userunitdir/tracker-extract-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-control-3.service.d/30_qubes.conf

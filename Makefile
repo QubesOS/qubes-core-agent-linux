@@ -50,7 +50,7 @@ SYSTEM_DROPINS += systemd-random-seed.service
 SYSTEM_DROPINS += tor.service tor@default.service
 SYSTEM_DROPINS += systemd-timesyncd.service
 SYSTEM_DROPINS += systemd-logind.service
-SYSTEM_DROPINS += sysinit.target
+SYSTEM_DROPINS += sysinit.target emergency.service rescue.service
 ifeq ($(ENABLE_SELINUX),1)
 SYSTEM_DROPINS += selinux-autorelabel.target selinux-autorelabel.service
 endif
