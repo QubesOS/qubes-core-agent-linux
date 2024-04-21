@@ -2,6 +2,18 @@
 
 set -e
 
+if [ "$1" = "started-by-init" ]; then
+    true "INFO: Started by systemd unit (timer.) Continuing..."
+else
+    true "INFO: Not started by systemd unit (timer.) Probably started by package manager hook script."
+    if test -e /run/qubes/persistent-full; then
+        true "INFO: Running inside Template and Standalone. Continuing..."
+    else
+        true "INFO: Probably running inside App Qube. Stop."
+        exit 0
+    fi
+fi
+
 upgrades_installed="$(/usr/lib/qubes/upgrades-installed-check)"
 
 if [ "$upgrades_installed" = "true" ]; then
