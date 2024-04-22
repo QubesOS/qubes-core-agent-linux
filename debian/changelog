@@ -1,3 +1,28 @@
+qubes-core-agent (4.2.30-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Remove Arch repository stub
+
+  [ Marek Marczykowski-Górecki ]
+  * Tell dom0 about basic distribution metadata
+  * Add support for Whonix version reporting too
+  * Add kicksecure detection too
+
+  [ Demi Marie Obenour ]
+  * Recognize more SVG files
+  * Recognize JPEG images
+  * Update MIME database entries
+  * Make qvm-open-in-dvm.desktop and qvm-view-in-dvm.desktop consistent
+
+  [ Patrick Schleizer ]
+  * fix: do not run package manager update command every time a package
+    gets installed in App Qube
+
+  [ Marek Marczykowski-Górecki ]
+  * Report when in-vm kernel supports memory hotplug
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 22 Apr 2024 15:58:45 +0200
+
 qubes-core-agent (4.2.29-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
