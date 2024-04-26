@@ -909,6 +909,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
+%config(noreplace) /etc/qubes/rpc-config/qubes.ConnectTCP
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenInVM
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenURL
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectFile
