@@ -229,8 +229,6 @@ install-netvm: install-systemd-networking-dropins install-networkmanager
 	install -m 0400 -D network/qubes-antispoof.nft $(DESTDIR)/etc/qubes/qubes-antispoof.nft
 	install -m 0400 -D network/qubes-ipv6-disabled.nft $(DESTDIR)/etc/qubes/qubes-ipv6-disabled.nft
 
-	install -m 0755 -D qubes-rpc/qubes.UpdatesProxy $(DESTDIR)/etc/qubes-rpc/qubes.UpdatesProxy
-
 # networkmanager install target allow integration of NetworkManager for Qubes VM:
 # * make connections config persistent
 # * adjust DNS redirections when needed

@@ -1,5 +1,6 @@
 etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 etc/qubes-rpc/qubes.UpdatesProxy
+etc/qubes/rpc-config/qubes.UpdatesProxy
 etc/qubes/qubes-ipv6-disabled.nft
 etc/qubes/qubes-ipv6.nft
 etc/qubes/qubes-ipv4.nft
