@@ -5,3 +5,4 @@ Description=Forward connection to updates proxy over Qubes RPC
 ExecStart=/usr/bin/qrexec-client-vm --use-stdin-socket '' qubes.UpdatesProxy
 StandardInput=socket
 StandardOutput=inherit
+StandardError=journal
