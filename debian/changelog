@@ -1,3 +1,13 @@
+qubes-core-agent (4.2.31-1) unstable; urgency=medium
+
+  [ Ludovic Bellier ]
+  * Update archlinux python version dependency to <3.13
+
+  [ Marek Marczykowski-Górecki ]
+  * ci: temporarily allow failure if "repro" job on bookworm
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 01 May 2024 03:47:37 +0200
+
 qubes-core-agent (4.2.30-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
