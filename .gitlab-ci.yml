@@ -22,3 +22,6 @@ include:
   project: QubesOS/qubes-continuous-integration
 - file: /r4.2/gitlab-vm.yml
   project: QubesOS/qubes-continuous-integration
+
+r4.2:repro:vm-bookworm:
+  allow_failure: true
