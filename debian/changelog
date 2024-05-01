@@ -1,3 +1,9 @@
+qubes-core-agent (4.2.32-1) unstable; urgency=medium
+
+  * suspend: skip S3 related workarounds when using S0ix
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 01 May 2024 04:13:45 +0200
+
 qubes-core-agent (4.2.31-1) unstable; urgency=medium
 
   [ Ludovic Bellier ]
