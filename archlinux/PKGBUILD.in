@@ -59,6 +59,7 @@ package_qubes-vm-core() {
         qubes-vm-utils
         qubes-libvchan
         qubes-db-vm
+        'qubes-vm-qrexec>=4.2.19'
         python
         python-xdg
         ntp

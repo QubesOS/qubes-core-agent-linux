@@ -163,7 +163,7 @@ Requires:   librsvg2-tools
 %endif
 Requires:   zenity
 Requires:   dconf
-Requires:   qubes-core-qrexec-vm
+Requires:   qubes-core-qrexec-vm >= 4.2.19
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 # qubes.Suspend{Pre,Post}
