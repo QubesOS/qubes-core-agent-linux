@@ -113,7 +113,7 @@ int main(int argc, char ** argv)
             if (asprintf(&procdir_path, "/proc/%d/fd", getpid()) < 0) {
                 gui_fatal("Error allocating memory");
             }
-            procfs_fd = open(procdir_path, O_DIRECTORY | O_RDONLY);
+            procfs_fd = open(procdir_path, O_DIRECTORY | O_RDONLY | O_NOCTTY | O_CLOEXEC);
             if (procfs_fd < 0)
                 perror("Failed to open /proc");
             else
