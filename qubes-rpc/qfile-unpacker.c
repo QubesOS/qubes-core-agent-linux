@@ -33,7 +33,8 @@ static char *prepare_creds_return_dir(uid_t uid, uid_t myuid)
         gui_fatal("Error setting group permissions");
     if (initgroups(pwd->pw_name, pwd->pw_gid) < 0)
         gui_fatal("Error initializing groups");
-    if (setfsuid(pwd->pw_uid) < 0)
+    setfsuid(pwd->pw_uid);
+    if ((uid_t)setfsuid(-1) != uid)
         gui_fatal("Error setting filesystem level permissions");
     return pwd->pw_dir;
 }
