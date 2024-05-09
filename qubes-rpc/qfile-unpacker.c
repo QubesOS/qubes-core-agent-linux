@@ -29,6 +29,8 @@ static char *prepare_creds_return_dir(uid_t uid, uid_t myuid)
     }
     setenv("HOME", pwd->pw_dir, 1);
     setenv("USER", pwd->pw_name, 1);
+    if (pwd->pw_uid != uid)
+        gui_fatal("getpwuid() returned entry for wrong user");
     if (setgid(pwd->pw_gid) < 0)
         gui_fatal("Error setting group permissions");
     if (initgroups(pwd->pw_name, pwd->pw_gid) < 0)
