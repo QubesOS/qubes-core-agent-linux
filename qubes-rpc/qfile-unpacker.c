@@ -17,7 +17,7 @@
 
 #define INCOMING_DIR_NAME "QubesIncoming"
 
-char *prepare_creds_return_dir(int uid)
+static char *prepare_creds_return_dir(uid_t uid)
 {
     const struct passwd *pwd;
     uid_t myuid = getuid();
