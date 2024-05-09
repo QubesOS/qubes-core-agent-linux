@@ -76,10 +76,11 @@ install:
 		qubes.PostInstall \
 		qubes.GetDate \
 		qubes.ShowInTerminal \
-		qubes.ConnectTCP \
 		qubes.TemplateSearch \
 		qubes.TemplateDownload
 	$(LN) qubes.VMExec $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.VMExecGUI
+	$(LN) /dev/tcp/127.0.0.1 $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.ConnectTCP
+	$(LN) /dev/tcp/127.0.0.1/8082 $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.UpdatesProxy
 	for config in *.config; do \
 		install -D -m 0644 "$$config" "$(DESTDIR)$(QUBESRPCCONFDIR)/$${config%.config}"; \
 	done

@@ -163,7 +163,7 @@ Requires:   librsvg2-tools
 %endif
 Requires:   zenity
 Requires:   dconf
-Requires:   qubes-core-qrexec-vm
+Requires:   qubes-core-qrexec-vm >= 4.2.19
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 # qubes.Suspend{Pre,Post}
@@ -909,6 +909,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
+%config(noreplace) /etc/qubes/rpc-config/qubes.ConnectTCP
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenInVM
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenURL
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectFile
@@ -1099,6 +1100,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/qubes-ipv4.nft
 %config(noreplace) /etc/qubes/qubes-ipv6.nft
 %config(noreplace) /etc/qubes/qubes-ipv6-disabled.nft
+%config(noreplace) /etc/qubes/rpc-config/qubes.UpdatesProxy
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
 %config(noreplace) /etc/tinyproxy/updates-blacklist
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules

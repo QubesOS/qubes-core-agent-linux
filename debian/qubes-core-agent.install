@@ -43,6 +43,7 @@ etc/qubes/autostart/*
 etc/qubes/applications/*
 etc/qubes/post-install.d/README
 etc/qubes/post-install.d/*.sh
+etc/qubes/rpc-config/qubes.ConnectTCP
 etc/qubes/rpc-config/qubes.OpenInVM
 etc/qubes/rpc-config/qubes.OpenURL
 etc/qubes/rpc-config/qubes.SelectFile

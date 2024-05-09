@@ -47,7 +47,7 @@ Depends:
     python3-xdg,
     python3-dbus,
     qubes-utils (>= 3.1.3),
-    qubes-core-qrexec,
+    qubes-core-qrexec (>= 4.2.19),
     qubesdb-vm,
     systemd,
     xdg-user-dirs,
