@@ -77,6 +77,8 @@ int main(int argc, char ** argv)
         if (asprintf(&incoming_dir_root, "%s/%s", home_dir, INCOMING_DIR_NAME) < 0) {
             gui_fatal("Error allocating memory");
         }
+        // mkdir() failing is harmless.  If the directory doesn't exist after
+        // the call, the subsequent chdir() will fail.
         mkdir(incoming_dir_root, 0700);
         if (asprintf(&incoming_dir, "%s/%s", incoming_dir_root, remote_domain) < 0)
             gui_fatal("Error allocating memory");
