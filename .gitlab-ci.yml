@@ -14,10 +14,6 @@ checks:tests:
   - shellcheck -e SC1117 $(grep -l '^#!/bin/\(ba\)\?sh' $(git ls-files))
   stage: checks
 include:
-- file: /r4.1/gitlab-base.yml
-  project: QubesOS/qubes-continuous-integration
-- file: /r4.1/gitlab-vm.yml
-  project: QubesOS/qubes-continuous-integration
 - file: /r4.2/gitlab-base.yml
   project: QubesOS/qubes-continuous-integration
 - file: /r4.2/gitlab-vm.yml
