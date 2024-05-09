@@ -1,3 +1,14 @@
+qubes-core-agent (4.2.33-1) unstable; urgency=medium
+
+  * Use new built-in TCP support in qrexec for qubes.ConnectTCP
+  * Use new built-in TCP support in qrexec for qubes.UpdatesProxy
+  * Use 'qrexec-client-vm --use-stdin-socket' to properly handle EOF
+  * Log updates proxy connection errors to journal
+  * Require qrexec >= 4.2.19 for built-in TCP support
+  * ci: drop R4.1 builds
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 09 May 2024 20:08:14 +0200
+
 qubes-core-agent (4.2.32-1) unstable; urgency=medium
 
   * suspend: skip S3 related workarounds when using S0ix
