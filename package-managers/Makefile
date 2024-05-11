@@ -64,10 +64,14 @@ else
 endif
 	install -D -m 0644 apt-qubes-archive-keyring-4.2.gpg \
 		$(DESTDIR)/usr/share/keyrings/qubes-archive-keyring-4.2.gpg
+	install -D -m 0644 apt-qubes-archive-keyring-4.3.gpg \
+		$(DESTDIR)/usr/share/keyrings/qubes-archive-keyring-4.3.gpg
 	ln -s qubes-archive-keyring-4.2.gpg \
 		$(DESTDIR)/usr/share/keyrings/qubes-archive-keyring.gpg
 	install -D -m 0644 apt-qubes-ubuntu-archive-keyring-4.2.gpg \
 		$(DESTDIR)/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg
+	install -D -m 0644 apt-qubes-ubuntu-archive-keyring-4.3.gpg \
+		$(DESTDIR)/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg
 	ln -s qubes-ubuntu-archive-keyring-4.2.gpg \
 		$(DESTDIR)/usr/share/keyrings/qubes-ubuntu-archive-keyring.gpg
 	install -D -m 0644 apt-conf-00notify-hook \
