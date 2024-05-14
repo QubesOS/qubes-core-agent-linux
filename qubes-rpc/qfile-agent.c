@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <gui-fatal.h>
 #include <libqubes-rpc-filecopy.h>
 
@@ -82,10 +83,17 @@ int main(int argc, char **argv)
     invocation_cwd_fd = open(".", O_PATH | O_DIRECTORY);
     if (invocation_cwd_fd < 0)
         gui_fatal("open \".\"");
+    bool ignore_options = false;
     for (i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--ignore-symlinks")==0) {
-            ignore_symlinks = 1;
-            continue;
+        if (!ignore_options) {
+            if (strcmp(argv[i], "--ignore-symlinks")==0) {
+                ignore_symlinks = 1;
+                continue;
+            }
+            if (strcmp(argv[i], "--") == 0) {
+                ignore_options = true;
+                continue;
+            }
         }
         if (!*argv[i])
             gui_fatal("Invalid empty argument %i", i);
