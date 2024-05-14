@@ -21,7 +21,7 @@
 
 set -e -o pipefail
 
-unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_BYTES service scriptdir
+unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_BYTES service scriptdir ignore_symlinks
 
 # Determine the operation to be performed
 case ${0##*/} in
@@ -41,9 +41,9 @@ esac
 
 usage () {
     if [ "$TARGET_TYPE" = "vm" ]; then
-        echo "usage: $0 [--without-progress] destination_qube_name FILE [FILE ...]"
+        echo "usage: $0 [--without-progress] [--ignore-symlinks] destination_qube_name FILE [FILE ...]"
     else
-        echo "usage: $0 [--without-progress] FILE [FILE ...]"
+        echo "usage: $0 [--without-progress] [--ignore-symlinks] FILE [FILE ...]"
     fi
 
     echo
@@ -66,6 +66,7 @@ export PROGRESS_TYPE=console
 while [ "$#" -gt 0 ]; do
     case $1 in
         (--without-progress) export PROGRESS_TYPE=none; shift;;
+        (--ignore-symlinks) ignore_symlinks=true; shift;;
         (-h|--help) usage 0;;
         (--) shift; break;;
         (-*) usage 1;;
@@ -93,7 +94,7 @@ fi
 if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_BYTES; fi
 
 "$scriptdir/qubes/qrexec-client-vm" --filter-escape-chars-stderr -- "$VM" \
-    "$service" "$scriptdir/qubes/qfile-agent" "$@"
+    "$service" "$scriptdir/qubes/qfile-agent" ${ignore_symlinks+--ignore-symlinks} -- "$@"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
     rm -rf -- "$@"
