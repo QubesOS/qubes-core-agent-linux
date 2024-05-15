@@ -175,10 +175,8 @@ usr/lib/qubes/tinyproxy-wrapper
 usr/share/glib-2.0/schemas/*
 usr/share/kde4/services/*.desktop
 usr/share/keyrings/qubes-archive-keyring.gpg
-usr/share/keyrings/qubes-archive-keyring-4.2.gpg
 usr/share/keyrings/qubes-archive-keyring-4.3.gpg
 usr/share/keyrings/qubes-ubuntu-archive-keyring.gpg
-usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg
 usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg
 usr/share/kservices5/ServiceMenus/*.desktop
 usr/share/applications/*.desktop

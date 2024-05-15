@@ -1,15 +1,15 @@
 # Main qubes updates repository
-deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg ] https://debu.qubes-os.org/r4.2/vm @DIST@ main
-#deb-src [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg ] https://debu.qubes-os.org/r4.2/vm @DIST@ main
+deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg ] https://debu.qubes-os.org/r4.3/vm @DIST@ main
+#deb-src [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg ] https://debu.qubes-os.org/r4.3/vm @DIST@ main
 
 # Qubes updates candidates repository
-#deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg] https://debu.qubes-os.org/r4.2/vm @DIST@-testing main
-#deb-src  [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg ]  https://debu.qubes-os.org/r4.2/vm @DIST@-testing main
+#deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg] https://debu.qubes-os.org/r4.3/vm @DIST@-testing main
+#deb-src  [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg ]  https://debu.qubes-os.org/r4.3/vm @DIST@-testing main
 
 # Qubes security updates testing repository
-#deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg] https://debu.qubes-os.org/r4.2/vm @DIST@-securitytesting main
-#deb-src  [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg ] https://debu.qubes-os.org/r4.2/vm @DIST@-securitytesting main
+#deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg] https://debu.qubes-os.org/r4.3/vm @DIST@-securitytesting main
+#deb-src  [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg ] https://debu.qubes-os.org/r4.3/vm @DIST@-securitytesting main
 
 # Qubes experimental/unstable repository
-#deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg] https://debu.qubes-os.org/r4.2/vm @DIST@-unstable main
-#deb-src  [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.2.gpg ] https://debu.qubes-os.org/r4.2/vm @DIST@-unstable main
+#deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg] https://debu.qubes-os.org/r4.3/vm @DIST@-unstable main
+#deb-src  [arch=amd64 signed-by=/usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg ] https://debu.qubes-os.org/r4.3/vm @DIST@-unstable main
