@@ -17,10 +17,9 @@
 
 #define INCOMING_DIR_NAME "QubesIncoming"
 
-static char *prepare_creds_return_dir(uid_t uid)
+static char *prepare_creds_return_dir(uid_t uid, uid_t myuid)
 {
     const struct passwd *pwd;
-    uid_t myuid = getuid();
     if (myuid != 0 && myuid != (uid_t)uid)
         gui_fatal("Refusing to change to UID other than the caller's UID");
     pwd = getpwuid(uid);
@@ -44,23 +43,29 @@ int main(int argc, char ** argv)
     char *home_dir;
     char *incoming_dir_root;
     char *incoming_dir;
-    int uid, ret;
+    uid_t caller_uid = getuid(), uid = caller_uid;
     pid_t pid;
     const char *remote_domain;
     char *procdir_path;
     int procfs_fd;
-    int i;
+    int i, ret;
 
     if (argc >= 3) {
+        char *end, *user = argv[1];
         errno = 0;
-        uid = strtol(argv[1], NULL, 10);
-        if (errno)
-            gui_fatal("Invalid user ID argument");
-        home_dir = prepare_creds_return_dir(uid);
+        if (strcmp(user, "0") != 0) {
+            unsigned long long u = strtoull(user, &end, 10);
+            uid = (uid_t)u;
+            if (user[0] < '1' || user[0] > '9' ||
+                    errno != 0 || *end != '\0' || uid != u)
+                gui_fatal("Invalid user ID argument");
+        } else {
+            uid = 0;
+        }
+        home_dir = prepare_creds_return_dir(uid, caller_uid);
         incoming_dir = argv[2];
     } else {
-        uid = getuid();
-        home_dir = prepare_creds_return_dir(uid);
+        home_dir = prepare_creds_return_dir(caller_uid, caller_uid);
         remote_domain = getenv("QREXEC_REMOTE_DOMAIN");
         if (!remote_domain) {
             gui_fatal("Cannot get remote domain name");
