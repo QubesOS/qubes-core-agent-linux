@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Upgrade
+Type = Path
+Target = *
+
+[Action]
+Description = Notifying dom0 about successful upgrade...
+Depends = qubes-vm-qrexec
+When = PostTransaction
+Exec = /usr/lib/qubes/qrexec-client-vm dom0 qubes.NotifyUpdates /bin/sh -c 'echo 0'
