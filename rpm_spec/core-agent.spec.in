@@ -146,11 +146,6 @@ Requires:   python%{python3_pkgversion}-dbus
 %endif
 # for qubes-session-autostart, xdg-icon
 Requires:   python%{python3_pkgversion}-pyxdg
-%if 0%{?is_opensuse}
-Requires:   python%{python3_pkgversion}-python-daemon
-%else
-Requires:   python%{python3_pkgversion}-daemon
-%endif
 # for qvm-feature-request
 Requires:   python%{python3_pkgversion}-qubesdb
 # for qubes.ShowInTerminal RPC service

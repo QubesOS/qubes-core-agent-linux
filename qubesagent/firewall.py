@@ -27,7 +27,6 @@ import ipaddress
 import subprocess
 import pwd
 import shutil
-import daemon
 
 import qubesdb
 import sys
@@ -635,15 +634,8 @@ def main():
     else:
         print('Sorry, iptables no longer supported', file=sys.stderr)
         sys.exit(1)
-    context = daemon.DaemonContext()
-    context.stderr = sys.stderr
-    context.detach_process = False
-    context.files_preserve = [worker.qdb.watch_fd()]
-    context.signal_map = {
-        signal.SIGTERM: lambda _signal, _stack: worker.terminate(),
-    }
-    with context:
-        worker.main()
+    signal.signal(signal.SIGTERM, lambda _signal, _stack: worker.terminate())
+    worker.main()
 
 
 if __name__ == '__main__':

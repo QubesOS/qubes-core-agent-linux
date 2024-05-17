@@ -41,7 +41,6 @@ Depends:
     util-linux,
     e2fsprogs,
     parted,
-    python3-daemon,
     python3-qubesdb,
     python3-gi,
     python3-xdg,
