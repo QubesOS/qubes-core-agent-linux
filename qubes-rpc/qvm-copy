@@ -46,11 +46,14 @@ usage () {
         echo "usage: $0 [--without-progress] [--ignore-symlinks] FILE [FILE ...]"
     fi
     echo 'Options:
+    --no-ignore-symlinks   Do not ignore symbolic links (default).
     --ignore-symlinks      Ignore symbolic links.
+    --with-progress        Show a progress indicator (default).
     --without-progress     Do not show a progress indicator.
     -h, --help             Show this message and exit.
     --                     Stop searching for options.
 
+    If there is a conflict, later options override earlier options.
 '
 
     if [ "$OPERATION_TYPE" = "move" ]; then
@@ -71,7 +74,9 @@ export PROGRESS_TYPE=console
 while [ "$#" -gt 0 ]; do
     case $1 in
         (--without-progress) export PROGRESS_TYPE=none; shift;;
+        (--with-progress) export PROGRESS_TYPE=console; shift;;
         (--ignore-symlinks) ignore_symlinks=true; shift;;
+        (--no-ignore-symlinks) unset ignore_symlinks; shift;;
         (-h|--help) usage 0;;
         (--) shift; break;;
         (-*) usage 1;;
