@@ -3,4 +3,9 @@ if [ -f /usr/lib/qubes/qvm_nautilus_bookmark.sh ]
 then
   /usr/lib/qubes/qvm_nautilus_bookmark.sh >/dev/null 2>&1 </dev/null
 fi
-exec /usr/lib/qubes/qfile-unpacker
+case $1 in
+('') arg=;;
+(allow-unsafe-characters) arg=--allow-unsafe-characters;;
+(*) printf 'Unexpected argument %s\n' "$1" >&2; exit 1;;
+esac
+exec /usr/lib/qubes/qfile-unpacker $arg
