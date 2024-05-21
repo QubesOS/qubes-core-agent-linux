@@ -45,8 +45,13 @@ usage () {
     else
         echo "usage: $0 [--without-progress] [--ignore-symlinks] FILE [FILE ...]"
     fi
+    echo 'Options:
+    --ignore-symlinks      Ignore symbolic links.
+    --without-progress     Do not show a progress indicator.
+    -h, --help             Show this message and exit.
+    --                     Stop searching for options.
 
-    echo
+'
 
     if [ "$OPERATION_TYPE" = "move" ]; then
         echo "Move FILE to ~/QubesIncoming/[THIS QUBE'S NAME]/ in the destination qube."
