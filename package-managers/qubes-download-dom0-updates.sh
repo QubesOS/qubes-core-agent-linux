@@ -60,9 +60,9 @@ if [ -z "$YUM_ACTION" ]; then
 fi
 
 if type dnf >/dev/null 2>&1; then
-    YUM=(dnf --best --allowerasing --noplugins)
+    YUM=(dnf --best --allowerasing --noplugins -y)
 else
-    YUM=(yum)
+    YUM=(yum -y)
 fi
 
 if ! [ -d "$DOM0_UPDATES_DIR" ]; then
@@ -130,7 +130,7 @@ if [ ${#PKGLIST[@]} -eq 0 ] && [ "$CHECK_ONLY" = "1" ]; then
 fi
 
 # now, we will download something
-YUM_COMMAND=(fakeroot "${YUM[@]}" "$YUM_ACTION" -y --downloadonly)
+YUM_COMMAND=(fakeroot "${YUM[@]}" "$YUM_ACTION" --downloadonly)
 # check for --downloadonly option - if not supported (Debian), fallback to
 # yumdownloader
 if ! "${YUM[@]}" --help | grep -q downloadonly; then
@@ -161,7 +161,7 @@ if ! "${YUM[@]}" --help | grep -q downloadonly; then
         YUM_COMMAND=(yumdownloader "--destdir=$DOM0_UPDATES_DIR/packages" --resolve)
     elif [ "$YUM_ACTION" == "list" ] || [ "$YUM_ACTION" == "search" ]; then
         # those actions do not download any package, so lack of --downloadonly is irrelevant
-        YUM_COMMAND=("${YUM[@]}" -y -- "$YUM_ACTION")
+        YUM_COMMAND=("${YUM[@]}" -- "$YUM_ACTION")
     elif [ "$YUM_ACTION" == "reinstall" ]; then
         # this is just approximation of 'reinstall' action...
         mapfile -t PKGLIST < <(rpm "--root=$DOM0_UPDATES_DIR" -q "${PKGLIST[@]}")
