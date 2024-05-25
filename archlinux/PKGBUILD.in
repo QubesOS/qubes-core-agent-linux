@@ -108,6 +108,9 @@ package_qubes-vm-core() {
     mkdir -p "${pkgdir}/usr/share/libalpm/hooks/"
     install -m 644 "archlinux/PKGBUILD.qubes-update-desktop-icons.hook" "${pkgdir}/usr/share/libalpm/hooks/qubes-update-desktop-icons.hook"
 
+    # Install pacman hook to notify dom0 about successful upgrade
+    install -m 644 "archlinux/PKGBUILD.qubes-post-upgrade.hook" "${pkgdir}/usr/share/libalpm/hooks/qubes-post-upgrade.hook"
+
     # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
     mkdir -p -m 0755 "${pkgdir}/etc/pacman.d"
     install -m 644 "archlinux/PKGBUILD-qubes-pacman-options.conf" "${pkgdir}/etc/pacman.d/10-qubes-options.conf"
