@@ -14,10 +14,10 @@ checks:tests:
   - shellcheck -e SC1117 $(grep -l '^#!/bin/\(ba\)\?sh' $(git ls-files))
   stage: checks
 include:
-- file: /r4.2/gitlab-base.yml
+- file: /r4.3/gitlab-base.yml
   project: QubesOS/qubes-continuous-integration
-- file: /r4.2/gitlab-vm.yml
+- file: /r4.3/gitlab-vm.yml
   project: QubesOS/qubes-continuous-integration
 
-r4.2:repro:vm-bookworm:
+r4.3:repro:vm-bookworm:
   allow_failure: true
