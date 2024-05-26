@@ -1,3 +1,21 @@
+qubes-core-agent (4.3.0-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Do not use python-daemon library
+
+  [ Demi Marie Obenour ]
+  * Always pass -y to DNF when downloading dom0 updates
+
+  [ Ali Mirjamali ]
+  * pacman hook to notify dom0 about successful upgrade
+
+  [ Marek Marczykowski-Górecki ]
+  * Add R4.3 keys
+  * Switch to R4.3 repositories and remove R4.2 keys
+  * ci: switch to R4.3
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 26 May 2024 03:13:11 +0200
+
 qubes-core-agent (4.2.33-1) unstable; urgency=medium
 
   * Use new built-in TCP support in qrexec for qubes.ConnectTCP
