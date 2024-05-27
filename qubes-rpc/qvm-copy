@@ -21,14 +21,22 @@
 
 set -e -o pipefail
 
-unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE service
+unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE service scriptdir
 
+# Determine the operation to be performed
 case ${0##*/} in
     (qvm-move) OPERATION_TYPE=move TARGET_TYPE=default MIN_ARGS=1;;
     (qvm-copy) OPERATION_TYPE=copy TARGET_TYPE=default MIN_ARGS=1;;
     (qvm-copy-to-vm) OPERATION_TYPE=copy TARGET_TYPE=vm MIN_ARGS=2;;
     (qvm-move-to-vm) OPERATION_TYPE=move TARGET_TYPE=vm MIN_ARGS=2;;
     (*) printf 'Invoked with unrecognized name %s, cannot determine operation to perform\n' "$0"; exit 1;;
+esac
+
+# Find the binaries we were shipped with, in case we were installed to
+# somewhere other than /usr.
+case $0 in
+    (*/*) scriptdir=${0%/*}/../lib;;
+    (*) scriptdir=../lib;;
 esac
 
 usage () {
@@ -74,7 +82,7 @@ else
   VM="@default"
 fi
 
-if FILECOPY_TOTAL_SIZE=$(/usr/lib/qubes/qubes-fs-tree-check \
+if FILECOPY_TOTAL_SIZE=$("$scriptdir/qubes/qubes-fs-tree-check" \
     --allow-symlinks --allow-directories --machine -- "$@"); then
     service=qubes.Filecopy
 else
@@ -84,8 +92,8 @@ else
 fi
 if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_SIZE; fi
 
-/usr/lib/qubes/qrexec-client-vm --filter-escape-chars-stderr -- "$VM" \
-    "$service" /usr/lib/qubes/qfile-agent "$@"
+"$scriptdir/qubes/qrexec-client-vm" --filter-escape-chars-stderr -- "$VM" \
+    "$service" "$scriptdir/qubes/qfile-agent" "$@"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
     rm -rf -- "$@"
