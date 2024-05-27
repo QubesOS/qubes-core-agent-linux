@@ -864,7 +864,6 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 void tar_file_processor(int fd, struct filters *filters)
 {
 	int ret;
-	int i;
 	int current;
 
 	struct file_header hdr;
@@ -872,7 +871,6 @@ void tar_file_processor(int fd, struct filters *filters)
 
 	char buf[BLKMULT+1];
 
-	i=0;
 	current = NEED_READ;
 	size_t to_skip = 0;
 	int sync_count = 0;
@@ -948,9 +946,6 @@ void tar_file_processor(int fd, struct filters *filters)
 
 			current = NEED_SYNC_TRAIL;
 		}
-		i++;
-		//if (i >= 10)
-		//	exit(0);
 	}
 
 }
