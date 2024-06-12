@@ -165,7 +165,6 @@ typedef struct {
  */
 
 static unsigned long tar_chksm (char *, int);
-char *gnu_hack_string;          /* GNU ././@LongLink hackery */
 
 char untrusted_namebuf[MAX_PATH_LENGTH];
 int use_seek = 1;
@@ -468,15 +467,8 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
       *dest++ = '/';
       cnt++;
     }
-  if (gnu_hack_string)
-    {
-      untrusted_hdr->namelen = cnt + strlen(strncpy (dest, gnu_hack_string,
-				  MIN(TNMSZ+1, sizeof (untrusted_namebuf) - cnt)));
-      free(gnu_hack_string);
-      gnu_hack_string = NULL;
-    } else
-      untrusted_hdr->namelen = cnt + strlen(strncpy (dest, hd->name,
-				  MIN(TNMSZ+1, sizeof (untrusted_namebuf) - cnt)));
+  untrusted_hdr->namelen = cnt + strlen(strncpy (dest, hd->name,
+			      MIN(TNMSZ+1, sizeof (untrusted_namebuf) - cnt)));
 
   // qfile count the \0 in the namelen
   untrusted_hdr->namelen += 1;
