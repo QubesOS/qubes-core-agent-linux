@@ -47,6 +47,7 @@
 #include <stdio.h>
 #include <libqubes-rpc-filecopy.h>
 #include <string.h>
+#include <assert.h>
 #include <gui-fatal.h>
 
 // #define DEBUG
@@ -462,17 +463,22 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
   dest = untrusted_namebuf;
   if (*(hd->prefix) != '\0')
     {
-      cnt = strlen(strncpy (dest, hd->prefix,
-		     MIN(sizeof (untrusted_namebuf) - 1,TPFSZ+1)));
+      cnt = strnlen(hd->prefix, sizeof(hd->prefix));
+      static_assert(sizeof (untrusted_namebuf) - 1 > TPFSZ+1, "buffer overflow risk");
+      memcpy(dest, hd->prefix, cnt);
+      dest[cnt++] = '/';
       dest += cnt;
-      *dest++ = '/';
-      cnt++;
     }
-  untrusted_hdr->namelen = cnt + strlen(strncpy (dest, hd->name,
-			      MIN(TNMSZ+1, sizeof (untrusted_namebuf) - cnt)));
+  {
+    size_t len = strnlen(hd->name, sizeof(hd->name));
+    static_assert(sizeof (hd->name) + 2 + sizeof(hd->prefix) <= sizeof (untrusted_namebuf),
+		  "buffer overflow risk");
+    memcpy(dest, hd->name, len);
+    // qfile count the \0 in the namelen
+    dest[len++] = '\0';
+    untrusted_hdr->namelen = (uint32_t)(cnt + len);
+  }
 
-  // qfile count the \0 in the namelen
-  untrusted_hdr->namelen += 1;
 
 #ifdef DEBUG
   fprintf(stderr,"Retrieved name len: %d\n",untrusted_hdr->namelen);
