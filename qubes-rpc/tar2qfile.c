@@ -37,6 +37,7 @@
  */
 
 #define _GNU_SOURCE /* For O_NOFOLLOW. */
+#include <limits.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/time.h>
@@ -750,7 +751,10 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 #ifdef DEBUG
 			fprintf(stderr,"Inserting %s into register\n",path);
 #endif
-			dirs_headers_sent = realloc(dirs_headers_sent, sizeof (char*) * (++n_dirs));
+			size_t new_alloc_size;
+			if (n_dirs >= INT_MAX || __builtin_mul_overflow(sizeof(char *), ++n_dirs, &new_alloc_size))
+				gui_fatal("Too many directories already sent");
+			dirs_headers_sent = realloc(dirs_headers_sent, new_alloc_size);
 			if (dirs_headers_sent == NULL)
 				return MEMORY_ALLOC_FAILED;
 			dirs_headers_sent[n_dirs-1] = malloc(sizeof (char) * (strlen(path)+1));
