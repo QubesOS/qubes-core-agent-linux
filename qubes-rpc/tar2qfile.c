@@ -718,7 +718,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 			path[len_last_token] = '\0';
 		} else {
 			pathsize = strlen(path);
-			path = realloc(path, sizeof (char) * (strlen(path)+1+len_last_token+1));
+			path = realloc(path, sizeof (char) * (pathsize+1+len_last_token+1));
 			if (path == NULL)
 				return MEMORY_ALLOC_FAILED;
 			path[pathsize] = '/';
@@ -757,14 +757,15 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 			dirs_headers_sent = realloc(dirs_headers_sent, new_alloc_size);
 			if (dirs_headers_sent == NULL)
 				return MEMORY_ALLOC_FAILED;
-			dirs_headers_sent[n_dirs-1] = malloc(sizeof (char) * (strlen(path)+1));
+			size_t len = strlen(path) + 1;
+			dirs_headers_sent[n_dirs-1] = malloc(len);
 			if (dirs_headers_sent[n_dirs-1] == NULL)
 				return MEMORY_ALLOC_FAILED;
 
-			memcpy(dirs_headers_sent[n_dirs-1], path, strlen(path)+1);
+			memcpy(dirs_headers_sent[n_dirs-1], path, len);
 
                         // Initialize the qfile headers for the current directory path
-			dir_header.namelen = strlen(path)+1;
+			dir_header.namelen = (uint32_t)len;
 			dir_header.atime = untrusted_hdr->atime;
 			dir_header.atime_nsec = untrusted_hdr->atime_nsec;
 			dir_header.mtime = untrusted_hdr->mtime;
