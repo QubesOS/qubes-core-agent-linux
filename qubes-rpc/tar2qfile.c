@@ -750,6 +750,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 				fprintf(stderr,"Directory headers already sent\n");
 #endif
 				dir_found=1;
+				break;
 			}
 		}
 		if (dir_found == 0) {
