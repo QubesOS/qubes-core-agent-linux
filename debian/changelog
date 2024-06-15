@@ -1,3 +1,13 @@
+qubes-core-agent (4.3.1-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Fix tar2qfile build with clang
+
+  [ Ben Grande ]
+  * Add os-release ID_LIKE to features
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 15 Jun 2024 04:20:50 +0200
+
 qubes-core-agent (4.3.0-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
