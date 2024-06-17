@@ -21,14 +21,22 @@
 
 set -e -o pipefail
 
-unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE
+unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE service scriptdir
 
+# Determine the operation to be performed
 case ${0##*/} in
     (qvm-move) OPERATION_TYPE=move TARGET_TYPE=default MIN_ARGS=1;;
     (qvm-copy) OPERATION_TYPE=copy TARGET_TYPE=default MIN_ARGS=1;;
     (qvm-copy-to-vm) OPERATION_TYPE=copy TARGET_TYPE=vm MIN_ARGS=2;;
     (qvm-move-to-vm) OPERATION_TYPE=move TARGET_TYPE=vm MIN_ARGS=2;;
     (*) printf 'Invoked with unrecognized name %s, cannot determine operation to perform\n' "$0"; exit 1;;
+esac
+
+# Find the binaries we were shipped with, in case we were installed to
+# somewhere other than /usr.
+case $0 in
+    (*/*) scriptdir=${0%/*}/../lib;;
+    (*) scriptdir=../lib;;
 esac
 
 usage () {
@@ -74,40 +82,18 @@ else
   VM="@default"
 fi
 
-for path; do
-    case $path in
-        (.|..) printf 'Refusing to copy "." or "..".
-Try copying from the parent directory.\n' >&2; exit 1;;
-    esac
-done
-
-if [ "$PROGRESS_TYPE" = console ] ; then
-    find_paths=( )
-    for path; do
-        case "$path" in
-            (-*) find_paths+=( ./"$path" ) ;;
-            (*)  find_paths+=(   "$path" ) ;;
-        esac
-    done
-
-    FILECOPY_TOTAL_SIZE=$(
-        find "${find_paths[@]}" -type f -print0 2>/dev/null |
-        du --files0-from - -c --apparent-size -k |
-        tail -n 1 |
-        cut -f 1 |
-        grep -xE '[0-9]+'
-    ) || FILECOPY_TOTAL_SIZE=0
-    export FILECOPY_TOTAL_SIZE
+if FILECOPY_TOTAL_SIZE=$("$scriptdir/qubes/qubes-fs-tree-check" \
+    --allow-symlinks --allow-directories --machine -- "$@"); then
+    service=qubes.Filecopy
+else
+    status=$?
+    if [[ "$status" -ne 2 ]]; then exit "$status"; fi
+    service=qubes.Filecopy+allow-unsafe-characters
 fi
+if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_SIZE; fi
 
-for path; do
-    if [ ! -e "$path" ]; then
-        echo "File or directory not found: $path"
-        exit 1
-    fi
-done
-
-/usr/lib/qubes/qrexec-client-vm --filter-escape-chars-stderr -- "$VM" qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
+"$scriptdir/qubes/qrexec-client-vm" --filter-escape-chars-stderr -- "$VM" \
+    "$service" "$scriptdir/qubes/qfile-agent" "$@"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
     rm -rf -- "$@"

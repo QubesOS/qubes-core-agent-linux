@@ -13,12 +13,22 @@ endif
 CPPFLAGS := -I.
 CFLAGS := $(DEBUG_FLAGS) -O2 -Wall -Wextra -Werror -fPIC -pie $(CFLAGS)
 LDFLAGS := $(DEBUG_FLAGS) -pie $(LDFLAGS)
-LDLIBS := -lqubes-rpc-filecopy
+LDLIBS := -lqubes-rpc-filecopy -lqubes-pure
 
 .PHONY: all clean install
 
-all:	vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile
+all:	vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile qubes-fs-tree-check bin-qfile-unpacker
 
+# Ensure that these programs can find their shared libraries,
+# even when installed in e.g. a TemplateBasedVM to somewhere other
+# than /usr.
+vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile qubes-fs-tree-check: LDFLAGS += '-Wl,-rpath,$$ORIGIN/../../$$LIB'
+# This is installed in /usr/bin, not /usr/lib/qubes, so it needs a different rpath.
+bin-qfile-unpacker: LDFLAGS += '-Wl,-rpath,$$ORIGIN/../$$LIB'
+bin-qfile-unpacker: qfile-unpacker.o gui-fatal.o
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+qubes-fs-tree-check: LDLIBS := -lqubes-pure
+qubes-fs-tree-check: qubes-fs-tree-check.o
 vm-file-editor: vm-file-editor.o
 qopen-in-vm: qopen-in-vm.o gui-fatal.o
 qfile-agent: qfile-agent.o gui-fatal.o
@@ -26,7 +36,7 @@ qfile-unpacker: qfile-unpacker.o gui-fatal.o
 tar2qfile: tar2qfile.o gui-fatal.o
 
 clean:
-	-$(RM) -- qopen-in-vm qfile-agent qfile-unpacker tar2qfile vm-file-editor *.o
+	-$(RM) -- qopen-in-vm qfile-agent qfile-unpacker tar2qfile vm-file-editor qubes-fs-tree-check bin-qfile-unpacker *.o
 
 install:
 	install -d $(DESTDIR)$(BINDIR)
@@ -46,13 +56,14 @@ install:
 	install -t $(DESTDIR)$(QUBESLIBDIR) \
 		prepare-suspend resize-rootfs \
 		qfile-agent qopen-in-vm qrun-in-vm qubes-sync-clock \
-		tar2qfile vm-file-editor xdg-icon qvm-template-repo-query
+		tar2qfile vm-file-editor xdg-icon qvm-template-repo-query \
+		qubes-fs-tree-check
 	# Install qfile-unpacker as SUID, because it will fail to receive
 	# files from other vm.
 	install -t $(DESTDIR)$(QUBESLIBDIR) -m 4755 qfile-unpacker
 	# This version isn't confined by SELinux, so it supports other
 	# home directories.
-	install -t $(DESTDIR)$(BINDIR) -m 4755 qfile-unpacker
+	install -m 4755 bin-qfile-unpacker $(DESTDIR)$(BINDIR)/qfile-unpacker
 	install -d $(DESTDIR)$(QUBESRPCCMDDIR)
 	install -t $(DESTDIR)$(QUBESRPCCMDDIR) \
 		qubes.Filecopy qubes.OpenInVM qubes.VMShell \
