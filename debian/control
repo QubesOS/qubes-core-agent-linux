@@ -5,8 +5,8 @@ Maintainer: unman <unman@thirdeyesecurity.org>
 Build-Depends:
     debhelper,
     libpam0g-dev,
-    libqubes-pure-dev,
-    libqubes-rpc-filecopy-dev (>= 3.1.3),
+    libqubes-pure-dev (>= 4.2.17),
+    libqubes-rpc-filecopy-dev (>= 4.2.17),
     libvchan-xen-dev,
     python3,
     python3-setuptools,
