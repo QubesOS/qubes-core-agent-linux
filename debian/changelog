@@ -1,3 +1,22 @@
+qubes-core-agent (4.3.2-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Make prepare_creds_return_dir() static
+  * Validate user ID arguments
+  * Correctly check for success of setfsuid()
+  * Exit if getpwuid() returned entry for wrong user
+  * Explain why the return value of mkdir() is ignored
+  * Use O_CLOEXEC | O_NOCTTY to open a directory
+  * qfile-unpacker: Add flags to allow unsafe characters and symlinks
+  * qubes.Filecopy: support unpacking files with unsafe characters
+  * Select between qubes.Filecopy and qubes.UnsafeFileCopy
+  * Support installation outside of /usr
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm,deb: bump required version of qubes-utils libs
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 18 Jun 2024 09:31:23 +0200
+
 qubes-core-agent (4.3.1-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
