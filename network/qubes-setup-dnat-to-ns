@@ -53,8 +53,6 @@ def get_dns_resolved():
     try:
         resolve1 = bus.get_object('org.freedesktop.resolve1',
                                   '/org/freedesktop/resolve1')
-        resolve1_proxy = dbus.Interface(resolve1,
-                                        dbus_interface='org.freedesktop.resolve1')
         dns = resolve1.Get('org.freedesktop.resolve1.Manager',
                            'DNS',
                            dbus_interface='org.freedesktop.DBus.Properties')
@@ -71,7 +69,10 @@ def get_dns_resolved():
     dns.sort(key=lambda x: x[0] != 0)
     # Only keep IPv4 entries. systemd-resolved is trusted to return valid
     # addresses.
-    return [IPv4Address(bytes(addr)) for _g, family, addr in dns if family == 2]
+    # ToDo: We only need abridged IPv4 DNS entries for ifindex == 0.
+    # to ensure static DNS of disconnected network interfaces are not added.
+    return [IPv4Address(bytes(addr)) for ifindex, family, addr in dns
+            if family == 2]
 
 def install_firewall_rules(dns):
     qdb = qubesdb.QubesDB()
@@ -98,12 +99,26 @@ def install_firewall_rules(dns):
         'chain dnat-dns {',
         'type nat hook prerouting priority dstnat; policy accept;',
     ]
-    for vm_nameserver, dest in zip(qubesdb_dns, get_dns_resolved()):
-        dns_ = str(dest)
-        res += [
-            f"ip daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
-            f"ip daddr {vm_nameserver} tcp dport 53 dnat to {dns_}",
-        ]
+    dns_resolved = get_dns_resolved()
+    if not dns_resolved:
+        # User has no IPv4 DNS set in sys-net. Maybe IPv6 only environment.
+        # Or maybe user wants to enforce DNS-Over-HTTPS.
+        # Drop IPv4 DNS requests to qubesdb_dns addresses.
+        for vm_nameserver in qubesdb_dns:
+            res += [
+                f"ip daddr {vm_nameserver} udp dport 53 drop",
+                f"ip daddr {vm_nameserver} tcp dport 53 drop",
+            ]
+    else:
+        while len(qubesdb_dns) > len(dns_resolved):
+            # Ensure that upstream DNS pool is larger than qubesdb_dns pool
+            dns_resolved = dns_resolved + dns_resolved
+        for vm_nameserver, dest in zip(qubesdb_dns, dns_resolved):
+            dns_ = str(dest)
+            res += [
+                f"ip daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
+                f"ip daddr {vm_nameserver} tcp dport 53 dnat to {dns_}",
+            ]
     res += ["}\n}\n"]
     os.execvp("nft", ("nft", "--", "\n".join(res)))
 
