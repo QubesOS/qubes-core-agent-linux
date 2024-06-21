@@ -10,3 +10,4 @@ Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
 MimeType=application/octet-stream;application/pdf;application/qubes-untrusted-file;application/rdf+xml;application/rss+xml;application/vnd.mozilla.xul+xml;application/x-wwf;application/x-zerosize;application/xhtml+xml;application/xml;image/gif;image/jpeg;image/png;image/svg+xml;text/html;text/plain;text/xml;x-scheme-handler/about;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/unknown;
+NoDisplay=true
