@@ -5,7 +5,7 @@ then
 fi
 case $1 in
 ('') arg=;;
-(allow-unsafe-characters) arg=--allow-unsafe-characters;;
+(allow-all-names) arg=--allow-all-names;;
 (*) printf 'Unexpected argument %s\n' "$1" >&2; exit 1;;
 esac
 exec /usr/lib/qubes/qfile-unpacker $arg
