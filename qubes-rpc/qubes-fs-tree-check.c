@@ -191,8 +191,8 @@ const struct option opts[] = {
     {"no-allow-symlinks", no_argument, NULL, 'A'},
     {"allow-directories", no_argument, NULL, 'd'},
     {"no-allow-directories", no_argument, NULL, 'D'},
-    {"allow-unsafe-characters", no_argument, NULL, 'u'},
-    {"no-allow-unsafe-characters", no_argument, NULL, 'U'},
+    {"allow-all-names", no_argument, NULL, 'u'},
+    {"no-allow-all-names", no_argument, NULL, 'U'},
     {0, 0, NULL, 0},
 };
 

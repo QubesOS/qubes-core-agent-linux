@@ -69,8 +69,8 @@ enum {
 };
 
 const struct option opts[] = {
-    { "no-allow-unsafe-characters", no_argument, NULL, opt_no_allow_unsafe_characters },
-    { "allow-unsafe-characters", no_argument, NULL, opt_allow_unsafe_characters },
+    { "no-allow-all-names", no_argument, NULL, opt_no_allow_unsafe_characters },
+    { "allow-all-names", no_argument, NULL, opt_allow_unsafe_characters },
     { "no-allow-unsafe-symlinks", no_argument, NULL, opt_no_allow_unsafe_symlinks },
     { "allow-unsafe-symlinks", no_argument, NULL, opt_allow_unsafe_symlinks },
     { "verbose", no_argument, NULL, 'v' },

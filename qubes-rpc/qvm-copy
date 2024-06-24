@@ -80,7 +80,7 @@ if FILECOPY_TOTAL_SIZE=$(/usr/lib/qubes/qubes-fs-tree-check \
 else
     status=$?
     if [[ "$status" -ne 2 ]]; then exit "$status"; fi
-    service=qubes.Filecopy+allow-unsafe-characters
+    service=qubes.Filecopy+allow-all-names
 fi
 if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_SIZE; fi
 
