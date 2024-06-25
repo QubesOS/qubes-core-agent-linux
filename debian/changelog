@@ -1,3 +1,10 @@
+qubes-core-agent (4.2.35-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Use allow-all-names instead of allow-unsafe-characters
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 25 Jun 2024 02:16:36 +0200
+
 qubes-core-agent (4.2.34-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
