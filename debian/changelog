@@ -1,3 +1,19 @@
+qubes-core-agent (4.3.3-1) unstable; urgency=medium
+
+  [ kennethrrosen ]
+  * Add NoDisplay=true
+
+  [ Ben Grande ]
+  * Enable software-rendering by default
+
+  [ Ali Mirjamali ]
+  * DNS leakage when only one DNS is set in a NetVM
+
+  [ Demi Marie Obenour ]
+  * Use allow-all-names instead of allow-unsafe-characters
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 25 Jun 2024 02:14:38 +0200
+
 qubes-core-agent (4.3.2-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
