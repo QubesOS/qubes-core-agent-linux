@@ -21,7 +21,7 @@
 
 set -e -o pipefail
 
-unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE service
+unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_BYTES service
 
 case ${0##*/} in
     (qvm-move) OPERATION_TYPE=move TARGET_TYPE=default MIN_ARGS=1;;
@@ -74,7 +74,7 @@ else
   VM="@default"
 fi
 
-if FILECOPY_TOTAL_SIZE=$(/usr/lib/qubes/qubes-fs-tree-check \
+if FILECOPY_TOTAL_BYTES=$(/usr/lib/qubes/qubes-fs-tree-check \
     --allow-symlinks --allow-directories --machine -- "$@"); then
     service=qubes.Filecopy
 else
@@ -82,7 +82,7 @@ else
     if [[ "$status" -ne 2 ]]; then exit "$status"; fi
     service=qubes.Filecopy+allow-all-names
 fi
-if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_SIZE; fi
+if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_BYTES; fi
 
 /usr/lib/qubes/qrexec-client-vm --filter-escape-chars-stderr -- "$VM" \
     "$service" /usr/lib/qubes/qfile-agent "$@"
