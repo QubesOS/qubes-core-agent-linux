@@ -19,7 +19,7 @@ enum {
     PROGRESS_FLAG_DONE
 };
 
-void do_notify_progress(long long total, int flag)
+void do_notify_progress(long long cur_total, int flag)
 {
     const char *du_size_env = getenv("FILECOPY_TOTAL_SIZE");
     const char *progress_type_env = getenv("PROGRESS_TYPE");
@@ -30,7 +30,7 @@ void do_notify_progress(long long total, int flag)
     if (!strcmp(progress_type_env, "console") && du_size_env) {
         char msg[256];
         snprintf(msg, sizeof(msg), "sent %lld/%lld KB\r",
-             (total + 1023) / 1024, strtoull(du_size_env, NULL, 10));
+             (cur_total + 1023) / 1024, strtoull(du_size_env, NULL, 10));
         ignore = write(2, msg, strlen(msg));
         if (flag == PROGRESS_FLAG_DONE)
             ignore = write(2, "\n", 1);
@@ -40,7 +40,7 @@ void do_notify_progress(long long total, int flag)
     }
     if (!strcmp(progress_type_env, "gui") && saved_stdout_env) {
         char msg[256];
-        snprintf(msg, sizeof(msg), "%lld\n", total);
+        snprintf(msg, sizeof(msg), "%lld\n", cur_total);
         if (write(strtoul(saved_stdout_env, NULL, 10), msg, strlen(msg)) == -1
             && errno == EPIPE)
             exit(32);
@@ -49,18 +49,18 @@ void do_notify_progress(long long total, int flag)
 
 void notify_progress(int size, int flag)
 {
-    static long long total = 0;
+    static long long cur_total = 0;
     static long long prev_total = 0;
-    total += size;
-    if (total > prev_total + PROGRESS_NOTIFY_DELTA
+    cur_total += size;
+    if (cur_total > prev_total + PROGRESS_NOTIFY_DELTA
         || (flag != PROGRESS_FLAG_NORMAL)) {
         // check for possible error from qfile-unpacker; if error occured,
         // exit() will be called, so don't bother with current state
         // (notify_progress can be called as callback from copy_file())
         if (flag == PROGRESS_FLAG_NORMAL)
             wait_for_result();
-        do_notify_progress(total, flag);
-        prev_total = total;
+        do_notify_progress(cur_total, flag);
+        prev_total = cur_total;
     }
 }
 
