@@ -21,16 +21,17 @@ enum {
 
 void do_notify_progress(long long cur_total, int flag)
 {
-    const char *du_size_env = getenv("FILECOPY_TOTAL_SIZE");
+    const char *total_bytes_env = getenv("FILECOPY_TOTAL_BYTES");
     const char *progress_type_env = getenv("PROGRESS_TYPE");
     const char *saved_stdout_env = getenv("SAVED_FD_1");
     int ignore;
     if (!progress_type_env)
         return;
-    if (!strcmp(progress_type_env, "console") && du_size_env) {
+    if (!strcmp(progress_type_env, "console") && total_bytes_env) {
         char msg[256];
         snprintf(msg, sizeof(msg), "sent %lld/%lld KB\r",
-             (cur_total + 1023) / 1024, strtoull(du_size_env, NULL, 10));
+                 (cur_total + 1023) / 1024,
+                 (strtoull(total_bytes_env, NULL, 10) + 1023) / 1024);
         ignore = write(2, msg, strlen(msg));
         if (flag == PROGRESS_FLAG_DONE)
             ignore = write(2, "\n", 1);

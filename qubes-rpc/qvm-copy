@@ -21,7 +21,7 @@
 
 set -e -o pipefail
 
-unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_SIZE service scriptdir
+unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_BYTES service scriptdir
 
 # Determine the operation to be performed
 case ${0##*/} in
@@ -82,7 +82,7 @@ else
   VM="@default"
 fi
 
-if FILECOPY_TOTAL_SIZE=$("$scriptdir/qubes/qubes-fs-tree-check" \
+if FILECOPY_TOTAL_BYTES=$("$scriptdir/qubes/qubes-fs-tree-check" \
     --allow-symlinks --allow-directories --machine -- "$@"); then
     service=qubes.Filecopy
 else
@@ -90,7 +90,7 @@ else
     if [[ "$status" -ne 2 ]]; then exit "$status"; fi
     service=qubes.Filecopy+allow-all-names
 fi
-if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_SIZE; fi
+if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_BYTES; fi
 
 "$scriptdir/qubes/qrexec-client-vm" --filter-escape-chars-stderr -- "$VM" \
     "$service" "$scriptdir/qubes/qfile-agent" "$@"
