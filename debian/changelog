@@ -1,3 +1,11 @@
+qubes-core-agent (4.3.4-1) unstable; urgency=medium
+
+  [ Rusty Bird ]
+  * qfile-agent: rename a variable
+  * qfile-agent: fix CLI progress display unit mismatch
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 05 Jul 2024 17:31:56 +0200
+
 qubes-core-agent (4.3.3-1) unstable; urgency=medium
 
   [ kennethrrosen ]
