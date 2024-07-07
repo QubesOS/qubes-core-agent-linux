@@ -583,6 +583,13 @@ if [ -L /usr/local ]; then
     mount /usr/local || :
 fi
 
+%if 0%{?fedora} < 41
+if [ ! -f /etc/qubes-dnf-hardened ]; then
+    dnf config-manager --setopt=zchunk=0 --setopt=deltarpm=0 --save &&
+    touch /etc/qubes-dnf-hardened
+fi
+%endif
+
 # workaround for Fedora's systemd package bug
 # https://bugzilla.redhat.com/1559286
 if [ -d /var/lib/private ]; then
@@ -964,6 +971,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo
 %if 0%{?fedora} >= 41
 /etc/dnf/libdnf5-plugins/actions.d/qubes-post-update.actions
+/etc/dnf/libdnf5.conf.d/10-qubes.conf
 %else
 %if 0%{?rhel} == 7
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
