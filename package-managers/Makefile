@@ -94,6 +94,8 @@ endif
 install-dnf5: install-rpm
 	install -D -m 0644 qubes-post-update.actions \
 		$(DESTDIR)$(SYSCONFDIR)/dnf/libdnf5-plugins/actions.d/qubes-post-update.actions
+	install -D -m 0644 dnf-harden.conf \
+		$(DESTDIR)$(SYSCONFDIR)/dnf/libdnf5.conf.d/10-qubes.conf
 
 install-yum: install-rpm
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins
