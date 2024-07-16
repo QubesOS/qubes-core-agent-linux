@@ -13,6 +13,8 @@ help:
 install: manpages
 	mkdir -p $(DESTDIR)/usr/share/man/man1
 	cp $(VM_DOCS) $(DESTDIR)/usr/share/man/man1/
+	ln -sf qvm-copy.1.gz $(DESTDIR)/usr/share/man/man1/qvm-copy-to-vm.1.gz
+	ln -sf qvm-move.1.gz $(DESTDIR)/usr/share/man/man1/qvm-move-to-vm.1.gz
 
 %.1: %.rst
 	$(PANDOC) $< > $@
