@@ -30,6 +30,7 @@ Depends:
     apt-transport-https,
     dconf-cli,
     dmsetup,
+    distro-info-data,
     gawk,
     graphicsmagick,
     init-system-helpers,
