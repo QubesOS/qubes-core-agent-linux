@@ -1,3 +1,16 @@
+qubes-core-agent (4.3.5-1) unstable; urgency=medium
+
+  [ kennethrrosen ]
+  * Include distro-info-data
+
+  [ 3hhh ]
+  * qubes-firewall: Move dynamic forward rules to a dedicated chain.
+
+  [ Marek Marczykowski-Górecki ]
+  * Limit initramfs size to fix booting with limited memory size
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 18 Jul 2024 04:40:39 +0200
+
 qubes-core-agent (4.3.4-1) unstable; urgency=medium
 
   [ Rusty Bird ]
