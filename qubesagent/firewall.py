@@ -401,7 +401,7 @@ class NftablesWorker(FirewallWorker):
             'table {family} {table} {{\n'
             '  chain {chain} {{\n'
             '  }}\n'
-            '  chain forward {{\n'
+            '  chain qubes-forward {{\n'
             '    {family} saddr {ip} jump {chain}\n'
             '  }}\n'
             '}}\n'.format(
@@ -600,11 +600,14 @@ class NftablesWorker(FirewallWorker):
     def init(self):
         nft_init = (
             'table {family} qubes-firewall {{\n'
+            '  chain qubes-forward {{\n'
+            '  }}\n'
             '  chain forward {{\n'
             '    type filter hook forward priority 0;\n'
             '    policy drop;\n'
             '    ct state established,related accept\n'
             '    meta iifname != "vif*" accept\n'
+            '    jump qubes-forward\n'
             '  }}\n'
             '  chain prerouting {{\n'
             '    type filter hook prerouting priority -300;\n'
