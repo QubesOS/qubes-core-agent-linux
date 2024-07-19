@@ -1,14 +1,14 @@
 ===========
-qvm-copy(1)
+qvm-move(1)
 ===========
 
 NAME
 ====
-qvm-copy - copy specified files to a destination VM. Prompt user to select a destination VM. Does not work in dom0.
+qvm-move - move specified files to a destination VM. Prompt user to select a destination VM. Does not work in dom0.
 
 SYNOPSIS
 ========
-| qvm-copy [--without-progress] file [file]+
+| qvm-move [--without-progress] file [file]+
 
 OPTIONS
 =======
@@ -17,17 +17,17 @@ OPTIONS
 
 
 =================
-qvm-copy-to-vm(1)
+qvm-move-to-vm(1)
 =================
-For use in scripting; for interactive use, use qvm-copy.
+For use in scripting; for interactive use, use qvm-move.
 
 NAME
 ====
-qvm-copy-to-vm - copy specified files to specified destination VM. Deprecated outside of dom0.
+qvm-move-to-vm - move specified files to specified destination VM. Deprecated outside of dom0.
 
 SYNOPSIS
 ========
-| qvm-copy-to-vm [--without-progress] dest_vmname file [file]+
+| qvm-move-to-vm [--without-progress] dest_vmname file [file]+
 
 OPTIONS
 =======
