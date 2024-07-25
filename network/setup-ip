@@ -6,11 +6,11 @@
 set -ueo pipefail
 
 add_link_route () {
-    /sbin/ip -- route replace to unicast "$1" dev "$2" scope link
+    ip -- route replace to unicast "$1" dev "$2" scope link
 }
 
 add_default_route () {
-    /sbin/ip -- route replace to unicast default via "$1" dev "$2" onlink
+    ip -- route replace to unicast default via "$1" dev "$2" onlink
 }
 
 readonly netvm_mac=fe:ff:ff:ff:ff:ff
@@ -27,19 +27,19 @@ configure_network () {
     local secondary_dns="${10}"
     local custom="${11}"
 
-    /sbin/ip -- address replace "$ip/$netmask" dev "$INTERFACE"
+    ip -- address replace "$ip/$netmask" dev "$INTERFACE"
     if [[ "$custom" = false ]]; then
-        /sbin/ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
+        ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
             lladdr "$netvm_mac" nud permanent
     fi
     if [ -n "$ip6" ]; then
-        /sbin/ip -- address replace "$ip6/$netmask6" dev "$INTERFACE"
+        ip -- address replace "$ip6/$netmask6" dev "$INTERFACE"
         if [ -n "$gateway6" ] && [[ "$custom" = false ]]; then
-            /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
+            ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
                 lladdr "$netvm_mac" nud permanent
         fi
     fi
-    /sbin/ip link set dev "$INTERFACE" group 1 up
+    ip link set dev "$INTERFACE" group 1 up
 
     if [ -n "$gateway" ]; then
         add_link_route "$gateway" "$INTERFACE"
@@ -96,7 +96,7 @@ configure_network_nm () {
     local ip4_nm_config
     local ip6_nm_config
     local uuid
-    /sbin/ip link set dev "$INTERFACE" group 1
+    ip link set dev "$INTERFACE" group 1
 
     prefix="$(get_prefix_from_subnet "$netmask")"
     prefix6="$netmask6"
@@ -167,12 +167,12 @@ __EOF__
     # reload connection
     nmcli connection load "$nm_config" || :
     if [[ "$custom" = false ]]; then
-        /sbin/ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
+        ip -- neighbour replace to "$gateway" dev "$INTERFACE" \
             lladdr "$netvm_mac" nud permanent
     fi
     if [ -n "$gateway6" ]; then
         if [[ "$custom" = false ]]; then
-            /sbin/ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
+            ip -- neighbour replace to "$gateway6" dev "$INTERFACE" \
                 lladdr "$netvm_mac" nud permanent
         fi
     fi
