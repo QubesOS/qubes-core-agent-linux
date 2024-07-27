@@ -27,16 +27,16 @@ h="$(echo "$s"|cut -d " " -f 2)"
 m="$(echo "$s"|cut -d " " -f 3)"
 if [ "$m" = SVG ]; then
     tmpfile2="$(mktemp /tmp/qimg-XXXXXXXX.png)"
-    rsvg-convert -o "$tmpfile2" "$filename"
+    rsvg-convert -w "$w" -h "$h" -o "$tmpfile2" "$filename"
     # downscale the image if necessary
     if [ -n "$forcemaxsize" ] && \
             { [ "$w" -gt "$forcemaxsize" ] || [ "$h" -gt "$forcemaxsize" ]; }; then
         gm convert "$tmpfile2" -scale "${forcemaxsize}x${forcemaxsize}" "$tmpfile2"
-        # read the size again, because icon may not be a square
-        s="$(gm identify -format '%w %h' "$tmpfile2")"
-        w="$(echo "$s"|cut -d " " -f 1)"
-        h="$(echo "$s"|cut -d " " -f 2)"
     fi
+    # read the size again, because icon may not be a square or could have changed with convert
+    s="$(gm identify -format '%w %h' "$tmpfile2")"
+    w="$(echo "$s"|cut -d " " -f 1)"
+    h="$(echo "$s"|cut -d " " -f 2)"
     filename="$tmpfile2"
 fi
 echo "$w $h"
