@@ -1,3 +1,32 @@
+qubes-core-agent (4.2.36-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Add R4.3 keys
+
+  [ Ali Mirjamali ]
+  * DNS leakage when only one DNS is set in a NetVM
+
+  [ Ben Grande ]
+  * Enable software-rendering by default
+
+  [ kennethrrosen ]
+  * Add NoDisplay=true
+
+  [ Rusty Bird ]
+  * qfile-agent: rename a variable
+  * qfile-agent: fix CLI progress display unit mismatch
+
+  [ Marek Marczykowski-Górecki ]
+  * Limit initramfs size to fix booting with limited memory size
+
+  [ kennethrrosen ]
+  * Include distro-info-data
+
+  [ Ali Mirjamali ]
+  * Manual for qvm-move(1)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 29 Jul 2024 03:30:10 +0200
+
 qubes-core-agent (4.2.35-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
