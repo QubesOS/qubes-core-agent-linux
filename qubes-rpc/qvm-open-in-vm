@@ -64,6 +64,18 @@ if [ -z "$target" ] || [ -z "$filename" ]; then
     usage
 fi
 
+if [ -d "$filename" ]; then
+    printf 'Error! "%s" is a directory.\n' "$filename"
+    usage
+elif [ ! -f "$filename" ]; then
+    expr "@$filename" : '@[A-Za-z][A-Za-z0-9+]*://'>/dev/null
+    # shellcheck disable=SC2181
+    if [ $? -ne 0 ]; then
+        printf 'Error! "%s" is not a valid file or URL.\n' "$filename"
+        usage
+    fi
+fi
+
 prompt_text='Are you sure you want to create another disposable VM?'
 case $target in
 (@dispvm|@dispvm:*)
