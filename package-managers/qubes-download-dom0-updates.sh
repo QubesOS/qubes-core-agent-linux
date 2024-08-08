@@ -107,7 +107,6 @@ fi
 
 # just check for updates, but don't download any package
 if [ ${#PKGLIST[@]} -eq 0 ] && [ "$CHECK_ONLY" = "1" ]; then
-    echo "Checking for dom0 updates..." >&2
     # shellcheck disable=SC2086
     UPDATES_FULL=$("${YUM[@]}" "${OPTS[@]}" check-update)
     check_update_retcode=$?
