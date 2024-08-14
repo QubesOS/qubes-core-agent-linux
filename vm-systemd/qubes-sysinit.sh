@@ -6,10 +6,10 @@ set -euf
 . /usr/lib/qubes/init/functions
 
 # List of services enabled by default (in case of absence of qubesdb entry)
-DEFAULT_ENABLED_NETVM="network-manager qubes-network qubes-update-check qubes-updates-proxy meminfo-writer qubes-firewall"
-DEFAULT_ENABLED_PROXYVM="qubes-network qubes-firewall qubes-update-check meminfo-writer"
-DEFAULT_ENABLED_APPVM="qubes-update-check meminfo-writer tracker evolution-data-server"
-DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup"
+DEFAULT_ENABLED_NETVM="network-manager qubes-network qubes-update-check qubes-updates-proxy meminfo-writer qubes-firewall software-rendering"
+DEFAULT_ENABLED_PROXYVM="qubes-network qubes-firewall qubes-update-check meminfo-writer software-rendering"
+DEFAULT_ENABLED_APPVM="qubes-update-check meminfo-writer tracker evolution-data-server software-rendering"
+DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup software-rendering"
 DEFAULT_ENABLED="meminfo-writer software-rendering"
 
 # Wait for xenbus initialization
