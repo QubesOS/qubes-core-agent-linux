@@ -119,6 +119,10 @@ package_qubes-vm-core() {
     install -m 0755 "package-managers/upgrades-installed-check" "${pkgdir}/usr/lib/qubes/"
     install -m 0755 "package-managers/upgrades-status-notify" "${pkgdir}/usr/lib/qubes/"
 
+    # Patch for /etc/sudoers default secure_path
+    install -d -m 0750 "${pkgdir}/etc/sudoers.d"
+    install -m 0440 "archlinux/PKGBUILD.qubes-secure-path.sudo" "${pkgdir}/etc/sudoers.d/qubes_secure_path"
+
     # Archlinux specific: enable autologin on tty1
     mkdir -p "$pkgdir/etc/systemd/system/getty@tty1.service.d/"
     cat <<EOF > "$pkgdir/etc/systemd/system/getty@tty1.service.d/autologin.conf"
