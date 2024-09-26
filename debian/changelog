@@ -1,3 +1,26 @@
+qubes-core-agent (4.3.6-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Manual for qvm-move(1)
+
+  [ Simon Gaiser ]
+  * setup-ip: Invoke 'ip' via $PATH
+
+  [ Willy-JL ]
+  * Fix warped SVG icons, ensure correct rasterized size
+
+  [ Ali Mirjamali ]
+  * Remove redundant qubes-dom0-update message
+
+  [ Marek Marczykowski-Górecki ]
+  * Enable software rendering by default in all qube types
+
+  [ Ali Mirjamali ]
+  * Accept only files for qvm-open-in-(d)vm
+  * Patch /etc/sudoers on Archlinux
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 26 Sep 2024 17:04:51 +0200
+
 qubes-core-agent (4.3.5-1) unstable; urgency=medium
 
   [ kennethrrosen ]
