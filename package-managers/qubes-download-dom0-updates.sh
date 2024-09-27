@@ -144,53 +144,14 @@ if [ ${#PKGLIST[@]} -eq 0 ] && [ "$CHECK_ONLY" = "1" ]; then
     fi
 fi
 
-# now, we will download something
-UPDATE_COMMAND=(fakeroot $UPDATE_CMD $UPDATE_ACTION "${UPDATE_ARGUMENTS[@]}")
-"$UPDATE_CMD" "$UPDATE_ACTION" --help | grep -q downloadonly && UPDATE_COMMAND+=(--downloadonly)
-# check for --downloadonly option - if not supported (Debian), fallback to
-# yumdownloader
-if ! "$UPDATE_CMD" --help | grep -q downloadonly && ! "$UPDATE_CMD" --version | grep -q dnf5; then
-    if dpkg --compare-versions \
-            "$(dpkg-query --show --showformat='${version}' rpm)" gt 4.14; then
-        SIGNATURE_REGEX="^[A-Za-z0-9._+-/]{1,128}\.rpm: digests signatures OK$"
-    else
-        SIGNATURE_REGEX="^[A-Za-z0-9._+-/]{1,128}\.rpm: [a-z0-9() ]* (pgp|gpg) [a-z0-9 ]* OK$"
-    fi
+# now, we will download something (or perform search, list or other tasks)
+UPDATE_COMMAND=(fakeroot "$UPDATE_CMD" "$UPDATE_ACTION" "${UPDATE_ARGUMENTS[@]}")
 
-    # setup environment for yumdownloader to be happy
-    if [ ! -e "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
-        ln -nsf dnf/dnf.conf "$DOM0_UPDATES_DIR/etc/yum.conf"
-    fi
-    if [ "$UPDATE_ACTION" = "install" ]; then
-        UPDATE_COMMAND=(yumdownloader "--destdir=$DOM0_UPDATES_DIR/packages" --resolve)
-    elif [ "$UPDATE_ACTION" = "upgrade" ]; then
-        # shellcheck disable=SC2086
-        UPDATES_FULL=$($UPDATE_CMD check-update "${UPDATE_ARGUMENTS[@]}" "${OPTS[@]}" "${PKGLIST[@]}")
-        check_update_retcode=$?
-        UPDATES_FULL=$(echo "$UPDATES_FULL" | grep -v "^Loaded plugins:\|^Last metadata\|^$")
-        mapfile -t PKGLIST < <(echo "$UPDATES_FULL" | grep -v "^Obsoleting\|Could not" | cut -f 1 -d ' ')
-        if [ "$check_update_retcode" -eq 0 ]; then
-            # exit code 0 means no updates available - regardless of stdout messages
-            echo "No new updates available" >&2
-            exit 0
-        fi
-        UPDATE_COMMAND=(yumdownloader "--destdir=$DOM0_UPDATES_DIR/packages" --resolve)
-    elif [ "$UPDATE_ACTION" == "list" ] || [ "$UPDATE_ACTION" == "search" ]; then
-        # those actions do not download any package, so lack of --downloadonly is irrelevant
-        UPDATE_COMMAND=($UPDATE_CMD "${UPDATE_ARGUMENTS[@]}" -- "$UPDATE_ACTION")
-    elif [ "$UPDATE_ACTION" == "reinstall" ]; then
-        # this is just approximation of 'reinstall' action...
-        mapfile -t PKGLIST < <(rpm "--root=$DOM0_UPDATES_DIR" -q "${PKGLIST[@]}")
-        UPDATE_COMMAND=(yumdownloader "--destdir=$DOM0_UPDATES_DIR/packages" --resolve)
-    else
-        echo "ERROR: yum version installed in VM $(hostname) does not suppport --downloadonly option" >&2
-        echo "ERROR: only 'install' and 'upgrade' actions supported ($UPDATE_ACTION not)" >&2
-        if [ "$GUI" = 1 ]; then
-            zenity --error --text="yum version too old for '$UPDATE_ACTION' action, see console for details"
-        fi
-        exit 1
-    fi
-fi
+# DNF4 supported --downloadonly option for all actions. DNF5 fails for list,
+# search, info and similar actions if --downloadonly is specified. The below
+# condition is a smart way to check if --downloadonly option is applicable to
+# the action.
+"$UPDATE_CMD" "$UPDATE_ACTION" --help | grep -q downloadonly && UPDATE_COMMAND+=(--downloadonly)
 
 mkdir -p "$DOM0_UPDATES_DIR/packages"
 
