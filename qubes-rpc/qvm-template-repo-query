@@ -49,7 +49,11 @@ touch -r "$hashfile" "$repodir/template.repo"
 RET=0
 
 if [ "$1" = "query" ]; then
-    dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{reponame}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
+    if dnf --version | grep -q dnf5; then
+        dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{repoid}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|\n' "$SPEC"
+    else
+        dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{repoid}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
+    fi
     RET="$?"
 elif [ "$1" = "download" ]; then
     # Download/retry algorithm: take mirrors in random order. In this order,
@@ -57,7 +61,11 @@ elif [ "$1" = "download" ]; then
     # downloaded - retry from the same one. If download failed and nothing was
     # downloaded, go to the next one. The intention is to retry on interrupted
     # connection, but skip mirrors that are not synchronized yet.
-    urls="$(dnf downloadurl "${OPTS[@]}" --url --all-mirrors "$SPEC" | shuf)"
+    if dnf --version | grep -q dnf5; then
+        urls="$(dnf download "${OPTS[@]}" --url -q "$SPEC")"
+    else
+        urls="$(dnf downloadurl "${OPTS[@]}" --url --all-mirrors "$SPEC" | shuf)"
+    fi
     readarray -t urls <<<"$urls"
     downloaded=0
     status_file="$repodir/download-status.tmp"
