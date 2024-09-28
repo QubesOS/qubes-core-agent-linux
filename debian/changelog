@@ -1,3 +1,13 @@
+qubes-core-agent (4.3.7-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Allow recent:/// in Nautilus for Copy/Move/Open
+  * Hide Copy/Move/Edit/View to qube for network items
+  * Support dnf5 for qubes-download-dom0-update.sh
+  * Drop yumdownloader, shellcheck fixes and comments
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 28 Sep 2024 16:17:18 +0200
+
 qubes-core-agent (4.3.6-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
