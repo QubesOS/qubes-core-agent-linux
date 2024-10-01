@@ -167,12 +167,16 @@ Requires:   dbus-1-tools
 %else
 Requires:   dbus-tools
 %endif
+%if 0%{?fedora} >= 41
+Requires:   libdnf5-plugin-actions
+%else
 %if 0%{?rhel} == 8
 # we need to stick to related DNF python version
 # which is python3.6 by default
 Requires:   python3-dnf-plugins-qubes-hooks
 %else
 Requires:   python%{python3_pkgversion}-dnf-plugins-qubes-hooks
+%endif
 %endif
 Requires:   python%{python3_pkgversion}-setuptools
 # for qubes.ResizeDisk
@@ -496,7 +500,11 @@ make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install-kde5
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
 
+%if 0%{?fedora} >= 41
+make -C package-managers PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT install install-dnf5
+%else
 make -C package-managers PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT install install-dnf
+%endif
 %if 0%{?rhel} == 7
 make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
 %endif
@@ -949,9 +957,13 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/yum.conf.d/qubes-proxy.conf
 %dir /etc/yum.repos.d
 %config(noreplace) /etc/yum.repos.d/qubes-r4.repo
+%if 0%{?fedora} >= 41
+/etc/dnf/libdnf5-plugins/actions.d/qubes-post-update.actions
+%else
 %if 0%{?rhel} == 7
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
+%endif
 %endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %dir /etc/dconf/db/local.d

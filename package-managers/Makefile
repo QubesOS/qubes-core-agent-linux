@@ -39,7 +39,7 @@ endif
 
 DIST ?= fc33
 
-.PHONY: install install-apt install-dnf install-rpm install-yum
+.PHONY: install install-apt install-dnf install-dnf5 install-rpm install-yum
 
 install:
 	install -d $(DESTDIR)$(QUBESLIBDIR)
@@ -94,6 +94,10 @@ else
 		$(DESTDIR)$(PYTHON3_SITELIB)/dnf-plugins/qubes-hooks.py
 endif
 	install -D -m 0644 dnf-qubes-hooks.conf $(DESTDIR)$(SYSCONFDIR)/dnf/plugins/qubes-hooks.conf
+
+install-dnf5: install-rpm
+	install -D -m 0644 qubes-post-update.actions \
+		$(DESTDIR)$(SYSCONFDIR)/dnf/libdnf5-plugins/actions.d/qubes-post-update.actions
 
 install-yum: install-rpm
 	install -d $(DESTDIR)$(LIBDIR)/yum-plugins
