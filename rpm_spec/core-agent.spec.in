@@ -201,6 +201,7 @@ BuildRequires: qubes-utils-devel >= 4.3.1
 BuildRequires: qubes-libvchan-%{?qubes_backend_vmm}%{?!qubes_backend_vmm:@BACKEND_VMM@}-devel
 BuildRequires: pam-devel
 BuildRequires: python%{python3_pkgversion}-setuptools
+BuildRequires: python%{python3_pkgversion}-devel
 BuildRequires: systemd
 %if 0%{?rhel} >= 8
 BuildRequires: redhat-lsb
@@ -230,6 +231,8 @@ Requires: (gnome-keyring if xdg-desktop-portal)
 %description
 The Qubes core files for installation inside a Qubes VM.
 
+%if 0%{?fedora} < 41
+# not relevant anymore with DNF5
 %if 0%{?rhel} == 8
 %package -n python3-dnf-plugins-qubes-hooks
 Summary: DNF plugin for Qubes specific post-installation actions
@@ -256,6 +259,7 @@ BuildArch: noarch
 DNF plugin for Qubes specific post-installation actions:
  * notify dom0 that updates were installed
  * refresh applications shortcut list
+%endif
 %endif
 
 %if 0%{?rhel} != 7
@@ -964,8 +968,8 @@ rm -f %{name}-%{version}
 /etc/yum/pluginconf.d/yum-qubes-hooks.conf
 /usr/lib/yum-plugins/yum-qubes-hooks.py*
 %endif
-%endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
+%endif
 %dir /etc/dconf/db/local.d
 %config(noreplace) /etc/dconf/db/local.d/dpi
 %config(noreplace) /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-notifyd.xml
@@ -1066,12 +1070,15 @@ rm -f %{name}-%{version}
 %dir /mnt/removable
 %dir /rw
 
+%if 0%{?fedora} < 41
+# not relevant anymore with DNF5
 %if 0%{?rhel} == 8
 %files -n python3-dnf-plugins-qubes-hooks
 %{plateform_python3_sitelib}/dnf-plugins/*
 %else
 %files -n python%{python3_pkgversion}-dnf-plugins-qubes-hooks
 %{python3_sitelib}/dnf-plugins/*
+%endif
 %endif
 
 %if 0%{?rhel} != 7
