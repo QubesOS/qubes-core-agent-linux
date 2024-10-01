@@ -1,0 +1,4 @@
+# notify dom0 if all updates are installed now
+post_transaction:::enabled=host-only:/usr/lib/qubes/upgrades-status-notify
+# refresh appmenus, features etc
+post_transaction:::enabled=host-only:/etc/qubes-rpc/qubes.PostInstall
