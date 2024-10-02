@@ -26,11 +26,18 @@ repodir=$(mktemp -d)
 trap 'rm -r "$repodir"' EXIT
 cat > "$repodir/template.repo"
 
+DNF5=false
+if [ "$(readlink /usr/bin/dnf)" = "dnf5" ]; then
+    DNF5=true
+fi
+
 OPTS+=(-y "--setopt=reposdir=${repodir}" --quiet)
 
-# use vendored 'downloadurl' dnf-plugin (fork of 'download' plugin), to print
-# all mirrors
-OPTS+=("--setopt=pluginpath=/usr/lib/qubes/dnf-plugins")
+if ! $DNF5; then
+    # use vendored 'downloadurl' dnf-plugin (fork of 'download' plugin), to print
+    # all mirrors
+    OPTS+=("--setopt=pluginpath=/usr/lib/qubes/dnf-plugins")
+fi
 
 if ! command -v dnf >/dev/null; then
     echo "ERROR: dnf command is missing, please use newer template for your UpdateVM to download templates." >&2
