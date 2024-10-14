@@ -33,8 +33,9 @@ set_qdbus() {
 }
 
 copy() {
-    PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm @default \
-        qubes.Filecopy /usr/lib/qubes/qfile-agent "$@"
+    PROGRESS_TYPE=gui /usr/lib/qubes/qrexec-client-vm \
+        --filter-escape-chars-stderr -- @default \
+        "$service" /usr/lib/qubes/qfile-agent "$@"
 }
 
 progress_kdialog() {
@@ -65,21 +66,14 @@ progress_zenity() {
 }
 
 
-find_paths=( )
-for path; do
-    case "$path" in
-        (-*) find_paths+=( ./"$path" ) ;;
-        (*)  find_paths+=(   "$path" ) ;;
-    esac
-done
-
-size=$(
-    find "${find_paths[@]}" -type f -print0 2>/dev/null |
-    du --files0-from - -c --apparent-size -b |
-    tail -n 1 |
-    cut -f 1 |
-    grep -xE '[0-9]+'
-) || size=0
+if size=$(/usr/lib/qubes/qubes-fs-tree-check \
+    --allow-symlinks --allow-directories --machine -- "$@"); then
+    service=qubes.Filecopy
+else
+    status=$?
+    if [[ "$status" -ne 2 ]]; then exit "$status"; fi
+    service=qubes.Filecopy+allow-all-names
+fi
 
 if [[ ${0##*/} == qvm-move-to-vm.* ]]; then
     description="Moving files..."
