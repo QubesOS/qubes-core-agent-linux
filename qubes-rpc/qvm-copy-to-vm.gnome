@@ -43,11 +43,11 @@ progress_kdialog() {
     (while read -r pos; do
         if [[ $pos == 0 ]]; then
             # shellcheck disable=SC2207
-            ref=( $(kdialog --progressbar "$DESCRIPTION") )
+            ref=( $(kdialog --progressbar "$description") )
             trap '"$qdbus" "${ref[@]}" close' EXIT  # for this subshell
         fi
 
-        "$qdbus" "${ref[@]}" value $((100 * pos / SIZE))
+        "$qdbus" "${ref[@]}" value $((100 * pos / size))
     done) >/dev/null  # hide qdbus's empty output lines
 }
 
@@ -57,10 +57,10 @@ progress_zenity() {
     (while read -r pos; do
         if [[ $pos == 0 ]]; then
             trap 'kill -- $!' EXIT  # for this subshell
-            exec {fd}> >(exec zenity --progress --text="$DESCRIPTION")
+            exec {fd}> >(exec zenity --progress --text="$description")
         fi
 
-        echo $((100 * pos / SIZE)) >&$fd
+        echo $((100 * pos / size)) >&$fd
     done)
 }
 
@@ -73,22 +73,22 @@ for path; do
     esac
 done
 
-SIZE=$(
+size=$(
     find "${find_paths[@]}" -type f -print0 2>/dev/null |
     du --files0-from - -c --apparent-size -b |
     tail -n 1 |
     cut -f 1 |
     grep -xE '[0-9]+'
-) || SIZE=0
+) || size=0
 
 if [[ ${0##*/} == qvm-move-to-vm.* ]]; then
-    DESCRIPTION="Moving files..."
+    description="Moving files..."
     trap '[[ $? == 0 ]] && rm -rf -- "$@"' EXIT
 else
-    DESCRIPTION="Copying files..."
+    description="Copying files..."
 fi
 
-if [[ $SIZE == 0 ]]; then
+if [[ $size == 0 ]]; then
     copy "$@" >/dev/null
 elif [[ $0 == *.kde ]] && type kdialog >/dev/null && set_qdbus; then
     copy "$@" | progress_kdialog
