@@ -56,7 +56,11 @@ touch -r "$hashfile" "$repodir/template.repo"
 RET=0
 
 if [ "$1" = "query" ]; then
-    dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{reponame}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
+    if $DNF5; then
+        dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{repoid}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|\n' "$SPEC"
+    else
+        dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{repoid}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
+    fi
     RET="$?"
 elif [ "$1" = "download" ]; then
     # Download/retry algorithm: take mirrors in random order. In this order,
@@ -64,8 +68,26 @@ elif [ "$1" = "download" ]; then
     # downloaded - retry from the same one. If download failed and nothing was
     # downloaded, go to the next one. The intention is to retry on interrupted
     # connection, but skip mirrors that are not synchronized yet.
-    urls="$(dnf downloadurl "${OPTS[@]}" --url --all-mirrors "$SPEC" | shuf)"
-    readarray -t urls <<<"$urls"
+    declare -a urls=()
+    if $DNF5 && dnf download --help | grep -q allmirrors; then
+        # The smartest case. DNF5 on Fedora 41 with --allmirrors patch
+        space_separated_urls="$(dnf download "${OPTS[@]}" --url --allmirrors "$SPEC")"
+        readarray -d ' ' -t urls <<<"$space_separated_urls"
+        urls=( $(shuf -e "${urls[@]}") )
+    elif $DNF5; then
+        # The middle case. DNF5 on Fedora 41 before --allmirror patch
+        # TODO: Phase out after DNF5 --allmirrors patch is released
+        url="$(dnf download "${OPTS[@]}" --url "$SPEC")"
+        urls=("$url")
+    else
+        # The old DNF4 on Fedora 40 and other old templates
+        # use vendored 'downloadurl' dnf-plugin (fork of 'download' plugin),
+        # to print all mirrors.
+        # TODO: Phase out after DNF4 is EOL
+        OPTS+=("--setopt=pluginpath=/usr/lib/qubes/dnf-plugins")
+        urls="$(dnf downloadurl "${OPTS[@]}" --url --all-mirrors "$SPEC" | shuf)"
+        readarray -t urls <<<"$urls"
+    fi
     downloaded=0
     status_file="$repodir/download-status.tmp"
     for url in "${urls[@]}"; do
