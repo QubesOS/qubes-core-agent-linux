@@ -4,9 +4,12 @@
 # It happens after local-fs.target is reached
 # but before sysinit.target is reached.
 
-if [ -x /rw/config/rc.local-early ] ; then
-    /rw/config/rc.local-early
-fi
+for rc in /rw/config/rc.local-early.d/*.rc /rw/config/rc.local-early; do
+    [ -f "$rc" ] || continue
+    [ -x "$rc" ] || continue
+    "$rc"
+done
+unset rc
 
 # Source Qubes library.
 # shellcheck source=init/functions
