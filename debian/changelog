@@ -1,3 +1,29 @@
+qubes-core-agent (4.3.8-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Use libdnf5-plugin-actions to execute post-update actions
+  * Do not build python3-dnf-plugins-qubes-hooks on Fedora >= 41
+  * qvm-template-repo-query: don't set pluginpath for DNF5
+
+  [ Ali Mirjamali ]
+  * Fix DNF5 repoquery
+
+  [ Rusty Bird ]
+  * qvm-copy-to-vm.gnome: lowercase $size and $description
+  * qvm-copy-to-vm.gnome: port +allow-all-names logic from qvm-copy
+
+  [ kennethrrosen ]
+  * Misc-post-stop: remove unused QubesIncoming
+  * Misc-post-stop: remove unused QubesIncoming
+
+  [ chriswoope ]
+  * Add support for /rw/config/rc.local-early
+
+  [ Marek Marczykowski-Górecki ]
+  * Add support for /rw/config/rc.local-early.d dir
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 20 Oct 2024 05:40:03 +0200
+
 qubes-core-agent (4.3.7-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
