@@ -1,3 +1,9 @@
+qubes-core-agent (4.3.9-1) unstable; urgency=medium
+
+  * Fix typo in 10-qubes-core-agent-features.sh
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 21 Oct 2024 14:46:20 +0200
+
 qubes-core-agent (4.3.8-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
