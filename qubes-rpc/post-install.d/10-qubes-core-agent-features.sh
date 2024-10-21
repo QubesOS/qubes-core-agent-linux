@@ -102,7 +102,7 @@ if [ -e /etc/xdg/autostart/blueman.desktop ]; then
     qvm-features-request supported-service.blueman=1
 fi
 
-vm-features-request supported-service.no-qubesincoming-cleanup=1
+qvm-features-request supported-service.no-qubesincoming-cleanup=1
 
 # native services plugged into qubes-services with systemd drop-ins, list them
 # only when actual service is installed
