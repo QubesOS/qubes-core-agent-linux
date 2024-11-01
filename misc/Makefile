@@ -52,6 +52,8 @@ install:
 	install -m 0755 -d $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
 	install -m 0644 -t $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml xfce4-notifyd.xml
 	install -m 0644 -t $(DESTDIR)/etc/xdg/xfce4/xfconf/xfce-perchannel-xml displays.xml
+	install -m 0644 -D -t $(DESTDIR)/etc/security/limits.d 90-qubes-core.conf
+	install -m 0644 -D -t $(DESTDIR)/usr/lib/sysctl.d 20-qubes-core.conf
 
 marker-vm: marker-vm.in
 	printf "$(VERSION)" | cut -f 1,2 -d . | cat $< - > marker-vm
