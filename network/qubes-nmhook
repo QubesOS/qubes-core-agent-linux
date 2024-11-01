@@ -7,10 +7,14 @@
 if [ "$2" = "up" ] || [ "$2" = "vpn-up" ] || [ "$2" = "vpn-down" ] || [ "$2" = "dhcp4-change" ]; then
     /usr/lib/qubes/qubes-setup-dnat-to-ns
 
-    # FIXME: Tinyproxy does not reload DNS servers.
-    if under_systemd ; then
-        systemctl --no-block try-restart qubes-updates-proxy.service
-    else
-        service qubes-updates-proxy try-restart
+    # Do not restart updates proxy if DNS hasn't changed
+    # (qubes-setup-dnat-to-ns exits with 100 in such a case)
+    if [ $? -ne 100 ]; then
+        # FIXME: Tinyproxy does not reload DNS servers.
+        if under_systemd ; then
+            systemctl --no-block try-restart qubes-updates-proxy.service
+        else
+            service qubes-updates-proxy try-restart
+        fi
     fi
 fi
