@@ -185,7 +185,9 @@ configure_qubes_ns() {
     secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
     echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
     echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
-    /usr/lib/qubes/qubes-setup-dnat-to-ns
+    ret=0
+    /usr/lib/qubes/qubes-setup-dnat-to-ns || ret=$?
+    [ "$ret" -eq 0 ] || [ "$ret" -eq 100 ] || exit "$ret"
 }
 
 qubes_ip_change_hook() {
