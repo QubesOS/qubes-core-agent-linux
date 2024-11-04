@@ -20,6 +20,10 @@
 #
 
 from __future__ import annotations
+
+import subprocess
+import sys
+
 import dbus
 import qubesdb
 from typing import List
@@ -85,7 +89,7 @@ def install_firewall_rules(dns):
             qubesdb_dns.append(IPv4Address(ns_maybe.decode("ascii", "strict")))
         except (UnicodeDecodeError, ValueError):
             pass
-    res = [
+    preamble = [
         'add table ip qubes',
         # Add the chain so that the subsequent delete will work. If the chain already
         # exists this is a harmless no-op.
@@ -95,6 +99,8 @@ def install_firewall_rules(dns):
         # atomic operation, so there is no period where neither chain is present or
         # where both are present.
         'delete chain ip qubes dnat-dns',
+    ]
+    rules = [
         'table ip qubes {',
         'chain dnat-dns {',
         'type nat hook prerouting priority dstnat; policy accept;',
@@ -105,7 +111,7 @@ def install_firewall_rules(dns):
         # Or maybe user wants to enforce DNS-Over-HTTPS.
         # Drop IPv4 DNS requests to qubesdb_dns addresses.
         for vm_nameserver in qubesdb_dns:
-            res += [
+            rules += [
                 f"ip daddr {vm_nameserver} udp dport 53 drop",
                 f"ip daddr {vm_nameserver} tcp dport 53 drop",
             ]
@@ -115,12 +121,25 @@ def install_firewall_rules(dns):
             dns_resolved = dns_resolved + dns_resolved
         for vm_nameserver, dest in zip(qubesdb_dns, dns_resolved):
             dns_ = str(dest)
-            res += [
+            rules += [
                 f"ip daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
                 f"ip daddr {vm_nameserver} tcp dport 53 dnat to {dns_}",
             ]
-    res += ["}\n}\n"]
-    os.execvp("nft", ("nft", "--", "\n".join(res)))
+    rules += ["}", "}"]
+
+    # check if new rules are the same as the old ones - if so, don't reload
+    # and return that info via exit code
+    try:
+        old_rules = subprocess.check_output(
+            ["nft", "list", "chain", "ip", "qubes", "dnat-dns"]).decode().splitlines()
+    except subprocess.CalledProcessError:
+        old_rules = []
+    old_rules = [line.strip() for line in old_rules]
+
+    if old_rules == rules:
+        sys.exit(100)
+
+    os.execvp("nft", ("nft", "--", "\n".join(preamble + rules)))
 
 if __name__ == '__main__':
     install_firewall_rules(get_dns_resolved())
