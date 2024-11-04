@@ -37,6 +37,7 @@
  */
 
 #define _GNU_SOURCE /* For O_NOFOLLOW. */
+#include <limits.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/time.h>
@@ -46,6 +47,7 @@
 #include <stdio.h>
 #include <libqubes-rpc-filecopy.h>
 #include <string.h>
+#include <assert.h>
 #include <gui-fatal.h>
 
 // #define DEBUG
@@ -165,7 +167,6 @@ typedef struct {
  */
 
 static unsigned long tar_chksm (char *, int);
-char *gnu_hack_string;          /* GNU ././@LongLink hackery */
 
 char untrusted_namebuf[MAX_PATH_LENGTH];
 int use_seek = 1;
@@ -462,24 +463,22 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
   dest = untrusted_namebuf;
   if (*(hd->prefix) != '\0')
     {
-      cnt = strlen(strncpy (dest, hd->prefix,
-		     MIN(sizeof (untrusted_namebuf) - 1,TPFSZ+1)));
+      cnt = strnlen(hd->prefix, sizeof(hd->prefix));
+      static_assert(sizeof (untrusted_namebuf) - 1 > TPFSZ+1, "buffer overflow risk");
+      memcpy(dest, hd->prefix, cnt);
+      dest[cnt++] = '/';
       dest += cnt;
-      *dest++ = '/';
-      cnt++;
     }
-  if (gnu_hack_string)
-    {
-      untrusted_hdr->namelen = cnt + strlen(strncpy (dest, gnu_hack_string,
-				  MIN(TNMSZ+1, sizeof (untrusted_namebuf) - cnt)));
-      free(gnu_hack_string);
-      gnu_hack_string = NULL;
-    } else
-      untrusted_hdr->namelen = cnt + strlen(strncpy (dest, hd->name,
-				  MIN(TNMSZ+1, sizeof (untrusted_namebuf) - cnt)));
+  {
+    size_t len = strnlen(hd->name, sizeof(hd->name));
+    static_assert(sizeof (hd->name) + 2 + sizeof(hd->prefix) <= sizeof (untrusted_namebuf),
+		  "buffer overflow risk");
+    memcpy(dest, hd->name, len);
+    // qfile count the \0 in the namelen
+    dest[len++] = '\0';
+    untrusted_hdr->namelen = (uint32_t)(cnt + len);
+  }
 
-  // qfile count the \0 in the namelen
-  untrusted_hdr->namelen += 1;
 
 #ifdef DEBUG
   fprintf(stderr,"Retrieved name len: %d\n",untrusted_hdr->namelen);
@@ -725,7 +724,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 			path[len_last_token] = '\0';
 		} else {
 			pathsize = strlen(path);
-			path = realloc(path, sizeof (char) * (strlen(path)+1+len_last_token+1));
+			path = realloc(path, sizeof (char) * (pathsize+1+len_last_token+1));
 			if (path == NULL)
 				return MEMORY_ALLOC_FAILED;
 			path[pathsize] = '/';
@@ -751,6 +750,7 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 				fprintf(stderr,"Directory headers already sent\n");
 #endif
 				dir_found=1;
+				break;
 			}
 		}
 		if (dir_found == 0) {
@@ -758,17 +758,21 @@ ustar_rd (int fd, struct file_header * untrusted_hdr, char *buf, struct stat * s
 #ifdef DEBUG
 			fprintf(stderr,"Inserting %s into register\n",path);
 #endif
-			dirs_headers_sent = realloc(dirs_headers_sent, sizeof (char*) * (++n_dirs));
+			size_t new_alloc_size;
+			if (n_dirs >= INT_MAX || __builtin_mul_overflow(sizeof(char *), ++n_dirs, &new_alloc_size))
+				gui_fatal("Too many directories already sent");
+			dirs_headers_sent = realloc(dirs_headers_sent, new_alloc_size);
 			if (dirs_headers_sent == NULL)
 				return MEMORY_ALLOC_FAILED;
-			dirs_headers_sent[n_dirs-1] = malloc(sizeof (char) * (strlen(path)+1));
+			size_t len = strlen(path) + 1;
+			dirs_headers_sent[n_dirs-1] = malloc(len);
 			if (dirs_headers_sent[n_dirs-1] == NULL)
 				return MEMORY_ALLOC_FAILED;
 
-			memcpy(dirs_headers_sent[n_dirs-1], path, strlen(path)+1);
+			memcpy(dirs_headers_sent[n_dirs-1], path, len);
 
                         // Initialize the qfile headers for the current directory path
-			dir_header.namelen = strlen(path)+1;
+			dir_header.namelen = (uint32_t)len;
 			dir_header.atime = untrusted_hdr->atime;
 			dir_header.atime_nsec = untrusted_hdr->atime_nsec;
 			dir_header.mtime = untrusted_hdr->mtime;
