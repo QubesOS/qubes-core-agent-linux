@@ -1,3 +1,19 @@
+qubes-core-agent (4.3.11-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Replace test and [ with bash's [[
+  * Remove unreachable code
+  * tar2qfile: Avoid integer overflow
+  * tar2qfile: Remove redundant calls to strlen()
+  * tar2qfile: Avoid off-by-1 out-of-bounds read
+  * tar2qfile: Break early if directory headers sent already
+
+  [ Marek Marczykowski-Górecki ]
+  * network: do not restart tinyproxy if DNS hasn't changed
+  * Adjust default process/threads limit
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 04 Nov 2024 19:14:27 +0100
+
 qubes-core-agent (4.3.10-1) unstable; urgency=medium
 
   * Limit initramfs size in Fedora HVM even more
