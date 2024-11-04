@@ -56,6 +56,7 @@ etc/qubes/rpc-config/qubes.VMExecGUI
 etc/qubes/suspend-post.d/README
 etc/qubes/suspend-post.d/*.sh
 etc/qubes/suspend-pre.d/README
+etc/security/limits.d/90-qubes-core.conf
 etc/sudoers.d/qt_x11_no_mitshm
 etc/sudoers.d/umask
 etc/sysctl.d/20_tcp_timestamps.conf
@@ -106,6 +107,7 @@ lib/systemd/system/sysinit.target.d/30_qubes.conf
 lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 lib/systemd/system/systemd-logind.service.d/30_qubes.conf
 lib/systemd/resolved.conf.d/30_resolved-no-mdns-or-llmnr.conf
+usr/lib/sysctl.d/20-qubes-core.conf
 usr/lib/systemd/user/tracker-extract-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-miner-fs-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-miner-fs-control-3.service.d/30_qubes.conf
