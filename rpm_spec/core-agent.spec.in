@@ -134,6 +134,7 @@ Requires:   sed
 Requires:   util-linux
 Requires:   e2fsprogs
 Requires:   hostname
+Requires:   (%{name}-dracut if dracut)
 # for Qubes Manager VM updater
 Requires:   xterm
 # for qubes-desktop-run
@@ -372,6 +373,19 @@ Configure sudo, PolicyKit and similar tool to not ask for any password when
 switching from user to root. Since all the user data in a VM is accessible
 already from normal user account, there is not much more to guard there. Qubes
 VMs are single user systems.
+
+%package dracut
+Summary:        Dracut configuration needed in Qubes OS
+License:        GPL
+Group:          Qubes
+Requires:       dracut
+Requires:       qubes-core-agent = %{version}
+
+%description dracut
+Dracut configuration needed in Qubes OS.  This enables
+passwordless login in rescue and emergency modes, as well
+as configuring dracut to only install certain drivers and
+omit others.
 
 %package thunar
 Summary: Thunar support for Qubes VM tools
@@ -1021,12 +1035,6 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/resize-rootfs
 /usr/lib/qubes/set-default-text-editor
 /usr/lib/qubes/tinyproxy-wrapper
-/usr/lib/dracut/dracut.conf.d/30-qubes.conf
-# Ensure that dracut is not a hard requirement.
-# It is only needed with in-VM initramfs, not
-# dom0-provided initramfs.
-%dir /usr/lib/dracut/modules.d/99qubes
-/usr/lib/dracut/modules.d/99qubes/module-setup.sh
 
 /usr/lib/environment.d/60-gnome-software-fix.conf
 %dir /usr/lib/qubes/init
@@ -1096,6 +1104,11 @@ rm -f %{name}-%{version}
 /usr/share/caja-python/extensions/qvm_move_caja.py*
 /usr/share/caja-python/extensions/qvm_dvm_caja.py*
 %endif
+
+%files dracut
+/usr/lib/dracut/dracut.conf.d/30-qubes.conf
+%dir /usr/lib/dracut/modules.d/99qubes
+/usr/lib/dracut/modules.d/99qubes/module-setup.sh
 
 %files nautilus
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
