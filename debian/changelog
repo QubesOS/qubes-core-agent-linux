@@ -1,3 +1,46 @@
+qubes-core-agent (4.2.38-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Allow recent:/// in Nautilus for Copy/Move/Open
+  * Patch /etc/sudoers on Archlinux
+  * Hide Copy/Move/Edit/View to qube for network items
+  * Support dnf5 for qubes-download-dom0-update.sh
+  * Drop yumdownloader, shellcheck fixes and comments
+
+  [ Marek Marczykowski-Górecki ]
+  * Use libdnf5-plugin-actions to execute post-update actions
+  * Do not build python3-dnf-plugins-qubes-hooks on Fedora >= 41
+  * qvm-template-repo-query: don't set pluginpath for DNF5
+
+  [ Rusty Bird ]
+  * qvm-copy-to-vm.gnome: lowercase $size and $description
+  * qvm-copy-to-vm.gnome: port +allow-all-names logic from qvm-copy
+
+  [ Ali Mirjamali ]
+  * Fix DNF5 repoquery
+
+  [ Marek Marczykowski-Górecki ]
+  * Limit initramfs size in Fedora HVM even more
+
+  [ Demi Marie Obenour ]
+  * Remove unreachable code
+  * tar2qfile: Avoid integer overflow
+  * tar2qfile: Remove redundant calls to strlen()
+  * tar2qfile: Avoid off-by-1 out-of-bounds read
+  * tar2qfile: Break early if directory headers sent already
+
+  [ Marek Marczykowski-Górecki ]
+  * Adjust default process/threads limit
+  * network: do not restart tinyproxy if DNS hasn't changed
+
+  [ Demi Marie Obenour ]
+  * Replace test and [ with bash's [[
+  * qvm-copy: support --ignore-symlinks and honor "--"
+  * Improve qvm-copy --help output
+  * Add negated versions of --without-progress and --ignore-symlinks
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 05 Nov 2024 20:16:50 +0100
+
 qubes-core-agent (4.2.37-1) unstable; urgency=medium
 
   [ Simon Gaiser ]
