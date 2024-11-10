@@ -115,7 +115,9 @@ process_dirent(const char *d_name, int fd, int flags, const char *name,
         int sub_file = openat(fd, d_name, O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC | O_RDONLY);
         if (sub_file < 0)
             err(1, "open(%s)", escaped);
-        return simple_fs_walk(sub_file, ignore_symlinks, name, flags, size);
+        // If "bad" is true, return "true", but still do the
+        // FS walk to get the amount of data to copy.
+        return simple_fs_walk(sub_file, ignore_symlinks, name, flags, size) || bad;
     } else {
         // __builtin_add_overflow uses infinite signed precision,
         // so a negative number would not cause overflow.
