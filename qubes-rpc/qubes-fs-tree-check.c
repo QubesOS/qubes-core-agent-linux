@@ -195,6 +195,7 @@ const struct option opts[] = {
     {"no-allow-directories", no_argument, NULL, 'D'},
     {"allow-all-names", no_argument, NULL, 'u'},
     {"no-allow-all-names", no_argument, NULL, 'U'},
+    {"help", no_argument, NULL, 'h'},
     {0, 0, NULL, 0},
 };
 
@@ -242,6 +243,19 @@ int main(int argc, char **argv)
         case 'U':
             flags &= ~COPY_ALLOW_UNSAFE_CHARACTERS;
             break;
+        case 'h':
+            fputs("Usage:\n"
+                  "  --help                  Print this message\n"
+                  "  --machine-readable      Print the number of bytes to copy on stdout\n"
+                  "  --ignore-symlinks       Ignore symbolic links; overrides previous --no-ignore-symlinks\n"
+                  "  --no-ignore-symlinks    Do not ignore symbolic links; overrides previous --ignore-symlinks\n"
+                  "  --allow-directories     Allow directories; overrides previous --no-allow-directories\n"
+                  "  --no-allow-directories  Do not allow directories; overrides previous --allow-directories\n"
+                  "  --allow-all-names       Allow all-names; overrides previous --no-allow-all-names\n"
+                  "  --no-allow-all-names    Do not allow all-names; overrides previous --allow-all-names\n",
+                  stderr);
+            fflush(stderr);
+            return ferror(stderr) ? 1 : 0;
         default:
             abort();
         }
