@@ -1,3 +1,20 @@
+qubes-core-agent (4.3.12-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * qvm-copy: support --ignore-symlinks and honor "--"
+  * Improve qvm-copy --help output
+  * Add negated versions of --without-progress and --ignore-symlinks
+
+  [ Michel ]
+  * debian: use polkitd instead of policykit-1
+
+  [ Demi Marie Obenour ]
+  * Harden DNF config
+  * qubes-fs-tree-check: add --help
+  * qubes-fs-tree-check: Detect if a directory is unsafe for display
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 15 Nov 2024 15:54:07 +0100
+
 qubes-core-agent (4.3.11-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
