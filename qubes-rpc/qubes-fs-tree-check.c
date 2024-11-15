@@ -115,7 +115,9 @@ process_dirent(const char *d_name, int fd, int flags, const char *name,
         int sub_file = openat(fd, d_name, O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC | O_RDONLY);
         if (sub_file < 0)
             err(1, "open(%s)", escaped);
-        return simple_fs_walk(sub_file, ignore_symlinks, name, flags, size);
+        // If "bad" is true, return "true", but still do the
+        // FS walk to get the amount of data to copy.
+        return simple_fs_walk(sub_file, ignore_symlinks, name, flags, size) || bad;
     } else {
         // __builtin_add_overflow uses infinite signed precision,
         // so a negative number would not cause overflow.
@@ -193,6 +195,7 @@ const struct option opts[] = {
     {"no-allow-directories", no_argument, NULL, 'D'},
     {"allow-all-names", no_argument, NULL, 'u'},
     {"no-allow-all-names", no_argument, NULL, 'U'},
+    {"help", no_argument, NULL, 'h'},
     {0, 0, NULL, 0},
 };
 
@@ -240,6 +243,19 @@ int main(int argc, char **argv)
         case 'U':
             flags &= ~COPY_ALLOW_UNSAFE_CHARACTERS;
             break;
+        case 'h':
+            fputs("Usage:\n"
+                  "  --help                  Print this message\n"
+                  "  --machine-readable      Print the number of bytes to copy on stdout\n"
+                  "  --ignore-symlinks       Ignore symbolic links; overrides previous --no-ignore-symlinks\n"
+                  "  --no-ignore-symlinks    Do not ignore symbolic links; overrides previous --ignore-symlinks\n"
+                  "  --allow-directories     Allow directories; overrides previous --no-allow-directories\n"
+                  "  --no-allow-directories  Do not allow directories; overrides previous --allow-directories\n"
+                  "  --allow-all-names       Allow all-names; overrides previous --no-allow-all-names\n"
+                  "  --no-allow-all-names    Do not allow all-names; overrides previous --allow-all-names\n",
+                  stderr);
+            fflush(stderr);
+            return ferror(stderr) ? 1 : 0;
         default:
             abort();
         }
