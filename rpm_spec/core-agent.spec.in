@@ -487,6 +487,7 @@ usermod -L root
 
 make install-vm PYTHON=%{__python3} "DESTDIR=$RPM_BUILD_ROOT" SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib ENABLE_SELINUX=%with_selinux
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
+make -C boot DESTDIR=$RPM_BUILD_ROOT install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
 make -C filesystem DESTDIR=$RPM_BUILD_ROOT install
@@ -519,9 +520,6 @@ sed -i \
         -e 's:/fc:/centos:' \
         $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
 %endif
-
-install -D -m 0644 boot/dracut-qubes.conf $RPM_BUILD_ROOT/usr/lib/dracut/dracut.conf.d/30-qubes.conf
-install -D -m 0644 boot/grub.qubes $RPM_BUILD_ROOT/etc/default/grub.qubes
 
 %if ! %with_sysvinit
     rm -rf $RPM_BUILD_ROOT/etc/init.d/qubes-* $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
