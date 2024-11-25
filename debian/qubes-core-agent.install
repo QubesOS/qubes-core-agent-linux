@@ -138,6 +138,7 @@ usr/bin/qvm-run-vm
 usr/bin/qvm-connect-tcp
 usr/bin/qvm-sync-clock
 usr/lib/environment.d/60-gnome-software-fix.conf
+usr/lib/dracut/dracut.conf.d/30-qubes.conf
 usr/lib/python3/dist-packages/qubesagent-*.egg-info/*
 usr/lib/python3/dist-packages/qubesagent/*
 usr/lib/qubes-bind-dirs.d/30_cron.conf
