@@ -24,11 +24,12 @@ elif [ -e /etc/debian_version ]; then
     set -e
     set -o pipefail
     # shellcheck disable=SC2034
-    apt_get_update_output="$(apt-get -q update 2>&1)"
+    apt_get_update_output="$(apt-get -q update 2>&1 | tee /proc/self/fd/2)"
     apt_get_upgrade_output="$(LANG="C" apt-get -s upgrade 2>&1)"
     exit_code="$?"
     # shellcheck disable=SC2266
     echo "$apt_get_upgrade_output" | awk "/^Inst/{ print $2 }" | [ "$(wc -L)" -eq 0 ] && echo "true" || echo "false"
+    echo "$apt_get_upgrade_output" >&2
 elif [ -e /etc/arch-release ]; then
     ## Archlinux
     checkupdates >/dev/null 2>&1
