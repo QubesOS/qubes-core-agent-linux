@@ -1,3 +1,19 @@
+qubes-core-agent (4.2.39-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * qubes-fs-tree-check: Detect if a directory is unsafe for display
+
+  [ Michel ]
+  * debian: use polkitd instead of policykit-1
+
+  [ Demi Marie Obenour ]
+  * qubes-fs-tree-check: add --help
+
+  [ Daniel Moerner ]
+  * Sync other systemd /tmp mount options with Fedora
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 08 Dec 2024 13:18:42 +0100
+
 qubes-core-agent (4.2.38-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
