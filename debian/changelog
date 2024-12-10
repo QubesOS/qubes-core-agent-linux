@@ -1,3 +1,16 @@
+qubes-core-agent (4.3.13-1) unstable; urgency=medium
+
+  [ Daniel Moerner ]
+  * Sync other systemd /tmp mount options with Fedora
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: use the install target in boot/Makefile
+  * debian: include all boot-related configs in the package
+  * archlinux: do not open-code boot configs install target
+  * dracut: add few more setting to reduce initramfs size on Debian
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 10 Dec 2024 22:46:54 +0100
+
 qubes-core-agent (4.3.12-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
