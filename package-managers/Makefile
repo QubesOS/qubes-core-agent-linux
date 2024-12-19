@@ -25,7 +25,7 @@ DIST_NAME = centos
 endif
 else ifneq (,$(wildcard /etc/os-release))
 DIST = $(shell grep VERSION_CODENAME= /etc/os-release | cut -d'=' -f2)
-DIST_NAME = $(shell grep NAME= /etc/os-release | cut -d'=' -f2)
+DIST_NAME = $(shell grep ^NAME= /etc/os-release | cut -d'=' -f2)
 endif
 
 ifeq (,$(DIST))
@@ -38,6 +38,10 @@ endif
 endif
 
 DIST ?= fc33
+
+# Ensure to remove quotes
+DIST := $(shell echo $(DIST) | tr -d '"')
+DIST_NAME := $(shell echo $(DIST_NAME) | tr -d '"')
 
 .PHONY: install install-apt install-dnf install-dnf5 install-rpm install-yum
 
