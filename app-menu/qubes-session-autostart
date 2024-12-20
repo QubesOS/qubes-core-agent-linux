@@ -28,9 +28,17 @@ from qubesagent.xdg import launch, find_dropins, \
     load_desktop_entry_with_dropins
 import xdg.BaseDirectory
 import os
+import re
 
 
 QUBES_XDG_CONFIG_DROPINS = '/etc/qubes/autostart'
+
+
+def check_file_existence(path: str) -> bool:
+    if os.path.isabs(path):
+        return os.path.exists(path)
+    else:
+        return os.path.exists(os.path.join(xdg.BaseDirectory.xdg_config_home, path))
 
 
 def entry_should_be_started(entry, environments):
@@ -40,6 +48,18 @@ def entry_should_be_started(entry, environments):
     """
     if entry.getHidden():
         return False
+
+    # Handle AutostartCondition keys. Not part of the official XDG specification but documented here:
+    # https://lists.freedesktop.org/archives/xdg/2007-January/007436.html
+    # Only if-exists and unless-exists keywords are supported
+    # Invalid syntax is ignored
+    for autostart_condition in entry.get('AutostartCondition', list=True):
+        search = re.search(r'^\s*(if|unless)-exists (.*)', autostart_condition)
+        if search:
+            should_exists = search.group(1) == 'if'
+            if should_exists != check_file_existence(search.group(2)):
+                return False
+
     if entry.getOnlyShowIn():
         return bool(set(entry.getOnlyShowIn()).intersection(environments))
     if entry.getNotShowIn():
