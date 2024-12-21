@@ -70,9 +70,11 @@ lib/systemd/system/boot.automount.d/30_qubes.conf
 lib/systemd/system/ModemManager.service.d/30_qubes.conf
 lib/systemd/system/NetworkManager-wait-online.service.d/30_qubes.conf
 lib/systemd/system/NetworkManager.service.d/30_qubes.conf
+lib/systemd/system/abrtd.service.d/30_qubes.conf
 lib/systemd/system/anacron-resume.service.d/30_qubes.conf
 lib/systemd/system/anacron.service.d/30_qubes.conf
 lib/systemd/system/avahi-daemon.service.d/30_qubes.conf
+lib/systemd/system/bluetooth.service.d/30_qubes.conf
 lib/systemd/system/chronyd.service.d/30_qubes.conf
 lib/systemd/system/cron.service.d/30_qubes.conf
 lib/systemd/system/cups.path.d/30_qubes.conf
@@ -85,6 +87,7 @@ lib/systemd/system/netfilter-persistent.service.d/30_qubes.conf
 lib/systemd/system/org.cups.cupsd.path.d/30_qubes.conf
 lib/systemd/system/org.cups.cupsd.service.d/30_qubes.conf
 lib/systemd/system/org.cups.cupsd.socket.d/30_qubes.conf
+lib/systemd/system/polkit.service.d/30_qubes.conf
 lib/systemd/system/dev-xvdc1-swap.service
 lib/systemd/system/qubes-early-vm-config.service
 lib/systemd/system/qubes-misc-post.service
@@ -118,6 +121,10 @@ usr/lib/systemd/user/evolution-addressbook-factory.service.d/30_qubes.conf
 usr/lib/systemd/user/evolution-calendar-factory.service.d/30_qubes.conf
 usr/lib/systemd/user/evolution-source-registry.service.d/30_qubes.conf
 usr/lib/systemd/user/evolution-user-prompter.service.d/30_qubes.conf
+usr/lib/systemd/user/at-spi-dbus-bus.service.d/30_qubes.conf
+usr/lib/systemd/user/gvfs-daemon.service.d/30_qubes.conf
+usr/lib/systemd/user/pipewire.service.d/40_minimal.conf
+usr/lib/systemd/user/wireplumber.service.d/30_qubes.conf
 lib/udev/rules.d/50-qubes-mem-hotplug.rules
 usr/bin/qfile-unpacker
 usr/bin/qubes-desktop-run

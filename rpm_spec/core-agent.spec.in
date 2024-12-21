@@ -1274,6 +1274,8 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/qubes-updates-proxy-forwarder.socket
 %{_unitdir}-preset/%qubes_preset_file
 %_modulesloaddir/qubes-core.conf
+%_unitdir/abrtd.service.d/30_qubes.conf
+%_unitdir/bluetooth.service.d/30_qubes.conf
 %dir %_unitdir/boot.automount.d
 %_unitdir/boot.automount.d/30_qubes.conf
 %dir %_unitdir/*.service.d
@@ -1294,6 +1296,7 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/ModemManager.service.d/30_qubes.conf
 %_unitdir/NetworkManager.service.d/30_qubes.conf
 %_unitdir/NetworkManager-wait-online.service.d/30_qubes.conf
+%_unitdir/polkit.service.d/30_qubes.conf
 %_unitdir/serial-getty@.service.d/30_qubes.conf
 %_unitdir/systemd-random-seed.service.d/30_qubes.conf
 %_unitdir/systemd-timesyncd.service.d/30_qubes.conf
@@ -1316,6 +1319,10 @@ The Qubes core startup configuration for SystemD init.
 %_userunitdir/evolution-calendar-factory.service.d/30_qubes.conf
 %_userunitdir/evolution-source-registry.service.d/30_qubes.conf
 %_userunitdir/evolution-user-prompter.service.d/30_qubes.conf
+%_userunitdir/at-spi-dbus-bus.service.d/30_qubes.conf
+%_userunitdir/gvfs-daemon.service.d/30_qubes.conf
+%_userunitdir/pipewire.service.d/40_minimal.conf
+%_userunitdir/wireplumber.service.d/30_qubes.conf
 
 %post systemd
 
