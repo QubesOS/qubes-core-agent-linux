@@ -5,7 +5,7 @@ pkgver=@VERSION@
 pkgrel=@REL@
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
-url="http://qubes-os.org/"
+url="https://qubes-os.org/"
 license=('GPL')
 makedepends=(
     gcc
@@ -83,7 +83,7 @@ package_qubes-vm-core() {
         pacman-contrib
         parted
         # Block updating if there is a major python update as the python API will be in the wrong PYTHONPATH
-        'python<3.13'
+        'python<3.14'
     )
     optdepends=(gnome-keyring gnome-settings-daemon python-caja python-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
     install="archlinux/PKGBUILD.install"
