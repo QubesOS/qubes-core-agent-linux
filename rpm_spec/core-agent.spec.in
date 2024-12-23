@@ -350,6 +350,7 @@ Requires:   NetworkManager >= 0.8.1-1
 Requires:   glib2
 Requires:   polkit
 Requires:   qubes-core-agent-networking = %{version}
+Requires:   (qubes-core-agent-network-manager if NetworkManager)
 Conflicts:  qubes-core-vm < 4.0.0
 %if 0%{?is_opensuse}
 # for directory ownership
