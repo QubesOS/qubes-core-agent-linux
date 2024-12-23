@@ -130,6 +130,7 @@ install-init:
 	install -m 0644 init/functions $(DESTDIR)$(LIBDIR)/qubes/init/
 ifneq ($(ENABLE_SELINUX),1)
 	rm -f $(DESTDIR)$(LIBDIR)/qubes/init/relabel-root.sh
+	rm -f $(DESTDIR)$(LIBDIR)/qubes/init/relabel-rw.sh
 endif
 
 # Systemd service files

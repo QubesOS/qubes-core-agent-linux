@@ -433,6 +433,7 @@ a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 %dir %_unitdir/selinux-autorelabel.service.d
 %_unitdir/selinux-autorelabel.service.d/30_qubes.conf
 /usr/lib/qubes/init/relabel-root.sh
+/usr/lib/qubes/init/relabel-rw.sh
 
 %postun selinux
 if [ "$1" -eq 0 ]; then
