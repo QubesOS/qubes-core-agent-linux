@@ -9,6 +9,14 @@ deb/*
 __pycache__
 debian/changelog.*
 pkgs
-misc/mime/[^p]*
-misc/mime/mimeapps.list
-misc/mime/mimeinfo.cache
+/misc/mime/[^p]*
+/misc/applications/mimeapps.list
+/misc/applications/mimeinfo.cache
+/misc/applications/defaults.list
+# Compiled binaries
+/qubes-rpc/bin-qfile-unpacker
+/qubes-rpc/qubes-fs-tree-check
+# SELinux stuff
+/selinux/*.if
+/selinux/*.pp
+/selinux/tmp/
