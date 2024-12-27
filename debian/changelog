@@ -1,3 +1,17 @@
+qubes-core-agent (4.3.14-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * package-managers: ensure to catch only NAME and remove quotes
+
+  [ Guillaume Chinal ]
+  * AutostartCondition support
+
+  [ Demi Marie Obenour ]
+  * Bump Python version on Arch
+  * Add missing .gitignore entries
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 27 Dec 2024 01:57:11 +0100
+
 qubes-core-agent (4.3.13-1) unstable; urgency=medium
 
   [ Daniel Moerner ]
