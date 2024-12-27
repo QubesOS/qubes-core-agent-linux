@@ -1,3 +1,19 @@
+qubes-core-agent (4.2.40-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: use the install target in boot/Makefile
+  * debian: include all boot-related configs in the package
+  * archlinux: do not open-code boot configs install target
+  * dracut: add few more setting to reduce initramfs size on Debian
+
+  [ Frédéric Pierret (fepitre) ]
+  * package-managers: ensure to catch only NAME and remove quotes
+
+  [ Demi Marie Obenour ]
+  * Bump Python version on Arch
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 27 Dec 2024 03:11:39 +0100
+
 qubes-core-agent (4.2.39-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
