@@ -14,7 +14,12 @@ else
     fi
 fi
 
-upgrades_installed="$(/usr/lib/qubes/upgrades-installed-check)"
+script_arg=
+if [ "$1" = "skip-refresh" ]; then
+    script_arg=skip-refresh
+fi
+
+upgrades_installed="$(/usr/lib/qubes/upgrades-installed-check $script_arg)"
 
 if [ "$upgrades_installed" = "true" ]; then
     /usr/lib/qubes/qrexec-client-vm dom0 qubes.NotifyUpdates /bin/sh -c 'echo 0'
