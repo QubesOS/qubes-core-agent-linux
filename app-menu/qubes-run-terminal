@@ -19,6 +19,10 @@ if is_command gnome-terminal; then
     exec qubes-run-gnome-terminal
 fi
 
+if is_command ptyxis; then
+    exec ptyxis
+fi
+
 if is_command kgx; then
     exec qubes-run-gnome-console
 fi
