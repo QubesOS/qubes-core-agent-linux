@@ -97,6 +97,7 @@ fi
 SOURCE="${@%/}"
 
 if FILECOPY_TOTAL_BYTES=$("$scriptdir/qubes/qubes-fs-tree-check" \
+    ${ignore_symlinks+--ignore-symlinks} \
     --allow-symlinks --allow-directories --machine -- "${SOURCE}"); then
     service=qubes.Filecopy
 else
