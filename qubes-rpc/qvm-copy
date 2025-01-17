@@ -86,11 +86,11 @@ else
 fi
 
 # strip trailing slash from source directory
-SOURCE="${@%/}"
+SOURCE=( "${@%/}" )
 
 if FILECOPY_TOTAL_BYTES=$(/usr/lib/qubes/qubes-fs-tree-check \
     ${ignore_symlinks} \
-    --allow-symlinks --allow-directories --machine -- "${SOURCE}"); then
+    --allow-symlinks --allow-directories --machine -- "${SOURCE[@]}"); then
     service=qubes.Filecopy
 else
     status=$?
@@ -100,8 +100,8 @@ fi
 if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_BYTES; fi
 
 /usr/lib/qubes/qrexec-client-vm --filter-escape-chars-stderr -- "$VM" \
-    "$service" /usr/lib/qubes/qfile-agent ${ignore_symlinks} -- "${SOURCE}"
+    "$service" /usr/lib/qubes/qfile-agent ${ignore_symlinks} -- "${SOURCE[@]}"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
-    rm -rf -- "${SOURCE}"
+    rm -rf -- "${SOURCE[@]}"
 fi
