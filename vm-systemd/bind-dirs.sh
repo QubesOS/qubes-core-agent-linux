@@ -118,7 +118,12 @@ main() {
 }
 
 binds=()
-for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do
+sources=( "/usr/lib/qubes-bind-dirs.d" "/etc/qubes-bind-dirs.d" )
+if [ ! -f "/var/run/qubes-service/custom-persist" ]; then
+    sources+=( "/rw/config/qubes-bind-dirs.d" )
+fi
+
+for source_folder in "${sources[@]}"; do
    true "source_folder: $source_folder"
    if [ ! -d "$source_folder" ]; then
       continue
