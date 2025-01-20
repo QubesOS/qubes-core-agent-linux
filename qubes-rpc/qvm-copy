@@ -75,7 +75,7 @@ while [ "$#" -gt 0 ]; do
     case $1 in
         (--without-progress) export PROGRESS_TYPE=none; shift;;
         (--with-progress) export PROGRESS_TYPE=console; shift;;
-        (--ignore-symlinks) ignore_symlinks=true; shift;;
+        (--ignore-symlinks) ignore_symlinks="--ignore-symlinks"; shift;;
         (--no-ignore-symlinks) unset ignore_symlinks; shift;;
         (-h|--help) usage 0;;
         (--) shift; break;;
@@ -93,8 +93,12 @@ else
   VM="@default"
 fi
 
+# strip trailing slash from source directory
+SOURCE=( "${@%/}" )
+
 if FILECOPY_TOTAL_BYTES=$("$scriptdir/qubes/qubes-fs-tree-check" \
-    --allow-symlinks --allow-directories --machine -- "$@"); then
+    ${ignore_symlinks} \
+    --allow-symlinks --allow-directories --machine -- "${SOURCE[@]}"); then
     service=qubes.Filecopy
 else
     status=$?
@@ -104,8 +108,8 @@ fi
 if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_BYTES; fi
 
 "$scriptdir/qubes/qrexec-client-vm" --filter-escape-chars-stderr -- "$VM" \
-    "$service" "$scriptdir/qubes/qfile-agent" ${ignore_symlinks+--ignore-symlinks} -- "$@"
+    "$service" "$scriptdir/qubes/qfile-agent" ${ignore_symlinks} -- "${SOURCE[@]}"
 
 if [ "$OPERATION_TYPE" = "move" ] ; then
-    rm -rf -- "$@"
+    rm -rf -- "${SOURCE[@]}"
 fi
