@@ -1,6 +1,6 @@
 # Maintainer: Frédéric Pierret (fepitre) <frederic@invisiblethingslab.com>
 
-pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-passwordless-root)
+pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-passwordless-root qubes-vm-dom0-updates)
 pkgver=@VERSION@
 pkgrel=@REL@
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
@@ -203,4 +203,30 @@ package_qubes-vm-passwordless-root() {
         SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
         USER_DROPIN_DIR=/usr/lib/systemd/user \
         DIST=archlinux
+}
+
+package_qubes-vm-dom0-updates() {
+    pkgdesc="Qubes OS tools for fetching dom0 updates"
+    depends=(
+        qubes-vm-core
+        qubes-vm-networking
+        python
+        dnf
+    )
+
+    cd "${_pkgnvr}"
+    make -C package-managers install \
+        DESTDIR="$pkgdir" \
+        SBINDIR=/usr/bin \
+        LIBDIR=/usr/lib \
+        SYSLIBDIR=/usr/lib \
+        SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
+        USER_DROPIN_DIR=/usr/lib/systemd/user \
+        DIST=archlinux
+
+    # already included in the main package
+    rm -f "${pkgdir}/usr/lib/qubes/upgrades-installed-check"
+    rm -f "${pkgdir}/usr/lib/qubes/upgrades-status-notify"
+    # not relevant for dom0 updates
+    rm -f "${pkgdir}/usr/lib/environment.d/60-gnome-software-fix.conf"
 }
