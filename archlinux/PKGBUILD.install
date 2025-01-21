@@ -114,7 +114,7 @@ update_qubesconfig() {
         if ! grep -q localhost /etc/hosts; then
 
           cat <<EOF > /etc/hosts
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 $(hostname)
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 $(hostnamectl hostname)
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 EOF
 
@@ -126,10 +126,10 @@ EOF
     if ! is_protected_file /etc/hostname ; then
         for ip in '127\.0\.0\.1' '::1'; do
             if grep -q "^${ip}\(\s\|$\)" /etc/hosts; then
-                sed -i "/^${ip}\s/,+0s/\(\s$(hostname)\)\+\(\s\|$\)/\2/g" /etc/hosts
-                sed -i "s/^${ip}\(\s\|$\).*$/\0 $(hostname)/" /etc/hosts
+                sed -i "/^${ip}\s/,+0s/\(\s$(hostnamectl hostname)\)\+\(\s\|$\)/\2/g" /etc/hosts
+                sed -i "s/^${ip}\(\s\|$\).*$/\0 $(hostnamectl hostname)/" /etc/hosts
             else
-                echo "${ip} $(hostname)" >> /etc/hosts
+                echo "${ip} $(hostnamectl hostname)" >> /etc/hosts
             fi
         done
     fi

@@ -19,7 +19,12 @@ unset rc
 if ! is_protected_file /etc/hostname ; then
     name=$(qubesdb-read /name)
     if [ -n "$name" ]; then
-        hostname "$name"
+        if [ -f /usr/bin/hostname ]; then
+            hostname "$name"
+        else
+            echo "$name" > /etc/hostname
+            echo "$name" > /proc/sys/kernel/hostname
+        fi
         if [ -e /etc/debian_version ]; then
             ipv4_localhost_re="127\.0\.1\.1"
         else
