@@ -1260,6 +1260,8 @@ The Qubes core startup configuration for SystemD init.
 %defattr(-,root,root,-)
 /etc/systemd/system/xendriverdomain.service
 %_unitdir/dev-xvdc1-swap.service
+%_unitdir/home.mount
+%_unitdir/qubes-bind-dirs.service
 %_unitdir/qubes-misc-post.service
 %_unitdir/qubes-mount-dirs.service
 %_unitdir/qubes-rootfs-resize.service
@@ -1271,6 +1273,7 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/qubes-sync-time.timer
 %_unitdir/qubes-updates-proxy-forwarder@.service
 %_unitdir/qubes-updates-proxy-forwarder.socket
+%_unitdir/usr-local.mount
 %{_unitdir}-preset/%qubes_preset_file
 %_modulesloaddir/qubes-core.conf
 %dir %_unitdir/boot.automount.d
