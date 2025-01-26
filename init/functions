@@ -250,3 +250,15 @@ initialize_home() {
         for waitpid in $waitpids ; do wait "$waitpid" ; done ; waitpids=
     done
 }
+
+disable_persistent_home() {
+    echo "Disabling persistent /home"
+    mkdir /run/systemd/system/home.mount.d
+    echo -e '[Mount]\nWhat=/home' > /run/systemd/system/home.mount.d/30_qubes.conf
+}
+
+disable_persistent_usrlocal() {
+    echo "Disabling persistent /usr/local"
+    mkdir /run/systemd/system/usr-local.mount.d
+    echo -e '[Mount]\nWhat=/usr/local' > /run/systemd/system/usr-local.mount.d/30_qubes.conf
+}
