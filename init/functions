@@ -57,6 +57,10 @@ is_appvm() {
     [ "$(qubes_vm_type)" = "AppVM" ]
 }
 
+is_custom_persist_enabled() {
+    [ -f "/var/run/qubes-service/custom-persist" ]
+}
+
 is_proxyvm() {
     [ "$(qubes_vm_type)" = "ProxyVM" ]
 }
