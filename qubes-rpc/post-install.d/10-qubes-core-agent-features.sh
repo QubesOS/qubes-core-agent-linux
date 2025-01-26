@@ -49,6 +49,7 @@ qvm-features-request qubes-agent-version="$qubes_version"
 if [ -r /etc/os-release ]; then
     distro_like=""
     eol=""
+    version=""
     while IFS='=' read -r key val; do
         val="${val##[\"\']}"
         val="${val%%[\"\']}"
