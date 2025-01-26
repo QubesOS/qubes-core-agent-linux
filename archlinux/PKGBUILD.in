@@ -153,6 +153,7 @@ package_qubes-vm-networking() {
         python
         iproute2
         networkmanager
+        network-manager-applet
         tinyproxy
         nftables
         conntrack-tools
