@@ -1,3 +1,30 @@
+qubes-core-agent (4.3.16-1) unstable; urgency=medium
+
+  [ Kunal Mehta ]
+  * Support ptyxis in qubes-run-terminal
+
+  [ Zaz Brown ]
+  * strip trailing slash from source directory
+  * FIX --ignore-symlinks
+  * refactor
+  * FIX qvm-copy for multiple sources
+
+  [ Ali Mirjamali ]
+  * Remove `hostname` dependency for Archlinux
+
+  [ Marek Marczykowski-Górecki ]
+  * archlinux: package tools for fetching dom0 updates
+  * archlinux: enable NetworkManager
+  * dom0-update: apply --installroot etc for --help calls too
+  * arch: fix creating marker-vm file
+  * archlinux: include nm-applet in network dependencies
+  * post-install: initialize version to empty value
+
+  [ Demi Marie Obenour ]
+  * Relabel / and /rw if needed
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 26 Jan 2025 03:45:57 +0100
+
 qubes-core-agent (4.3.15-1) unstable; urgency=medium
 
   * log stdout/err from updates check on Debian
