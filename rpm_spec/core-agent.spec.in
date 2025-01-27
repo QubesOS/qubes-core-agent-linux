@@ -897,6 +897,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
 %config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
 %config(noreplace) /etc/qubes-rpc/qubes.OpenURL
+%config(noreplace) /etc/qubes-rpc/qubes.GetMem
 %config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
 %config(noreplace) /etc/qubes-rpc/qubes.ConnectTCP
 %config(noreplace) /etc/qubes-rpc/qubes.VMShell
