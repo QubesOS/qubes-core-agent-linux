@@ -25,14 +25,16 @@ fi
 
 if $mount_home; then
   initialize_home "/rw/home" ifneeded
+  under_systemd || mount -o noauto,bind,defaults,nosuid,nodev /rw/home /home
 else
-  disable_persistent_home
+  under_systemd && disable_persistent_home
   initialize_home "/home" unconditionally
 fi
 
-if ! $mount_usr_local; then
-  disable_persistent_usrlocal
+if $mount_usr_local; then
+  under_systemd || mount -o noauto,bind,defaults /rw/usrlocal /usr/local
+else
+  under_systemd && disable_persistent_usrlocal
 fi
 
-systemctl daemon-reload
-
+under_systemd && systemctl daemon-reload || exit 0
