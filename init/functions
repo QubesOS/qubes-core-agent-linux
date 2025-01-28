@@ -23,7 +23,9 @@ qsvc() {
 }
 
 under_systemd() {
-    pidof systemd >/dev/null 2>&1
+    local init_command_name
+    read -r init_command_name < /proc/1/comm
+    [ "$init_command_name" = "systemd" ]
 }
 
 systemd_version_changed() {
