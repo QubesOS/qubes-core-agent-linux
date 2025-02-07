@@ -6,3 +6,4 @@ ehci_pci
 xhci_pci
 iwldvm
 iwlmvm
+iwlwifi

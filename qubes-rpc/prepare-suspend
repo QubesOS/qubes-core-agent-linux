@@ -81,6 +81,12 @@ if [ "$action" = "suspend" ]; then
     done
     echo "$LOADED_MODULES" > /var/run/qubes-suspend-modules-loaded
 else
+    # Free some RAM for minimal netvm to prevent memory issues when loading
+    # drivers
+    if [ -f /var/run/qubes-service/minimal-netvm ]; then
+      sync
+      echo 3 > /proc/sys/vm/drop_caches
+    fi
     # shellcheck disable=SC2013
     for mod in $(cat /var/run/qubes-suspend-modules-loaded); do
         modprobe "$mod"
