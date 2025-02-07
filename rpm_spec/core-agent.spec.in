@@ -1120,6 +1120,7 @@ rm -f %{name}-%{version}
 
 %files networking
 %config /etc/sysctl.d/81-qubes.conf.optional
+%config /etc/sysctl.d/82-qubes-minimal-sys-net.conf.optional
 %config(noreplace) /etc/qubes-rpc/qubes.UpdatesProxy
 %config(noreplace) /etc/qubes/qubes-antispoof.nft
 %config(noreplace) /etc/qubes/qubes-ipv4.nft
@@ -1140,6 +1141,7 @@ rm -f %{name}-%{version}
 %_unitdir/qubes-network.service
 %_unitdir/qubes-network-uplink.service
 %_unitdir/qubes-network-uplink@.service
+%_unitdir/qubes-sysctl-minimal-sys-net.service
 %_unitdir/qubes-updates-proxy.service
 /usr/lib/systemd/network/80-qubes-vif.link
 /usr/lib/qubes/init/network-proxy-setup.sh

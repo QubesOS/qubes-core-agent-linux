@@ -6,6 +6,7 @@ etc/qubes/qubes-ipv6.nft
 etc/qubes/qubes-ipv4.nft
 etc/qubes/qubes-antispoof.nft
 etc/sysctl.d/81-qubes.conf.optional
+etc/sysctl.d/82-qubes-minimal-sys-net.conf.optional
 etc/tinyproxy/tinyproxy-updates.conf
 etc/tinyproxy/updates-blacklist
 etc/udev/rules.d/99-qubes-network.rules
@@ -17,6 +18,7 @@ lib/systemd/system/qubes-antispoof.service
 lib/systemd/system/qubes-network.service
 lib/systemd/system/qubes-network-uplink.service
 lib/systemd/system/qubes-network-uplink@.service
+lib/systemd/system/qubes-sysctl-minimal-sys-net.service
 lib/systemd/system/qubes-updates-proxy.service
 lib/systemd/network/80-qubes-vif.link
 usr/lib/qubes/init/network-proxy-setup.sh

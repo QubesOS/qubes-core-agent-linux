@@ -1,0 +1,8 @@
+# Keep RAM for kernel data structures to prevent page allocation
+# failures when running minimal sys-net
+
+vm.dirty_background_ratio = 5
+vm.dirty_ratio = 10
+vm.dirty_expire_centisecs = 250
+vm.min_free_kbytes = 20480
+vm.zone_reclaim_mode = 3

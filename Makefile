@@ -143,7 +143,7 @@ endif
 
 # Systemd service files
 SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service) vm-systemd/dev-xvdc1-swap.service
-SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service vm-systemd/qubes-antispoof.service
+SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service vm-systemd/qubes-antispoof.service vm-systemd/qubes-sysctl-minimal-sys-net.service
 SYSTEMD_SELINUX_SERVICES := vm-systemd/qubes-relabel-root.service vm-systemd/qubes-relabel-rw.service
 SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES) $(SYSTEMD_SELINUX_SERVICES), $(SYSTEMD_ALL_SERVICES))
 
@@ -207,6 +207,7 @@ install-common: install-doc
 install-networking:
 	install -d $(DESTDIR)/etc/sysctl.d
 	install -m 644 network/81-qubes.conf.optional $(DESTDIR)/etc/sysctl.d/
+	install -m 644 network/82-qubes-minimal-sys-net.conf.optional $(DESTDIR)/etc/sysctl.d/
 	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system
 	install -m 0644 vm-systemd/qubes-*.socket $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 

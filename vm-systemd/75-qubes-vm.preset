@@ -114,6 +114,7 @@ enable qubes-psu-client@.service default sys-usb
 enable dev-xvdc1-swap.service
 enable NetworkManager.service
 enable NetworkManager-dispatcher.service
+enable qubes-sysctl-minimal-sys-net.service
 
 # Disable useless Xen services in Qubes VM
 disable xenstored.service
