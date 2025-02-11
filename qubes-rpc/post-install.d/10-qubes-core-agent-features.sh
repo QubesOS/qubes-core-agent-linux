@@ -104,6 +104,8 @@ if [ -e /etc/xdg/autostart/blueman.desktop ]; then
 fi
 
 qvm-features-request supported-service.no-qubesincoming-cleanup=1
+qvm-features-request supported-service.minimal-netvm=1
+qvm-features-request supported-service.minimal-usbvm=1
 
 # native services plugged into qubes-services with systemd drop-ins, list them
 # only when actual service is installed
@@ -134,4 +136,3 @@ advertise_systemd_service qubes-updates-proxy qubes-updates-proxy.service
 advertise_systemd_service qubes-firewall qubes-firewall.service
 advertise_systemd_service qubes-network qubes-network.service
 advertise_systemd_service apparmor apparmor.service
-
