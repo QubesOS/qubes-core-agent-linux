@@ -183,8 +183,8 @@ class FirewallWorker(object):
     def conntrack_drop(self, src, con):
         subprocess.run(['conntrack', '-D', '--src', src, '--dst', con[1],
                         '--proto', con[0], '--dport', con[2]],
-                       stdout=subprocess.PIPE,
-                       stderr=subprocess.STDOUT)
+                       stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
 
     def conntrack_get_connections(self, family, source):
         connections = set()
@@ -192,7 +192,7 @@ class FirewallWorker(object):
         with subprocess.Popen(['conntrack', '-L',
                                '--family', f'ipv{family}', '--src', source],
                              stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT) as p:
+                             stderr=subprocess.DEVNULL) as p:
             while True:
                 line = p.stdout.readline()
                 if not line:
