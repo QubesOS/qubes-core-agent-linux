@@ -118,7 +118,12 @@ main() {
 }
 
 binds=()
-for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do
+sources=( "/usr/lib/qubes-bind-dirs.d" "/etc/qubes-bind-dirs.d" )
+if [ ! -f "/var/run/qubes-service/custom-persist" ]; then
+    sources+=( "/rw/config/qubes-bind-dirs.d" )
+fi
+
+for source_folder in "${sources[@]}"; do
    true "source_folder: $source_folder"
    if [ ! -d "$source_folder" ]; then
       continue
@@ -129,6 +134,16 @@ for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/confi
       source "$file_name"
    done
 done
+
+# read binds in QubesDB if custom-persist feature is enabled
+if is_custom_persist_enabled; then
+  while read -r qubes_persist_entry; do
+    [[ "$qubes_persist_entry" =~ =\ (.*)$ ]] || continue
+    target="${BASH_REMATCH[1]}"
+    [[ "$target" =~ ^(\/home|\/usr\/local)$ ]] && continue
+    binds+=( "$target" )
+  done <<< "$(qubesdb-multiread /persist/)"
+fi
 
 main "$@"
 

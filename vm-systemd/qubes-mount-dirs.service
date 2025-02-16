@@ -6,7 +6,7 @@ Description=Initialize and mount /rw and /home
 After=qubes-sysinit.service dev-xvdb.device
 After=systemd-fsck@dev-xvdb.service
 DefaultDependencies=no
-Before=local-fs.target rw.mount home.mount qubes-gui-agent.service
+Before=local-fs.target rw.mount usr-local.mount home.mount qubes-gui-agent.service
 
 [Service]
 Type=oneshot

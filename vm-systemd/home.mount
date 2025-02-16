@@ -1,0 +1,5 @@
+[Mount]
+What=/rw/home
+Where=/home
+Type=none
+Options=noauto,bind,defaults,nosuid,nodev
