@@ -1,3 +1,27 @@
+qubes-core-agent (4.3.17-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Pull in qubes-core-agent-network-manager when installing
+    NetworkManager
+
+  [ Ali Mirjamali ]
+  * Have `ptyxis` higher priority than `gnome-terminal`
+
+  [ Guillaume Chinal ]
+  * add systemd dropins for minimal sys-net and sys-usb Some unnecessary
+    services are running on sys-net and sys-usb which consumes RAM for
+    nothing. SystemD dropins are added to automatically disable
+    identified unecessary services by enabling minimal-netvm or minimal-
+    usbvm  service on the sys-vms with qvm-service.
+  * memory optimizations for minimal netvm
+  * free RAM before reloading wireless driver after suspend
+  * announce minimal-netvm and minimal-usbvm services availibility
+
+  [ Corey Ford ]
+  * qubes-firewall: Suppress extraneous conntrack output
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 18 Feb 2025 00:00:26 +0100
+
 qubes-core-agent (4.3.16-1) unstable; urgency=medium
 
   [ Kunal Mehta ]
