@@ -1,3 +1,30 @@
+qubes-core-agent (4.2.41-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Add missing .gitignore entries
+
+  [ Marek Marczykowski-Górecki ]
+  * log stdout/err from updates check on Debian
+
+  [ Kunal Mehta ]
+  * Support ptyxis in qubes-run-terminal
+
+  [ Ali Mirjamali ]
+  * Have `ptyxis` higher priority than `gnome-terminal`
+
+  [ Marek Marczykowski-Górecki ]
+  * strip trailing slash from source directory
+
+  [ Zaz Brown ]
+  * FIX --ignore-symlinks
+  * refactor
+  * FIX qvm-copy for multiple sources
+
+  [ Corey Ford ]
+  * qubes-firewall: Suppress extraneous conntrack output
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 18 Feb 2025 01:27:03 +0100
+
 qubes-core-agent (4.2.40-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
