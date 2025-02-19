@@ -91,7 +91,11 @@ bind_dirs() {
          if [ ! -e "$fso_ro" ]; then
             ## Create empty file or directory if path exists in /rw to allow to bind mount none existing files/dirs.
             test -d "$fso_rw" && mkdir --parents "$fso_ro"
-            test -f "$fso_rw" && touch "$fso_ro"
+            if [ -f "$fso_rw" ]; then
+              parent_directory="$(dirname "$fso_ro")"
+              test -d "$parent_directory" || mkdir --parents "$parent_directory"
+              touch "$fso_ro"
+            fi
          fi
       else
          if [ -d "$fso_ro" ] || [ -f "$fso_ro" ]; then
