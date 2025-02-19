@@ -1,0 +1,5 @@
+[Mount]
+What=/rw/usrlocal
+Where=/usr/local
+Type=none
+Options=noauto,bind,defaults

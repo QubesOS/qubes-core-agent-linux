@@ -86,10 +86,15 @@ class FirewallWorker(object):
             return []
         return ips.decode().split()
 
+    def is_custom_persist_enabled(self) -> bool:
+        """Check if the feature custom-persist is enabled on the current VM"""
+        return os.path.isfile('/var/run/qubes-service/custom-persist')
+
     def run_firewall_dir(self):
         """Run scripts dir contents, before user script"""
-        script_dir_paths = ['/etc/qubes/qubes-firewall.d',
-                            '/rw/config/qubes-firewall.d']
+        script_dir_paths = ['/etc/qubes/qubes-firewall.d']
+        if not self.is_custom_persist_enabled():
+            script_dir_paths.append('/rw/config/qubes-firewall.d')
         for script_dir_path in script_dir_paths:
             if not os.path.isdir(script_dir_path):
                 continue
@@ -328,7 +333,8 @@ class FirewallWorker(object):
         self.terminate_requested = False
         self.init()
         self.run_firewall_dir()
-        self.run_user_script()
+        if not self.is_custom_persist_enabled():
+            self.run_user_script()
         self.sd_notify('READY=1')
         self.qdb.watch('/qubes-firewall/')
         self.qdb.watch('/connected-ips')
