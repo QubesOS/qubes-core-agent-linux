@@ -144,6 +144,39 @@ if is_custom_persist_enabled; then
   while read -r qubes_persist_entry; do
     [[ "$qubes_persist_entry" =~ =\ (.*)$ ]] || continue
     target="${BASH_REMATCH[1]}"
+
+    # if the first char is not a slash, options should be extracted from
+    # the value
+    if [[ "$target" != /* ]]; then
+      resource_type="$(echo "$target" | cut -d':' -f1)"
+      owner="$(echo "$target" | cut -d':' -f2)"
+      group="$(echo "$target" | cut -d':' -f3)"
+      mode="$(echo "$target" | cut -d':' -f4)"
+      path="$(echo "$target" | cut -d':' -f5-)"
+
+      if [ -z "$path" ] || [[ "$path" != /* ]]; then
+        echo "Skipping invalid custom-persist value '${target}'" >&2
+        continue
+      fi
+
+      # create resource if it does not exist
+      if ! [ -e "${path}" ] && ! [ -e "/rw/bind-dirs${path}" ]; then
+        if [ "$resource_type" = "file" ]; then
+          # for files, we need to create parent directories
+          parent_directory="$(dirname "$path")"
+          [ -d "$parent_directory" ] || mkdir -p "${parent_directory}"
+          touch "${path}"
+        elif [ "$resource_type" = "dir" ]; then
+          mkdir -p "${path}"
+        else
+          echo "Invalid entry ${target}, skipping"
+          continue
+        fi
+        chown "$owner":"$group" "${path}"
+        chmod "$mode" "${path}"
+      fi
+      target="$path"
+    fi
     [[ "$target" =~ ^(\/home|\/usr\/local)$ ]] && continue
     binds+=( "$target" )
   done <<< "$(qubesdb-multiread /persist/)"
