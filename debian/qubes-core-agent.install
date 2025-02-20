@@ -110,6 +110,8 @@ lib/systemd/system/sysinit.target.d/30_qubes.conf
 lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 lib/systemd/system/systemd-logind.service.d/30_qubes.conf
 lib/systemd/resolved.conf.d/30_resolved-no-mdns-or-llmnr.conf
+lib/systemd/system/rescue.service.d/30_qubes.conf
+lib/systemd/system/emergency.service.d/30_qubes.conf
 usr/lib/sysctl.d/20-qubes-core.conf
 usr/lib/systemd/user/tracker-extract-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-miner-fs-3.service.d/30_qubes.conf
@@ -146,6 +148,7 @@ usr/bin/qvm-connect-tcp
 usr/bin/qvm-sync-clock
 usr/lib/environment.d/60-gnome-software-fix.conf
 usr/lib/dracut/dracut.conf.d/30-qubes.conf
+usr/lib/dracut/modules.d/99qubes/module-setup.sh
 usr/lib/python3/dist-packages/qubesagent-*.egg-info/*
 usr/lib/python3/dist-packages/qubesagent/*
 usr/lib/qubes-bind-dirs.d/30_cron.conf
