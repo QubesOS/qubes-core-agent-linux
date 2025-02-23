@@ -57,6 +57,10 @@ endif
 SYSTEM_DROPINS += polkit.service
 SYSTEM_DROPINS += abrtd.service
 SYSTEM_DROPINS += bluetooth.service
+SYSTEM_DROPINS += systemd-nsresourced.service
+SYSTEM_DROPINS += systemd-nsresourced.socket
+SYSTEM_DROPINS += systemd-userdbd.service
+SYSTEM_DROPINS += systemd-userdbd.socket
 
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
 SYSTEM_DROPINS_NETWORKING += tinyproxy.service
