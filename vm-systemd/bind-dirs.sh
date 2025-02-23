@@ -159,21 +159,24 @@ if is_custom_persist_enabled; then
         continue
       fi
 
+      rw_path="/rw/bind-dirs${path}"
       # create resource if it does not exist
-      if ! [ -e "${path}" ] && ! [ -e "/rw/bind-dirs${path}" ]; then
+      if ! [ -e "${path}" ] && ! [ -e "$rw_path" ]; then
         if [ "$resource_type" = "file" ]; then
           # for files, we need to create parent directories
-          parent_directory="$(dirname "$path")"
+          parent_directory="$(dirname "$rw_path")"
+          echo "custom-persist: pre-creating file ${rw_path} with rights ${owner}:${group} ${mode}"
           [ -d "$parent_directory" ] || mkdir -p "${parent_directory}"
-          touch "${path}"
+          touch "${rw_path}"
         elif [ "$resource_type" = "dir" ]; then
-          mkdir -p "${path}"
+          echo "custom-persist: pre-creating directory ${rw_path} with rights ${owner}:${group} ${mode}"
+          mkdir -p "${rw_path}"
         else
           echo "Invalid entry ${target}, skipping"
           continue
         fi
-        chown "$owner":"$group" "${path}"
-        chmod "$mode" "${path}"
+        chown "$owner":"$group" "${rw_path}"
+        chmod "$mode" "${rw_path}"
       fi
       target="$path"
     fi
