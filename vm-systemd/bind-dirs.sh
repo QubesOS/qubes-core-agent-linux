@@ -117,8 +117,10 @@ bind_dirs() {
       else
          if [ -d "$fso_ro" ] || [ -f "$fso_ro" ]; then
             ## Initially copy over data directories to /rw if rw directory does not exist.
-            echo "Initializing $rw_dest_dir with files from $fso_ro" >&2
-            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
+            echo "Initializing $fso_rw with files from $fso_ro" >&2
+            parent_directory="$(dirname "$fso_rw")"
+            test -d "$parent_directory" || mkdir --parents "$parent_directory"
+            cp --archive --recursive "$fso_ro" "$fso_rw"
          else
             echo "$fso_ro is neither a directory nor a file and the path does not exist below /rw, skipping."
             continue
