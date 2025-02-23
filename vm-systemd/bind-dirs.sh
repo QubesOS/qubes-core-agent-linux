@@ -29,6 +29,8 @@ shopt -s nullglob dotglob
 # shellcheck source=init/functions
 source /usr/lib/qubes/init/functions
 
+readonly DEFAULT_RW_BIND_DIR="/rw/bind-dirs"
+
 prerequisite() {
    if is_fully_persistent ; then
       echo "No TemplateBasedVM/DisposableVM detected. Exiting."
@@ -37,7 +39,7 @@ prerequisite() {
 }
 
 init() {
-   [ -n "$rw_dest_dir" ] || rw_dest_dir="/rw/bind-dirs"
+   [ -n "$rw_dest_dir" ] || rw_dest_dir="$DEFAULT_RW_BIND_DIR"
    [ -n "$symlink_level_max" ] || symlink_level_max="10"
    mkdir --parents "$rw_dest_dir"
 }
@@ -47,6 +49,21 @@ legacy() {
    ## https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-bind-dirs.d/41_qubes-whonix-legacy.conf
    ## Please do not remove this legacy function without coordination with Whonix.
    true
+}
+
+rw_from_ro() {
+  ro="$1"
+  # special cases for files/dirs in /home or /usr/local
+  if [[ "$ro" =~ ^/home/ ]]; then
+    # use /rw/home for /home/... binds
+    rw="/rw${ro}"
+  elif [[ "$ro" =~ ^/usr/local/ ]]; then
+    # use /rw/usrlocal for /usr/local/... binds
+    rw="/rw/usrlocal/$(echo "$ro" | cut -d/ -f4-)"
+  else
+    [ -z "$rw_dest_dir" ] && rw="${DEFAULT_RW_BIND_DIR}${ro}" || rw="${rw_dest_dir}${ro}"
+  fi
+  echo "$rw"
 }
 
 bind_dirs() {
@@ -77,7 +94,7 @@ bind_dirs() {
       done
 
       true "fso_ro: $fso_ro"
-      fso_rw="${rw_dest_dir}${fso_ro}"
+      fso_rw="$(rw_from_ro "$fso_ro")"
 
       # Make sure fso_ro is not mounted.
       umount "$fso_ro" 2> /dev/null || true
@@ -159,7 +176,7 @@ if is_custom_persist_enabled; then
         continue
       fi
 
-      rw_path="/rw/bind-dirs${path}"
+      rw_path="$(rw_from_ro "${path}")"
       # create resource if it does not exist
       if ! [ -e "${path}" ] && ! [ -e "$rw_path" ]; then
         if [ "$resource_type" = "file" ]; then
