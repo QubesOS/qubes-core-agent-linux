@@ -11,9 +11,11 @@ if [ -n "$(ls -A /usr/local/lib 2>/dev/null)" ] || \
     ldconfig
 fi
 
-for rc in /rw/config/rc.local.d/*.rc /rw/config/rc.local; do
-    [ -f "${rc}" ] || continue
-    [ -x "${rc}" ] || continue
-    "${rc}"
-done
+if ! is_custom_persist_enabled; then
+  for rc in /rw/config/rc.local.d/*.rc /rw/config/rc.local; do
+      [ -f "${rc}" ] || continue
+      [ -x "${rc}" ] || continue
+      "${rc}"
+  done
+fi
 unset rc

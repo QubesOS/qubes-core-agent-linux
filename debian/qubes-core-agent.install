@@ -89,6 +89,7 @@ lib/systemd/system/org.cups.cupsd.service.d/30_qubes.conf
 lib/systemd/system/org.cups.cupsd.socket.d/30_qubes.conf
 lib/systemd/system/polkit.service.d/30_qubes.conf
 lib/systemd/system/dev-xvdc1-swap.service
+lib/systemd/system/qubes-bind-dirs.service
 lib/systemd/system/qubes-early-vm-config.service
 lib/systemd/system/qubes-misc-post.service
 lib/systemd/system/qubes-mount-dirs.service
@@ -114,6 +115,8 @@ lib/systemd/system/systemd-nsresourced.socket.d/30_qubes.conf
 lib/systemd/system/systemd-userdbd.service.d/30_qubes.conf
 lib/systemd/system/systemd-userdbd.socket.d/30_qubes.conf
 lib/systemd/resolved.conf.d/30_resolved-no-mdns-or-llmnr.conf
+lib/systemd/system/home.mount
+lib/systemd/system/usr-local.mount
 usr/lib/sysctl.d/20-qubes-core.conf
 usr/lib/systemd/user/tracker-extract-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-miner-fs-3.service.d/30_qubes.conf
