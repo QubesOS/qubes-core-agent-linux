@@ -1,3 +1,11 @@
+qubes-core-agent (4.3.18-1) unstable; urgency=medium
+
+  [ Guillaume Chinal ]
+  * disable systemd-nsresourced and systemd-userdbd for minimal sys-net
+    and minimal sys-usb
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 24 Feb 2025 03:51:49 +0100
+
 qubes-core-agent (4.3.17-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
