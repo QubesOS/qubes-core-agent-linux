@@ -133,6 +133,19 @@ bind_dirs() {
    done
 }
 
+mk_parent_dirs() {
+  local target="$1"
+  local owner="$2"
+  local group="$3"
+  local depth="$4"
+  [[ "$depth" -gt 100 ]] && echo "Maximum recursion depth reached" >&2 && return 1
+  [ -e "$target" ] && return 0
+  mk_parent_dirs "$(dirname "$target")" "$owner" "$group" "$(( depth + 1 ))" || return 1
+  mkdir "$target" || return 1
+  chown "$owner":"$group" "$target" || return 1
+  return 0
+}
+
 main() {
    prerequisite "$@"
    init "$@"
@@ -185,11 +198,19 @@ if is_custom_persist_enabled; then
           # for files, we need to create parent directories
           parent_directory="$(dirname "$rw_path")"
           echo "custom-persist: pre-creating file ${rw_path} with rights ${owner}:${group} ${mode}"
-          [ -d "$parent_directory" ] || mkdir -p "${parent_directory}"
+          if [ ! -d "$parent_directory" ]; then
+            if ! mk_parent_dirs "$parent_directory" "$owner" "$group"; then
+              echo "Unable to create ${rw_path} parent dirs, skipping"
+              continue
+            fi
+          fi
           touch "${rw_path}"
         elif [ "$resource_type" = "dir" ]; then
           echo "custom-persist: pre-creating directory ${rw_path} with rights ${owner}:${group} ${mode}"
-          mkdir -p "${rw_path}"
+          if ! mk_parent_dirs "$rw_path" "$owner" "$group"; then
+            echo "Unable to create ${rw_path} parent dirs, skipping"
+            continue
+          fi
         else
           echo "Invalid entry ${target}, skipping"
           continue
