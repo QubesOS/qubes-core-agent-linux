@@ -129,7 +129,7 @@ bind_dirs() {
 
       # Bind the fso.
       echo "Bind mounting $fso_rw onto $fso_ro" >&2
-      mount --bind "$fso_rw" "$fso_ro"
+      mount --bind -o x-gvfs-hide "$fso_rw" "$fso_ro"
    done
 }
 
