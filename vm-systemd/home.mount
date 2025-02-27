@@ -1,3 +1,6 @@
+[Unit]
+ConditionPathExists=!/var/run/qubes/disable_persistent_home_dir
+
 [Mount]
 What=/rw/home
 Where=/home
