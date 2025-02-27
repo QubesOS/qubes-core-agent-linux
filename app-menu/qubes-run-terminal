@@ -1,32 +1,41 @@
 #!/bin/sh
 # Try to find a terminal emulator that's installed and run it.
+set -eu
 
-is_command() {
-    # bogus warning from ShellCheck < 0.5.0
-    # shellcheck disable=SC2039
-    type "$1" >/dev/null 2>&1
+is_cmd(){
+    command -v "$1" >/dev/null
 }
 
-if is_command x-terminal-emulator; then
-    exec x-terminal-emulator
-fi
-
-if is_command ptyxis; then
-    exec ptyxis
-fi
-
-if is_command gnome-terminal; then
-    exec qubes-run-gnome-terminal
-fi
-
-if is_command kgx; then
-    exec qubes-run-gnome-console
-fi
-
-for terminal in xfce4-terminal konsole urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal mate-terminal terminology st xterm; do
-    if is_command "$terminal" ; then
-        exec "$terminal"
+exec_cmd(){
+    if is_cmd "$1"; then
+        exec "$1"
     fi
+}
+
+reassign_term(){
+    if ! is_cmd "$1"; then
+        return
+    fi
+    case "$1" in
+        gnome-terminal) terminal="qubes-run-$1";;
+        kgx) terminal="qubes-run-gnome-console";;
+    esac
+}
+
+if is_cmd "${TERMINAL:-}"; then
+    terminal="${TERMINAL}"
+    reassign_term "$terminal"
+    exec_cmd "$terminal"
+fi
+
+for terminal in \
+    x-terminal-emulator ptyxis gnome-terminal kgx xfce4-terminal konsole \
+    urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal \
+    mate-terminal terminology st lxterm xterm
+do
+    reassign_term "$terminal"
+    exec_cmd "$terminal"
 done
 
 echo "ERROR: No suitable terminal found." >&2
+exit 1
