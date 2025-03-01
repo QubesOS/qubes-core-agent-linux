@@ -166,6 +166,8 @@ install-systemd: install-init
 	install -m 0644 vm-systemd/xendriverdomain.service $(DESTDIR)/etc/systemd/system/
 	install -m 0644 vm-systemd/80-qubes-vif.link $(DESTDIR)$(SYSLIBDIR)/systemd/network/
 	install -m 0644 vm-systemd/30_resolved-no-mdns-or-llmnr.conf $(DESTDIR)$(SYSLIBDIR)/systemd/resolved.conf.d/
+	install -m 0644 vm-systemd/home.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+	install -m 0644 vm-systemd/usr-local.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 
 .PHONY: install-sysvinit
 install-sysvinit: install-init

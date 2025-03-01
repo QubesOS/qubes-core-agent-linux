@@ -23,7 +23,9 @@ qsvc() {
 }
 
 under_systemd() {
-    pidof systemd >/dev/null 2>&1
+    local init_command_name
+    read -r init_command_name < /proc/1/comm
+    [ "$init_command_name" = "systemd" ]
 }
 
 systemd_version_changed() {
@@ -55,6 +57,10 @@ is_netvm() {
 
 is_appvm() {
     [ "$(qubes_vm_type)" = "AppVM" ]
+}
+
+is_custom_persist_enabled() {
+    [ -f "/var/run/qubes-service/custom-persist" ]
 }
 
 is_proxyvm() {
@@ -245,4 +251,14 @@ initialize_home() {
         fi
         for waitpid in $waitpids ; do wait "$waitpid" ; done ; waitpids=
     done
+}
+
+disable_persistent_home() {
+    echo "Disabling persistent /home"
+    touch /var/run/qubes/disable_persistent_home_dir
+}
+
+disable_persistent_usrlocal() {
+    echo "Disabling persistent /usr/local"
+    touch /var/run/qubes/disable_persistent_usrlocal_dir
 }

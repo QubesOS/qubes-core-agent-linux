@@ -29,6 +29,8 @@ shopt -s nullglob dotglob
 # shellcheck source=init/functions
 source /usr/lib/qubes/init/functions
 
+readonly DEFAULT_RW_BIND_DIR="/rw/bind-dirs"
+
 prerequisite() {
    if is_fully_persistent ; then
       echo "No TemplateBasedVM/DisposableVM detected. Exiting."
@@ -37,7 +39,7 @@ prerequisite() {
 }
 
 init() {
-   [ -n "$rw_dest_dir" ] || rw_dest_dir="/rw/bind-dirs"
+   [ -n "$rw_dest_dir" ] || rw_dest_dir="$DEFAULT_RW_BIND_DIR"
    [ -n "$symlink_level_max" ] || symlink_level_max="10"
    mkdir --parents "$rw_dest_dir"
 }
@@ -47,6 +49,21 @@ legacy() {
    ## https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-bind-dirs.d/41_qubes-whonix-legacy.conf
    ## Please do not remove this legacy function without coordination with Whonix.
    true
+}
+
+rw_from_ro() {
+  ro="$1"
+  # special cases for files/dirs in /home or /usr/local
+  if [[ "$ro" =~ ^/home/ ]]; then
+    # use /rw/home for /home/... binds
+    rw="/rw${ro}"
+  elif [[ "$ro" =~ ^/usr/local/ ]]; then
+    # use /rw/usrlocal for /usr/local/... binds
+    rw="/rw/usrlocal/$(echo "$ro" | cut -d/ -f4-)"
+  else
+    [ -z "$rw_dest_dir" ] && rw="${DEFAULT_RW_BIND_DIR}${ro}" || rw="${rw_dest_dir}${ro}"
+  fi
+  echo "$rw"
 }
 
 bind_dirs() {
@@ -77,7 +94,7 @@ bind_dirs() {
       done
 
       true "fso_ro: $fso_ro"
-      fso_rw="${rw_dest_dir}${fso_ro}"
+      fso_rw="$(rw_from_ro "$fso_ro")"
 
       # Make sure fso_ro is not mounted.
       umount "$fso_ro" 2> /dev/null || true
@@ -90,14 +107,22 @@ bind_dirs() {
       if [ -d "$fso_rw" ] || [ -f "$fso_rw" ]; then
          if [ ! -e "$fso_ro" ]; then
             ## Create empty file or directory if path exists in /rw to allow to bind mount none existing files/dirs.
-            test -d "$fso_rw" && mkdir --parents "$fso_ro"
-            test -f "$fso_rw" && touch "$fso_ro"
+            # shellcheck disable=SC2046
+            test -d "$fso_rw" && mk_parent_dirs "$fso_ro" $(stat --printf "%U %G" "$fso_rw")
+            if [ -f "$fso_rw" ]; then
+              parent_directory="$(dirname "$fso_ro")"
+              # shellcheck disable=SC2046
+              test -d "$parent_directory" || mk_parent_dirs "$parent_directory" $(stat --printf "%U %G" "$fso_rw")
+              touch "$fso_ro"
+            fi
          fi
       else
          if [ -d "$fso_ro" ] || [ -f "$fso_ro" ]; then
             ## Initially copy over data directories to /rw if rw directory does not exist.
-            echo "Initializing $rw_dest_dir with files from $fso_ro" >&2
-            cp --archive --recursive --parents "$fso_ro" "$rw_dest_dir"
+            echo "Initializing $fso_rw with files from $fso_ro" >&2
+            parent_directory="$(dirname "$fso_rw")"
+            test -d "$parent_directory" || mkdir --parents "$parent_directory"
+            cp --archive --recursive "$fso_ro" "$fso_rw"
          else
             echo "$fso_ro is neither a directory nor a file and the path does not exist below /rw, skipping."
             continue
@@ -106,8 +131,21 @@ bind_dirs() {
 
       # Bind the fso.
       echo "Bind mounting $fso_rw onto $fso_ro" >&2
-      mount --bind "$fso_rw" "$fso_ro"
+      mount --bind -o x-gvfs-hide "$fso_rw" "$fso_ro"
    done
+}
+
+mk_parent_dirs() {
+  local target="$1"
+  local owner="$2"
+  local group="$3"
+  local depth="$4"
+  [[ "$depth" -gt 100 ]] && echo "Maximum recursion depth reached" >&2 && return 1
+  [ -e "$target" ] && return 0
+  mk_parent_dirs "$(dirname "$target")" "$owner" "$group" "$(( depth + 1 ))" || return 1
+  mkdir "$target" || return 1
+  chown "$owner":"$group" "$target" || return 1
+  return 0
 }
 
 main() {
@@ -118,7 +156,12 @@ main() {
 }
 
 binds=()
-for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do
+sources=( "/usr/lib/qubes-bind-dirs.d" "/etc/qubes-bind-dirs.d" )
+if [ ! -f "/var/run/qubes-service/custom-persist" ]; then
+    sources+=( "/rw/config/qubes-bind-dirs.d" )
+fi
+
+for source_folder in "${sources[@]}"; do
    true "source_folder: $source_folder"
    if [ ! -d "$source_folder" ]; then
       continue
@@ -129,6 +172,60 @@ for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/confi
       source "$file_name"
    done
 done
+
+# read binds in QubesDB if custom-persist feature is enabled
+if is_custom_persist_enabled; then
+  while read -r qubes_persist_entry; do
+    [[ "$qubes_persist_entry" =~ =\ (.*)$ ]] || continue
+    target="${BASH_REMATCH[1]}"
+
+    # if the first char is not a slash, options should be extracted from
+    # the value
+    if [[ "$target" != /* ]]; then
+      resource_type="$(echo "$target" | cut -d':' -f1)"
+      owner="$(echo "$target" | cut -d':' -f2)"
+      group="$(echo "$target" | cut -d':' -f3)"
+      mode="$(echo "$target" | cut -d':' -f4)"
+      path="$(echo "$target" | cut -d':' -f5-)"
+
+      if [ -z "$path" ] || [[ "$path" != /* ]]; then
+        echo "Skipping invalid custom-persist value '${target}'" >&2
+        continue
+      fi
+
+      rw_path="$(rw_from_ro "${path}")"
+      # create resource if it does not exist
+      if ! [ -e "${path}" ] && ! [ -e "$rw_path" ]; then
+        if [ "$resource_type" = "file" ]; then
+          # for files, we need to create parent directories
+          parent_directory="$(dirname "$rw_path")"
+          echo "custom-persist: pre-creating file ${rw_path} with rights ${owner}:${group} ${mode}"
+          if [ ! -d "$parent_directory" ]; then
+            if ! mk_parent_dirs "$parent_directory" "$owner" "$group"; then
+              echo "Unable to create ${rw_path} parent dirs, skipping"
+              continue
+            fi
+          fi
+          touch "${rw_path}"
+        elif [ "$resource_type" = "dir" ]; then
+          echo "custom-persist: pre-creating directory ${rw_path} with rights ${owner}:${group} ${mode}"
+          if ! mk_parent_dirs "$rw_path" "$owner" "$group"; then
+            echo "Unable to create ${rw_path} parent dirs, skipping"
+            continue
+          fi
+        else
+          echo "Invalid entry ${target}, skipping"
+          continue
+        fi
+        chown "$owner":"$group" "${rw_path}"
+        chmod "$mode" "${rw_path}"
+      fi
+      target="$path"
+    fi
+    [[ "$target" =~ ^(\/home|\/usr\/local)$ ]] && continue
+    binds+=( "$target" )
+  done <<< "$(qubesdb-multiread /persist/)"
+fi
 
 main "$@"
 
