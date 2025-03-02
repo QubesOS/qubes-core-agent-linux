@@ -429,10 +429,7 @@ a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 
 %postun selinux
 if [ "$1" -eq 0 ]; then
-    %selinux_modules_uninstall \
-        %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp \
-        %{_datadir}/selinux/packages/qubes-xendriverdomain.pp \
-        %{_datadir}/selinux/packages/qubes-misc.pp
+    %selinux_modules_uninstall %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
 fi || :
 
 %pre selinux
