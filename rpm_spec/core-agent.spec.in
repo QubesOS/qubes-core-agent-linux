@@ -1312,8 +1312,6 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/sysinit.target.d/30_qubes.conf
 %_unitdir/systemd-nsresourced.service.d/30_qubes.conf
 %_unitdir/systemd-nsresourced.socket.d/30_qubes.conf
-%_unitdir/systemd-userdbd.service.d/30_qubes.conf
-%_unitdir/systemd-userdbd.socket.d/30_qubes.conf
 %dir %_userunitdir/*.service.d
 %_userunitdir/tracker-extract-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-3.service.d/30_qubes.conf

@@ -112,8 +112,6 @@ lib/systemd/system/systemd-timesyncd.service.d/30_qubes.conf
 lib/systemd/system/systemd-logind.service.d/30_qubes.conf
 lib/systemd/system/systemd-nsresourced.service.d/30_qubes.conf
 lib/systemd/system/systemd-nsresourced.socket.d/30_qubes.conf
-lib/systemd/system/systemd-userdbd.service.d/30_qubes.conf
-lib/systemd/system/systemd-userdbd.socket.d/30_qubes.conf
 lib/systemd/resolved.conf.d/30_resolved-no-mdns-or-llmnr.conf
 lib/systemd/system/home.mount
 lib/systemd/system/usr-local.mount
