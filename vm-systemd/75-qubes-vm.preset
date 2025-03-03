@@ -57,6 +57,8 @@ disable upower.service
 disable colord.service
 disable wpa_supplicant@.service
 disable dkms.service
+disable systemd-userdbd.service
+disable systemd-userdbd.socket
 enable qubes-relabel-root.service
 enable qubes-relabel-rw.service
 
