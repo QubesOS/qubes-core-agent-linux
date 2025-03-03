@@ -71,6 +71,7 @@ fi
 if type dnf >/dev/null 2>&1; then
     UPDATE_CMD=dnf
     UPDATE_ARGUMENTS+=(--noplugins -y)
+    CLEAN_OPTS+=(--noplugins -y)
     "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q best && UPDATE_ARGUMENTS+=(--best)
     "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q allowerasing && UPDATE_ARGUMENTS+=(--allowerasing)
     if "$UPDATE_CMD" --version | grep -q dnf5 && [ "$CHECK_ONLY" = "1" ]; then
@@ -116,7 +117,7 @@ rpm --root=$DOM0_UPDATES_DIR --rebuilddb
 
 if [ "$CLEAN" = "1" ]; then
     # shellcheck disable=SC2086
-    $UPDATE_CMD clean all "${UPDATE_ARGUMENTS[@]}" "${CLEAN_OPTS[@]}"
+    $UPDATE_CMD clean all "${CLEAN_OPTS[@]}"
     rm -f "$DOM0_UPDATES_DIR"/packages/*
     rm -rf "$DOM0_UPDATES_DIR"/var/cache/*
 fi
