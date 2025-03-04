@@ -431,10 +431,7 @@ a VM with SELinux enforcing, as is the default on Red Hat-family distributions.
 
 %postun selinux
 if [ "$1" -eq 0 ]; then
-    %selinux_modules_uninstall \
-        %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp \
-        %{_datadir}/selinux/packages/qubes-xendriverdomain.pp \
-        %{_datadir}/selinux/packages/qubes-misc.pp
+    %selinux_modules_uninstall %{_datadir}/selinux/packages/qubes-qfile-unpacker.pp %{_datadir}/selinux/packages/qubes-xendriverdomain.pp %{_datadir}/selinux/packages/qubes-misc.pp
 fi || :
 
 %pre selinux
@@ -1315,8 +1312,6 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/sysinit.target.d/30_qubes.conf
 %_unitdir/systemd-nsresourced.service.d/30_qubes.conf
 %_unitdir/systemd-nsresourced.socket.d/30_qubes.conf
-%_unitdir/systemd-userdbd.service.d/30_qubes.conf
-%_unitdir/systemd-userdbd.socket.d/30_qubes.conf
 %dir %_userunitdir/*.service.d
 %_userunitdir/tracker-extract-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-3.service.d/30_qubes.conf
