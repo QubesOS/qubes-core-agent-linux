@@ -163,18 +163,6 @@ class WorkerCommon(object):
         self.obj.apply_rules('10.137.0.1', [{'action': 'drop'}])
         self.assertIsNone(self.obj.qdb.read('/dns/10.137.0.1/ripe.net'))
 
-    def test_701_dns_info(self):
-        self.obj.conntrack_get_connections = Mock(return_value=[])
-        rules = [
-            {'action': 'accept', 'proto': 'tcp',
-                'dstports': '80-80', 'dsthost': 'ripe.net'},
-            {'action': 'drop'},
-        ]
-        self.obj.apply_rules('10.137.0.1', rules)
-        self.assertIsNotNone(self.obj.qdb.read('/dns/10.137.0.1/ripe.net'))
-        self.obj.apply_rules('10.137.0.1', [{'action': 'drop'}])
-        self.assertIsNone(self.obj.qdb.read('/dns/10.137.0.1/ripe.net'))
-
     def test_702_dns_info_qubesdb_path_length_crash(self):
         self.obj.conntrack_get_connections = Mock(return_value=[])
         rules = [
