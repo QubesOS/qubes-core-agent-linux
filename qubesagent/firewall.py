@@ -176,7 +176,7 @@ class FirewallWorker(object):
                         ' due to qubesdb path length limit').format(
                             host, source))
                     self.log.error('See https://github.com/QubesOS/'
-                        'qubes-issues/9085')
+                        'qubes-issues/issues/9084')
                 else:
                     raise
 
