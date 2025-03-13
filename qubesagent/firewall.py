@@ -162,7 +162,18 @@ class FirewallWorker(object):
         self.qdb.rm('/dns/{}/'.format(source))
 
         for host, hostaddrs in dns.items():
-            self.qdb.write('/dns/{}/{}'.format(source, host), str(hostaddrs))
+            path = '/dns/{}/{}'.format(source, host)
+            try:
+                self.qdb.write(path, str(hostaddrs))
+            except Exception as err:
+                if len(path) > 64 and err.args == (0, 'Error'):
+                    self.log.error(('Unable to add DNS information for {} ({})'
+                        ' due to qubesdb path length limit').format(
+                            host, source))
+                    self.log.error('See https://github.com/QubesOS/'
+                        'qubes-issues/9085')
+                else:
+                    raise
 
     def update_handled(self, addr):
         """
