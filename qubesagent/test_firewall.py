@@ -40,6 +40,8 @@ class DummyQubesDB(object):
             self.entries.pop(path)
 
     def write(self, path, val):
+        if len(path) > 64:
+            raise DummyQubesDBError(0, 'Error')
         self.entries[path] = val
 
     def multiread(self, prefix):
@@ -65,6 +67,8 @@ class DummyQubesDB(object):
         except IndexError:
             return None
 
+class DummyQubesDBError(Exception):
+    "Raised by QubesDB"
 
 class FirewallWorker(qubesagent.firewall.FirewallWorker):
     def __init__(self):
@@ -158,6 +162,23 @@ class WorkerCommon(object):
         self.assertIsNotNone(self.obj.qdb.read('/dns/10.137.0.1/ripe.net'))
         self.obj.apply_rules('10.137.0.1', [{'action': 'drop'}])
         self.assertIsNone(self.obj.qdb.read('/dns/10.137.0.1/ripe.net'))
+
+    def test_702_dns_info_qubesdb_path_length_crash(self):
+        self.obj.conntrack_get_connections = Mock(return_value=[])
+        rules = [
+            {'action': 'accept', 'proto': 'tcp',
+                'dstports': '443-443', 'dsthost': 'www.google.com'},
+            {'action': 'accept', 'proto': 'tcp',
+                'dstports': '443-443', 'dsthost': 'prod-dynamite-prod-05-us-signaler-pa.clients6.google.com'},
+            {'action': 'drop'},
+        ]
+        self.obj.apply_rules('10.137.0.22', rules)
+        self.assertIsNotNone(self.obj.qdb.read('/dns/10.137.0.22/www.google.com'))
+        # Unfortunately, this is assertIsNone until the QubesDB path length limit is raised.
+        self.assertIsNone(self.obj.qdb.read('/dns/10.137.0.22/prod-dynamite-prod-05-us-signaler-pa.clients6.google.com'))
+        self.obj.apply_rules('10.137.0.22', [{'action': 'drop'}])
+        self.assertIsNone(self.obj.qdb.read('/dns/10.137.0.22/www.google.com'))
+        self.assertIsNone(self.obj.qdb.read('/dns/10.137.0.22/prod-dynamite-prod-05-us-signaler-pa.clients6.google.com'))
 
 class TestNftablesWorker(TestCase, WorkerCommon):
     def setUp(self):
