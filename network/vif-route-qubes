@@ -144,7 +144,9 @@ table inet qubes-nat-accel {
         fi
         ;;
     offline)
-        do_without_error ifdown "${vif}"
+        if [ -e /sys/class/net/"$vif" ]; then
+            do_without_error ifdown "${vif}"
+        fi
         ipcmd='del'
         nftables_cmd=delete
         cmdprefix='do_without_error'
@@ -240,14 +242,20 @@ if [ "${ip}" ]; then
             log error "Cannot set IPv6 route to ${addr}, IPv6 disabled in the kernel"
             continue
         fi
-        ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
+        if [ "$ipcmd" = "add" ] || [ -e /sys/class/net/"$vif" ]; then
+            ${cmdprefix} ip route "${ipcmd}" "${addr}" dev "${vif}" metric "$metric"
+        fi
 
         network_hooks "${command}" "${vif}" "${addr}"
     done
-    ${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
+    if [ "$ipcmd" = "add" ] || [ -e /sys/class/net/"$vif" ]; then
+        ${cmdprefix} ip addr "${ipcmd}" "${back_ip}/32" dev "${vif}"
+    fi
     if [[ -n "${back_ip6}" ]] && [[ "${back_ip6}" != "fe80:"* ]] && [[ "$ipv6_disabled" = '0' ]]; then
-        ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
-        echo 1 >"/proc/sys/net/ipv6/conf/${vif}/proxy_ndp"
+        if [ "$ipcmd" = "add" ] || [ -e /sys/class/net/"$vif" ]; then
+            ${cmdprefix} ip addr "${ipcmd}" "${back_ip6}/128" dev "${vif}"
+            echo 1 >"/proc/sys/net/ipv6/conf/${vif}/proxy_ndp"
+        fi
     fi
 else
     network_hooks "${command}" "${vif}"
