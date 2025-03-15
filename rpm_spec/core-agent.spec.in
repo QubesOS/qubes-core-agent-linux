@@ -136,6 +136,8 @@ Requires:   e2fsprogs
 Requires:   hostname
 # for Qubes Manager VM updater
 Requires:   xterm
+# for qubes-core-admin-linux vmupdate
+Requires:   tar
 # for qubes-desktop-run
 %if 0%{?is_opensuse}
 Requires:   python%{python3_pkgversion}-gobject
