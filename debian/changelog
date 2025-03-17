@@ -1,3 +1,21 @@
+qubes-core-agent (4.3.20-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Avoid de-configuring non-existing interface
+
+  [ Ali Mirjamali ]
+  * Assure `script` is installed for dom0 update
+
+  [ Yanase Yuki ]
+  * qubes-core-agent: add tar to dependencies
+
+  [ Troy J. Farrell ]
+  * firewall: avoid crash on qubesdb long path errors
+  * Remove accidentally duplicated test function
+  * Fix the issue URL in the log message
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 17 Mar 2025 04:42:31 +0100
+
 qubes-core-agent (4.3.19-1) unstable; urgency=medium
 
   [ Guillaume Chinal ]
