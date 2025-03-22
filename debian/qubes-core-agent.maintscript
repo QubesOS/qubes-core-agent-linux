@@ -1,3 +1,4 @@
 rm_conffile /etc/apt/apt.conf.d/00notiy-hook
 rm_conffile /etc/tinyproxy/filter-updates
+rm_conffile /etc/tinyproxy/updates-blacklist
 rm_conffile /etc/systemd/system/haveged.service
