@@ -171,6 +171,7 @@ Requires:   dbus-tools
 %endif
 %if 0%{?fedora} >= 41
 Requires:   libdnf5-plugin-actions
+Requires:   python3-libdnf5
 %else
 %if 0%{?rhel} == 8
 # we need to stick to related DNF python version
