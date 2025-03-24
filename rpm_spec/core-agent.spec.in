@@ -1130,7 +1130,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/qubes-ipv6-disabled.nft
 %config(noreplace) /etc/qubes/rpc-config/qubes.UpdatesProxy
 %config(noreplace) /etc/tinyproxy/tinyproxy-updates.conf
-%config(noreplace) /etc/tinyproxy/updates-blacklist
 %config(noreplace) /etc/udev/rules.d/99-qubes-network.rules
 %if !0%{?is_opensuse}
 /etc/dhclient.d/qubes-setup-dnat-to-ns.sh
