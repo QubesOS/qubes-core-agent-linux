@@ -1,3 +1,17 @@
+qubes-core-agent (4.3.21-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Launch `volumeicon` and `pasystray` only for audiovm
+
+  [ 3np ]
+  * fix(network): no proxying of localhost connections by default; allow
+    overriding proxy vars at runtime
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: require python3-libdnf5 on F41+
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 25 Mar 2025 04:25:02 +0100
+
 qubes-core-agent (4.3.20-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
