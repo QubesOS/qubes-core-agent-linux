@@ -19,12 +19,15 @@ LDLIBS := -lqubes-rpc-filecopy -lqubes-pure
 
 all:	vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile qubes-fs-tree-check bin-qfile-unpacker
 
+ifdef DEVEL_BUILD
 # Ensure that these programs can find their shared libraries,
 # even when installed in e.g. a TemplateBasedVM to somewhere other
 # than /usr.
 vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile qubes-fs-tree-check: LDFLAGS += '-Wl,-rpath,$$ORIGIN/../../$$LIB'
 # This is installed in /usr/bin, not /usr/lib/qubes, so it needs a different rpath.
 bin-qfile-unpacker: LDFLAGS += '-Wl,-rpath,$$ORIGIN/../$$LIB'
+endif
+
 bin-qfile-unpacker: qfile-unpacker.o gui-fatal.o
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 qubes-fs-tree-check: LDLIBS := -lqubes-pure

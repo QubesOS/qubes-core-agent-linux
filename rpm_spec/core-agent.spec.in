@@ -220,6 +220,7 @@ BuildRequires: sudo
 BuildRequires: dracut
 BuildRequires: ca-certificates
 BuildRequires: qubes-core-qrexec
+BuildRequires: xdg-desktop-portal
 %endif
 # for update-mime-database
 BuildRequires: shared-mime-info
@@ -489,6 +490,10 @@ fi
 usermod -L root
 
 %install
+
+%if 0%{?is_opensuse}
+export ETCSECURITYDIR=/usr/etc/security
+%endif
 
 make install-vm PYTHON=%{__python3} "DESTDIR=$RPM_BUILD_ROOT" SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib ENABLE_SELINUX=%with_selinux
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
@@ -985,7 +990,11 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/dconf/db/local.d/dpi
 %config(noreplace) /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-notifyd.xml
 %config(noreplace) /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/displays.xml
+%if 0%{?is_opensuse}
+%config(noreplace) /usr/etc/security/limits.d/90-qubes-core.conf
+%else
 %config(noreplace) /etc/security/limits.d/90-qubes-core.conf
+%endif
 /usr/lib/sysctl.d/20-qubes-core.conf
 %_udevrulesdir/50-qubes-mem-hotplug.rules
 %_unitdir/user@.service.d/90-session-stop-timeout.conf
@@ -1317,6 +1326,7 @@ The Qubes core startup configuration for SystemD init.
 %dir %_unitdir/sysinit.target.d
 %_unitdir/sysinit.target.d/30_qubes.conf
 %_unitdir/systemd-nsresourced.service.d/30_qubes.conf
+%dir %_unitdir/systemd-nsresourced.socket.d
 %_unitdir/systemd-nsresourced.socket.d/30_qubes.conf
 %dir %_userunitdir/*.service.d
 %_userunitdir/tracker-extract-3.service.d/30_qubes.conf
