@@ -81,6 +81,12 @@ if [ "$action" = "suspend" ]; then
     done
     echo "$LOADED_MODULES" > /var/run/qubes-suspend-modules-loaded
 else
+    # Force some apps into swap, to free memory for wifi drivers to be loaded
+    # in a moment. Some of those allocations cannot trigger swappin on their
+    # own. It's ok for this command to use more memory than VM has RAM. But it
+    # cannot exceed swap size.
+    dd if=/dev/zero of=/dev/null bs=512M count=1 status=none
+    echo 1 > /proc/sys/vm/compact_memory
     # Free some RAM for minimal netvm to prevent memory issues when loading
     # drivers
     if [ -f /var/run/qubes-service/minimal-netvm ]; then
