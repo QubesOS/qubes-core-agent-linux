@@ -1,3 +1,12 @@
+qubes-core-agent (4.3.22-1) unstable; urgency=medium
+
+  * Free some memory on resume before re-loading modules
+  * rpm: use /usr/etc/security instead of /etc/security on openSUSE
+  * rpm: fix directories ownership
+  * Do not include rpath in release builds
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 06 Apr 2025 03:44:59 +0200
+
 qubes-core-agent (4.3.21-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
