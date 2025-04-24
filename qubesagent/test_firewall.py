@@ -236,7 +236,7 @@ class TestNftablesWorker(TestCase, WorkerCommon):
             'table ip qubes-firewall {\n'
             '  chain chain {\n'
             '    ip protocol tcp ip daddr 1.2.3.0/24 tcp dport 80 accept\n'
-            '    ip protocol udp ip daddr { 147.75.102.29/32 } '
+            '    ip protocol udp ip daddr { 193.219.28.150/32 } '
             'udp dport 443-1024 accept\n'
             '    ip daddr { 1.1.1.1/32, 2.2.2.2/32 } tcp dport 53 accept\n'
             '    ip daddr { 1.1.1.1/32, 2.2.2.2/32 } udp dport 53 accept\n'
