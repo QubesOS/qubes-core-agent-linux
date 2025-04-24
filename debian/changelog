@@ -1,3 +1,36 @@
+qubes-core-agent (4.2.42-1) unstable; urgency=medium
+
+  [ Guillaume Chinal ]
+  * fix under_systemd function on debian Read command name in /proc
+
+  [ Marek Marczykowski-Górecki ]
+  * rpm: fix formating of %postun selinux macro
+  * Disable systemd-userdbd
+  * dom0-update: apply --installroot etc for --help calls too
+  * dom0-updates: do not pass --allowerasing to dnf clean
+
+  [ Troy J. Farrell ]
+  * firewall: avoid crash on qubesdb long path errors
+  * Remove accidentally duplicated test function
+  * Fix the issue URL in the log message
+
+  [ Yanase Yuki ]
+  * qubes-core-agent: add tar to dependencies
+
+  [ Ali Mirjamali ]
+  * Assure `script` is installed for dom0 update
+  * Launch `volumeicon` and `pasystray` only for audiovm
+
+  [ Marek Marczykowski-Górecki ]
+  * Avoid de-configuring non-existing interface
+  * rpm: require python3-libdnf5 on F41+
+  * Free some memory on resume before re-loading modules
+  * apt: skip 'apt-get update' when running from apt already
+  * Simplify logging apt-get update output
+  * tests: update yum.qubes-os.org IP
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 24 Apr 2025 10:38:17 +0200
+
 qubes-core-agent (4.2.41-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
