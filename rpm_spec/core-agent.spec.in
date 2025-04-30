@@ -1128,6 +1128,8 @@ rm -f %{name}-%{version}
 %dir %attr(0775,root,qubes) /var/lib/qubes/dom0-updates
 /usr/lib/qubes/qvm-template-repo-query
 /usr/lib/qubes/qubes-download-dom0-updates.sh
+/usr/lib/qubes/qubes-download-dom0-updates-init.sh
+/usr/lib/qubes/qubes-download-dom0-updates-finish.sh
 %dir /usr/lib/qubes/dnf-plugins
 /usr/lib/qubes/dnf-plugins/downloadurl.py
 
