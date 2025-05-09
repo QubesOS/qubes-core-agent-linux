@@ -77,6 +77,7 @@ install:
 		qubes.SuspendPreAll \
 		qubes.SuspendPostAll \
 		qubes.WaitForSession \
+		qubes.WaitForRunningSystem \
 		qubes.DetachPciDevice \
 		qubes.Backup qubes.Restore \
 		qubes.RegisterBackupLocation \

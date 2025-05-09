@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+systemctl --wait --quiet is-system-running
+exit 0

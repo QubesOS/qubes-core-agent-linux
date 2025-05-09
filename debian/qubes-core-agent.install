@@ -37,6 +37,7 @@ etc/qubes-rpc/qubes.VMRootShell
 etc/qubes-rpc/qubes.VMExec
 etc/qubes-rpc/qubes.VMExecGUI
 etc/qubes-rpc/qubes.WaitForSession
+etc/qubes-rpc/qubes.WaitForRunningSystem
 etc/qubes-rpc/qubes.GetDate
 etc/qubes-suspend-module-blacklist
 etc/qubes/autostart/*
