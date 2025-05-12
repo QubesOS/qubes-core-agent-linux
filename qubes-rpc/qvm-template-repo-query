@@ -26,6 +26,25 @@ repodir=$(mktemp -d)
 trap 'rm -r "$repodir"' EXIT
 cat > "$repodir/template.repo"
 
+# extract keys from wrapper in repo file
+mkdir "$repodir/keys"
+sed -i "s~/etc/qubes/repo-templates/keys/~$repodir/keys/~" "$repodir/template.repo"
+in_wrapper=false
+line_is_filename=true
+while read -r line; do
+    [[ "$line" == "###!Q!BEGIN-QUBES-WRAPPER!Q!###" ]] && in_wrapper=true && continue
+    [[ "$line" == "###!Q!END-QUBES-WRAPPER!Q!###" ]] && in_wrapper=false && continue
+    $in_wrapper || continue
+    if $line_is_filename; then
+        filename="${line:1}"
+        line_is_filename=false
+    else
+        mkdir -p "$(dirname "$filename")"
+        echo "${line:1}" | base64 -d > "$filename"
+        line_is_filename=true
+    fi
+done < "$repodir/template.repo"
+
 DNF5=false
 if [ "$(readlink /usr/bin/dnf)" = "dnf5" ]; then
     DNF5=true
