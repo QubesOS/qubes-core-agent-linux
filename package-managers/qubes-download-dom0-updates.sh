@@ -156,6 +156,10 @@ UPDATE_COMMAND=(fakeroot "$UPDATE_CMD" "$UPDATE_ACTION" "${UPDATE_ARGUMENTS[@]}"
 
 mkdir -p "$DOM0_UPDATES_DIR/packages"
 
+if [ "$UPDATE_ACTION" = "download" ];  then
+   UPDATE_COMMAND+=(--destdir="$DOM0_UPDATES_DIR/packages")
+fi
+
 set -e
 
 "${UPDATE_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}"
