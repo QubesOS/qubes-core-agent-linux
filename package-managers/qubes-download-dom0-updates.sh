@@ -74,6 +74,7 @@ if type dnf >/dev/null 2>&1; then
     CLEAN_OPTS+=(--noplugins -y)
     "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q best && UPDATE_ARGUMENTS+=(--best)
     "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q allowerasing && UPDATE_ARGUMENTS+=(--allowerasing)
+    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q color && UPDATE_ARGUMENTS+=(--color=never)
     if "$UPDATE_CMD" --version | grep -q dnf5 && [ "$CHECK_ONLY" = "1" ]; then
         UPDATE_ACTION=check-upgrade
     fi
