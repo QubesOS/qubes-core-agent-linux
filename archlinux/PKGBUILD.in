@@ -212,7 +212,7 @@ package_qubes-vm-dom0-updates() {
         qubes-vm-core
         qubes-vm-networking
         python
-        dnf
+        dnf5
     )
 
     cd "${_pkgnvr}"
