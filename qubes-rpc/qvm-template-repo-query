@@ -45,8 +45,13 @@ while read -r line; do
     fi
 done < "$repodir/template.repo"
 
+if ! DNF=$(command -v dnf5 dnf dnf4 | head -1); then
+    echo "ERROR: dnf command is missing, please use newer template for your UpdateVM to download templates." >&2
+    echo "You can choose any Fedora version, Debian 11 (or newer), or any other based on those (like Whonix 16)." >&2
+    exit 1
+fi
 DNF5=false
-if [ "$(readlink /usr/bin/dnf)" = "dnf5" ]; then
+if [[ "$DNF" = *"/dnf5" ]]; then
     DNF5=true
 fi
 
@@ -58,11 +63,6 @@ if ! $DNF5; then
     OPTS+=("--setopt=pluginpath=/usr/lib/qubes/dnf-plugins")
 fi
 
-if ! command -v dnf >/dev/null; then
-    echo "ERROR: dnf command is missing, please use newer template for your UpdateVM to download templates." >&2
-    echo "You can choose any Fedora version, Debian 11 (or newer), or any other based on those (like Whonix 16)." >&2
-    exit 1
-fi
 
 # This creates the hashfile if it doesn't exist, and keep the ctime and mtime
 # unchanged otherwise.
@@ -76,9 +76,9 @@ RET=0
 
 if [ "$1" = "query" ]; then
     if $DNF5; then
-        dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{repoid}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|\n' "$SPEC"
+        $DNF repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{repoid}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|\n' "$SPEC"
     else
-        dnf repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{repoid}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
+        $DNF repoquery "${OPTS[@]}" --qf='%{name}|%{epoch}|%{version}|%{release}|%{repoid}|%{downloadsize}|%{buildtime}|%{license}|%{url}|%{summary}|%{description}|' "$SPEC"
     fi
     RET="$?"
 elif [ "$1" = "download" ]; then
@@ -88,15 +88,15 @@ elif [ "$1" = "download" ]; then
     # downloaded, go to the next one. The intention is to retry on interrupted
     # connection, but skip mirrors that are not synchronized yet.
     declare -a urls=()
-    if $DNF5 && dnf download --help | grep -q allmirrors; then
+    if $DNF5 && $DNF download --help | grep -q allmirrors; then
         # The smartest case. DNF5 on Fedora 41 with --allmirrors patch
-        space_separated_urls="$(dnf download "${OPTS[@]}" --url --allmirrors "$SPEC")"
+        space_separated_urls="$($DNF download "${OPTS[@]}" --url --allmirrors "$SPEC")"
         readarray -d ' ' -t urls <<<"$space_separated_urls"
         urls=( $(shuf -e "${urls[@]}") )
     elif $DNF5; then
         # The middle case. DNF5 on Fedora 41 before --allmirror patch
         # TODO: Phase out after DNF5 --allmirrors patch is released
-        url="$(dnf download "${OPTS[@]}" --url "$SPEC")"
+        url="$($DNF download "${OPTS[@]}" --url "$SPEC")"
         urls=("$url")
     else
         # The old DNF4 on Fedora 40 and other old templates
@@ -104,7 +104,7 @@ elif [ "$1" = "download" ]; then
         # to print all mirrors.
         # TODO: Phase out after DNF4 is EOL
         OPTS+=("--setopt=pluginpath=/usr/lib/qubes/dnf-plugins")
-        urls="$(dnf downloadurl "${OPTS[@]}" --url --all-mirrors "$SPEC" | shuf)"
+        urls="$($DNF downloadurl "${OPTS[@]}" --url --all-mirrors "$SPEC" | shuf)"
         readarray -t urls <<<"$urls"
     fi
     downloaded=0
