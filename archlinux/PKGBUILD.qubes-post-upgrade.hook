@@ -1,6 +1,6 @@
 [Trigger]
 Operation = Upgrade
-Type = Path
+Type = Package
 Target = *
 
 [Action]
