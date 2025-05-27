@@ -100,6 +100,14 @@ package_qubes-vm-core() {
     make -C qubes-rpc/kde DESTDIR="$pkgdir" install
     make -C qubes-rpc/nautilus DESTDIR="$pkgdir" install
     make -C qubes-rpc/thunar DESTDIR="$pkgdir" install
+    make -C filesystem DESTDIR="$pkgdir" install
+
+    # Adjust fstab for Arch
+    mv "$pkgdir/etc/fstab" "$pkgdir/etc/fstab.qubes"
+    echo "
+# This MUST be a ramfs, not a tmpfs!  The data here is incredibly sensitive
+# (allows root access) and must not be leaked to disk.
+tmpfs                   /etc/pacman.d/gnupg/private-keys-v1.d       ramfs   defaults,noexec,nosuid,nodev,mode=600    0 0" >> "$pkgdir/etc/fstab.qubes"
 
     # Install systemd script allowing to automount /lib/modules
     install -m 644 "archlinux/PKGBUILD.qubes-ensure-lib-modules.service" "${pkgdir}/usr/lib/systemd/system/qubes-ensure-lib-modules.service"
