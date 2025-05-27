@@ -34,9 +34,6 @@ pre_install() {
         cp /etc/fstab /var/lib/qubes/fstab.orig
     fi
 
-    # Add qubes core related fstab entries
-    echo "xen	/proc/xen	xenfs	defaults	0 0" >> /etc/fstab
-
     usermod -L root
     usermod -L user
 }
