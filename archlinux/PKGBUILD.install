@@ -90,6 +90,15 @@ update_qubesconfig() {
         cp -f /etc/fstab.qubes /etc/fstab
     fi
 
+    # Fix fstab update to core-agent-linux 4.3.19
+    if grep -q '/rw/home\|/rw/usrlocal' /etc/fstab; then
+        sed -i \
+            -e '/# Template Binds/d' \
+            -e '/\/rw\/home/d' \
+            -e '/\/rw\/usrlocal/d' \
+            /etc/fstab
+    fi
+
     #/usr/lib/qubes/update-proxy-configs
     # Archlinux pacman configuration is handled in update_finalize
 
