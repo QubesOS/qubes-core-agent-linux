@@ -1,3 +1,14 @@
+qubes-core-agent (4.3.25-1) unstable; urgency=medium
+
+  * archlinux: update dnf dependency
+  * Use/prefer dnf5 if available
+  * archlinux: fix post-upgrade notify hook
+  * archlinux: /proc/xen is not relevant anymore
+  * archlinux: install qubes version of /etc/fstab
+  * archlinux: remove static /home and /usr/local entries
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 30 May 2025 05:05:04 +0200
+
 qubes-core-agent (4.3.24-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
