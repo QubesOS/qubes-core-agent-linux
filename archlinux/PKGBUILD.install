@@ -34,9 +34,6 @@ pre_install() {
         cp /etc/fstab /var/lib/qubes/fstab.orig
     fi
 
-    # Add qubes core related fstab entries
-    echo "xen	/proc/xen	xenfs	defaults	0 0" >> /etc/fstab
-
     usermod -L root
     usermod -L user
 }
@@ -88,8 +85,19 @@ update_qubesconfig() {
         mount /usr/local || :
     fi
 
-    # Fix fstab update to core-agent-linux 4.0.33
-    grep -F -q "/rw/usrlocal" /etc/fstab || sed "/\/rw\/home/a\/rw\/usrlocal    \/usr\/local  none    noauto,bind,defaults 0 0" -i /etc/fstab
+    # Install qubes version of fstab
+    if ! grep -q dmroot /etc/fstab; then
+        cp -f /etc/fstab.qubes /etc/fstab
+    fi
+
+    # Fix fstab update to core-agent-linux 4.3.19
+    if grep -q '/rw/home\|/rw/usrlocal' /etc/fstab; then
+        sed -i \
+            -e '/# Template Binds/d' \
+            -e '/\/rw\/home/d' \
+            -e '/\/rw\/usrlocal/d' \
+            /etc/fstab
+    fi
 
     #/usr/lib/qubes/update-proxy-configs
     # Archlinux pacman configuration is handled in update_finalize
