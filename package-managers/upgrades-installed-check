@@ -52,6 +52,16 @@ elif [ -e /etc/gentoo-release ]; then
     emerge_output="$(emerge -puDv @world 2>&1)"
     exit_code="$?"
     echo "$emerge_output" | grep -qF -- '[ebuild' && echo "false" || echo "true"
+elif [ -e /etc/alpine-release ]; then
+    ## Alpine and APK based distros
+    set -e
+    set -o pipefail
+    if ! $skip_refresh; then
+        sudo apk update -q >&2
+    fi
+    upgrades="$(apk list --upgradable)"
+    exit_code="$?"
+    [ -n "${upgrades}" ] && echo "false" || echo "true"
 else
     echo "Check not implemented for this distribution" >&2
     exit 1
