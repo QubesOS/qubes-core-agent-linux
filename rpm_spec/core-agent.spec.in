@@ -943,6 +943,8 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 %config(noreplace) /etc/qubes/rpc-config/qubes.VMShell+WaitForSession
 %config(noreplace) /etc/qubes/rpc-config/qubes.VMExecGUI
+%config(noreplace) /etc/qubes/rpc-config/qubes.VMRootExec
+%config(noreplace) /etc/qubes/rpc-config/qubes.VMRootShell
 %config(noreplace) /etc/default/grub.qubes
 
 # MIME stuff

@@ -55,6 +55,8 @@ etc/qubes/rpc-config/qubes.StartApp
 etc/qubes/rpc-config/qubes.InstallUpdatesGUI
 etc/qubes/rpc-config/qubes.VMShell+WaitForSession
 etc/qubes/rpc-config/qubes.VMExecGUI
+etc/qubes/rpc-config/qubes.VMRootExec
+etc/qubes/rpc-config/qubes.VMRootShell
 etc/qubes/suspend-post.d/README
 etc/qubes/suspend-post.d/*.sh
 etc/qubes/suspend-pre.d/README
