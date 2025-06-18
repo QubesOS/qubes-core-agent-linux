@@ -72,6 +72,7 @@ install:
 		qubes.Filecopy qubes.OpenInVM qubes.VMShell \
 		qubes.VMRootShell \
 		qubes.VMExec \
+		qubes.VMRootExec \
 		qubes.OpenURL \
 		qubes.SuspendPre qubes.SuspendPost qubes.GetAppmenus \
 		qubes.SuspendPreAll \

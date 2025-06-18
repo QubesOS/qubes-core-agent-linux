@@ -911,6 +911,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.VMShell
 %config(noreplace) /etc/qubes-rpc/qubes.VMExec
 %config(noreplace) /etc/qubes-rpc/qubes.VMExecGUI
+%config(noreplace) /etc/qubes-rpc/qubes.VMRootExec
 %config(noreplace) /etc/qubes-rpc/qubes.VMRootShell
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPre
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPreAll
