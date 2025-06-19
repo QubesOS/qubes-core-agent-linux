@@ -46,6 +46,7 @@ SYSTEM_DROPINS += cups.service cups-browsed.service cups.path cups.socket ModemM
 SYSTEM_DROPINS += getty@tty.service serial-getty@.service
 SYSTEM_DROPINS += tmp.mount
 SYSTEM_DROPINS += org.cups.cupsd.service org.cups.cupsd.path org.cups.cupsd.socket
+SYSTEM_DROPINS += firewalld.service
 SYSTEM_DROPINS += systemd-random-seed.service
 SYSTEM_DROPINS += tor.service tor@default.service
 SYSTEM_DROPINS += systemd-timesyncd.service
