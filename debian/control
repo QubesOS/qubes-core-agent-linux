@@ -79,7 +79,6 @@ Recommends:
     xterm
 Conflicts:
     qubes-core-agent-linux,
-    firewalld,
     qubes-core-vm-sysvinit,
     qubes-gui-agent (<< 4.1.6-1),
     pulseaudio-qubes (<< 4.2.0-1),

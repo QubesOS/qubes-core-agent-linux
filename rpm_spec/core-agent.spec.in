@@ -125,7 +125,6 @@ Vendor:     Invisible Things Lab
 License:    GPL
 URL:        https://www.qubes-os.org
 
-Conflicts:  firewalld
 Requires:   xdg-utils
 Requires:   qubes-utils >= 3.1.3
 Requires:   qubes-utils-libs >= 4.3.1
