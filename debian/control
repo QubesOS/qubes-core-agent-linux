@@ -137,7 +137,6 @@ Package: qubes-core-agent-networking
 Architecture: any
 Depends:
     qubes-core-agent (= ${binary:Version}),
-    tinyproxy,
     nftables,
     conntrack,
     socat,
