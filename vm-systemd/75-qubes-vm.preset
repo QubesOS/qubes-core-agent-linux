@@ -34,6 +34,7 @@
 disable avahi.service
 disable avahi-daemon.service
 disable avahi-daemon.socket
+disable firewalld.service
 
 # Fedora only services
 disable rpcbind.service

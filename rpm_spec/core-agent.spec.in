@@ -125,7 +125,6 @@ Vendor:     Invisible Things Lab
 License:    GPL
 URL:        https://www.qubes-os.org
 
-Conflicts:  firewalld
 Requires:   xdg-utils
 Requires:   qubes-utils >= 3.1.3
 Requires:   qubes-utils-libs >= 4.3.1
@@ -1313,6 +1312,7 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/org.cups.cupsd.socket.d/30_qubes.conf
 %dir %_unitdir/org.cups.cupsd.path.d
 %_unitdir/org.cups.cupsd.path.d/30_qubes.conf
+%_unitdir/firewalld.service.d/30_qubes.conf
 %_unitdir/getty@tty.service.d/30_qubes.conf
 %_unitdir/ModemManager.service.d/30_qubes.conf
 %_unitdir/NetworkManager.service.d/30_qubes.conf
