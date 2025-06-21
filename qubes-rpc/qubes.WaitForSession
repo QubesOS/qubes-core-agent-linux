@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-if test "$(qubesdb-read /qubes-gui-enabled)" = "True"; then
+if test "$(qubesdb-read --default=True /qubes-gui-enabled)" = "True"; then
     user="$(qubesdb-read /default-user || echo 'user')"
     while ! [ -e "/var/run/qubes/qrexec-server.$user.sock" ]; do
         sleep 0.1
