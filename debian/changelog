@@ -1,3 +1,24 @@
+qubes-core-agent (4.3.26-1) unstable; urgency=medium
+
+  [ Ben Grande ]
+  * Wait for session only if necessary
+
+  [ Marek Marczykowski-Górecki ]
+  * Add qubes.VMRootExec service
+  * Use rpc-config for running qubes.VMRoot* services as root
+
+  [ 3np ]
+  * qubes-core-agent: remove conflict with firewalld
+  * disable firewalld by default
+
+  [ Ali Mirjamali ]
+  * Add Alpine (APK) Updates availability check
+
+  [ Marek Marczykowski-Górecki ]
+  * Assume GUI is enabled if dom0 didn't provide that info
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 23 Jun 2025 00:53:11 +0200
+
 qubes-core-agent (4.3.25-1) unstable; urgency=medium
 
   * archlinux: update dnf dependency
