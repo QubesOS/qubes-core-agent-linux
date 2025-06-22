@@ -3,23 +3,23 @@ Section: admin
 Priority: extra
 Maintainer: unman <unman@thirdeyesecurity.org>
 Build-Depends:
+    config-package-dev,
     debhelper,
+    desktop-file-utils,
+    dh-python,
     libpam0g-dev,
     libqubes-pure-dev (>= 4.3.2),
     libqubes-rpc-filecopy-dev (>= 4.3.2),
     libvchan-xen-dev,
+    libxen-dev,
+    lsb-release,
+    pandoc,
+    pkg-config,
     python3,
     python3-setuptools,
     quilt,
-    libxen-dev,
-    pkg-config,
-    dh-python,
-    lsb-release,
-    xserver-xorg-dev,
-    config-package-dev,
-    pandoc,
     shared-mime-info,
-    desktop-file-utils,
+    xserver-xorg-dev,
 Standards-Version: 4.4.0.1
 Homepage: https://www.qubes-os.org
 Vcs-Git: https://github.com/QubesOS/qubes-core-agent-linux
@@ -29,8 +29,9 @@ Architecture: any
 Depends:
     apt-transport-https,
     dconf-cli,
-    dmsetup,
     distro-info-data,
+    dmsetup,
+    e2fsprogs,
     gawk,
     graphicsmagick,
     init-system-helpers,
@@ -38,27 +39,26 @@ Depends:
     librsvg2-bin,
     locales,
     ncurses-term,
-    psmisc,
-    procps,
-    util-linux,
-    e2fsprogs,
     parted,
-    python3-qubesdb,
-    python3-gi,
-    python3-xdg,
+    procps,
+    psmisc,
     python3-dbus,
-    qubes-utils (>= 3.1.3),
+    python3-gi,
+    python3-qubesdb,
+    python3-xdg,
     qubes-core-qrexec (>= 4.2.19),
+    qubes-utils (>= 3.1.3),
     qubesdb-vm,
     systemd,
+    util-linux,
     xdg-user-dirs,
     xdg-utils,
+    xenstore-utils,
     xen-utils-common,
     xen-utils-guest,
-    xenstore-utils,
     ${python3:Depends},
     ${shlibs:Depends},
-    ${misc:Depends}
+    ${misc:Depends},
 Recommends:
     cups,
     gnome-terminal,
@@ -68,20 +68,20 @@ Recommends:
     locales-all,
     mate-notification-daemon,
     ntpdate,
-    system-config-printer,
     qubes-core-agent-nautilus,
     qubes-core-agent-networking,
     qubes-core-agent-network-manager,
+    system-config-printer,
     x11-xserver-utils,
     xinit,
     xserver-xorg-core,
     xsettingsd,
-    xterm
+    xterm,
 Conflicts:
+    pulseaudio-qubes (<< 4.2.0-1),
     qubes-core-agent-linux,
     qubes-core-vm-sysvinit,
     qubes-gui-agent (<< 4.1.6-1),
-    pulseaudio-qubes (<< 4.2.0-1),
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec services.
@@ -119,13 +119,13 @@ Description: Qubes integration for Thunar
 Package: qubes-core-agent-dom0-updates
 Architecture: any
 Depends:
-    fakeroot,
-    rpm,
+    curl,
     dnf | yum,
     dnf | yum-utils,
-    curl,
+    fakeroot,
     qubes-core-qrexec,
     qubes-repo-templates,
+    rpm,
 Replaces: qubes-core-agent (<< 4.1.28-1)
 Breaks: qubes-core-agent (<< 4.1.28-1)
 Description: Scripts required to handle dom0 updates.
@@ -142,7 +142,7 @@ Depends:
     tinyproxy,
     iproute2,
     ${python3:Depends},
-    ${misc:Depends}
+    ${misc:Depends},
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Networking support for Qubes VM
