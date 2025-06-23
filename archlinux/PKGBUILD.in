@@ -1,6 +1,6 @@
 # Maintainer: Frédéric Pierret (fepitre) <frederic@invisiblethingslab.com>
 
-pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-nautilus qubes-vm-passwordless-root qubes-vm-dom0-updates)
+pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-caja qubes-vm-nautilus qubes-vm-passwordless-root qubes-vm-dom0-updates)
 pkgver=@VERSION@
 pkgrel=@REL@
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
@@ -88,7 +88,7 @@ package_qubes-vm-core() {
         gnome-keyring
         gnome-settings-daemon
         gpk-update-viewer
-        python-caja
+        qubes-vm-caja
         qubes-vm-keyring
         qubes-vm-nautilus
         qubes-vm-networking
@@ -103,7 +103,6 @@ package_qubes-vm-core() {
     make -C app-menu install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
     make -C misc install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
     make -C qubes-rpc DESTDIR="$pkgdir" install
-    make -C qubes-rpc/caja DESTDIR="$pkgdir" install
     make -C qubes-rpc/kde DESTDIR="$pkgdir" install
     make -C qubes-rpc/thunar DESTDIR="$pkgdir" install
     make -C filesystem DESTDIR="$pkgdir" install
@@ -204,6 +203,26 @@ package_qubes-vm-keyring() {
     install -m0644 "archlinux/PKGBUILD-keyring-keys" "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm.gpg"
     install -m0644 "archlinux/PKGBUILD-keyring-trusted" "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-trusted"
     install -m0644 "archlinux/PKGBUILD-keyring-revoked" "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-revoked"
+}
+
+package_qubes-vm-caja() {
+    pkgdesc="Qubes OS Caja addons for inter-VM file copy/move/open"
+    conflicts=('qubes-vm-core<4.3.26')
+    depends=(
+        bash
+        python-caja
+        qubes-vm-qrexec
+    )
+
+    cd "${_pkgnvr}"
+    make -C qubes-rpc/caja install \
+        DESTDIR="$pkgdir" \
+        SBINDIR=/usr/bin \
+        LIBDIR=/usr/lib \
+        SYSLIBDIR=/usr/lib \
+        SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
+        USER_DROPIN_DIR=/usr/lib/systemd/user \
+        DIST=archlinux
 }
 
 package_qubes-vm-nautilus() {
