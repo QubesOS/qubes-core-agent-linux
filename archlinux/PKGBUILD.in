@@ -6,7 +6,7 @@ pkgrel=@REL@
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
 arch=("x86_64")
 url="https://qubes-os.org/"
-license=('GPL')
+license=('GPL-2.0-or-later')
 makedepends=(
     gcc
     make
