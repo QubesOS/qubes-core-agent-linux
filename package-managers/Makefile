@@ -49,6 +49,8 @@ install:
 	install -d $(DESTDIR)$(QUBESLIBDIR)
 	install -t $(DESTDIR)$(QUBESLIBDIR) \
 		qubes-download-dom0-updates.sh \
+		qubes-download-dom0-updates-init.sh \
+		qubes-download-dom0-updates-finish.sh \
 		upgrades-installed-check \
 		upgrades-status-notify
 	install -d -m 2775 $(DESTDIR)$(QUBESSTATEDIR)/dom0-updates
