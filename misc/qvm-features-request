@@ -99,9 +99,15 @@ def main(args=None):
 
     if args.commit:
         devnull = os.open(os.devnull, os.O_RDWR)
-        subprocess.check_call(
-            ['qrexec-client-vm', 'dom0', 'qubes.FeaturesRequest'],
-            stdin=devnull, stdout=devnull)
+        cmd = ['qrexec-client-vm', 'dom0', 'qubes.FeaturesRequest']
+        try:
+            subprocess.check_call(cmd, stdin=devnull, stdout=devnull)
+        except subprocess.CalledProcessError as e:
+            print(
+                f"Error: Command `{' '.join(cmd)}` returned exit code {e.returncode}",
+                file=sys.stderr
+            )
+            any_error = True
 
     if any_error:
         return 1
