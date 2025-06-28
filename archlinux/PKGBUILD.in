@@ -208,7 +208,7 @@ package_qubes-vm-keyring() {
 
 package_qubes-vm-nautilus() {
     pkgdesc="Qubes OS Nautilus addons for inter-VM file copy/move/open"
-    conflicts=('qubes-vm-core<4.3.20')
+    conflicts=('qubes-vm-core<4.3.26')
     depends=(
         bash
         python-gobject
