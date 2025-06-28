@@ -1,6 +1,6 @@
 # Maintainer: Frédéric Pierret (fepitre) <frederic@invisiblethingslab.com>
 
-pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-caja qubes-vm-nautilus qubes-vm-passwordless-root qubes-vm-dom0-updates)
+pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-caja qubes-vm-nautilus qubes-vm-passwordless-root qubes-vm-thunar qubes-vm-dom0-updates)
 pkgver=@VERSION@
 pkgrel=@REL@
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
@@ -92,6 +92,7 @@ package_qubes-vm-core() {
         qubes-vm-keyring
         qubes-vm-nautilus
         qubes-vm-networking
+        qubes-vm-thunar
     )
     install="archlinux/PKGBUILD.install"
 
@@ -104,7 +105,6 @@ package_qubes-vm-core() {
     make -C misc install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
     make -C qubes-rpc DESTDIR="$pkgdir" install
     make -C qubes-rpc/kde DESTDIR="$pkgdir" install
-    make -C qubes-rpc/thunar DESTDIR="$pkgdir" install
     make -C filesystem DESTDIR="$pkgdir" install
 
     # Adjust fstab for Arch
@@ -216,6 +216,30 @@ package_qubes-vm-caja() {
 
     cd "${_pkgnvr}"
     make -C qubes-rpc/caja install \
+        DESTDIR="$pkgdir" \
+        SBINDIR=/usr/bin \
+        LIBDIR=/usr/lib \
+        SYSLIBDIR=/usr/lib \
+        SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
+        USER_DROPIN_DIR=/usr/lib/systemd/user \
+        DIST=archlinux
+}
+
+package_qubes-vm-thunar() {
+    pkgdesc="Qubes OS Thunar addons for inter-VM file copy/move/open"
+    conflicts=('qubes-vm-core<4.3.26')
+    depends=(
+        bash
+        qubes-vm-qrexec
+        thunar
+    )
+    optdepends=(
+        qubes-img-converter
+        qubes-pdf-converter
+    )
+
+    cd "${_pkgnvr}"
+    make -C qubes-rpc/thunar install \
         DESTDIR="$pkgdir" \
         SBINDIR=/usr/bin \
         LIBDIR=/usr/lib \
