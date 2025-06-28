@@ -54,6 +54,7 @@ package_qubes-vm-core() {
         echo 'invalid $pkgver'>&2
         exit 1
     }
+    provides=(qubes-core-agent)
     conflicts=('pulseaudio-qubes<4.2.0')
     release=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}
     depends=(
@@ -159,6 +160,7 @@ EOF
 #
 package_qubes-vm-networking() {
     pkgdesc="Qubes OS tools allowing to use a Qubes VM as a NetVM/ProxyVM"
+    provides=(qubes-core-agent-networking)
     depends=(
         conntrack-tools
         iproute2
@@ -207,6 +209,7 @@ package_qubes-vm-keyring() {
 
 package_qubes-vm-caja() {
     pkgdesc="Qubes OS Caja addons for inter-VM file copy/move/open"
+    provides=(qubes-core-agent-caja)
     conflicts=('qubes-vm-core<4.3.26')
     depends=(
         bash
@@ -227,6 +230,7 @@ package_qubes-vm-caja() {
 
 package_qubes-vm-thunar() {
     pkgdesc="Qubes OS Thunar addons for inter-VM file copy/move/open"
+    provides=(qubes-core-agent-thunar)
     conflicts=('qubes-vm-core<4.3.26')
     depends=(
         bash
@@ -251,6 +255,7 @@ package_qubes-vm-thunar() {
 
 package_qubes-vm-nautilus() {
     pkgdesc="Qubes OS Nautilus addons for inter-VM file copy/move/open"
+    provides=(qubes-core-agent-nautilus)
     conflicts=('qubes-vm-core<4.3.26')
     depends=(
         bash
@@ -273,6 +278,7 @@ package_qubes-vm-nautilus() {
 
 package_qubes-vm-passwordless-root() {
     pkgdesc="Qubes OS Passwordless root access from normal user"
+    provides=(qubes-core-agent-passwordless-root)
 
     cd "${_pkgnvr}"
     make -C passwordless-root install \
@@ -287,6 +293,7 @@ package_qubes-vm-passwordless-root() {
 
 package_qubes-vm-dom0-updates() {
     pkgdesc="Qubes OS tools for fetching dom0 updates"
+    provides=(qubes-core-agent-dom0-updates)
     depends=(
         dnf5
         python
