@@ -10,17 +10,18 @@ license=('GPL-2.0-or-later')
 makedepends=(
     gcc
     make
-    pkg-config
+
+    desktop-file-utils
     libx11
-    python
-    python-setuptools
     lsb-release
     pandoc
+    pkg-config
+    python
+    python-setuptools
     shared-mime-info
-    desktop-file-utils
-    qubes-vm-utils
-    qubes-libvchan
     qubes-db-vm
+    qubes-libvchan
+    qubes-vm-utils
     qubes-vm-xen
 )
 _pkgnvr="${pkgname}-${pkgver}-${pkgrel}"
@@ -56,35 +57,42 @@ package_qubes-vm-core() {
     conflicts=('pulseaudio-qubes<4.2.0')
     release=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}
     depends=(
-        qubes-vm-utils
-        qubes-libvchan
-        qubes-db-vm
-        'qubes-vm-qrexec>=4.2.19'
-        python
-        python-xdg
-        ntp
-        iproute2
+        dconf
+        fakeroot
+        gawk
         gnome-packagekit
         graphicsmagick
-        fakeroot
-        notification-daemon
-        dconf
-        zenity
         haveged
-        python-gobject
-        python-dbus
-        xdg-utils
-        gawk
-        sed
-        procps-ng
+        iproute2
         librsvg
-        socat
+        notification-daemon
+        ntp
         pacman-contrib
         parted
+        procps-ng
         # Block updating if there is a major python update as the python API will be in the wrong PYTHONPATH
         'python<3.14'
+        python-dbus
+        python-gobject
+        python-xdg
+        qubes-db-vm
+        qubes-libvchan
+        'qubes-vm-qrexec>=4.2.19'
+        qubes-vm-utils
+        sed
+        socat
+        xdg-utils
+        zenity
     )
-    optdepends=(gnome-keyring gnome-settings-daemon python-caja python-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
+    optdepends=(
+        gnome-keyring
+        gnome-settings-daemon
+        gpk-update-viewer
+        python-caja
+        python-nautilus
+        qubes-vm-keyring
+        qubes-vm-networking
+    )
     install="archlinux/PKGBUILD.install"
 
     cd "${_pkgnvr}"
@@ -154,16 +162,16 @@ EOF
 package_qubes-vm-networking() {
     pkgdesc="Qubes OS tools allowing to use a Qubes VM as a NetVM/ProxyVM"
     depends=(
-        qubes-vm-core
-        qubes-vm-utils
-        qubes-db-vm
-        python
+        conntrack-tools
         iproute2
         networkmanager
         network-manager-applet
-        tinyproxy
         nftables
-        conntrack-tools
+        python
+        qubes-db-vm
+        qubes-vm-core
+        qubes-vm-utils
+        tinyproxy
     )
     install="archlinux/PKGBUILD-networking.install"
 
@@ -216,10 +224,10 @@ package_qubes-vm-passwordless-root() {
 package_qubes-vm-dom0-updates() {
     pkgdesc="Qubes OS tools for fetching dom0 updates"
     depends=(
+        dnf5
+        python
         qubes-vm-core
         qubes-vm-networking
-        python
-        dnf5
     )
 
     cd "${_pkgnvr}"
