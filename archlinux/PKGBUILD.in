@@ -1,6 +1,6 @@
 # Maintainer: Frédéric Pierret (fepitre) <frederic@invisiblethingslab.com>
 
-pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-passwordless-root qubes-vm-dom0-updates)
+pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-caja qubes-vm-nautilus qubes-vm-passwordless-root qubes-vm-thunar qubes-vm-dom0-updates)
 pkgver=@VERSION@
 pkgrel=@REL@
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
@@ -54,6 +54,7 @@ package_qubes-vm-core() {
         echo 'invalid $pkgver'>&2
         exit 1
     }
+    provides=(qubes-core-agent)
     conflicts=('pulseaudio-qubes<4.2.0')
     release=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}
     depends=(
@@ -88,10 +89,11 @@ package_qubes-vm-core() {
         gnome-keyring
         gnome-settings-daemon
         gpk-update-viewer
-        python-caja
-        python-nautilus
+        qubes-vm-caja
         qubes-vm-keyring
+        qubes-vm-nautilus
         qubes-vm-networking
+        qubes-vm-thunar
     )
     install="archlinux/PKGBUILD.install"
 
@@ -103,10 +105,7 @@ package_qubes-vm-core() {
     make -C app-menu install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
     make -C misc install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
     make -C qubes-rpc DESTDIR="$pkgdir" install
-    make -C qubes-rpc/caja DESTDIR="$pkgdir" install
     make -C qubes-rpc/kde DESTDIR="$pkgdir" install
-    make -C qubes-rpc/nautilus DESTDIR="$pkgdir" install
-    make -C qubes-rpc/thunar DESTDIR="$pkgdir" install
     make -C filesystem DESTDIR="$pkgdir" install
 
     # Adjust fstab for Arch
@@ -161,6 +160,7 @@ EOF
 #
 package_qubes-vm-networking() {
     pkgdesc="Qubes OS tools allowing to use a Qubes VM as a NetVM/ProxyVM"
+    provides=(qubes-core-agent-networking)
     depends=(
         conntrack-tools
         iproute2
@@ -207,8 +207,78 @@ package_qubes-vm-keyring() {
     install -m0644 "archlinux/PKGBUILD-keyring-revoked" "${pkgdir}/usr/share/pacman/keyrings/qubesos-vm-revoked"
 }
 
+package_qubes-vm-caja() {
+    pkgdesc="Qubes OS Caja addons for inter-VM file copy/move/open"
+    provides=(qubes-core-agent-caja)
+    conflicts=('qubes-vm-core<4.3.26')
+    depends=(
+        bash
+        python-caja
+        qubes-vm-qrexec
+    )
+
+    cd "${_pkgnvr}"
+    make -C qubes-rpc/caja install \
+        DESTDIR="$pkgdir" \
+        SBINDIR=/usr/bin \
+        LIBDIR=/usr/lib \
+        SYSLIBDIR=/usr/lib \
+        SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
+        USER_DROPIN_DIR=/usr/lib/systemd/user \
+        DIST=archlinux
+}
+
+package_qubes-vm-thunar() {
+    pkgdesc="Qubes OS Thunar addons for inter-VM file copy/move/open"
+    provides=(qubes-core-agent-thunar)
+    conflicts=('qubes-vm-core<4.3.26')
+    depends=(
+        bash
+        qubes-vm-qrexec
+        thunar
+    )
+    optdepends=(
+        qubes-img-converter
+        qubes-pdf-converter
+    )
+
+    cd "${_pkgnvr}"
+    make -C qubes-rpc/thunar install \
+        DESTDIR="$pkgdir" \
+        SBINDIR=/usr/bin \
+        LIBDIR=/usr/lib \
+        SYSLIBDIR=/usr/lib \
+        SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
+        USER_DROPIN_DIR=/usr/lib/systemd/user \
+        DIST=archlinux
+}
+
+package_qubes-vm-nautilus() {
+    pkgdesc="Qubes OS Nautilus addons for inter-VM file copy/move/open"
+    provides=(qubes-core-agent-nautilus)
+    conflicts=('qubes-vm-core<4.3.26')
+    depends=(
+        bash
+        python-gobject
+        python-nautilus
+        qubes-vm-core
+        qubes-vm-qrexec
+    )
+
+    cd "${_pkgnvr}"
+    make -C qubes-rpc/nautilus install \
+        DESTDIR="$pkgdir" \
+        SBINDIR=/usr/bin \
+        LIBDIR=/usr/lib \
+        SYSLIBDIR=/usr/lib \
+        SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
+        USER_DROPIN_DIR=/usr/lib/systemd/user \
+        DIST=archlinux
+}
+
 package_qubes-vm-passwordless-root() {
     pkgdesc="Qubes OS Passwordless root access from normal user"
+    provides=(qubes-core-agent-passwordless-root)
 
     cd "${_pkgnvr}"
     make -C passwordless-root install \
@@ -223,6 +293,7 @@ package_qubes-vm-passwordless-root() {
 
 package_qubes-vm-dom0-updates() {
     pkgdesc="Qubes OS tools for fetching dom0 updates"
+    provides=(qubes-core-agent-dom0-updates)
     depends=(
         dnf5
         python
