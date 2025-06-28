@@ -6,4 +6,5 @@ QUBESLIBDIR ?= /usr/lib/qubes
 install:
 	install -d $(DESTDIR)$(NAUTILUSPYEXTDIR)
 	install -t $(DESTDIR)$(NAUTILUSPYEXTDIR) -m 0644 *.py
+	install -d $(DESTDIR)$(QUBESLIBDIR)
 	install -t $(DESTDIR)$(QUBESLIBDIR) -m 0755 *.sh
