@@ -210,7 +210,7 @@ package_qubes-vm-keyring() {
 package_qubes-vm-caja() {
     pkgdesc="Qubes OS Caja addons for inter-VM file copy/move/open"
     provides=(qubes-core-agent-caja=@VERSION@)
-    conflicts=('qubes-vm-core<4.3.26')
+    conflicts=('qubes-vm-core<4.3.27')
     depends=(
         bash
         python-caja
@@ -231,7 +231,7 @@ package_qubes-vm-caja() {
 package_qubes-vm-thunar() {
     pkgdesc="Qubes OS Thunar addons for inter-VM file copy/move/open"
     provides=(qubes-core-agent-thunar=@VERSION@)
-    conflicts=('qubes-vm-core<4.3.26')
+    conflicts=('qubes-vm-core<4.3.27')
     depends=(
         bash
         qubes-vm-qrexec
@@ -256,7 +256,7 @@ package_qubes-vm-thunar() {
 package_qubes-vm-nautilus() {
     pkgdesc="Qubes OS Nautilus addons for inter-VM file copy/move/open"
     provides=(qubes-core-agent-nautilus=@VERSION@)
-    conflicts=('qubes-vm-core<4.3.26')
+    conflicts=('qubes-vm-core<4.3.27')
     depends=(
         bash
         python-gobject
