@@ -1,3 +1,19 @@
+qubes-core-agent (4.3.27-1) unstable; urgency=medium
+
+  [ 3np ]
+  * arch:  fix SPDX license
+  * chore(debian): remove duplicate depends
+  * chore(arch): remove duplicate depends
+  * qvm-features-request: unverbose logging of erroring qrexec calls
+  * arch: sort dependencies alphabetically
+  * debian: sort dependencies alphabetically
+  * arch: break out qubes-vm-nautilus from qubes-vm-core
+  * arch: bump qubes-vm-nautilus conflicts qubes-vm-core<4.3.26
+  * arch: break out qubes-vm-caja from qubes-vm-core
+  * arch: break out qubes-vm-thunar from qubes-vm-core
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 03 Jul 2025 16:00:41 +0200
+
 qubes-core-agent (4.3.26-1) unstable; urgency=medium
 
   [ Ben Grande ]
