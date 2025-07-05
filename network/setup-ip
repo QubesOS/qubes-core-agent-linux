@@ -201,14 +201,14 @@ configure_qubes_ns() {
     if [ -n "$primary_dns6" ]; then
         cat > /var/run/qubes/qubes-ns<< EOF
 NS1=$primary_dns6
-NS1=$secondary_dns6
+NS2=$secondary_dns6
 NS3=$primary_dns
 NS4=$secondary_dns
 EOF
     else
         cat > /var/run/qubes/qubes-ns<< EOF
 NS1=$primary_dns
-NS1=$secondary_dns
+NS2=$secondary_dns
 EOF
     fi
     /usr/lib/qubes/qubes-setup-dnat-to-ns
