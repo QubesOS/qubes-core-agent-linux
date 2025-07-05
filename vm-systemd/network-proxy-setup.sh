@@ -6,7 +6,7 @@
 
 # Setup gateway for all the VMs this NetVM is servicing...
 network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
-if [ "x$network" != "x" ]; then
+if [ -n "${network}" ]; then
 
     if [ -e /proc/sys/kernel ] && ! [ -e /proc/sys/kernel/modules_disabled ]; then
         readonly modprobe_fail_cmd='true'

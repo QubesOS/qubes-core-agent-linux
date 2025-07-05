@@ -26,7 +26,6 @@ import sys
 
 import dbus
 import qubesdb
-from typing import List
 from ipaddress import IPv4Address
 import os
 
