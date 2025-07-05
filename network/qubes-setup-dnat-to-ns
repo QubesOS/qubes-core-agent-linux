@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+from itertools import cycle
 import subprocess
 import sys
 
@@ -116,10 +117,7 @@ def install_firewall_rules(dns):
                 f"ip daddr {vm_nameserver} tcp dport 53 drop",
             ]
     else:
-        while len(qubesdb_dns) > len(dns_resolved):
-            # Ensure that upstream DNS pool is larger than qubesdb_dns pool
-            dns_resolved = dns_resolved + dns_resolved
-        for vm_nameserver, dest in zip(qubesdb_dns, dns_resolved):
+        for vm_nameserver, dest in zip(qubesdb_dns, cycle(dns_resolved)):
             dns_ = str(dest)
             rules += [
                 f"ip daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
