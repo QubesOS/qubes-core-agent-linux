@@ -135,7 +135,7 @@ def install_firewall_rules(dns):
                 break
             dns_ = str(dest)
             if dest is None or (vm_nameserver == dest and
-                                qdb.read('/qubes-ip') is None):
+                                qdb.read('/qubes-primary-dns') is None):
                 rules += [
                     f"ip daddr {vm_nameserver} tcp dport 53 reject with icmp type host-unreachable",
                     f"ip daddr {vm_nameserver} udp dport 53 reject with icmp type host-unreachable",
