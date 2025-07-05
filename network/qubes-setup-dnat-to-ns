@@ -80,7 +80,6 @@ def get_dns_resolved():
 def install_firewall_rules(dns):
     qdb = qubesdb.QubesDB()
     nft_cmd = []
-    is_changed = False
     dns_resolved = get_dns_resolved()
     for family in [4, 6]:
         ip46 = '6' if family == 6 else ''
@@ -148,11 +147,9 @@ def install_firewall_rules(dns):
         if old_rules == rules:
             continue
 
-        is_changed = True
-
         nft_cmd += [preamble, rules]
 
-    if not is_changed:
+    if not nft_cmd:
         sys.exit(100)
     os.execvp("nft", ("nft", "--", "\n".join(nft_cmd)))
 
