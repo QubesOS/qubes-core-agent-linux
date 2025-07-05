@@ -26,7 +26,7 @@ if [ -n "${network}" ]; then
         for ns in "${primary_dns}" "${secondary_dns}" "${primary_dns6}" "${secondary_dns6}"; do
             if [ -n "${ns}" ]; then
                 echo "NS${i}=${ns}"
-                ((i++))
+                i="$(( i+1 ))"
             fi
         done
     }
