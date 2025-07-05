@@ -14,28 +14,12 @@ if [ -n "${network}" ]; then
         readonly modprobe_fail_cmd='false'
     fi
 
-    gateway=$(qubesdb-read /qubes-netvm-gateway)
-    gateway6=$(qubesdb-read /qubes-netvm-gateway6 ||:)
-    #netmask=$(qubesdb-read /qubes-netvm-netmask)
-    primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
-    secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns ||:)
-    primary_dns6=$(qubesdb-read /qubes-netvm-primary-dns6 ||:)
-    secondary_dns6=$(qubesdb-read /qubes-netvm-secondary-dns6 ||:)
-    gen_ns_spec() {
-        i=1
-        for ns in "${primary_dns}" "${secondary_dns}" "${primary_dns6}" "${secondary_dns6}"; do
-            if [ -n "${ns}" ]; then
-                echo "NS${i}=${ns}"
-                i="$(( i+1 ))"
-            fi
-        done
-    }
     modprobe netbk 2> /dev/null || modprobe xen-netback || "${modprobe_fail_cmd}"
-    gen_ns_spec > /var/run/qubes/qubes-ns
-    /usr/lib/qubes/qubes-setup-dnat-to-ns
+    configure_qubes_ns
 
     echo "1" > /proc/sys/net/ipv4/ip_forward
     # enable also IPv6 forwarding, if IPv6 is enabled
+    gateway6=$(qubesdb-read /qubes-netvm-gateway6 ||:)
     if [ -n "$gateway6" ]; then
         echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
     fi
