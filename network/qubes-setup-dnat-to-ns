@@ -48,6 +48,7 @@ def get_dns_resolv_conf():
     return nameservers
 
 def get_dns_resolved():
+    dns = []
     try:
         bus = dbus.SystemBus()
     except dbus.exceptions.DBusException as s:
@@ -59,7 +60,7 @@ def get_dns_resolved():
                                   '/org/freedesktop/resolve1')
         dns = resolve1.Get('org.freedesktop.resolve1.Manager',
                            'DNS',
-                           dbus_interface='org.freedesktop.DBus.Properties')
+                           dbus_interface='org.freedesktop.DBus.Properties') or []
     except dbus.exceptions.DBusException as s:
         error = s.get_dbus_name()
         if error in (
