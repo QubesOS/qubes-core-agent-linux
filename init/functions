@@ -115,6 +115,25 @@ umount_retry() {
     return 0
 }
 
+configure_qubes_ns() {
+    get_nameserver_config > /var/run/qubes/qubes-ns
+    /usr/lib/qubes/qubes-setup-dnat-to-ns
+}
+
+get_nameserver_config() {
+  primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || qubesdb-read /qubes-netvm-gateway)
+  secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns ||:)
+  primary_dns6=$(qubesdb-read /qubes-netvm-primary-dns6 ||:)
+  secondary_dns6=$(qubesdb-read /qubes-netvm-secondary-dns6 ||:)
+  i=1
+  for ns in "${primary_dns}" "${secondary_dns}" "${primary_dns6}" "${secondary_dns6}"; do
+      if [ -n "${ns}" ]; then
+          echo "NS${i}=${ns}"
+          i="$(( i+1 ))"
+      fi
+  done
+}
+
 get_mac_from_iface() {
     local iface="$1"
     local mac=
