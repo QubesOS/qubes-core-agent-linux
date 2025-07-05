@@ -112,16 +112,18 @@ def install_firewall_rules(dns):
         # Or maybe user wants to enforce DNS-Over-HTTPS.
         # Drop IPv4 DNS requests to qubesdb_dns addresses.
         for vm_nameserver in qubesdb_dns:
+            vm_ns_ = str(vm_nameserver)
             rules += [
-                f"ip daddr {vm_nameserver} udp dport 53 drop",
-                f"ip daddr {vm_nameserver} tcp dport 53 drop",
+                f"ip daddr {vm_ns_} udp dport 53 drop",
+                f"ip daddr {vm_ns_} tcp dport 53 drop",
             ]
     else:
         for vm_nameserver, dest in zip(qubesdb_dns, cycle(dns_resolved)):
+            vm_ns_ = str(vm_nameserver)
             dns_ = str(dest)
             rules += [
-                f"ip daddr {vm_nameserver} udp dport 53 dnat to {dns_}",
-                f"ip daddr {vm_nameserver} tcp dport 53 dnat to {dns_}",
+                f"ip daddr {vm_ns_} udp dport 53 dnat to {dns_}",
+                f"ip daddr {vm_ns_} tcp dport 53 dnat to {dns_}",
             ]
     rules += ["}", "}"]
 
