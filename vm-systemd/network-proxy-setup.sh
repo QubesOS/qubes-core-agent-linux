@@ -6,7 +6,7 @@
 
 # Setup gateway for all the VMs this NetVM is servicing...
 network=$(qubesdb-read /qubes-netvm-network 2>/dev/null)
-if [ "x$network" != "x" ]; then
+if [ -n "${network}" ]; then
 
     if [ -e /proc/sys/kernel ] && ! [ -e /proc/sys/kernel/modules_disabled ]; then
         readonly modprobe_fail_cmd='true'
@@ -24,7 +24,7 @@ if [ "x$network" != "x" ]; then
     gen_ns_spec() {
         i=1
         for ns in "${primary_dns}" "${secondary_dns}" "${primary_dns6}" "${secondary_dns6}"; do
-            if [ "x${ns}" != "x" ]; then
+            if [ -n "${ns}" ]; then
                 echo "NS${i}=${ns}"
                 ((i++))
             fi
