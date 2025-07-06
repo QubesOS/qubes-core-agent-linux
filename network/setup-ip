@@ -179,12 +179,6 @@ __EOF__
 }
 
 configure_qubes_ns() {
-    gateway=$(qubesdb-read /qubes-netvm-gateway)
-    #netmask=$(qubesdb-read /qubes-netvm-netmask)
-    primary_dns=$(qubesdb-read /qubes-netvm-primary-dns 2>/dev/null || echo "$gateway")
-    secondary_dns=$(qubesdb-read /qubes-netvm-secondary-dns)
-    echo "NS1=$primary_dns" > /var/run/qubes/qubes-ns
-    echo "NS2=$secondary_dns" >> /var/run/qubes/qubes-ns
     ret=0
     /usr/lib/qubes/qubes-setup-dnat-to-ns || ret=$?
     [ "$ret" -eq 0 ] || [ "$ret" -eq 100 ] || exit "$ret"
