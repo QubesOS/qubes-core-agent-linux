@@ -60,6 +60,9 @@ def get_dns_resolved():
         dns = resolve1.Get('org.freedesktop.resolve1.Manager',
                            'DNS',
                            dbus_interface='org.freedesktop.DBus.Properties')
+        if dns is None:
+            return get_dns_resolv_conf()
+
     except dbus.exceptions.DBusException as s:
         error = s.get_dbus_name()
         if error in (
