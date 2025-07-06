@@ -27,7 +27,7 @@ import sys
 
 import dbus
 import qubesdb
-from ipaddress import IPv4Address
+from ipaddress import ip_address
 import os
 
 def get_dns_resolv_conf():
@@ -42,7 +42,7 @@ def get_dns_resolv_conf():
             if len(tokens) < 2 or tokens[0] != "nameserver":
                 continue
             try:
-                nameservers.append(IPv4Address(tokens[1]))
+                nameservers.append(ip_address(tokens[1]))
             except ValueError:
                 pass
     return nameservers
@@ -74,74 +74,88 @@ def get_dns_resolved():
         raise
     # Use global entries first
     dns.sort(key=lambda x: x[0] != 0)
-    # Only keep IPv4 entries. systemd-resolved is trusted to return valid
-    # addresses.
+    # systemd-resolved is trusted to return valid addresses.
     # ToDo: We only need abridged IPv4 DNS entries for ifindex == 0.
     # to ensure static DNS of disconnected network interfaces are not added.
-    return [IPv4Address(bytes(addr)) for ifindex, family, addr in dns
-            if family == 2]
+    return [ip_address(bytes(addr)) for ifindex, family, addr in dns]
 
 def install_firewall_rules(dns):
     qdb = qubesdb.QubesDB()
-    qubesdb_dns = []
-    for i in ('/qubes-netvm-primary-dns', '/qubes-netvm-secondary-dns'):
-        ns_maybe = qdb.read(i)
-        if ns_maybe is None:
-            continue
-        try:
-            qubesdb_dns.append(IPv4Address(ns_maybe.decode("ascii", "strict")))
-        except (UnicodeDecodeError, ValueError):
-            pass
-    preamble = [
-        'add table ip qubes',
-        # Add the chain so that the subsequent delete will work. If the chain already
-        # exists this is a harmless no-op.
-        'add chain ip qubes dnat-dns',
-        # Delete the chain so that if the chain already exists, it will be removed.
-        # The removal of the old chain and addition of the new one happen as a single
-        # atomic operation, so there is no period where neither chain is present or
-        # where both are present.
-        'delete chain ip qubes dnat-dns',
-    ]
-    rules = [
-        'table ip qubes {',
-        'chain dnat-dns {',
-        'type nat hook prerouting priority dstnat; policy accept;',
-    ]
+    nft_cmd = []
     dns_resolved = get_dns_resolved()
-    if not dns_resolved:
-        # User has no IPv4 DNS set in sys-net. Maybe IPv6 only environment.
-        # Or maybe user wants to enforce DNS-Over-HTTPS.
-        # Drop IPv4 DNS requests to qubesdb_dns addresses.
-        for vm_nameserver in qubesdb_dns:
-            vm_ns_ = str(vm_nameserver)
-            rules += [
-                f"ip daddr {vm_ns_} udp dport 53 drop",
-                f"ip daddr {vm_ns_} tcp dport 53 drop",
-            ]
-    else:
-        for vm_nameserver, dest in zip(qubesdb_dns, cycle(dns_resolved)):
-            vm_ns_ = str(vm_nameserver)
-            dns_ = str(dest)
-            rules += [
-                f"ip daddr {vm_ns_} udp dport 53 dnat to {dns_}",
-                f"ip daddr {vm_ns_} tcp dport 53 dnat to {dns_}",
-            ]
-    rules += ["}", "}"]
+    for family in [4, 6]:
+        ip46 = '6' if family == 6 else ''
+        dns_servers = [dns_ip for dns_ip in dns_resolved if dns_ip.version == family]
+        qubesdb_dns = []
+        for i in (f"/qubes-netvm-primary-dns{ip46}", f"/qubes-netvm-secondary-dns{ip46}"):
+            ns_maybe = qdb.read(i)
+            if ns_maybe is None:
+                continue
+            try:
+                qubesdb_dns.append(ip_address(ns_maybe.decode("ascii", "strict")))
+            except (UnicodeDecodeError, ValueError):
+                pass
+        preamble = [
+            f"add table ip{ip46} qubes",
+            # Add the chain so that the subsequent delete will work. If the chain already
+            # exists this is a harmless no-op.
+            f"add chain ip{ip46} qubes dnat-dns",
+            # Delete the chain so that if the chain already exists, it will be removed.
+            # The removal of the old chain and addition of the new one happen as a single
+            # atomic operation, so there is no period where neither chain is present or
+            # where both are present.
+            f"delete chain ip{ip46} qubes dnat-dns",
+        ]
+        rules = [
+            f"table ip{ip46} qubes {{",
+            'chain custom-dnat-dns {}',
+            'chain dnat-dns {',
+            'type nat hook prerouting priority dstnat; policy accept;',
+            'jump custom-dnat-dns',
+        ]
+        if not dns_servers:
+            # User has no DNS set in NetVM.
+            # Or maybe user wants to enforce DNS-Over-HTTPS.
+            # Drop DNS requests to qubesdb_dns addresses.
+            for vm_nameserver in qubesdb_dns:
+                vm_ns_ = str(vm_nameserver)
+                rules += [
+                    f"ip{ip46} daddr {vm_ns_} udp dport 53 drop",
+                    f"ip{ip46} daddr {vm_ns_} tcp dport 53 drop",
+                ]
+        else:
+            for (vm_nameserver, dest) in zip(qubesdb_dns, cycle(dns_servers)):
+                vm_ns_ = str(vm_nameserver)
+                dns_ = str(dest)
+                if dest is None or (vm_nameserver == dest and len(qubesdb_dns) == 0):
+                    rules += [
+                        f"ip{ip46} daddr {vm_ns_} tcp dport 53 reject with icmp{ip46} type host-unreachable",
+                        f"ip{ip46} daddr {vm_ns_} udp dport 53 reject with icmp{ip46} type host-unreachable",
+                    ]
+                else:
+                    rules += [
+                        f"ip{ip46} daddr {vm_ns_} udp dport 53 dnat to {dns_}",
+                        f"ip{ip46} daddr {vm_ns_} tcp dport 53 dnat to {dns_}",
+                    ]
+        rules += ["}", "}"]
 
-    # check if new rules are the same as the old ones - if so, don't reload
-    # and return that info via exit code
-    try:
-        old_rules = subprocess.check_output(
-            ["nft", "list", "chain", "ip", "qubes", "dnat-dns"]).decode().splitlines()
-    except subprocess.CalledProcessError:
-        old_rules = []
-    old_rules = [line.strip() for line in old_rules]
+        # check if new rules are the same as the old ones - if so, don't reload
+        # and return that info via exit code
+        try:
+            old_rules = subprocess.check_output(
+                ["nft", "list", "chain", f"ip{ip46}", "qubes", "dnat-dns"]).decode().splitlines()
+        except subprocess.CalledProcessError:
+            old_rules = []
+        old_rules = [line.strip() for line in old_rules]
 
-    if old_rules == rules:
+        if old_rules == rules:
+            continue
+
+        nft_cmd += [preamble, rules]
+
+    if not nft_cmd:
         sys.exit(100)
-
-    os.execvp("nft", ("nft", "--", "\n".join(preamble + rules)))
+    os.execvp("nft", ("nft", "--", "\n".join(nft_cmd)))
 
 if __name__ == '__main__':
     install_firewall_rules(get_dns_resolved())
