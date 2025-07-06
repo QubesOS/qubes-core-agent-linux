@@ -66,14 +66,15 @@ configure_network () {
         if [ -h /etc/resolv.conf ]; then
             rm -f /etc/resolv.conf
         fi
-        echo -n > /etc/resolv.conf
-        if ! qsvc disable-dns-server ; then
-            if [ -n "$primary_dns6" ]; then
-                echo "nameserver $primary_dns6" >> /etc/resolv.conf
-                echo "nameserver $secondary_dns6" >> /etc/resolv.conf
-            fi
-            echo "nameserver $primary_dns" >> /etc/resolv.conf
-            echo "nameserver $secondary_dns" >> /etc/resolv.conf
+        if qsvc disable-dns-server ; then
+            echo -n > /etc/resolv.conf
+        else
+            cat <<EOF | grep -v 'nameserver\s*$' > /etc/resolv.conf
+nameserver ${primary_dns6}
+nameserver ${secondary_dns6}
+nameserver ${primary_dns}
+nameserver ${secondary_dns}
+EOF
         fi
     fi
     if [ -x /usr/bin/resolvectl ] && \
