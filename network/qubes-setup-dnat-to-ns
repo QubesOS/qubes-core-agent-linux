@@ -21,13 +21,14 @@
 
 from __future__ import annotations
 
+from typing import List
 from itertools import cycle
 import subprocess
 import sys
 
 import dbus
 import qubesdb
-from ipaddress import ip_address
+from ipaddress import ip_address, IPv4Address, IPv6Address
 import os
 
 def get_dns_resolv_conf():
@@ -81,12 +82,12 @@ def get_dns_resolved():
 
 def install_firewall_rules():
     qdb = qubesdb.QubesDB()
-    nft_cmd = []
-    dns_resolved = get_dns_resolved()
+    nft_cmd: List[str] = []
+    dns_resolved: List[IPv4Address | IPv6Address] = get_dns_resolved()
     for family in [4, 6]:
         ip46 = '6' if family == 6 else ''
         dns_servers = [dns_ip for dns_ip in dns_resolved if dns_ip.version == family]
-        qubesdb_dns = []
+        qubesdb_dns: List[IPv4Address | IPv6Address] = []
         for i in (f"/qubes-netvm-primary-dns{ip46}", f"/qubes-netvm-secondary-dns{ip46}"):
             ns_maybe = qdb.read(i)
             if ns_maybe is None:
@@ -151,7 +152,7 @@ def install_firewall_rules():
         if old_rules == rules:
             continue
 
-        nft_cmd += [preamble, rules]
+        nft_cmd += [*preamble, *rules]
 
     if not nft_cmd:
         sys.exit(100)
