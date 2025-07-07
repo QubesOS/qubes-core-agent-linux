@@ -79,7 +79,7 @@ def get_dns_resolved():
     # to ensure static DNS of disconnected network interfaces are not added.
     return [ip_address(bytes(addr)) for ifindex, family, addr in dns]
 
-def install_firewall_rules(dns):
+def install_firewall_rules():
     qdb = qubesdb.QubesDB()
     nft_cmd = []
     dns_resolved = get_dns_resolved()
@@ -158,4 +158,4 @@ def install_firewall_rules(dns):
     os.execvp("nft", ("nft", "--", "\n".join(nft_cmd)))
 
 if __name__ == '__main__':
-    install_firewall_rules(get_dns_resolved())
+    install_firewall_rules()
