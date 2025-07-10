@@ -128,16 +128,10 @@ def install_firewall_rules():
             for (vm_nameserver, dest) in zip(qubesdb_dns, cycle(dns_servers)):
                 vm_ns_ = str(vm_nameserver)
                 dns_ = str(dest)
-                if dest is None or (vm_nameserver == dest and len(qubesdb_dns) == 0):
-                    rules += [
-                        f"ip{ip46} daddr {vm_ns_} tcp dport 53 reject with icmp{ip46} type host-unreachable",
-                        f"ip{ip46} daddr {vm_ns_} udp dport 53 reject with icmp{ip46} type host-unreachable",
-                    ]
-                else:
-                    rules += [
-                        f"ip{ip46} daddr {vm_ns_} udp dport 53 dnat to {dns_}",
-                        f"ip{ip46} daddr {vm_ns_} tcp dport 53 dnat to {dns_}",
-                    ]
+                rules += [
+                    f"ip{ip46} daddr {vm_ns_} udp dport 53 dnat to {dns_}",
+                    f"ip{ip46} daddr {vm_ns_} tcp dport 53 dnat to {dns_}",
+                ]
         rules += ["}", "}"]
 
         # check if new rules are the same as the old ones - if so, don't reload
