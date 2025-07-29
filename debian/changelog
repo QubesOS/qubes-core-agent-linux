@@ -1,3 +1,41 @@
+qubes-core-agent (4.2.43-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * Harden DNF config
+  * Pull in qubes-core-agent-network-manager when installing
+    NetworkManager
+  * Relabel / and /rw if needed
+
+  [ Kunal Mehta ]
+  * Support ptyxis in qubes-run-terminal
+
+  [ Ali Mirjamali ]
+  * Remove `hostname` dependency for Archlinux
+
+  [ Marek Marczykowski-Górecki ]
+  * archlinux: enable NetworkManager
+  * arch: fix creating marker-vm file
+  * archlinux: include nm-applet in network dependencies
+  * post-install: initialize version to empty value
+
+  [ Ali Mirjamali ]
+  * Allow `qubes-dom0-update --action=download`
+
+  [ Marek Marczykowski-Górecki ]
+  * archlinux: fix post-upgrade notify hook
+  * archlinux: /proc/xen is not relevant anymore
+  * archlinux: install qubes version of /etc/fstab
+
+  [ 3np ]
+  * arch:  fix SPDX license
+  * chore(debian): remove duplicate depends
+  * chore(arch): remove duplicate depends
+  * qvm-features-request: unverbose logging of erroring qrexec calls
+  * chore(qubes-setup-dnat-to-ns): remove unused import
+  * chore: use -n for empty-var-checks in shell
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 29 Jul 2025 17:29:37 +0200
+
 qubes-core-agent (4.2.42-1) unstable; urgency=medium
 
   [ Guillaume Chinal ]
