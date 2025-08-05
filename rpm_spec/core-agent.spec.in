@@ -122,7 +122,7 @@ Summary:    The QubesOS core files for VMs
 
 Group:      Qubes
 Vendor:     Invisible Things Lab
-License:    GPL
+License:    GPL-2.0-only
 URL:        https://www.qubes-os.org
 
 Requires:   xdg-utils
@@ -389,7 +389,7 @@ Thunar support for Qubes VM tools
 %package selinux
 BuildArch: noarch
 Summary:   SELinux policy for Qubes VMs
-License:   GPLv2+
+License:   GPL-2.0-or-later
 
 # The following is based on %%selinux_requires, which has the following license:
 # Copyright (C) 2017 Red Hat, Inc. All rights reserved.
@@ -1172,7 +1172,7 @@ rm -f %{name}-%{version}
 %if %with_sysvinit
 %package sysvinit
 Summary:        Qubes unit files for SysV init style or upstart
-License:        GPL v2 only
+License:        GPL-2.0-only
 Group:          Qubes
 Requires:       upstart
 Requires:       initscripts
@@ -1240,7 +1240,7 @@ fi
 
 %package systemd
 Summary:        Qubes unit files for SystemD init style
-License:        GPL v2 only
+License:        GPL-2.0-only
 Group:          Qubes
 Requires:       systemd
 %if !0%{?is_opensuse}
