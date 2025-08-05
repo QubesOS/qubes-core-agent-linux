@@ -265,7 +265,6 @@ DNF plugin for Qubes specific post-installation actions:
 %endif
 %endif
 
-%if 0%{?rhel} != 7
 %package caja
 Summary:    Qubes integration for Caja
 Requires:   qubes-core-agent = %{version}
@@ -282,7 +281,6 @@ BuildRequires: python-caja
 
 %description caja
 Caja addons for inter-VM file copy/move/open.
-%endif
 
 %package nautilus
 Summary:    Qubes integration for Nautilus
@@ -504,9 +502,7 @@ make -C misc "DESTDIR=$RPM_BUILD_ROOT" UDEVRULESDIR=%_udevrulesdir SYSLIBDIR=/us
 make -C network DESTDIR=$RPM_BUILD_ROOT install
 make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install install-rh
 make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
-%if 0%{?rhel} != 7
 make -C qubes-rpc/caja DESTDIR=$RPM_BUILD_ROOT install
-%endif
 %if !0%{?is_opensuse}
 make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install-kde4
 %endif
@@ -519,11 +515,8 @@ make -C package-managers PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT install ins
 %else
 make -C package-managers PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT install install-dnf
 %endif
-%if 0%{?rhel} == 7
-make -C package-managers DESTDIR=$RPM_BUILD_ROOT install-yum
-%endif
 
-%if 0%{?rhel} >= 7
+%if 0%{?rhel} >= 8
 sed -i \
         -e 's:-primary:-centos:' \
         -e 's:/fc:/centos:' \
@@ -983,10 +976,6 @@ rm -f %{name}-%{version}
 /etc/dnf/libdnf5-plugins/actions.d/qubes-post-update.actions
 /etc/dnf/libdnf5.conf.d/10-qubes.conf
 %else
-%if 0%{?rhel} == 7
-/etc/yum/pluginconf.d/yum-qubes-hooks.conf
-/usr/lib/yum-plugins/yum-qubes-hooks.py*
-%endif
 %config(noreplace) /etc/dnf/plugins/qubes-hooks.conf
 %endif
 %dir /etc/dconf/db/local.d
@@ -1105,12 +1094,10 @@ rm -f %{name}-%{version}
 %endif
 %endif
 
-%if 0%{?rhel} != 7
 %files caja
 /usr/share/caja-python/extensions/qvm_copy_caja.py*
 /usr/share/caja-python/extensions/qvm_move_caja.py*
 /usr/share/caja-python/extensions/qvm_dvm_caja.py*
-%endif
 
 %files nautilus
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
