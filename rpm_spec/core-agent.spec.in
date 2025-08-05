@@ -23,12 +23,6 @@
 %define qubes_services qubes-core qubes-core-netvm qubes-core-early qubes-firewall qubes-iptables qubes-updates-proxy qubes-updates-proxy-forwarder
 %define qubes_preset_file 75-qubes-vm.preset
 
-# systemd is used in Fedora and CentOS
-%if 0%{?fedora} || 0%{?rhel} || 0%{?is_opensuse}
-%define with_sysvinit 0
-%else
-%define with_sysvinit 1
-%endif
 %bcond_without selinux
 
 %if 0%{?rhel} == 8
@@ -523,9 +517,7 @@ sed -i \
         $RPM_BUILD_ROOT/etc/yum.repos.d/qubes-*.repo
 %endif
 
-%if ! %with_sysvinit
     rm -rf $RPM_BUILD_ROOT/etc/init.d/qubes-* $RPM_BUILD_ROOT/etc/sysconfig/modules/qubes-core.modules
-%endif
 
 %if 0%{?is_opensuse}
 # no dhclient there
@@ -1169,75 +1161,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/sudoers.d/qubes
 %config(noreplace) /etc/pam.d/su.qubes
 
-%if %with_sysvinit
-%package sysvinit
-Summary:        Qubes unit files for SysV init style or upstart
-License:        GPL-2.0-only
-Group:          Qubes
-Requires:       upstart
-Requires:       initscripts
-Requires:       qubes-core-agent = %{version}
-Requires:       qubes-core-qrexec-vm
-Requires:       qubes-core-agent-networking = %{version}
-Provides:       qubes-core-agent-init-scripts
-Conflicts:      qubes-core-agent-systemd
-Provides:       qubes-core-vm-sysvinit = %{version}-%{release}
-Obsoletes:      qubes-core-vm-sysvinit < 4.0.0
-
-%description sysvinit
-The Qubes core startup configuration for SysV init (or upstart).
-
-%files sysvinit
-/etc/init.d/qubes-sysinit
-/etc/init.d/qubes-core-early
-/etc/init.d/qubes-core
-/etc/init.d/qubes-core-netvm
-/etc/init.d/qubes-firewall
-/etc/init.d/qubes-iptables
-/etc/init.d/qubes-updates-proxy
-/etc/init.d/qubes-updates-proxy-forwarder
-/etc/sysconfig/modules/qubes-core.modules
-
-%post sysvinit
-
-#echo "--> Turning off unnecessary services..."
-# FIXME: perhaps there is more elegant way to do this?
-for f in /etc/init.d/*
-do
-        srv=`basename $f`
-        [ $srv = 'functions' ] && continue
-        [ $srv = 'killall' ] && continue
-        [ $srv = 'halt' ] && continue
-        [ $srv = 'single' ] && continue
-        [ $srv = 'reboot' ] && continue
-        [ $srv = 'qubes-gui' ] && continue
-        chkconfig $srv off
-done
-
-#echo "--> Enabling essential services..."
-chkconfig rsyslog on
-chkconfig haldaemon on
-chkconfig messagebus on
-for svc in %qubes_services ; do
-    if [ "$1" = 1 ] ; then
-        chkconfig --add $svc || echo "WARNING: Cannot add service $svc!"
-    else
-        chkconfig $svc resetpriorities || echo "WARNING: Cannot reset priorities of service $svc!"
-    fi
-done
-
-# TODO: make this not display the silly message about security context...
-sed -i 's/^id:.:initdefault:/id:3:initdefault:/' /etc/inittab
-
-%preun sysvinit
-if [ "$1" = 0 ] ; then
-    # no more packages left
-    for svc in %qubes_services ; do
-        chkconfig --del $svc
-    done
-fi
-%endif
-
 %package systemd
 Summary:        Qubes unit files for SystemD init style
 License:        GPL-2.0-only
@@ -1250,7 +1173,6 @@ Requires(postun): systemd-units
 %endif
 Requires:       qubes-core-agent = %{version}
 Provides:       qubes-core-agent-init-scripts
-Conflicts:      qubes-core-agent-sysvinit
 Provides:       qubes-core-vm-systemd = %{version}-%{release}
 Obsoletes:      qubes-core-vm-systemd < 4.0.0
 Conflicts:      qubes-gui-agent < 4.1.0
