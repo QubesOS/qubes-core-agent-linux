@@ -1,3 +1,31 @@
+qubes-core-agent (4.3.28-1) unstable; urgency=medium
+
+  [ 3np ]
+  * chore(qubes-setup-dnat-to-ns): remove unused import
+  * chore: use -n for empty-var-checks in shell
+  * perf(network-agent): use cycle instead of manually doubling
+    nameserver list for zip
+  * chore(network-agent): consistently memoize ip_address
+    stringification
+  * network: remove redundant qubesdb-read calls and /run/qubes/qubes-ns
+  * fix(qubes-setup-dnat-to-ns): handle null dns dbus response as error
+
+  [ Yanase Yuki ]
+  * tinyproxy: drop unused configs
+  * tinyproxy: drop no longer needed wrapper
+
+  [ 3np ]
+  * arch: qubes-vm-* provide qubes-core-agent-*
+  * tinyproxy: hardcode /usr/bin/tinyproxy path
+
+  [ Yanase Yuki ]
+  * rpm: drop RHEL 7 support
+  * rpm: use SPDX identifier for License fields
+  * rpm: drop sysvinit support
+  * boot: move qubes-serial-login to /usr/bin
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 07 Aug 2025 03:10:16 +0200
+
 qubes-core-agent (4.3.27-1) unstable; urgency=medium
 
   [ 3np ]
