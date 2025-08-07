@@ -982,7 +982,7 @@ rm -f %{name}-%{version}
 /usr/lib/sysctl.d/20-qubes-core.conf
 %_udevrulesdir/50-qubes-mem-hotplug.rules
 %_unitdir/user@.service.d/90-session-stop-timeout.conf
-/usr/sbin/qubes-serial-login
+%_bindir/qubes-serial-login
 %_bindir/qvm-copy-to-vm
 %_bindir/qvm-move-to-vm
 %_bindir/qvm-copy
