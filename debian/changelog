@@ -1,3 +1,9 @@
+qubes-core-agent (4.3.29-1) unstable; urgency=medium
+
+  * Do not start xfce4-notifyd anymore on newer distros
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 08 Aug 2025 02:29:27 +0200
+
 qubes-core-agent (4.3.28-1) unstable; urgency=medium
 
   [ 3np ]
