@@ -13,6 +13,8 @@ elif [ -f "$DOM0_UPDATES_DIR/etc/yum.conf" ]; then
 fi
 # DNF uses /etc/yum.repos.d, even when --installroot is specified
 OPTS+=("--setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d")
+# DNF does not find the right vars dir automatically when --installroot is used
+OPTS+=("--setopt=varsdir=$DOM0_UPDATES_DIR/etc/yum/vars")
 CLEAN_OPTS=("${OPTS[@]}")
 # DNF verifies signatures implicitly, but yumdownloader does not.
 SIGNATURE_REGEX=""
