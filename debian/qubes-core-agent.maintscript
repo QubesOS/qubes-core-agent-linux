@@ -1,3 +1,4 @@
 rm_conffile /etc/apt/apt.conf.d/00notiy-hook
 rm_conffile /etc/tinyproxy/filter-updates
+mv_conffile /etc/tinyproxy/updates-blacklist /etc/tinyproxy/updates-blocklist qubes-whonix #TODO: fill in version
 rm_conffile /etc/systemd/system/haveged.service
