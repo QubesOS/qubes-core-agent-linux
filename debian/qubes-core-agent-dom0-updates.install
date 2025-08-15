@@ -2,4 +2,6 @@ etc/qubes-rpc/qubes.TemplateSearch
 etc/qubes-rpc/qubes.TemplateDownload
 usr/lib/qubes/qvm-template-repo-query
 usr/lib/qubes/qubes-download-dom0-updates.sh
+usr/lib/qubes/qubes-download-dom0-updates-init.sh
+usr/lib/qubes/qubes-download-dom0-updates-finish.sh
 usr/lib/qubes/dnf-plugins/downloadurl.py

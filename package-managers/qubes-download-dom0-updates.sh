@@ -14,8 +14,6 @@ fi
 # DNF uses /etc/yum.repos.d, even when --installroot is specified
 OPTS+=("--setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d")
 CLEAN_OPTS=("${OPTS[@]}")
-# DNF verifies signatures implicitly, but yumdownloader does not.
-SIGNATURE_REGEX=""
 PKGLIST=()
 
 # Executable (yum or dnf)
@@ -76,8 +74,8 @@ if type dnf >/dev/null 2>&1 || type dnf5 >/dev/null 2>&1; then
     fi
     UPDATE_ARGUMENTS+=(--noplugins -y)
     CLEAN_OPTS+=(--noplugins -y)
-    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q best && UPDATE_ARGUMENTS+=(--best)
-    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q allowerasing && UPDATE_ARGUMENTS+=(--allowerasing)
+    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help 2>/dev/null | grep -q best && UPDATE_ARGUMENTS+=(--best)
+    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help 2>/dev/null | grep -q allowerasing && UPDATE_ARGUMENTS+=(--allowerasing)
     if [ "$UPDATE_CMD" = "dnf5" ] && [ "$CHECK_ONLY" = "1" ]; then
         UPDATE_ACTION=check-upgrade
     fi
@@ -91,33 +89,11 @@ if ! [ -d "$DOM0_UPDATES_DIR" ]; then
     exit 1
 fi
 
-mkdir -p $DOM0_UPDATES_DIR/etc
-
-# remove converted sqlite db if legacy db is newer, to force conversion again
-# legacy db could be only in the /var/lib/rpm location, but sqlite could be in any
-if [ -e "$DOM0_UPDATES_DIR/var/lib/rpm/rpmdb.sqlite" ] && \
-       [ "$DOM0_UPDATES_DIR/var/lib/rpm/Packages" -nt "$DOM0_UPDATES_DIR/var/lib/rpm/rpmdb.sqlite" ]; then
-    rm -f -- "$DOM0_UPDATES_DIR/var/lib/rpm/rpmdb.sqlite"*
-elif [ -e "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm/rpmdb.sqlite" ] && \
-         [ "$DOM0_UPDATES_DIR/var/lib/rpm/Packages" -nt "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm/rpmdb.sqlite" ]; then
-    # remove the whole directory, to make the logic below happy
-    rm -rf -- "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm"
+"$(dirname "$0")/qubes-download-dom0-updates-init.sh" ; RETCODE=$?
+if [ $RETCODE -ne 0 ]; then
+    echo "qubes-download-dom0-updates-init.sh failed with exit code ${RETCODE}!" >&2
+    exit $RETCODE
 fi
-
-# Check if we need to copy rpmdb somewhere else
-DOM0_DBPATH=/var/lib/rpm
-if [ -d "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm" ] && ! [ -L "$DOM0_UPDATES_DIR/usr/lib/sysimage/rpm" ]; then
-    DOM0_DBPATH=/usr/lib/sysimage/rpm
-fi
-DBPATH=$(rpm --eval '%{_dbpath}')
-if [ ! "$DBPATH" = "$DOM0_DBPATH" ]; then
-    mkdir -p "$DOM0_UPDATES_DIR$DBPATH"
-    rm -rf -- "$DOM0_UPDATES_DIR$DBPATH"
-    cp -r "$DOM0_UPDATES_DIR$DOM0_DBPATH" "$DOM0_UPDATES_DIR$DBPATH"
-fi
-# Rebuild rpm database in case of different rpm version
-rm -f -- "$DOM0_UPDATES_DIR$DBPATH"/__*
-rpm --root=$DOM0_UPDATES_DIR --rebuilddb
 
 if [ "$CLEAN" = "1" ]; then
     # shellcheck disable=SC2086
@@ -168,41 +144,5 @@ set -e
 
 "${UPDATE_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}"
 
-find "$DOM0_UPDATES_DIR/var/cache" -name '*.rpm' -print0 2>/dev/null |\
-    xargs -0 -r ln -f -t "$DOM0_UPDATES_DIR/packages/"
-
-if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
-    if [ -n "$SIGNATURE_REGEX" ]; then
-        rpmkeys_error=0
-        for pkg in "$DOM0_UPDATES_DIR"/packages/*.rpm; do
-            rpmkeys_exit_code=0
-            output="$(rpmkeys --root "$DOM0_UPDATES_DIR" --checksig "$pkg")" \
-                || rpmkeys_exit_code="$?"
-            if [ ! "$rpmkeys_exit_code" = "0" ]; then
-                echo "ERROR: could not verify $pkg" >&2
-                rpmkeys_error=1
-                rm "$pkg"
-            elif ! echo "$output" |grep -Pq "$SIGNATURE_REGEX"; then
-                echo "ERROR: missing or invalid signature for $pkg" >&2
-                rpmkeys_error=1
-                rm "$pkg"
-            else
-                echo "Successfully verified $pkg" >&2
-            fi
-        done
-        if [ ! "$rpmkeys_error" = "0" ]; then
-            echo "ERROR: could not verify one or more packages" >&2
-            exit 1
-        fi
-    fi
-
-    cmd="/usr/lib/qubes/qrexec-client-vm dom0 qubes.ReceiveUpdates /usr/lib/qubes/qfile-agent"
-    qrexec_exit_code=0
-    $cmd "$DOM0_UPDATES_DIR"/packages/*.rpm || { qrexec_exit_code=$? ; true; };
-    if [ ! "$qrexec_exit_code" = "0" ]; then
-        echo "'$cmd $DOM0_UPDATES_DIR/packages/*.rpm' failed with exit code ${qrexec_exit_code}!" >&2
-        exit "$qrexec_exit_code"
-    fi
-else
-    echo "No packages downloaded" >&2
-fi
+"$(dirname "$0")/qubes-download-dom0-updates-finish.sh" ; RETCODE=$?
+exit $RETCODE
