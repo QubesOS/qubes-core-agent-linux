@@ -15,6 +15,7 @@ etc/qubes-rpc/qubes.DetachPciDevice
 etc/qubes-rpc/qubes.Filecopy
 etc/qubes-rpc/qubes.GetAppmenus
 etc/qubes-rpc/qubes.GetImageRGBA
+etc/qubes-rpc/qubes.GetMem
 etc/qubes-rpc/qubes.InstallUpdatesGUI
 etc/qubes-rpc/qubes.OpenInVM
 etc/qubes-rpc/qubes.OpenURL

@@ -1,0 +1,9 @@
+#!/bin/sh
+# Return percentage of available memory.
+set -eu
+awk -- '
+  BEGIN {total=0; available=0}
+  /MemTotal/ {total=$2}
+  /MemAvailable/ {available=$2}
+  END {printf "%.0f", (available/total)*100}
+  ' /proc/meminfo
