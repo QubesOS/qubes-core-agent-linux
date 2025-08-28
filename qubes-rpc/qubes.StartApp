@@ -1,6 +1,8 @@
 #!/usr/bin/python3 --
 
 import sys, os, pwd
+import hashlib
+import base64
 import qubesdb
 from qubesagent.xdg import launch
 from xdg.BaseDirectory import xdg_data_dirs
@@ -12,7 +14,22 @@ def main(argv):
         print('This service requires an argument', file=sys.stderr)
         sys.exit(1)
     qubes_db = qubesdb.QubesDB()
-    if qubes_db.read('/qubes-service/app-dispvm.' + arg) is not None:
+    # replace default file handlers to open files in disposables
+    force_open_dvm = False
+    arg_hash = (
+        base64.urlsafe_b64encode(hashlib.sha256(arg.encode()).digest())
+        .decode()
+        .rstrip("=")
+    )
+    if qubes_db.read("/hash-app-dispvm/" + arg_hash) == arg:
+        force_open_dvm = True
+    # legacy entry, for short app names only
+    if (
+        len(arg) <= 37
+        and qubes_db.read("/qubes-service/app-dispvm." + arg) is not None
+    ):
+        force_open_dvm = True
+    if force_open_dvm:
         for bad_var in ('XDG_DATA_HOME', 'GNOME_DESKTOP_SESSION_ID'):
             try:
                 del os.environ[bad_var]
