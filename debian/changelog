@@ -1,3 +1,10 @@
+qubes-core-agent (4.3.30-1) unstable; urgency=medium
+
+  * Fix handling long application names in qubes.StartApp service
+  * rpm: skip systemctl daemon-reload if systemd is not running
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 31 Aug 2025 15:18:01 +0200
+
 qubes-core-agent (4.3.29-1) unstable; urgency=medium
 
   * Do not start xfce4-notifyd anymore on newer distros
