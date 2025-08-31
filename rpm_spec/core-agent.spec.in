@@ -1368,7 +1368,7 @@ then
     changed=true
 fi
 
-if [ "x$changed" != "x" ]
+if [ "x$changed" != "x" ] && [ -e /run/systemd/system ]
 then
     systemctl daemon-reload
 fi
@@ -1398,7 +1398,7 @@ then
     changed=true
 fi
 
-if [ "x$changed" != "x" ]
+if [ "x$changed" != "x" ] && [ -e /run/systemd/system ]
 then
     systemctl daemon-reload
 fi
