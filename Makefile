@@ -157,7 +157,8 @@ install-systemd: install-init
 		$(DESTDIR)$(SYSLIBDIR)/modules-load.d \
 		$(DESTDIR)/etc/systemd/system \
 		$(DESTDIR)$(SYSLIBDIR)/systemd/network \
-		$(DESTDIR)$(SYSLIBDIR)/systemd/resolved.conf.d/
+		$(DESTDIR)$(SYSLIBDIR)/systemd/resolved.conf.d/ \
+		$(DESTDIR)$(SYSLIBDIR)/systemd/user-environment-generators
 	install -m 0644 $(SYSTEMD_CORE_SERVICES) $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/qubes-*.timer $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0644 vm-systemd/75-qubes-vm.preset $(DESTDIR)$(SYSLIBDIR)/systemd/system-preset/
@@ -166,6 +167,7 @@ install-systemd: install-init
 	install -m 0644 vm-systemd/80-qubes-vif.link $(DESTDIR)$(SYSLIBDIR)/systemd/network/
 	install -m 0644 vm-systemd/30_resolved-no-mdns-or-llmnr.conf $(DESTDIR)$(SYSLIBDIR)/systemd/resolved.conf.d/
 	install -m 0644 vm-systemd/home.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+	install -m 0755 vm-systemd/user-environment-generators/30-qubes.sh $(DESTDIR)$(SYSLIBDIR)/systemd/user-environment-generators/30-qubes.sh
 	install -m 0644 vm-systemd/usr-local.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 
 .PHONY: install-sysvinit
