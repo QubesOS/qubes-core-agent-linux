@@ -76,8 +76,8 @@ if type dnf >/dev/null 2>&1 || type dnf5 >/dev/null 2>&1; then
     fi
     UPDATE_ARGUMENTS+=(--noplugins -y)
     CLEAN_OPTS+=(--noplugins -y)
-    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q best && UPDATE_ARGUMENTS+=(--best)
-    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q allowerasing && UPDATE_ARGUMENTS+=(--allowerasing)
+    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help 2>/dev/null | grep -q -- '--best' && UPDATE_ARGUMENTS+=(--best)
+    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help 2>/dev/null | grep -q -- '--allowerasing' && UPDATE_ARGUMENTS+=(--allowerasing)
     if [ "$UPDATE_CMD" = "dnf5" ] && [ "$CHECK_ONLY" = "1" ]; then
         UPDATE_ACTION=check-upgrade
     fi
