@@ -193,6 +193,7 @@ Obsoletes:  qubes-core-vm-doc < 4.0.0
 Conflicts:  qubes-gui-agent < 4.1.6
 Conflicts:  pulseaudio-qubes < 4.2.0
 Provides:   group(qubes)
+Requires(post): dosfstools
 Requires(pre): shadow
 Requires(pre): qubes-db
 BuildRequires: gcc
@@ -583,6 +584,15 @@ if [ -L /usr/local ]; then
     rm -f /usr/local
     mkdir /usr/local
     mount /usr/local || :
+fi
+
+rootdev=$(grep -o '^[^ ]* / ' /proc/mounts | cut -f 1 -d ' ') || rootdev=
+# if root volume uses partitions, and is mounted directly (no dm-snapshot),
+# check if xvda1 needs filesystem to be created
+if [ -n "$rootdev" ] && [ "$(readlink -f "$rootdev")" = "/dev/xvda3" ]; then
+    if [ -z "$(blkid -o value -s TYPE /dev/xvda1)" ]; then
+        mkfs.vfat -S 4096 -n EFI /dev/xvda1 || echo "Creating EFI fs failed: 'mkfs.vfat -S 4096 -n EFI /dev/xvda1': $?" >&2
+    fi
 fi
 
 %if 0%{?fedora} < 41
