@@ -1255,6 +1255,7 @@ The Qubes core startup configuration for SystemD init.
 %_userunitdir/gvfs-daemon.service.d/30_qubes.conf
 %_userunitdir/pipewire.service.d/40_minimal.conf
 %_userunitdir/wireplumber.service.d/30_qubes.conf
+/usr/lib/systemd/user-environment-generators/30-qubes.sh
 
 %post systemd
 
