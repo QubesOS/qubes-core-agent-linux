@@ -166,6 +166,16 @@ case "${1}" in
             mount /usr/local || :
         fi
 
+        rootdev=$(grep -o '^[^ ]* / ' /proc/mounts | cut -f 1 -d ' ') || rootdev=
+        # if root volume uses partitions, and is mounted directly (no dm-snapshot),
+        # check if xvda1 needs filesystem to be created
+        if [ -n "$rootdev" ] && [ "$(readlink -f "$rootdev")" = "/dev/xvda3" ]; then
+            if [ -z "$(blkid -o value -s TYPE /dev/xvda1)" ]; then
+                mkfs.vfat -S 4096 -n EFI /dev/xvda1 || \
+                    echo "Creating EFI fs failed: 'mkfs.vfat -S 4096 -n EFI /dev/xvda1': $?" >&2
+            fi
+        fi
+
         # remove old symlinks
         if [ -L /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service ]; then
             rm /etc/systemd/system/sysinit.target.wants/qubes-random-seed.service

@@ -31,6 +31,7 @@ Depends:
     dconf-cli,
     distro-info-data,
     dmsetup,
+    dosfstools,
     e2fsprogs,
     gawk,
     graphicsmagick,
