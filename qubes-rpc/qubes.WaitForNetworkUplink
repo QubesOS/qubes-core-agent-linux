@@ -1,0 +1,21 @@
+#!/bin/bash
+# Wait with a timeout for the uplink service to be started. Used on deferred netvm.
+set -eu
+
+# shellcheck disable=SC1091
+. /usr/lib/qubes/init/functions
+iface="$(get_qubes_managed_iface)"
+if test -z "$iface"; then
+  exit
+fi
+
+i=0
+while test $i -le 10; do
+  if systemctl is-active --quiet "qubes-network-uplink@$iface.service"; then
+    ip link show "$iface" | grep "state UP" || exit 4
+    exit 0
+  fi
+  sleep 0.3
+  i=$((i+1))
+done
+exit 3
