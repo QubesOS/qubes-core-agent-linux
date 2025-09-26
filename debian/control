@@ -117,6 +117,16 @@ Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for Thunar
  Thunar addons for inter-VM file copy/move/open.
 
+Package: qubes-core-agent-pcmanfm-qt
+Architecture: any
+Depends:
+    pcmanfm-qt,
+    qubes-core-qrexec,
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
+Description: Qubes integration for PCManFM-Qt
+ PCManFM-Qt addons for inter-VM file copy/move/open.
+
 Package: qubes-core-agent-dom0-updates
 Architecture: any
 Depends:

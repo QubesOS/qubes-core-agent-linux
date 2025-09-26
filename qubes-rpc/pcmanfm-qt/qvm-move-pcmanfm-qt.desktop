@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Action
+Name=Move to other qube
+Icon=stock_folder-move
+Profiles=on_item;
+
+[X-Action-Profile on_item]
+MimeTypes=*;
+Exec=/usr/lib/qubes/qvm-actions.sh move %F

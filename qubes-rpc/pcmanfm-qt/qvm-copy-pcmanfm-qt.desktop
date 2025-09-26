@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Action
+Name=Copy to other qube
+Icon=stock_folder-copy
+Profiles=on_item;
+
+[X-Action-Profile on_item]
+MimeTypes=*;
+Exec=/usr/lib/qubes/qvm-actions.sh copy %F

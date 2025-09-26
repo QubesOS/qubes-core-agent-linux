@@ -1,0 +1,6 @@
+usr/share/file-manager/actions/qvm-copy-pcmanfm-qt.desktop
+usr/share/file-manager/actions/qvm-edit-dvm-pcmanfm-qt.desktop
+usr/share/file-manager/actions/qvm-move-pcmanfm-qt.desktop
+usr/share/file-manager/actions/qvm-open-pcmanfm-qt.desktop
+usr/share/file-manager/actions/qvm-open-dvm-pcmanfm-qt.desktop
+etc/xdg/pcmanfm-qt/default/settings.conf

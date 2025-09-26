@@ -33,6 +33,14 @@ case "$action" in
     openvm)
         for file in "$@"
         do
+            if [ -d "$file" ];
+            then
+                zenity --notification --text "Directory $file found, cannot open directories in other VMs." --timeout 3 &
+                exit 1
+            fi
+        done
+        for file in "$@"
+        do
             #shellcheck disable=SC2016
             qvm-open-in-vm '@default' "$file" | zenity --notification --text "Opening $file in qube..." --timeout 3 &
         done
@@ -40,10 +48,26 @@ case "$action" in
     opendvm)
         for file in "$@"
         do
+            if [ -d "$file" ];
+            then
+                zenity --notification --text "Directory $file found, cannot open directories in other VMs." --timeout 3 &
+                exit 1
+            fi
+        done
+        for file in "$@"
+        do
             qvm-open-in-dvm "$file" | zenity --notification --text "Opening $file in disposable qube..." --timeout 3 &
         done
         ;;
     viewdvm)
+        for file in "$@"
+        do
+            if [ -d "$file" ];
+            then
+                zenity --notification --text "Directory $file found, cannot open directories in other VMs." --timeout 3 &
+                exit 1
+            fi
+        done
         for file in "$@"
         do
             qvm-open-in-dvm --view-only "$file" | zenity --notification --text "Opening $file in disposable qube..." --timeout 3 &

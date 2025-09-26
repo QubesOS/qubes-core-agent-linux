@@ -30,6 +30,7 @@ override_dh_auto_install:
 	make -C qubes-rpc/kde install
 	make -C qubes-rpc/nautilus install
 	make -C qubes-rpc/thunar install
+	make -C qubes-rpc/pcmanfm-qt install
 	make -C boot install GRUBCFGNAME=grub.d/30-qubes.cfg
 
 override_dh_fixperms:

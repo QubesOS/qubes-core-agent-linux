@@ -180,6 +180,7 @@ usr/lib/qubes/qopen-in-vm
 usr/lib/qubes/qubes-sync-clock
 usr/lib/qubes/qrun-in-vm
 usr/lib/qubes/qubes-trigger-sync-appmenus.sh
+usr/lib/qubes/qvm-actions.sh
 usr/lib/qubes/qvm-copy-to-vm.gnome
 usr/lib/qubes/qvm-copy-to-vm.kde
 usr/lib/qubes/qvm-move-to-vm.gnome

@@ -53,6 +53,7 @@ install:
 	$(LN) qvm-copy $(DESTDIR)$(BINDIR)/qvm-copy-to-vm
 	install -d $(DESTDIR)$(QUBESLIBDIR)
 	install -t $(DESTDIR)$(QUBESLIBDIR) qvm-copy-to-vm.gnome
+	install -t $(DESTDIR)$(QUBESLIBDIR) qvm-actions.sh
 	$(LN) qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-move-to-vm.gnome
 	$(LN) qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-copy-to-vm.kde
 	$(LN) qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-move-to-vm.kde
