@@ -56,6 +56,7 @@ for i in "${apps_dirs[@]}"; do
      /^\[/ { if (tolower($0) != "\[desktop entry\]") nextfile }
      /^Exec *=/ { entry = entry file ":Exec=qubes-desktop-run " file "\n"; next }
      /^NoDisplay *= *true$/ { entry=""; nextfile }
+     /^Categories *= *Screensaver;$/ { entry=""; nextfile }
      /=/ { entry = entry file ":" $0 "\n" }
      ENDFILE { print entry }
      ' 2> /dev/null '{}' +)
