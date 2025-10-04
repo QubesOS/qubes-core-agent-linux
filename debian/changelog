@@ -1,3 +1,13 @@
+qubes-core-agent (4.3.32-1) unstable; urgency=medium
+
+  [ Aaron Rainbolt ]
+  * Add qubes-core-agent-pcmanfm-qt integration package
+
+  [ Ali Mirjamali ]
+  * Exclude ScreenSavers from available Applications
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 04 Oct 2025 13:46:41 +0200
+
 qubes-core-agent (4.3.31-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
