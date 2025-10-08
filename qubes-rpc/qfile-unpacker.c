@@ -103,7 +103,7 @@ int main(int argc, char ** argv)
     char *procdir_path;
     int procfs_fd;
     int i, ret;
-    int flags = COPY_ALLOW_SYMLINKS | COPY_ALLOW_DIRECTORIES;
+    int flags = COPY_ALLOW_SYMLINKS | COPY_ALLOW_DIRECTORIES | COPY_ALLOW_NON_CANONICAL_SYMLINKS;
     if (argc < 1)
         errx(EXIT_FAILURE, "NULL argv[0] passed to execve()");
     if (argc >= 3 && argv[1][0] >= '0' && argv[1][0] <= '9') {
