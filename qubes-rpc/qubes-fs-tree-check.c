@@ -287,10 +287,12 @@ int main(int argc, char **argv)
         size_t bname_len = strlen(bname);
         if (bname_len < 3 && memcmp("..", bname, bname_len) == 0)
             errx(1, "Refusing to copy path with basename empty, ., or ..");
+        if (bname[0] == '/')
+            errx(1, "Refusing to copy root directory");
         int dir_fd = open(dname, O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOCTTY);
         if (dir_fd < 0)
             err(1, "open(%s)", escaped);
-        if (process_dirent(bname, dir_fd, flags, argv[i], ignore_symlinks,
+        if (process_dirent(bname, dir_fd, flags, bname, ignore_symlinks,
                     escaped, &size))
             bad = true;
         free(dup2);
