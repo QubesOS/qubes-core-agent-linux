@@ -146,7 +146,8 @@ process_dirent(const char *d_name, int fd, int flags, const char *name,
     // charset checks done already, do not repeat them
     if (qubes_pure_validate_symbolic_link_v2((const uint8_t *)name,
                                              (const uint8_t *)buf,
-                                             QUBES_PURE_ALLOW_UNSAFE_CHARACTERS) < 0)
+                                             QUBES_PURE_ALLOW_UNSAFE_CHARACTERS |
+                                             QUBES_PURE_ALLOW_NON_CANONICAL_SYMLINKS) < 0)
         errx(1, "Refusing to copy unsafe symbolic link %s", escaped);
     free(buf);
     return bad;
