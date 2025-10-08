@@ -271,13 +271,14 @@ int main(int argc, char **argv)
     bool bad = false;
     unsigned long long size = 0;
     for (int i = optind; i < argc; ++i) {
-        size_t len = strlen(argv[i]) + 1;
-        if (len < 4 && memcmp("..", argv[i], len - 1) == 0) {
+        size_t len = strlen(argv[i]);
+        if (len < 3 && memcmp("..", argv[i], len) == 0) {
             if (len == 0)
                 errx(1, "Empty string (passed as argument %d) is not a valid path", i);
             else
                 errx(1, "Argument %d is \"%s\", which is not allowed.  Try operating from the parent directory.", i, argv[i]);
         }
+        len++;
         char *escaped = simple_strvis(argv[i]);
         char *dup1 = malloc(len), *dup2 = malloc(len);
         if (dup1 == NULL || dup2 == NULL)
