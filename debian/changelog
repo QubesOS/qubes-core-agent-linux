@@ -1,3 +1,12 @@
+qubes-core-agent (4.3.33-1) unstable; urgency=medium
+
+  [ Demi Marie Obenour ]
+  * qubes-fs-tree-check: Use relative source path for validation
+  * qvm-copy: Allow non-canonical symbolic links
+  * qubes-fs-tree-check: Fix wrong error message for empty path
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 11 Oct 2025 03:13:08 +0200
+
 qubes-core-agent (4.3.32-1) unstable; urgency=medium
 
   [ Aaron Rainbolt ]
