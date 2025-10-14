@@ -1,0 +1,11 @@
+[Unit]
+Description=Qubes admin access authorization daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/qubes-admin-authzd
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
