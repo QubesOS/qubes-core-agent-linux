@@ -1,0 +1,4 @@
+# This will be re-preset on package upgrade. If you really want you can
+# override this with a higher higher-priority preset file but that is probably
+# a bad idea since it will break the pam module.
+enable qubes-admin-authzd.service

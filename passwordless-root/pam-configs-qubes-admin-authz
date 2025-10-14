@@ -1,0 +1,7 @@
+Name: authorize admin access without password (by package qubes-core-agent-passwordless-root)
+Default: yes
+Priority: 258
+Auth-Type: Primary
+Auth:
+ sufficient pam_qubes_admin_authz.so
+

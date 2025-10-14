@@ -24,6 +24,7 @@ all:
 ifeq ($(ENABLE_SELINUX),1)
 	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile -- $(selinux_policies)
 endif
+	$(MAKE) -C passwordless-root
 
 clean:
 	make -C misc clean
