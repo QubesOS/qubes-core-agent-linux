@@ -64,6 +64,14 @@ while [ -n "$1" ]; do
     shift
 done
 
+if [ -e /run/qubes-service/whonix-gateway ]; then
+    # DNF (or rather curl) refuses to resolve onion addresses directly, use
+    # socks proxy to avoid the issue
+    OPTS+=( --setopt=proxy=socks5h://127.0.0.1:9050/ )
+    # for stream isolation
+    OPTS+=( --setopt=proxy_username=dom0updates --setopt=proxy_password=dom0updates )
+fi
+
 if [ -z "$UPDATE_ACTION" ]; then
     UPDATE_ACTION=upgrade
 fi
