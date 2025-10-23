@@ -1,3 +1,13 @@
+qubes-core-agent (4.3.34-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Use socks5 proxy on Whonix Gateway to fix onion urls resolution
+
+  [ Ben Grande ]
+  * Introduce a service to wait for network uplink
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 23 Oct 2025 14:02:33 +0200
+
 qubes-core-agent (4.3.33-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
