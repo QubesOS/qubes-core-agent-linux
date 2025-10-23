@@ -80,6 +80,7 @@ install:
 		qubes.SuspendPostAll \
 		qubes.WaitForSession \
 		qubes.WaitForRunningSystem \
+		qubes.WaitForNetworkUplink \
 		qubes.DetachPciDevice \
 		qubes.Backup qubes.Restore \
 		qubes.RegisterBackupLocation \
