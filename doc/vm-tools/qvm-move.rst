@@ -27,12 +27,10 @@ qvm-move-to-vm - move specified files to specified destination VM. Deprecated ou
 
 SYNOPSIS
 ========
-| qvm-move-to-vm [--without-progress] dest_vmname file [file]+
+| qvm-move-to-vm dest_vmname file [file]+
 
 OPTIONS
 =======
---without-progress
-    Don't display progress info
 
 
 AUTHORS

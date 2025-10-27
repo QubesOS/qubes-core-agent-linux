@@ -27,12 +27,10 @@ qvm-copy-to-vm - copy specified files to specified destination VM. Deprecated ou
 
 SYNOPSIS
 ========
-| qvm-copy-to-vm [--without-progress] dest_vmname file [file]+
+| qvm-copy-to-vm dest_vmname file [file]+
 
 OPTIONS
 =======
---without-progress
-    Don't display progress info
 
 
 AUTHORS
