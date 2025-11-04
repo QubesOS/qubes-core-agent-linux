@@ -14,6 +14,8 @@ fi
 # DNF uses /etc/yum.repos.d, even when --installroot is specified
 OPTS+=("--setopt=reposdir=$DOM0_UPDATES_DIR/etc/yum.repos.d")
 OPTS+=("--setopt=cachedir=$DOM0_UPDATES_DIR/var/cache/dnf")
+# Disarm protected packages mechanism, let dom0 evaluate it instead
+OPTS+=("--setopt=protected_packages=")
 CLEAN_OPTS=("${OPTS[@]}")
 # DNF verifies signatures implicitly, but yumdownloader does not.
 SIGNATURE_REGEX=""
