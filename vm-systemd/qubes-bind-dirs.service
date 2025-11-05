@@ -1,7 +1,7 @@
 [Unit]
 Description=Mount configured bind files and directories
 After=qubes-mount-dirs.service local-fs.target rw.mount home.mount usr-local.mount
-Before=qubes-gui-agent.service
+Before=qubes-gui-agent.service systemd-tmpfiles-setup.service
 DefaultDependencies=no
 Requires=qubes-mount-dirs.service home.mount usr-local.mount
 
