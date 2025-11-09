@@ -1,3 +1,21 @@
+qubes-core-agent (4.3.35-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Revert "Use socks5 proxy on Whonix Gateway to fix onion urls
+    resolution"
+  * dom0-updates: specify DNF cache in a writable directory
+
+  [ Aaron Rainbolt ]
+  * Start qubes-bind-dirs.service before systemd-tmpfiles-setup.service
+
+  [ Atrate ]
+  * Trim filesystems after TemplateVM update
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: disarm protected packages in updatevm
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 09 Nov 2025 03:12:10 +0100
+
 qubes-core-agent (4.3.34-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
