@@ -1,3 +1,29 @@
+qubes-core-agent (4.2.44-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix handling long application names in qubes.StartApp service
+  * rpm: skip systemctl daemon-reload if systemd is not running
+
+  [ Ali Mirjamali ]
+  * Prevent "unable to detect release version" messages
+
+  [ Marek Marczykowski-Górecki ]
+  * Create filesystem on xvda1 on update
+
+  [ Ali Mirjamali ]
+  * Exclude ScreenSavers from available Applications
+
+  [ Demi Marie Obenour ]
+  * qubes-fs-tree-check: Use relative source path for validation
+  * qubes-fs-tree-check: Fix wrong error message for empty path
+  * qvm-copy: Allow non-canonical symbolic links
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-updates: specify DNF cache in a writable directory
+  * dom0-updates: disarm protected packages in updatevm
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 10 Nov 2025 03:14:31 +0100
+
 qubes-core-agent (4.2.43-1) unstable; urgency=medium
 
   [ Demi Marie Obenour ]
