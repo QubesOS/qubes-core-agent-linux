@@ -232,15 +232,17 @@ class TestNftablesWorker(TestCase, WorkerCommon):
             {'action': 'drop'},
         ]
         expected_nft = (
+            'flush set ip qubes-firewall dns-addr\n'
+            'add element ip qubes-firewall dns-addr { 1.1.1.1, 2.2.2.2 }\n'
             'flush chain ip qubes-firewall chain\n'
             'table ip qubes-firewall {\n'
             '  chain chain {\n'
             '    ip protocol tcp ip daddr 1.2.3.0/24 tcp dport 80 accept\n'
             '    ip protocol udp ip daddr { 193.219.28.150/32 } '
             'udp dport 443-1024 accept\n'
-            '    ip daddr { 1.1.1.1/32, 2.2.2.2/32 } tcp dport 53 accept\n'
-            '    ip daddr { 1.1.1.1/32, 2.2.2.2/32 } udp dport 53 accept\n'
-            '    ip protocol udp ip daddr { 1.1.1.1/32, 2.2.2.2/32 } udp dport '
+            '    ip daddr @dns-addr tcp dport 53 accept\n'
+            '    ip daddr @dns-addr udp dport 53 accept\n'
+            '    ip protocol udp ip daddr @dns-addr udp dport '
             '53 reject with icmp type admin-prohibited\n'
             '    ip protocol icmp reject with icmp type admin-prohibited\n'
             '    reject with icmp type admin-prohibited\n'
@@ -269,15 +271,17 @@ class TestNftablesWorker(TestCase, WorkerCommon):
             {'action': 'drop'},
         ]
         expected_nft = (
+            'flush set ip6 qubes-firewall dns-addr\n'
+            'add element ip6 qubes-firewall dns-addr { 2001::1, 2001::2 }\n'
             'flush chain ip6 qubes-firewall chain\n'
             'table ip6 qubes-firewall {\n'
             '  chain chain {\n'
             '    ip6 nexthdr tcp ip6 daddr a::b/128 tcp dport 80 accept\n'
             '    ip6 nexthdr tcp ip6 daddr { 2001:67c:2e8:25::c100:b33/128 } '
             'accept\n'
-            '    ip6 daddr { 2001::1/128, 2001::2/128 } tcp dport 53 accept\n'
-            '    ip6 daddr { 2001::1/128, 2001::2/128 } udp dport 53 accept\n'
-            '    ip6 nexthdr udp ip6 daddr { 2001::1/128, 2001::2/128 } '
+            '    ip6 daddr @dns-addr tcp dport 53 accept\n'
+            '    ip6 daddr @dns-addr udp dport 53 accept\n'
+            '    ip6 nexthdr udp ip6 daddr @dns-addr '
             'udp dport 53 reject with icmpv6 type admin-prohibited\n'
             '    ip6 nexthdr icmpv6 icmpv6 type 128 reject with icmpv6 type '
             'admin-prohibited\n'
@@ -314,6 +318,9 @@ class TestNftablesWorker(TestCase, WorkerCommon):
         self.assertEqual(self.obj.loaded_rules,
         [
             'table ip qubes-firewall {\n'
+            '  set dns-addr {\n'
+            '    type ipv4_addr\n'
+            '  }\n'
             '  chain qubes-forward {\n'
             '  }\n'
             '  chain forward {\n'
@@ -333,6 +340,9 @@ class TestNftablesWorker(TestCase, WorkerCommon):
             '  }\n'
             '}\n'
             'table ip6 qubes-firewall {\n'
+            '  set dns-addr {\n'
+            '    type ipv6_addr\n'
+            '  }\n'
             '  chain qubes-forward {\n'
             '  }\n'
             '  chain forward {\n'

@@ -484,8 +484,6 @@ class NftablesWorker(FirewallWorker):
 
         fullmask = '/128' if family == 6 else '/32'
 
-        dns = list(addr + fullmask for addr in self.dns_addresses(family))
-
         ret_dns = {}
 
         for rule in rules:
@@ -541,10 +539,7 @@ class NftablesWorker(FirewallWorker):
                     continue
                 else:
                     dstports = '53'
-                if not dns:
-                    continue
-                nft_rule += ' {} daddr {{ {} }}'.format(ip_match, ', '.join(
-                    dns))
+                nft_rule += ' {} daddr @dns-addr'.format(ip_match)
 
             if 'icmptype' in rule:
                 if family == 4:
@@ -570,7 +565,11 @@ class NftablesWorker(FirewallWorker):
             else:
                 nft_rules.append(nft_rule + ' ' + action)
 
+        dns = list(self.dns_addresses(family))
+
         return (
+            'flush set {family} {table} dns-addr\n'
+            '{add_dns_c}add element {family} {table} dns-addr {{ {add_dns_addrs} }}\n'
             'flush chain {family} {table} {chain}\n'
             'table {family} {table} {{\n'
             '  chain {chain} {{\n'
@@ -580,7 +579,9 @@ class NftablesWorker(FirewallWorker):
                 family=('ip6' if family == 6 else 'ip'),
                 table='qubes-firewall',
                 chain=chain,
-                rules='\n   '.join(nft_rules)
+                rules='\n   '.join(nft_rules),
+                add_dns_c='#' if len(dns) == 0 else '',
+                add_dns_addrs=', '.join(dns)
             ), ret_dns)
 
     def apply_rules_family(self, source, rules, family):
@@ -617,6 +618,9 @@ class NftablesWorker(FirewallWorker):
     def init(self):
         nft_init = (
             'table {family} qubes-firewall {{\n'
+            '  set dns-addr {{\n'
+            '    type ipv{family_num}_addr\n'
+            '  }}\n'
             '  chain qubes-forward {{\n'
             '  }}\n'
             '  chain forward {{\n'
@@ -637,7 +641,10 @@ class NftablesWorker(FirewallWorker):
             '}}\n'
         )
         nft_init = ''.join(
-            nft_init.format(family=family) for family in ('ip', 'ip6'))
+            nft_init.format(
+                family_num=family_num,
+                family='ip6' if family_num == 6 else 'ip')
+            for family_num in (4, 6))
         self.run_nft(nft_init)
 
     def cleanup(self):
