@@ -1,3 +1,10 @@
+qubes-core-agent (4.3.36-1) unstable; urgency=medium
+
+  [ Simon Gaiser ]
+  * network: Update specialtarget=dns rules on DNS change
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 20 Nov 2025 20:24:15 +0100
+
 qubes-core-agent (4.3.35-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
