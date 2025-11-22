@@ -93,6 +93,7 @@ install:
 		qubes.StartApp \
 		qubes.PostInstall \
 		qubes.GetDate \
+		qubes.GetMem \
 		qubes.ShowInTerminal \
 		qubes.TemplateSearch \
 		qubes.TemplateDownload
