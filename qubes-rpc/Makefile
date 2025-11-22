@@ -17,13 +17,13 @@ LDLIBS := -lqubes-rpc-filecopy -lqubes-pure
 
 .PHONY: all clean install
 
-all:	vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile qubes-fs-tree-check bin-qfile-unpacker
+all:	vm-file-editor vm-log qopen-in-vm qfile-agent qfile-unpacker tar2qfile qubes-fs-tree-check bin-qfile-unpacker
 
 ifdef DEVEL_BUILD
 # Ensure that these programs can find their shared libraries,
 # even when installed in e.g. a TemplateBasedVM to somewhere other
 # than /usr.
-vm-file-editor qopen-in-vm qfile-agent qfile-unpacker tar2qfile qubes-fs-tree-check: LDFLAGS += '-Wl,-rpath,$$ORIGIN/../../$$LIB'
+vm-file-editor vm-log qopen-in-vm qfile-agent qfile-unpacker tar2qfile qubes-fs-tree-check: LDFLAGS += '-Wl,-rpath,$$ORIGIN/../../$$LIB'
 # This is installed in /usr/bin, not /usr/lib/qubes, so it needs a different rpath.
 bin-qfile-unpacker: LDFLAGS += '-Wl,-rpath,$$ORIGIN/../$$LIB'
 endif
@@ -33,13 +33,14 @@ bin-qfile-unpacker: qfile-unpacker.o gui-fatal.o
 qubes-fs-tree-check: LDLIBS := -lqubes-pure
 qubes-fs-tree-check: qubes-fs-tree-check.o
 vm-file-editor: vm-file-editor.o
+vm-log: vm-log.o
 qopen-in-vm: qopen-in-vm.o gui-fatal.o
 qfile-agent: qfile-agent.o gui-fatal.o
 qfile-unpacker: qfile-unpacker.o gui-fatal.o
 tar2qfile: tar2qfile.o gui-fatal.o
 
 clean:
-	-$(RM) -- qopen-in-vm qfile-agent qfile-unpacker tar2qfile vm-file-editor qubes-fs-tree-check bin-qfile-unpacker *.o
+	-$(RM) -- qopen-in-vm qfile-agent qfile-unpacker tar2qfile vm-file-editor vm-log qubes-fs-tree-check bin-qfile-unpacker *.o
 
 install:
 	install -d $(DESTDIR)$(BINDIR)
@@ -61,7 +62,7 @@ install:
 		prepare-suspend resize-rootfs \
 		qfile-agent qopen-in-vm qrun-in-vm qubes-sync-clock \
 		tar2qfile vm-file-editor xdg-icon qvm-template-repo-query \
-		qubes-fs-tree-check
+		qubes-fs-tree-check vm-log
 	# Install qfile-unpacker as SUID, because it will fail to receive
 	# files from other vm.
 	install -t $(DESTDIR)$(QUBESLIBDIR) -m 4755 qfile-unpacker
@@ -95,7 +96,8 @@ install:
 		qubes.GetDate \
 		qubes.ShowInTerminal \
 		qubes.TemplateSearch \
-		qubes.TemplateDownload
+		qubes.TemplateDownload \
+		qubes.Log
 	$(LN) qubes.VMExec $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.VMExecGUI
 	$(LN) /dev/tcp/127.0.0.1 $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.ConnectTCP
 	$(LN) /dev/tcp/127.0.0.1/8082 $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.UpdatesProxy
