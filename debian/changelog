@@ -1,3 +1,16 @@
+qubes-core-agent (4.3.37-1) unstable; urgency=medium
+
+  [ Ali Mirjamali ]
+  * Inform user before long trim operation
+
+  [ Aaron Rainbolt ]
+  * Fall back to the absolute path for fstrim if needed
+
+  [ Ali Mirjamali ]
+  * Avoid `SyntaxWarning` during update on Debian Trixie
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 25 Nov 2025 04:56:24 +0100
+
 qubes-core-agent (4.3.36-1) unstable; urgency=medium
 
   [ Simon Gaiser ]
