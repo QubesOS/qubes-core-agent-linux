@@ -143,10 +143,10 @@ class WorkerCommon(object):
         self.assertEqual(dns_ret.keys(), {expected_domain})
         self.assertIsInstance(dns_ret[expected_domain], set)
         if family == 4:
-            self.assertIsNotNone(re.match('^\d+\.\d+\.\d+\.\d+/32$',
+            self.assertIsNotNone(re.match(r'^\d+\.\d+\.\d+\.\d+/32$',
                                 dns_ret[expected_domain].pop()))
         elif family == 6:
-            self.assertIsNotNone(re.match('^[0-9a-f:]+/\d+$',
+            self.assertIsNotNone(re.match(r'^[0-9a-f:]+/\d+$',
                                 dns_ret[expected_domain].pop()))
         else:
             raise ValueError()
