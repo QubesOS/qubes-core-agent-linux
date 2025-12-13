@@ -27,6 +27,7 @@ import ipaddress
 import subprocess
 import pwd
 import shutil
+import time
 
 import qubesdb
 import sys
@@ -342,6 +343,7 @@ class FirewallWorker(object):
 
     def main(self):
         self.terminate_requested = False
+        self.reload_requested = False
         self.init()
         self.run_firewall_dir()
         if not self.is_custom_persist_enabled():
@@ -355,28 +357,44 @@ class FirewallWorker(object):
             self.handle_addr(source_addr)
         self.update_connected_ips(4)
         self.update_connected_ips(6)
-        try:
-            for watch_path in iter(self.qdb.read_watch, None):
-                if watch_path == '/connected-ips':
-                    self.update_connected_ips(4)
-
-                if watch_path == '/connected-ips6':
-                    self.update_connected_ips(6)
-
-                # ignore writing rules itself - wait for final write at
-                # source_addr level empty write (/qubes-firewall/SOURCE_ADDR)
-                if watch_path.startswith('/qubes-firewall/') and watch_path.count('/') == 2:
-                    source_addr = watch_path.split('/')[2]
+        while not self.terminate_requested:
+            if self.reload_requested:
+                clock_monotonic = time.clock_gettime(time.CLOCK_MONOTONIC)
+                clock_monotonic = int(clock_monotonic * 1_000_000)
+                self.sd_notify(f'RELOADING=1\nMONOTONIC_USEC={clock_monotonic}')
+                for source_addr in self.list_targets():
                     self.handle_addr(source_addr)
+                self.reload_requested = False
+                self.sd_notify('READY=1')
+            try:
+                watch_path = self.qdb.read_watch()
+            except OSError:  # EINTR
+                # signal received, re-check loop condition
+                continue
 
-        except OSError:  # EINTR
-            # signal received, don't continue the loop
-            pass
+            if watch_path is None:
+                break
+
+            if watch_path == '/connected-ips':
+                self.update_connected_ips(4)
+
+            if watch_path == '/connected-ips6':
+                self.update_connected_ips(6)
+
+            # ignore writing rules itself - wait for final write at
+            # source_addr level empty write (/qubes-firewall/SOURCE_ADDR)
+            if watch_path.startswith('/qubes-firewall/') and watch_path.count('/') == 2:
+                source_addr = watch_path.split('/')[2]
+                self.handle_addr(source_addr)
+
 
         self.cleanup()
 
     def terminate(self):
         self.terminate_requested = True
+
+    def reload(self):
+        self.reload_requested = True
 
 class NftablesWorker(FirewallWorker):
     supported_rule_opts = ['action', 'proto', 'dst4', 'dst6', 'dsthost',
@@ -662,6 +680,7 @@ def main():
         print('Sorry, iptables no longer supported', file=sys.stderr)
         sys.exit(1)
     signal.signal(signal.SIGTERM, lambda _signal, _stack: worker.terminate())
+    signal.signal(signal.SIGHUP, lambda _signal, _stack: worker.reload())
     worker.main()
 
 
