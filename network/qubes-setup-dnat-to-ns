@@ -142,10 +142,11 @@ def install_firewall_rules(dns):
         sys.exit(100)
 
     if os.path.exists('/run/qubes-service/qubes-firewall'):
-        rules.append("flush set ip qubes-firewall dns-addr")
-        if len(dns_resolved) > 0:
-            dns_ = ", ".join(str(addr) for addr in dns_resolved)
-            rules.append(f"add element ip qubes-firewall dns-addr {{ {dns_} }}")
+        subprocess.call(["systemctl",
+                         "--no-block",
+                         "try-reload-or-restart",
+                         "qubes-firewall.service"
+        ])
 
     os.execvp("nft", ("nft", "--", "\n".join(preamble + rules)))
 
