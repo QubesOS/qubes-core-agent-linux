@@ -1,3 +1,10 @@
+qubes-core-agent (4.3.38-1) unstable; urgency=medium
+
+  * Support reloading in qubes-firewall service
+  * network: reload firewall rules on DNS change
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 22 Dec 2025 02:02:25 +0100
+
 qubes-core-agent (4.3.37-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
