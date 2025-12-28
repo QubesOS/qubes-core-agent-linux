@@ -17,7 +17,7 @@ reassign_term(){
         return
     fi
     case "$1" in
-        gnome-terminal) terminal="qubes-run-$1";;
+        gnome-terminal|alacritty) terminal="qubes-run-$1";;
         kgx) terminal="qubes-run-gnome-console";;
     esac
 }
@@ -31,7 +31,7 @@ fi
 for terminal in \
     x-terminal-emulator ptyxis gnome-terminal kgx xfce4-terminal konsole \
     urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal \
-    mate-terminal terminology st lxterm xterm
+    alacritty mate-terminal terminology st lxterm xterm
 do
     reassign_term "$terminal"
     exec_cmd "$terminal"
