@@ -1,1 +1,2 @@
 DPkg::Post-Invoke {"/usr/lib/qubes/upgrades-status-notify skip-refresh || true";};
+APT::Update::Post-Invoke {"/etc/qubes-rpc/qubes.PostInstall";};
