@@ -489,7 +489,7 @@ export ETCSECURITYDIR=/usr/etc/security
 
 make install-vm PYTHON=%{__python3} "DESTDIR=$RPM_BUILD_ROOT" SYSTEM_DROPIN_DIR=%{_unitdir} SYSLIBDIR=/usr/lib ENABLE_SELINUX=%with_selinux
 make -C app-menu DESTDIR=$RPM_BUILD_ROOT install
-make -C boot DESTDIR=$RPM_BUILD_ROOT install
+make -C boot DESTDIR=$RPM_BUILD_ROOT SYSTEM_DROPIN_DIR=%{_unitdir} install
 make -C boot/redhat DESTDIR=$RPM_BUILD_ROOT install
 make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
 make -C filesystem DESTDIR=$RPM_BUILD_ROOT install

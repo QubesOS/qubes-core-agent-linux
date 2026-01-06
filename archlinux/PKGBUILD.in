@@ -101,7 +101,7 @@ package_qubes-vm-core() {
     cd "${_pkgnvr}"
 
     # shellcheck disable=SC2154
-    make -C boot DESTDIR="$pkgdir" install
+    make -C boot DESTDIR="$pkgdir" SYSTEM_DROPIN_DIR=/usr/lib/systemd/system install
     make install-corevm DESTDIR="$pkgdir" SBINDIR=/usr/bin LIBDIR=/usr/lib SYSLIBDIR=/usr/lib SYSTEM_DROPIN_DIR=/usr/lib/systemd/system USER_DROPIN_DIR=/usr/lib/systemd/user DIST=archlinux
     make -C app-menu install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
     make -C misc install DESTDIR="$pkgdir" install LIBDIR=/usr/lib SYSLIBDIR=/usr/lib
