@@ -75,8 +75,8 @@ if type dnf >/dev/null 2>&1; then
     UPDATE_CMD=dnf
     UPDATE_ARGUMENTS+=(--noplugins -y)
     CLEAN_OPTS+=(--noplugins -y)
-    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help 2>/dev/null | grep -q -- '--best' && UPDATE_ARGUMENTS+=(--best)
-    "$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help 2>/dev/null | grep -q -- '--allowerasing' && UPDATE_ARGUMENTS+=(--allowerasing)
+    "$UPDATE_CMD" "$UPDATE_ACTION" "${OPTS[@]}" --help 2>/dev/null | grep -q -- '--best' && UPDATE_ARGUMENTS+=(--best)
+    "$UPDATE_CMD" "$UPDATE_ACTION" "${OPTS[@]}" --help 2>/dev/null | grep -q -- '--allowerasing' && UPDATE_ARGUMENTS+=(--allowerasing)
     if "$UPDATE_CMD" --version | grep -q dnf5 && [ "$CHECK_ONLY" = "1" ]; then
         UPDATE_ACTION=check-upgrade
     fi
@@ -155,7 +155,7 @@ UPDATE_COMMAND=(fakeroot "$UPDATE_CMD" "$UPDATE_ACTION" "${UPDATE_ARGUMENTS[@]}"
 # search, info and similar actions if --downloadonly is specified. The below
 # condition is a smart way to check if --downloadonly option is applicable to
 # the action.
-"$UPDATE_CMD" "${OPTS[@]}" "$UPDATE_ACTION" --help | grep -q downloadonly && UPDATE_COMMAND+=(--downloadonly)
+"$UPDATE_CMD" "$UPDATE_ACTION" "${OPTS[@]}" --help 2>/dev/null | grep -q downloadonly && UPDATE_COMMAND+=(--downloadonly)
 
 mkdir -p "$DOM0_UPDATES_DIR/packages"
 
