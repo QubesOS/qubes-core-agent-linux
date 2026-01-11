@@ -4,8 +4,8 @@
 
 [Desktop Entry]
 Version=1.0
-Name=QubesOS View In DisposableVM
-Exec=/usr/bin/qvm-open-in-dvm --view-only -- %u
+Name=Edit In DisposableVM
+Exec=/usr/bin/qvm-open-in-dvm -- %u
 Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
