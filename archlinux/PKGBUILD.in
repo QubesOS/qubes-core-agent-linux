@@ -83,7 +83,7 @@ package_qubes-vm-core() {
         pacman-contrib
         parted
         # Block updating if there is a major python update as the python API will be in the wrong PYTHONPATH
-        'python<3.14'
+        'python<3.15'
     )
     optdepends=(gnome-keyring gnome-settings-daemon python-caja python-nautilus gpk-update-viewer qubes-vm-networking qubes-vm-keyring)
     install="archlinux/PKGBUILD.install"
