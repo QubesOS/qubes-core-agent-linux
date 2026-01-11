@@ -73,7 +73,7 @@ package_qubes-vm-core() {
         parted
         procps-ng
         # Block updating if there is a major python update as the python API will be in the wrong PYTHONPATH
-        'python<3.14'
+        'python<3.15'
         python-dbus
         python-gobject
         python-xdg
