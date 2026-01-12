@@ -1,3 +1,17 @@
+qubes-core-agent (4.3.40-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * dom0-update: put options after the dnf action
+
+  [ Ludovic Bellier ]
+  * Bump Python version dependency in Arch packages Arch just bumped to
+    Python 3.14.
+
+  [ Marek Marczykowski-Górecki ]
+  * Use "Edit", not "View" action for opening all files in disposables
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 12 Jan 2026 03:20:31 +0100
+
 qubes-core-agent (4.3.39-1) unstable; urgency=medium
 
   * Set user session stop timeout in all templates
