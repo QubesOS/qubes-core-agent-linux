@@ -260,9 +260,18 @@ DNF plugin for Qubes specific post-installation actions:
 %endif
 %endif
 
+%package bookmark
+Summary:    Qubes integration for GUI bookmarks
+Requires:   qubes-core-agent = %{version}
+Conflicts:  qubes-core-vm < 4.0.0
+
+%description bookmark
+GUI bookmarks for famous Qubes OS directories.
+
 %package caja
 Summary:    Qubes integration for Caja
 Requires:   qubes-core-agent = %{version}
+Requires:   qubes-core-agent-bookmark = %{version}
 %if 0%{?is_opensuse}
 Requires:   python-caja
 %else
@@ -280,6 +289,7 @@ Caja addons for inter-VM file copy/move/open.
 %package nautilus
 Summary:    Qubes integration for Nautilus
 Requires:   qubes-core-agent = %{version}
+Requires:   qubes-core-agent-bookmark = %{version}
 %if 0%{?is_opensuse}
 Requires:   python-nautilus-common-files
 %else
@@ -293,6 +303,14 @@ BuildRequires: python-nautilus-common-files
 
 %description nautilus
 Nautilus addons for inter-VM file copy/move/open.
+
+%package thunar
+Summary:    Thunar support for Qubes VM tools
+Requires:   Thunar
+Requires:   qubes-core-agent-bookmark = %{version}
+
+%description thunar
+Thunar support for Qubes VM tools
 
 %package dom0-updates
 BuildArch:  noarch
@@ -372,13 +390,6 @@ Configure sudo, PolicyKit and similar tool to not ask for any password when
 switching from user to root. Since all the user data in a VM is accessible
 already from normal user account, there is not much more to guard there. Qubes
 VMs are single user systems.
-
-%package thunar
-Summary: Thunar support for Qubes VM tools
-Requires: Thunar
-
-%description thunar
-Thunar support for Qubes VM tools
 
 %if %{with selinux}
 %package selinux
@@ -504,6 +515,7 @@ make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install-kde4
 make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install-kde5
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
+make -C qubes-rpc/bookmark DESTDIR=$RPM_BUILD_ROOT install
 
 %if 0%{?fedora} >= 41
 make -C package-managers PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT install install-dnf5
@@ -1097,6 +1109,9 @@ rm -f %{name}-%{version}
 %endif
 %endif
 
+%files bookmark
+/usr/lib/qubes/qvm_bookmark.sh
+
 %files caja
 /usr/share/caja-python/extensions/qvm_copy_caja.py*
 /usr/share/caja-python/extensions/qvm_move_caja.py*
@@ -1106,7 +1121,6 @@ rm -f %{name}-%{version}
 /usr/share/nautilus-python/extensions/qvm_copy_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_move_nautilus.py*
 /usr/share/nautilus-python/extensions/qvm_dvm_nautilus.py*
-/usr/lib/qubes/qvm_nautilus_bookmark.sh
 
 %files thunar
 /usr/lib/qubes/qvm-actions.sh
