@@ -239,7 +239,6 @@ install-netvm: install-systemd-networking-dropins install-networkmanager
 	install -D network/vif-route-qubes $(DESTDIR)/etc/xen/scripts/vif-route-qubes
 	install -D network/vif-qubes-nat.sh $(DESTDIR)/etc/xen/scripts/vif-qubes-nat.sh
 	install -m 0644 -D network/tinyproxy-updates.conf $(DESTDIR)/etc/tinyproxy/tinyproxy-updates.conf
-	install -m 0644 -D network/updates-blacklist $(DESTDIR)/etc/tinyproxy/updates-blacklist
 
 	install -m 0400 -D network/qubes-ipv4.nft $(DESTDIR)/etc/qubes/qubes-ipv4.nft
 	install -m 0400 -D network/qubes-ipv6.nft $(DESTDIR)/etc/qubes/qubes-ipv6.nft
