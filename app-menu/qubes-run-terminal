@@ -31,7 +31,7 @@ fi
 for terminal in \
     x-terminal-emulator ptyxis gnome-terminal kgx xfce4-terminal konsole \
     urxvt rxvt termit terminator Eterm aterm roxterm termite lxterminal \
-    mate-terminal terminology st lxterm xterm
+    alacritty mate-terminal terminology st lxterm xterm
 do
     reassign_term "$terminal"
     exec_cmd "$terminal"
