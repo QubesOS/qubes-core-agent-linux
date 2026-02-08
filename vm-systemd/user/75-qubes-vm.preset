@@ -1,0 +1,3 @@
+# Units below this line will be re-preset on package upgrade
+
+enable qubes-setup-minimal-vm.service

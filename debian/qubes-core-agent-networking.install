@@ -18,7 +18,6 @@ lib/systemd/system/qubes-antispoof.service
 lib/systemd/system/qubes-network.service
 lib/systemd/system/qubes-network-uplink.service
 lib/systemd/system/qubes-network-uplink@.service
-lib/systemd/system/qubes-sysctl-minimal-sys-net.service
 lib/systemd/system/qubes-updates-proxy.service
 lib/systemd/network/80-qubes-vif.link
 usr/lib/qubes/init/network-proxy-setup.sh
