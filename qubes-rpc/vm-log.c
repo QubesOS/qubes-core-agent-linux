@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <regex.h>
+#include <qubes/pure.h>
 
 #define MAX_LINE_SIZE 4096
 #define DEFAULT_PRIO LOG_INFO
@@ -58,41 +59,6 @@ int extract_priority(int pri) {
 }
 
 /**
- * Implements strict ASCII filtering and replaces non-printable control characters.
- * All bytes outside the standard ASCII range (0x00 - 0x7F) are replaced with '?'.
- * Control characters (0x00-0x1F) and DEL (0x7F) are replaced with ' '.
- *
- * @param str Input string (read-only)
- * @param result Buffer to store the sanitized output (must be large enough)
- * @param max_len Maximum length of the input string to process
- * @return The length of the sanitized string written to result
- */
-size_t filter_to_ascii_and_sanitize(const char *str, char *result, size_t max_len) {
-	size_t i;
-	size_t j = 0;
-
-	for (i = 0; i < max_len && str[i] != '\0'; i++) {
-		unsigned char byte = (unsigned char)str[i];
-
-		if (byte > 0x7F) {
-			result[j++] = '?';
-			continue;
-		}
-
-		// Replace harmful control characters (0x00-0x1F) and DEL (0x7F)
-		if ((byte < 0x20) || byte == 0x7F) {
-			result[j++] = ' ';
-		}
-		// Keep printable ASCII characters
-		else {
-			result[j++] = str[i];
-		}
-	}
-	result[j] = '\0';
-	return j;
-}
-
-/**
  * Analyzes priority and sanitizes the input string.
  *
  * @param msg_in Untrusted log line (read-only)
@@ -100,7 +66,7 @@ size_t filter_to_ascii_and_sanitize(const char *str, char *result, size_t max_le
  * @param msg_out_size Size of the message buffer
  * @return Syslog priority
  */
-int sanitize(const char *msg_in, char *msg_out, size_t msg_out_size) {
+int sanitize(const char *untr_msg_in, char *msg_out, size_t msg_out_size) {
 	int prio = DEFAULT_PRIO;
 
 	// Max size for the matched priority string (up to 3 digits + NUL)
@@ -114,7 +80,7 @@ int sanitize(const char *msg_in, char *msg_out, size_t msg_out_size) {
 	regmatch_t matches[2];
 
 	if (regcomp(&regex, pattern, REG_EXTENDED) == 0) {
-		if (regexec(&regex, msg_in, 2, matches, 0) == 0) {
+		if (regexec(&regex, untr_msg_in, 2, matches, 0) == 0) {
 			// Check if the priority group was matched
 			if (matches[priority_id].rm_so != -1) {
 				// Convert signed regoff_t difference to size_t
@@ -125,7 +91,7 @@ int sanitize(const char *msg_in, char *msg_out, size_t msg_out_size) {
 
 					// Comparison: size_t (len) vs size_t (sizeof)
 					if (len < sizeof(prio_str)) {
-						strncpy(prio_str, msg_in + matches[priority_id].rm_so, len);
+						strncpy(prio_str, untr_msg_in + matches[priority_id].rm_so, len);
 						prio_str[len] = '\0';
 
 						// Convert string to integer
@@ -140,7 +106,7 @@ int sanitize(const char *msg_in, char *msg_out, size_t msg_out_size) {
 
 	// Sanitize the message and write it to msg_out
 	// Cast return value to void as it is ignored right now
-	(void)filter_to_ascii_and_sanitize(untr, msg_out, msg_out_size);
+	(void)qubes_pure_sanitize_string_safe_for_display(untr_msg_in, msg_out, msg_out_size);
 
 	return prio;
 }
