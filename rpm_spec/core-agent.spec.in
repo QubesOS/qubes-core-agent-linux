@@ -898,6 +898,7 @@ rm -f %{name}-%{version}
 %dir /etc/qubes-rpc
 %config(noreplace) /etc/qubes-rpc/qubes.ShowInTerminal
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
+%config(noreplace) /etc/qubes-rpc/qubes.Log
 %config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
 %config(noreplace) /etc/qubes-rpc/qubes.OpenURL
 %config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
@@ -1027,6 +1028,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qubes-fs-tree-check
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
+/usr/lib/qubes/vm-log
 /usr/lib/qubes/xdg-icon
 /usr/lib/qubes/update-proxy-configs
 /usr/lib/qubes/upgrades-installed-check
