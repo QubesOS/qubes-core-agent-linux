@@ -1,0 +1,15 @@
+[Unit]
+Description=Apply minimal vm runtime configuration
+DefaultDependencies=no
+Conflicts=shutdown.target
+After=systemd-modules-load.service qubes-sysinit.service
+Before=sysinit.target shutdown.target
+ConditionPathExists=|/var/run/qubes-service/minimal-netvm
+ConditionPathExists=|/var/run/qubes-service/minimal-usbvm
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/qubes/setup-minimal-vm
+
+[Install]
+WantedBy=sysinit.target

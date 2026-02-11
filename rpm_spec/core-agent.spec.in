@@ -1146,7 +1146,6 @@ rm -f %{name}-%{version}
 %_unitdir/qubes-network.service
 %_unitdir/qubes-network-uplink.service
 %_unitdir/qubes-network-uplink@.service
-%_unitdir/qubes-sysctl-minimal-sys-net.service
 %_unitdir/qubes-updates-proxy.service
 /usr/lib/systemd/network/80-qubes-vif.link
 /usr/lib/qubes/init/network-proxy-setup.sh
@@ -1252,6 +1251,7 @@ The Qubes core startup configuration for SystemD init.
 %_unitdir/systemd-nsresourced.service.d/30_qubes.conf
 %dir %_unitdir/systemd-nsresourced.socket.d
 %_unitdir/systemd-nsresourced.socket.d/30_qubes.conf
+%_unitdir/qubes-setup-minimal-vm.service
 %dir %_userunitdir/*.service.d
 %_userunitdir/tracker-extract-3.service.d/30_qubes.conf
 %_userunitdir/tracker-miner-fs-3.service.d/30_qubes.conf
@@ -1268,6 +1268,9 @@ The Qubes core startup configuration for SystemD init.
 %_userunitdir/pipewire.service.d/40_minimal.conf
 %_userunitdir/wireplumber.service.d/30_qubes.conf
 /usr/lib/systemd/user-environment-generators/30-qubes.sh
+%_userunitdir/qubes-setup-minimal-vm.service
+%{_userunitdir}-preset/75-qubes-vm.preset
+/usr/lib/qubes/setup-minimal-vm
 
 %post systemd
 
@@ -1278,9 +1281,11 @@ changed=
 if [ $1 -eq 1 ]
 then
     preset_units %{_presetdir}/%qubes_preset_file initial
+    preset_units %{_userunitdir}-preset/75-qubes-vm.preset initial "--global"
     changed=true
 else
     preset_units %{_presetdir}/%qubes_preset_file upgrade
+    preset_units %{_userunitdir}-preset/75-qubes-vm.preset upgrade "--global"
     changed=true
     # Upgrade path - now qubes-iptables is used instead
     for svc in iptables ip6tables
