@@ -12,6 +12,7 @@ install:
 	install -d $(DESTDIR)$(BINDIR)
 	install -t $(DESTDIR)$(BINDIR) \
 		qubes-desktop-run \
+		qubes-run-alacritty \
 		qubes-run-gnome-console \
 		qubes-run-gnome-terminal \
 		qubes-run-terminal \
