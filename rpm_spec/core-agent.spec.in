@@ -153,7 +153,7 @@ Requires:   librsvg2-tools
 %endif
 Requires:   zenity
 Requires:   dconf
-Requires:   qubes-core-qrexec-vm >= 4.2.19
+Requires:   qubes-core-qrexec-vm >= 4.3.12
 Requires:   qubes-libvchan
 Requires:   qubes-db-vm
 # qubes.Suspend{Pre,Post}
@@ -911,7 +911,6 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPreAll
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPost
 %config(noreplace) /etc/qubes-rpc/qubes.SuspendPostAll
-%config(noreplace) /etc/qubes-rpc/qubes.WaitForSession
 %config(noreplace) /etc/qubes-rpc/qubes.WaitForRunningSystem
 %config(noreplace) /etc/qubes-rpc/qubes.WaitForNetworkUplink
 %config(noreplace) /etc/qubes-rpc/qubes.DetachPciDevice

@@ -78,7 +78,6 @@ install:
 		qubes.SuspendPre qubes.SuspendPost qubes.GetAppmenus \
 		qubes.SuspendPreAll \
 		qubes.SuspendPostAll \
-		qubes.WaitForSession \
 		qubes.WaitForRunningSystem \
 		qubes.WaitForNetworkUplink \
 		qubes.DetachPciDevice \
