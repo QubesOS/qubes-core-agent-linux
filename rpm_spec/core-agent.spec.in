@@ -357,10 +357,10 @@ Integration of NetworkManager for Qubes VM:
  * show/hide NetworkManager applet icon
 
 %package passwordless-root
-BuildArch:  noarch
 Summary:    Passwordless root access from normal user
 Conflicts:  qubes-core-vm < 4.0.0
 Requires(pre): shadow
+Requires: authselect
 %if 0%{?is_opensuse}
 # for directory ownership
 BuildRequires: sudo
@@ -495,7 +495,7 @@ make -C config-overrides DESTDIR=$RPM_BUILD_ROOT install
 make -C filesystem DESTDIR=$RPM_BUILD_ROOT install
 make -C misc "DESTDIR=$RPM_BUILD_ROOT" UDEVRULESDIR=%_udevrulesdir SYSLIBDIR=/usr/lib install
 make -C network DESTDIR=$RPM_BUILD_ROOT install
-make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT install install-rh
+make -C passwordless-root DESTDIR=$RPM_BUILD_ROOT SYSLIBDIR=/usr/lib install install-rh
 make -C qubes-rpc DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/caja DESTDIR=$RPM_BUILD_ROOT install
 %if !0%{?is_opensuse}
@@ -543,16 +543,6 @@ if ! grep -q /etc/default/grub.qubes /etc/default/grub 2>/dev/null; then
     # include another file
     echo '. /etc/default/grub.qubes' >> /etc/default/grub
 fi
-
-%triggerin passwordless-root -- util-linux
-
-qubesfile=/etc/pam.d/su.qubes
-origfile=${qubesfile%.qubes}
-backupfile=${origfile}.qubes-orig
-if [ -r "$origfile" -a ! -r "$backupfile" ]; then
-    mv -f "$origfile" "$backupfile"
-fi
-ln -sf "$qubesfile" "$origfile"
 
 %post
 
@@ -710,6 +700,24 @@ fi
 %systemd_post qubes-network-uplink.service
 %systemd_post qubes-updates-proxy.service
 
+%post passwordless-root
+
+systemctl --no-reload preset qubes-admin-authzd.service
+
+# We really want to have this running immediately, such that passwordless auth
+# keeps working on upgrade. (But still allow the user to override the preset,
+# if they really want.
+
+if [[ -e /run/systemd/system ]]; then
+    systemctl daemon-reload
+
+    if systemctl is-enabled --quiet qubes-admin-authzd.service; then
+        systemctl restart qubes-admin-authzd.service
+    fi
+fi
+
+authselect apply-changes
+
 %post thunar
 if [ "$1" = 1 ]; then
   # There is no system-wide Thunar custom actions. There is only a default
@@ -741,6 +749,9 @@ fi
 %systemd_preun qubes-antispoof.service
 %systemd_preun qubes-network.service
 %systemd_preun qubes-updates-proxy.service
+
+%preun passwordless-root
+%systemd_preun qubes-admin-authzd.service
 
 %if %{with selinux}
 %post selinux
@@ -871,6 +882,8 @@ backupfile=${origfile}.qubes-orig
 if [ -f "$backupfile" ]; then
     mv -f "$backupfile" "$origfile"
 fi
+
+authselect apply-changes
 
 %posttrans
     /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
@@ -1169,9 +1182,18 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/show-hide-nm-applet.sh
 
 %files passwordless-root
-%config(noreplace) /etc/polkit-1/rules.d/00-qubes-allow-all.rules
 %config(noreplace) /etc/sudoers.d/qubes
-%config(noreplace) /etc/pam.d/su.qubes
+%config(noreplace) /etc/qubes/admin-authzd.conf
+
+/usr/lib64/security/pam_qubes_admin_authz.so
+/usr/bin/qubes-admin-authzd
+
+%_unitdir/qubes-admin-authzd.service
+%{_unitdir}-preset/75-qubes-admin-authz.preset
+
+/usr/share/authselect/vendor/*/*
+
+/usr/share/doc/qubes-core-agent-passwordless-root/README.md
 
 %package systemd
 Summary:        Qubes unit files for SystemD init style
