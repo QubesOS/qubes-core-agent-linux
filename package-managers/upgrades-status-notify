@@ -21,6 +21,10 @@ fi
 
 upgrades_installed="$(/usr/lib/qubes/upgrades-installed-check $script_arg)"
 
+if [ "$upgrades_installed" = "true" ] && [ -f "/usr/bin/flatpak" ] && [ -n "$(flatpak remote-ls --system --updates)" ]; then
+    upgrades_installed="false"
+fi
+
 if [ "$upgrades_installed" = "true" ]; then
     /usr/lib/qubes/qrexec-client-vm dom0 qubes.NotifyUpdates /bin/sh -c 'echo 0'
 elif [ "$upgrades_installed" = "false" ]; then
