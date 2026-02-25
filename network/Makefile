@@ -1,8 +1,7 @@
 BINDIR ?= /usr/bin
 LIBDIR ?= /usr/lib
-SYSCONFDIR ?= /etc
 QUBESLIBDIR = $(LIBDIR)/qubes
-UDEVRULESDIR = $(SYSCONFDIR)/udev/rules.d
+UDEVRULESDIR = $(LIBDIR)/udev/rules.d
 
 .PHONY: install
 
