@@ -146,7 +146,7 @@ endif
 
 # Systemd service files
 SYSTEMD_ALL_SERVICES := $(wildcard vm-systemd/qubes-*.service) vm-systemd/dev-xvdc1-swap.service
-SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service vm-systemd/qubes-antispoof.service vm-systemd/qubes-sysctl-minimal-sys-net.service
+SYSTEMD_NETWORK_SERVICES := vm-systemd/qubes-firewall.service vm-systemd/qubes-iptables.service vm-systemd/qubes-updates-proxy.service vm-systemd/qubes-antispoof.service
 SYSTEMD_SELINUX_SERVICES := vm-systemd/qubes-relabel-root.service vm-systemd/qubes-relabel-rw.service
 SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES) $(SYSTEMD_SELINUX_SERVICES), $(SYSTEMD_ALL_SERVICES))
 
@@ -169,6 +169,7 @@ install-systemd: install-init
 	install -m 0644 vm-systemd/home.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0755 vm-systemd/user-environment-generators/30-qubes.sh $(DESTDIR)$(SYSLIBDIR)/systemd/user-environment-generators/30-qubes.sh
 	install -m 0644 vm-systemd/usr-local.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
+	install -m 0755 vm-systemd/setup-minimal-vm $(DESTDIR)$(LIBDIR)/qubes/setup-minimal-vm
 
 .PHONY: install-sysvinit
 install-sysvinit: install-init
