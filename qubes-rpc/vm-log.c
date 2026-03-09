@@ -176,25 +176,11 @@ int main() {
 		return 1;
 	}
 
-	if (strlen(remote_domain) > 100) {
-		fprintf(stderr, "Error: Remote domain name is too long.\n");
+	struct QubesSlice remote_domain_slice = qubes_pure_buffer_init_from_nul_terminated_string(remote_domain);
+	if (qubes_pure_is_valid_qube_name(remote_domain_slice) != QUBE_NAME_OK) {
+		fprintf(stderr, "Error: Invalid QREXEC_REMOTE_DOMAIN.\n");
 		return 1;
 	}
-
-	regex_t regex;
-	const char *pattern = "^[a-zA-Z0-9_-]+$";
-
-	if (regcomp(&regex, pattern, REG_EXTENDED | REG_NOSUB) != 0) {
-		fprintf(stderr, "Error: Could not compile regex.\n");
-		return 1;
-	}
-
-	if (regexec(&regex, remote_domain, 0, NULL, 0) != 0) {
-		regfree(&regex);
-		fprintf(stderr, "Error: Invalid characters in QREXEC_REMOTE_DOMAIN.\n");
-		return 1;
-	}
-	regfree(&regex);
 
 	(void)handle_untrusted(remote_domain);
 
