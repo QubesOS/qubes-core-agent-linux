@@ -1,3 +1,18 @@
+qubes-core-agent (4.4.0-1) unstable; urgency=medium
+
+  [ Undef-a ]
+  * qubes-run-terminal: Add support for Alacritty
+  * Add qubes-run-alacritty to packaging
+
+  [ Ben Grande ]
+  * Move qubes.WaitForSession to shared qrexec package
+
+  [ Marek Marczykowski-Górecki ]
+  * Adjust dependencies for clean update
+  * ci: switch to the devel repo
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 17 Mar 2026 22:38:13 +0100
+
 qubes-core-agent (4.3.40-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
