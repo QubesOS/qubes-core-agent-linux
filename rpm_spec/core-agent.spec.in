@@ -1098,6 +1098,7 @@ rm -f %{name}-%{version}
 %endif
 
 %files caja
+/usr/share/caja-python/extensions/qvm_caja_bookmark.py*
 /usr/share/caja-python/extensions/qvm_copy_caja.py*
 /usr/share/caja-python/extensions/qvm_move_caja.py*
 /usr/share/caja-python/extensions/qvm_dvm_caja.py*
