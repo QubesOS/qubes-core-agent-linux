@@ -572,3 +572,26 @@ class TestFirewallWorker(TestCase):
 
         for server in dns_servers_ipv6:
             self.assertTrue(self.obj.is_blocked(rules, ("udp", server, "53"), dns))
+
+    def test_get_connected_ips_retries_on_interrupted_error(self):
+        #get_connected_ips() must retry qdb.read() on InterruptedError.
+        #simulate SIGHUP interrupting qdb.read() on first call,
+        #succeeding on second
+        original_read = self.obj.qdb.read
+        call_count = [0]
+
+        def read_with_interrupt(key):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                raise InterruptedError
+            return original_read(key)
+
+        self.obj.qdb.entries['/connected-ips'] = b'10.137.0.1 10.137.0.2'
+        self.obj.qdb.read = read_with_interrupt
+
+        #all the real get_connected_ips, not the overridden one
+        result = qubesagent.firewall.FirewallWorker.get_connected_ips(
+            self.obj, 4)
+
+        self.assertEqual(result, ['10.137.0.1', '10.137.0.2'])
+        self.assertEqual(call_count[0], 2)

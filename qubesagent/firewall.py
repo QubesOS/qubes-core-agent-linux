@@ -82,7 +82,13 @@ class FirewallWorker(object):
         raise NotImplementedError
 
     def get_connected_ips(self, family):
-        ips = self.qdb.read('/connected-ips6' if family == 6 else '/connected-ips')
+        while True:
+            try:
+                ips = self.qdb.read(
+                    '/connected-ips6' if family == 6 else '/connected-ips')
+                break
+            except InterruptedError:
+                continue
         if ips is None:
             return []
         return ips.decode().split()
