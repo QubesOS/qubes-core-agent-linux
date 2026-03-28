@@ -344,6 +344,9 @@ class FirewallWorker(object):
     def main(self):
         self.terminate_requested = False
         self.reload_requested = False
+        # Block SIGHUP and SIGTERM during all qdb operations to prevent interrupting request-response pairs which corrupts protocol state.
+        # Signals are only unblocked during read_watch() which is safe to interrupt as it's just waiting, not mid-operation.
+        signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGHUP, signal.SIGTERM})
         self.init()
         self.run_firewall_dir()
         if not self.is_custom_persist_enabled():
@@ -366,11 +369,22 @@ class FirewallWorker(object):
                     self.handle_addr(source_addr)
                 self.reload_requested = False
                 self.sd_notify('READY=1')
+            # Unblock signals only during read_watch()
+            signal.pthread_sigmask(signal.SIG_UNBLOCK, {signal.SIGHUP, signal.SIGTERM})
+
+            # Re-check flags after unblocking, in case signal arrived
+            if self.terminate_requested or self.reload_requested:
+                signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGHUP, signal.SIGTERM})
+                continue
             try:
                 watch_path = self.qdb.read_watch()
             except OSError:  # EINTR
-                # signal received, re-check loop condition
+                # signal received, block signals again and re-check loop condition
+                signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGHUP, signal.SIGTERM})
                 continue
+            
+            #Block signals again before doing any qdb work
+            signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGHUP, signal.SIGTERM})
 
             if watch_path is None:
                 break
