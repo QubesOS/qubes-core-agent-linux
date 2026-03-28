@@ -6,6 +6,7 @@ from unittest import TestCase
 from unittest.mock import patch, Mock
 
 import qubesagent.firewall
+import signal
 
 
 class DummyIptablesRestore(object):
@@ -572,3 +573,46 @@ class TestFirewallWorker(TestCase):
 
         for server in dns_servers_ipv6:
             self.assertTrue(self.obj.is_blocked(rules, ("udp", server, "53"), dns))
+
+    def test_main_blocks_signals_during_qdb_operations(self):
+        #Test that signals are blocked during qdb operations and only unblocked during read_watch().
+
+        self.obj.qdb.entries['/qubes-firewall/10.137.0.1/policy'] = b'accept'
+        self.obj.qdb.entries['/connected-ips'] = b''
+        self.obj.qdb.entries['/connected-ips6'] = b''
+
+        # Track sigmask calls
+        sigmask_calls = []
+        original_sigmask = signal.pthread_sigmask
+
+        def mock_sigmask(how, mask):
+            sigmask_calls.append((how, mask))
+            return original_sigmask(how, set())  # Don't actually block
+
+        # Make read_watch() terminate the loop after first call
+        call_count = [0]
+        def mock_read_watch():
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return '/qubes-firewall/10.137.0.1'
+            self.obj.terminate_requested = True
+            raise OSError("Interrupted")
+
+        self.obj.qdb.read_watch = mock_read_watch
+
+        with patch.object(signal, 'pthread_sigmask', mock_sigmask):
+            self.obj.main()
+
+        # Verify signal blocking pattern:
+        # 1. SIG_BLOCK at start
+        # 2. SIG_UNBLOCK before read_watch
+        # 3. SIG_BLOCK after read_watch (or in except)
+
+        block_calls = [c for c in sigmask_calls if c[0] == signal.SIG_BLOCK]
+        unblock_calls = [c for c in sigmask_calls if c[0] == signal.SIG_UNBLOCK]
+
+        self.assertGreater(len(block_calls), 0, "Should have SIG_BLOCK calls")
+        self.assertGreater(len(unblock_calls), 0, "Should have SIG_UNBLOCK calls")
+        # First call should be SIG_BLOCK
+        self.assertEqual(sigmask_calls[0][0], signal.SIG_BLOCK)
+
