@@ -1,4 +1,8 @@
 #!/bin/sh
 set -eu
-systemctl --wait --quiet is-system-running
-exit 0
+rc=0
+systemctl --wait is-system-running || rc=$?
+if test "$rc" -gt 0; then
+  LC_ALL=C TERM=dumb systemctl --failed --legend=no
+fi
+exit "$rc"
