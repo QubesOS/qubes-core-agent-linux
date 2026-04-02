@@ -11,6 +11,14 @@ if [ "$(blockdev --getro /dev/xvda)" -eq "1" ]; then
     exit 0
 fi
 
+# if root volume is a volatile snapshot (AppVM/DispVM), skip resize —
+# it must happen in the TemplateVM where changes persist
+vm_type=$(qubesdb-read /qubes-vm-type 2>/dev/null || true)
+if [ "$vm_type" = "AppVM" ] || [ "$vm_type" = "DispVM" ]; then
+    echo "volatile root volume ($vm_type), skipping resize" >&2
+    exit 0
+fi
+
 sysfs_xvda="/sys/class/block/xvda"
 
 # if root filesystem is already using (almost) the whole disk
