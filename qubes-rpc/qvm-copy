@@ -87,6 +87,7 @@ done
 if [ "$#" -lt "$MIN_ARGS" ]; then usage 1; fi
 
 if [ "$TARGET_TYPE" = "vm" ]; then
+  echo "In order to avoid typing target qube name twice, use qvm-copy/qvm-move instead of qvm-copy-to-vm/qvm-move-to-vm." >&2
   VM="$1"
   shift
 else
