@@ -8,9 +8,20 @@ fi
 # gvfs-open, kde-open, and possibly others don't wait for editor to be
 # closed, which is critical behaviour for DisposableVM (which gets destroyed
 # after this process exits).
-# The "| cat" is rather silly hack, to wait for all the children processes too
-# (unless they close their stdout). This is needed on Xfce template, because
-# exo-open starts the application in the background, but keeps the original
-# stdout/err connected.
+#
+# The `pidwait -A -f "$1"` is rather silly hack, to wait for the process that is
+# passed the temporary file path as a parameter, but ignoring parent processes.
+#
+# This is needed on Xfce template, because exo-open starts the application in
+# the background; and in templates built around KDE, because they start the
+# file handling process in a way that it is not a child of the shell that
+# spawned this script.
+#
+# We also want to make sure that `xdg-open`'s exit code is emitted back to
+# parent process in case of any errors.
 export DE=generic
-exec xdg-open "$@" | cat
+xdg-open "$@"
+XDG_OPEN_EXIT_CODE=$?
+pidwait -A -f "$1"
+exit $XDG_OPEN_EXIT_CODE
+
