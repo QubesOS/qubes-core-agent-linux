@@ -82,6 +82,11 @@ endif
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/10no-cache
 	install -D -m 0644 apt-conf-41error-on-any \
 		$(DESTDIR)$(APTCONFDIR)/apt.conf.d/41error-on-any
+ifneq ($(DIST_NAME),Ubuntu)
+	install -d $(DESTDIR)$(SYSCONFDIR)/extrepo
+	sed "s/@DIST@/$(DIST)/" extrepo-qubes-config.yaml.in \
+		> $(DESTDIR)$(SYSCONFDIR)/extrepo/config.yaml
+endif
 
 install-dnf: install-rpm
 ifeq ($(shell rpm --eval %{centos_ver} 2>/dev/null),8)
