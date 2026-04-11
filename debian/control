@@ -62,6 +62,8 @@ Depends:
     ${misc:Depends},
 Recommends:
     cups,
+    extrepo,
+    extrepo-offline-data,
     gnome-terminal,
     gnome-themes-standard,
     haveged,
