@@ -1,0 +1,8 @@
+---
+url: file:///usr/share/extrepo/offline-data
+dist: debian
+version: @DIST@
+enabled_policies:
+- main
+- contrib
+- non-free
