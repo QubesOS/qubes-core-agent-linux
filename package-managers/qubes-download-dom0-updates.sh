@@ -168,16 +168,74 @@ if [ "$UPDATE_ACTION" = "download" ];  then
 fi
 
 set -e
+set -o pipefail
 
-"${UPDATE_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}"
+"${UPDATE_COMMAND[@]}" "${OPTS[@]}" "${PKGLIST[@]}" | \
+  tee "$DOM0_UPDATES_DIR/download.out"
 
+# Collect rpms from various download locations into one directory
 find "$DOM0_UPDATES_DIR/var/cache" -name '*.rpm' -print0 2>/dev/null |\
     xargs -0 -r ln -f -t "$DOM0_UPDATES_DIR/packages/"
 
-if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
+case "$UPDATE_ACTION" in
+    # Never send package to dom0 for the following commands. This by no
+    # means is an exhaustive list, just some common ones.
+    changelog|list|search) ;;
+    # TODO: Look for any other commands that download packages and add
+    # NOTE: For now, use the fallback for distro-sync because its output
+    # may have some untested corner cases. So being conservative.
+    downgrade|download|install|upgrade)
+        RPMS=$(
+            grep '^ ' "$DOM0_UPDATES_DIR/download.out" |
+            tail -n +2 |
+            while read -r PKG ARCH VER _REPO _SIZE; do
+                # Assumption: Package names do not contain spaces
+                F="$PKG-${VER##*:}.$ARCH.rpm"
+                if [ -f "$DOM0_UPDATES_DIR"/packages/"$F" ]; then
+                    echo "$F"
+                else
+                    # Did not find package that was supposed to be downloaded... bail
+                    echo "Package $F requested but not downloaded" >&2
+                    exit 1
+                fi
+            done
+        ) || RET=$?
+        if [ -z "$RPMS" ]; then
+            cat >&2 <<EOF
+No packages found in output for action $UPDATE_ACTION. This is likely
+due to a change in the output format. Falling back to old method that
+sends all verified packages in the package cache.
+Output:
+EOF
+            cat "$DOM0_UPDATES_DIR/download.out" >&2
+        fi
+        if [ "${RET:-0}" -ne 0 ] || [ "$CLEAN" = "1" ]; then
+            # An error occured in determining or finding requested packages
+            # or --clean was specified, unset RPM to fallback to old method.
+            RPMS=
+        fi
+
+        ;&
+    # Fallback to previous implementation of uploading all verified rpms
+    # for all other actions and above failure condition.
+    *)
+        if [ -z "$RPMS" ]; then
+            RPMS=$(
+                for P in "$DOM0_UPDATES_DIR"/packages/*.rpm; do
+                    if [ -e "$P" ]; then
+                        echo "${P##*/}"
+                    fi
+                done
+            )
+        fi
+        ;;
+esac
+
+if [ -n "$RPMS" ]; then
     if [ -n "$SIGNATURE_REGEX" ]; then
         rpmkeys_error=0
-        for pkg in "$DOM0_UPDATES_DIR"/packages/*.rpm; do
+        for rpmfile in $RPMS; do
+            pkg="$DOM0_UPDATES_DIR"/packages/"$rpmfile"
             rpmkeys_exit_code=0
             output="$(rpmkeys --root "$DOM0_UPDATES_DIR" --checksig "$pkg")" \
                 || rpmkeys_exit_code="$?"
@@ -185,7 +243,7 @@ if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
                 echo "ERROR: could not verify $pkg" >&2
                 rpmkeys_error=1
                 rm "$pkg"
-            elif ! echo "$output" |grep -Pq "$SIGNATURE_REGEX"; then
+            elif ! echo "$output" | grep -Pq "$SIGNATURE_REGEX"; then
                 echo "ERROR: missing or invalid signature for $pkg" >&2
                 rpmkeys_error=1
                 rm "$pkg"
@@ -201,11 +259,14 @@ if ls "$DOM0_UPDATES_DIR"/packages/*.rpm > /dev/null 2>&1; then
 
     cmd="/usr/lib/qubes/qrexec-client-vm dom0 qubes.ReceiveUpdates /usr/lib/qubes/qfile-agent"
     qrexec_exit_code=0
-    $cmd "$DOM0_UPDATES_DIR"/packages/*.rpm || { qrexec_exit_code=$? ; true; };
+    rpmfiles=$(for rpmfile in $RPMS; do echo "$DOM0_UPDATES_DIR"/packages/"$rpmfile"; done)
+    # shellcheck disable=SC2086
+    $cmd $rpmfiles || { qrexec_exit_code=$? ; true; };
     if [ ! "$qrexec_exit_code" = "0" ]; then
-        echo "'$cmd $DOM0_UPDATES_DIR/packages/*.rpm' failed with exit code ${qrexec_exit_code}!" >&2
+        echo "'$cmd $rpmfiles' failed with exit code ${qrexec_exit_code}!" >&2
         exit "$qrexec_exit_code"
     fi
 else
     echo "No packages downloaded" >&2
 fi
+rm -f "$DOM0_UPDATES_DIR/download.out"
