@@ -23,6 +23,7 @@ width/height attributes should be converted successfully.
 """
 
 import os
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -66,6 +67,10 @@ def _run_script(svg_content):
 
 @unittest.skipUnless(
     os.path.exists(SCRIPT_PATH), 'qubes.GetImageRGBA script not found')
+@unittest.skipUnless(
+    shutil.which('gm'), 'GraphicsMagick (gm) not installed')
+@unittest.skipUnless(
+    shutil.which('rsvg-convert'), 'rsvg-convert not installed')
 class TestGetImageRGBA(unittest.TestCase):
 
     def _assert_valid_rgba_output(self, stdout, stderr):
