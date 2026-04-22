@@ -220,7 +220,13 @@ EOF
     # for all other actions and above failure condition.
     *)
         if [ -z "$RPMS" ]; then
-            RPMS=$(for P in "$DOM0_UPDATES_DIR"/packages/*.rpm; do echo "${P##*/}"; done)
+            RPMS=$(
+                for P in "$DOM0_UPDATES_DIR"/packages/*.rpm; do
+                    if [ -e "$P" ]; then
+                        echo "${P##*/}"
+                    fi
+                done
+            )
         fi
         ;;
 esac
