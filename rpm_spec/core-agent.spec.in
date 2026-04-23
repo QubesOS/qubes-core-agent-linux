@@ -1079,6 +1079,7 @@ rm -f %{name}-%{version}
 %{python3_sitelib}/qubesagent/xdg.py*
 %{python3_sitelib}/qubesagent/test_xdg.py*
 %{python3_sitelib}/qubesagent/test_tools.py*
+%{python3_sitelib}/qubesagent/test_getimgrgba.py*
 
 %dir /usr/share/qubes/mime-override
 /usr/share/qubes/mime-override/globs
