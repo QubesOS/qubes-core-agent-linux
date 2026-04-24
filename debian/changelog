@@ -1,3 +1,23 @@
+qubes-core-agent (4.4.1-1) unstable; urgency=medium
+
+  [ Guillaume Chinal ]
+  * minimal-vms: mask gvfs-daemon to prevent dbus timeout
+
+  [ Harshit6-b ]
+  * firewall blocks signal during read operations
+
+  [ Nihal ]
+  * misc/50_qubes.conf: disable kernelhints when dom0 kernel is used
+
+  [ Ben Grande ]
+  * Report failure reason on WaitForRunningSystem
+
+  [ Piotr Bartman-Szwarc ]
+  * updater: split qubes-download-dom0-updates.sh
+  * updater: install all scripts
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Fri, 24 Apr 2026 06:29:53 +0200
+
 qubes-core-agent (4.4.0-1) unstable; urgency=medium
 
   [ Undef-a ]
