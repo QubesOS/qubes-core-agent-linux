@@ -62,8 +62,6 @@ Depends:
     ${misc:Depends},
 Recommends:
     cups,
-    extrepo,
-    extrepo-offline-data,
     gnome-terminal,
     gnome-themes-standard,
     haveged,
@@ -80,11 +78,14 @@ Recommends:
     xserver-xorg-core,
     xsettingsd,
     xterm,
+Provides:
+    ${diverted-files},
 Conflicts:
     pulseaudio-qubes (<< 4.2.0-1),
     qubes-core-agent-linux,
     qubes-core-vm-sysvinit,
     qubes-gui-agent (<< 4.1.6-1),
+    ${diverted-files},
 Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec services.
