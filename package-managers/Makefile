@@ -85,7 +85,7 @@ endif
 ifneq ($(DIST_NAME),Ubuntu)
 	install -d $(DESTDIR)$(SYSCONFDIR)/extrepo
 	sed "s/@DIST@/$(DIST)/" extrepo-qubes-config.yaml.in \
-		> $(DESTDIR)$(SYSCONFDIR)/extrepo/config.yaml
+		> $(DESTDIR)$(SYSCONFDIR)/extrepo/config.yaml.qubes
 endif
 
 install-dnf: install-rpm
