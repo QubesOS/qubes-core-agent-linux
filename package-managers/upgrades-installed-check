@@ -22,8 +22,15 @@ if [ -e /etc/system-release ]; then
     else
         yum=yum
     fi
+    dnf_opts=()
+    if $skip_refresh; then
+        dnf_opts+=(--cacheonly)
+        if dnf --help|grep -q skip-file-locks; then
+            dnf_opts+=(--skip-file-locks)
+        fi
+    fi
     # shellcheck disable=SC2034
-    yum_output="$($yum -yq check-update)"
+    yum_output="$($yum -yq "${dnf_opts[@]}" check-update)"
     exit_code="$?"
     [ "$exit_code" -eq 100 ] && echo "false" && exit 0
     [ "$exit_code" -eq 0 ] && echo "true"
