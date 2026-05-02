@@ -43,6 +43,7 @@ override_dh_install:
 	if [ "$(DISTRIBUTION)" = "Ubuntu" ]; then \
 		sed -i '/defaults.list/d' debian/qubes-core-agent.install; \
 		sed -i '/extrepo/d' debian/qubes-core-agent.install; \
+		sed -i '/extrepo/d' debian/qubes-core-agent.displace; \
 	fi
 	dh_install --fail-missing
 
