@@ -1,3 +1,31 @@
+qubes-core-agent (4.4.2-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * dnf: avoid deadlock on repository lock after successful update
+
+  [ EliasDevv ]
+  * Fix missing deprecation warning for qvm-copy-to-vm
+
+  [ rysiekpl ]
+  * Fix for #10797: qvm-open-in-vm should now work in KDE-based cubes
+
+  [ Nihal ]
+  * debian: add extrepo with offline data for third-party repos
+  * fix: displace extrepo config
+
+  [ Marek Marczykowski-Górecki ]
+  * Fix excluding extrepo on ubuntu
+  * ci: install tools for svg conversion tests
+
+  [ Jayant-Kernel ]
+  * qubes.GetImageRGBA: fix SVG conversion for images without explicit
+    dimensions
+  * qubes.GetImageRGBA: add unit tests for SVG conversion
+  * qubesagent/test_getimgrgba: skip when tools unavailable
+  * rpm_spec: add test_getimgrgba to %files
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 02 May 2026 17:08:54 +0200
+
 qubes-core-agent (4.4.1-1) unstable; urgency=medium
 
   [ Guillaume Chinal ]
