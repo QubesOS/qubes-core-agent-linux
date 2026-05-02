@@ -1,3 +1,47 @@
+qubes-core-agent (4.3.41-1) unstable; urgency=medium
+
+  [ Undef-a ]
+  * qubes-run-terminal: Add support for Alacritty
+  * Add qubes-run-alacritty to packaging
+
+  [ EliasDevv ]
+  * Fix missing deprecation warning for qvm-copy-to-vm
+
+  [ Guillaume Chinal ]
+  * minimal-vms: mask gvfs-daemon to prevent dbus timeout
+
+  [ rysiekpl ]
+  * Fix for #10797: qvm-open-in-vm should now work in KDE-based cubes
+
+  [ Nihal ]
+  * misc/50_qubes.conf: disable kernelhints when dom0 kernel is used
+
+  [ Harshit6-b ]
+  * firewall blocks signal during read operations
+
+  [ Ben Grande ]
+  * Report failure reason on WaitForRunningSystem
+
+  [ Nihal ]
+  * debian: add extrepo with offline data for third-party repos
+  * fix: displace extrepo config
+
+  [ Marek Marczykowski-Górecki ]
+  * dnf: avoid deadlock on repository lock after successful update
+  * Fix excluding extrepo on ubuntu
+
+  [ Jayant-Kernel ]
+  * qubes.GetImageRGBA: fix SVG conversion for images without explicit
+    dimensions
+  * qubes.GetImageRGBA: add unit tests for SVG conversion
+  * qubesagent/test_getimgrgba: skip when tools unavailable
+  * rpm_spec: add test_getimgrgba to %files
+
+  [ Marek Marczykowski-Górecki ]
+  * ci: install tools for svg conversion tests
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 02 May 2026 17:08:39 +0200
+
 qubes-core-agent (4.3.40-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
