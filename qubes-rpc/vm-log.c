@@ -32,6 +32,30 @@
 #define MAX_LINE_SIZE 4096
 #define DEFAULT_PRIO LOG_INFO
 
+struct LogBackend {
+    void (*open)(const char *ident);
+    void (*write)(int priority, const char *message);
+    void (*close)(void);
+};
+
+static void syslog_open(const char *ident) {
+    openlog(ident, LOG_PID, LOG_DAEMON);
+}
+
+static void syslog_write(int priority, const char *message) {
+    syslog(priority, "%s", message);
+}
+
+static void syslog_close(void) {
+    closelog();
+}
+
+static const struct LogBackend SYSLOG_BACKEND = {
+    .open = syslog_open,
+    .write = syslog_write,
+    .close = syslog_close,
+};
+
 // Syslog priority array (Severity 0 to 7)
 const int SEV2SYSLOG_ARRAY[] = {
     LOG_EMERG,
@@ -188,7 +212,7 @@ int main() {
         return 1;
     }
 
-    (void) handle_untrusted(remote_domain);
+    handle_untrusted(remote_domain, &SYSLOG_BACKEND);
 
     return 0;
 }
