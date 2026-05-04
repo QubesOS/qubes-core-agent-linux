@@ -68,14 +68,14 @@ def get_dns_resolved():
         ) or error.startswith('org.freedesktop.systemd1.'):
             return get_dns_resolv_conf()
         raise
-    # Use global entries first
-    dns.sort(key=lambda x: x[0] != 0)
     # Only keep IPv4 entries. systemd-resolved is trusted to return valid
     # addresses.
-    # ToDo: We only need abridged IPv4 DNS entries for ifindex == 0.
-    # to ensure static DNS of disconnected network interfaces are not added.
-    return [IPv4Address(bytes(addr)) for ifindex, family, addr in dns
-            if family == 2]
+    dns = [entry for entry in dns if entry[1] == 2]
+    # Use global entries only if they exist. Otherwise fall back to
+    # interface-specific DNS entries.
+    if any(ifindex == 0 for ifindex, family, addr in dns):
+        dns = [entry for entry in dns if entry[0] == 0]
+    return [IPv4Address(bytes(addr)) for ifindex, family, addr in dns]
 
 def install_firewall_rules(dns):
     qdb = qubesdb.QubesDB()
