@@ -13,6 +13,18 @@ if [ -d "$NM_CONFIG_DIR" ] && [ ! -h "$NM_CONFIG_DIR" ]; then
     ln -s /rw/config/NM-system-connections "$NM_CONFIG_DIR"
 fi
 
+# adjust interface name in connections after R4.2->R4.3 upgrade
+for conn in "$NM_CONFIG_DIR"/*.nmconnection; do
+    intf=$(sed -n '/^interface-name=/ {s/.*=//;p}' "$conn")
+    if [ -z "$intf" ]; then
+        continue
+    fi
+    new_intf="${intf%f0}"
+    if ! [ -e "/sys/class/net/$intf" ] && [ -e "/sys/class/net/$new_intf" ]; then
+        sed -i "s/^interface-name=$intf/interface-name=$new_intf/" "$conn"
+    fi
+done
+
 # Do not manage xen-provided network devices
 unmanaged_devices=mac:fe:ff:ff:ff:ff:ff
 #for mac in `xenstore-ls device/vif | grep mac | cut -d= -f2 | tr -d '" '`; do
