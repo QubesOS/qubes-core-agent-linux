@@ -1,7 +1,7 @@
 #!/bin/sh
-if [ -f /usr/lib/qubes/qvm_nautilus_bookmark.sh ]
+if [ -f /usr/lib/qubes/qvm_bookmark.sh ]
 then
-  /usr/lib/qubes/qvm_nautilus_bookmark.sh >/dev/null 2>&1 </dev/null
+  /usr/lib/qubes/qvm_bookmark.sh >/dev/null 2>&1 </dev/null
 fi
 case $1 in
 ('') arg=;;

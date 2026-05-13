@@ -1,6 +1,6 @@
 # Maintainer: Frédéric Pierret (fepitre) <frederic@invisiblethingslab.com>
 
-pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-caja qubes-vm-nautilus qubes-vm-passwordless-root qubes-vm-thunar qubes-vm-dom0-updates)
+pkgname=(qubes-vm-core qubes-vm-networking qubes-vm-keyring qubes-vm-bookmark qubes-vm-caja qubes-vm-nautilus qubes-vm-passwordless-root qubes-vm-thunar qubes-vm-dom0-updates)
 pkgver=@VERSION@
 pkgrel=@REL@
 pkgdesc="The Qubes core files for installation inside a Qubes VM."
@@ -95,6 +95,7 @@ package_qubes-vm-core() {
         qubes-vm-nautilus
         qubes-vm-networking
         qubes-vm-thunar
+        qubes-vm-bookmark
     )
     install="archlinux/PKGBUILD.install"
 
@@ -220,6 +221,22 @@ package_qubes-vm-caja() {
 
     cd "${_pkgnvr}"
     make -C qubes-rpc/caja install \
+        DESTDIR="$pkgdir" \
+        SBINDIR=/usr/bin \
+        LIBDIR=/usr/lib \
+        SYSLIBDIR=/usr/lib \
+        SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
+        USER_DROPIN_DIR=/usr/lib/systemd/user \
+        DIST=archlinux
+}
+
+package_qubes-vm-bookmark() {
+    pkgdesc="Qubes integration for GUI bookmarks"
+    provides=(qubes-core-agent-bookmark=@VERSION@)
+    conflicts=('qubes-vm-core<4.3.26')
+
+    cd "${_pkgnvr}"
+    make -C qubes-rpc/bookmark install \
         DESTDIR="$pkgdir" \
         SBINDIR=/usr/bin \
         LIBDIR=/usr/lib \
