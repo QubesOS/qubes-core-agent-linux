@@ -96,9 +96,9 @@ install:
 		qubes.GetDate \
 		qubes.ShowInTerminal \
 		qubes.TemplateSearch \
-		qubes.TemplateDownload \
-		qubes.Log
+		qubes.TemplateDownload
 	$(LN) qubes.VMExec $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.VMExecGUI
+	$(LN) $(QUBESLIBDIR)/vm-log $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.Log
 	$(LN) /dev/tcp/127.0.0.1 $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.ConnectTCP
 	$(LN) /dev/tcp/127.0.0.1/8082 $(DESTDIR)$(QUBESRPCCMDDIR)/qubes.UpdatesProxy
 	for config in *.config; do \
