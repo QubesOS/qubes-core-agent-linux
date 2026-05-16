@@ -1,3 +1,37 @@
+qubes-core-agent (4.2.46-1) unstable; urgency=medium
+
+  [ Marek Marczykowski-Górecki ]
+  * Set user session stop timeout in all templates
+  * Use "Edit", not "View" action for opening all files in disposables
+
+  [ EliasDevv ]
+  * Fix missing deprecation warning for qvm-copy-to-vm
+
+  [ Nihal ]
+  * misc/50_qubes.conf: disable kernelhints when dom0 kernel is used
+
+  [ Jayant-Kernel ]
+  * qubes.GetImageRGBA: fix SVG conversion for images without explicit
+    dimensions
+  * qubes.GetImageRGBA: add unit tests for SVG conversion
+  * qubesagent/test_getimgrgba: skip when tools unavailable
+  * rpm_spec: add test_getimgrgba to %files
+
+  [ Marek Marczykowski-Górecki ]
+  * ci: install tools for svg conversion tests
+
+  [ heinrich5991 ]
+  * Only consider global DNS servers if they exist
+
+  [ Marek Marczykowski-Górecki ]
+  * network: adjust interface names in NM connections after update to
+    R4.3
+
+  [ Demi Marie Obenour ]
+  * Fix tar2qfile build with clang
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 16 May 2026 03:12:06 +0200
+
 qubes-core-agent (4.2.45-1) unstable; urgency=medium
 
   [ Ali Mirjamali ]
