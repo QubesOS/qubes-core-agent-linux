@@ -19,7 +19,7 @@ for conn in "$NM_CONFIG_DIR"/*.nmconnection; do
     if [ -z "$intf" ]; then
         continue
     fi
-    new_intf="${intf%f0}"
+    new_intf="$(echo "${intf}" | sed -e /f0//)"
     if ! [ -e "/sys/class/net/$intf" ] && [ -e "/sys/class/net/$new_intf" ]; then
         sed -i "s/^interface-name=$intf/interface-name=$new_intf/" "$conn"
     fi
