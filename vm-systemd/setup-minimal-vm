@@ -33,7 +33,20 @@ setup_minimal_netvm() {
 	fi
 }
 
+disable_zram() {
+    systemctl mask --runtime --now systemd-zram-setup@zram0
+    ln -nsf /dev/null /run/systemd/zram-generator.conf
+    systemctl daemon-reload
+    if command -v zramctl >/dev/null; then
+        zramctl -r zram0
+    fi
+}
+
 if is_minimal_netvm; then
 	setup_minimal_netvm
+    disable_zram
 fi
 
+if is_minimal_usbvm; then
+    disable_zram
+fi
