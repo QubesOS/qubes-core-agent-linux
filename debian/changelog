@@ -1,3 +1,11 @@
+qubes-core-agent (4.2.47-1) unstable; urgency=medium
+
+  * network: adjust interface names in NM connections after update to
+    R4.3 (cont)
+  * Disable geoclue
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 19 May 2026 17:33:34 +0200
+
 qubes-core-agent (4.2.46-1) unstable; urgency=medium
 
   [ Marek Marczykowski-Górecki ]
