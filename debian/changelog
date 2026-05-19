@@ -1,3 +1,12 @@
+qubes-core-agent (4.3.43-1) unstable; urgency=medium
+
+  * Disable geoclue
+  * Disable zram on minimal netvm/usbvm
+  * network: adjust interface names in NM connections after update to
+    R4.3 (cont)
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 19 May 2026 17:34:11 +0200
+
 qubes-core-agent (4.3.42-1) unstable; urgency=medium
 
   [ heinrich5991 ]
