@@ -1,3 +1,9 @@
+qubes-core-agent (4.3.44-1) unstable; urgency=medium
+
+  * Reduce udev max children count on minimal VMs
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 26 May 2026 03:18:58 +0200
+
 qubes-core-agent (4.3.43-1) unstable; urgency=medium
 
   * Disable geoclue
