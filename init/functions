@@ -118,7 +118,7 @@ umount_retry() {
 get_mac_from_iface() {
     local iface="$1"
     local mac=
-    if [ "x$iface" != "x" ] && [ -e "/sys/class/net/$iface" ]; then
+    if [ -n "$iface" ] && [ -e "/sys/class/net/$iface" ]; then
         mac="$(cat "/sys/class/net/$iface/address")"
     fi
     echo "$mac"
@@ -127,7 +127,7 @@ get_mac_from_iface() {
 get_iface_from_mac() {
     local mac="$1"
     local iface=
-    if [ "x$mac" != "x" ]; then
+    if [ -n "$mac" ]; then
         iface="$(ip -o link | grep -i "$mac" | awk '{print $2}' | cut -d ':' -f1)"
     fi
     echo "$iface"
@@ -144,7 +144,7 @@ get_qubes_managed_iface() {
     # Load the module explicitly here, to avoid waiting for udev doing that
     [ -e /sys/module/xen_netfront ] || modprobe xen-netfront || :
     qubes_iface="$(get_iface_from_mac "$mac")"
-    if [ "x$qubes_iface" != "x" ]; then
+    if [ -n "$qubes_iface" ]; then
         echo "$qubes_iface"
     elif [ -e /sys/class/net/eth0 ]; then
         echo eth0
@@ -159,7 +159,7 @@ get_prefix_from_subnet() {
     x=${1%%"$3"*}
     prefix=$(( $2 + (${#x}/4) ))
 
-    if [ "x$prefix" != "x" ]; then
+    if [ -n "$prefix" ]; then
         echo "$prefix"
     else
         echo "32"

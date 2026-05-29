@@ -285,7 +285,7 @@ configure_systemd() {
     # fix / ro mounted
     ln -sf /usr/lib/systemd/system/systemd-remount-fs.service /etc/systemd/system/sysinit.target.wants/
 
-    if [ "x$changed" != "x" ]
+    if [ -n "$changed" ]
     then
         systemctl daemon-reload
     fi
@@ -442,7 +442,7 @@ post_remove() {
         changed=true
     fi
 
-    if [ "x$changed" != "x" ]
+    if [ -n "$changed" ]
     then
         systemctl daemon-reload
     fi
