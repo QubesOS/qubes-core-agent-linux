@@ -33,6 +33,7 @@ bin-qfile-unpacker: qfile-unpacker.o gui-fatal.o
 qubes-fs-tree-check: LDLIBS := -lqubes-pure
 qubes-fs-tree-check: qubes-fs-tree-check.o
 vm-file-editor: vm-file-editor.o
+vm-log: LDLIBS += -lqubesdb
 vm-log: vm-log.o
 qopen-in-vm: qopen-in-vm.o gui-fatal.o
 qfile-agent: qfile-agent.o gui-fatal.o

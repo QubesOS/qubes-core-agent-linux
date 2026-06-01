@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
-#include <unistd.h>
 #include <regex.h>
 #include <errno.h>
 #include <qubesdb-client.h>
@@ -32,9 +31,6 @@
 
 #define MAX_LINE_SIZE 4096
 #define DEFAULT_PRIO LOG_INFO
-// Maximum length of the raw value returned by qubesdb-read.
-// Backends: "syslog", "stderr", "file://<path>"
-#define MAX_BACKEND_STR 128
 
 // Syslog priority array (Severity 0 to 7)
 const int SEV2SYSLOG_ARRAY[] = {
@@ -79,51 +75,6 @@ int extract_priority(int pri) {
 }
 
 /**
- * Reads the raw value of /vm-config/log-backend from QubesDB.
- *
- * @param out Buffer to receive the value (NUL-terminated).
- * @param size Size of the buffer.
- * @return 1 on success, 0 if the feature is absent or an error occurs.
- */
-int read_log_backend_feature(char *out, size_t size) {
-    if (!out || size == 0) {
-        return 0;
-    }
-
-    qdb_handle_t qdb = qdb_open(NULL);
-    if (!qdb) {
-        syslog(LOG_WARNING,
-           "qubes.Log: failed to read vm-config features from qubesdb."
-           MAX_BACKEND_STR - 1);
-        return 0;
-    }
-
-    char *value = qdb_read(qdb, "/vm-config/log-backend", NULL);
-    qdb_close(qdb);
-
-    if (!value) {
-        syslog(LOG_WARNING,
-           "qubes.Log: failed to read log-backend feature."
-           MAX_BACKEND_STR - 1);
-        return 0;
-    }
-
-    size_t len = strlen(value);
-    if (len >= size) {
-        syslog(LOG_WARNING,
-           "qubes.Log: log-backend feature is too long (> %d), ignoring."
-           MAX_BACKEND_STR - 1);
-        free(value);
-        return 0;
-    }
-
-    memcpy(out, value, len + 1);
-    free(value);
-
-    return len > 0;
-}
-
-/**
  * Initialises the log backend.
  *
  * Reads the QubesDB feature and selects the backend.
@@ -135,8 +86,17 @@ int read_log_backend_feature(char *out, size_t size) {
 void open_log_backend(const char *ident) {
     openlog(ident, LOG_PID | LOG_CONS, LOG_USER);
 
-    char raw[MAX_BACKEND_STR];
-    if (!read_log_backend_feature(raw, sizeof(raw))) {
+    qdb_handle_t qdb = qdb_open(NULL);
+    if (!qdb) {
+        // qubesdb unavailable, fallback to syslog
+        backend.type = BACKEND_SYSLOG;
+        return;
+    }
+
+    char *raw = qdb_read(qdb, "/vm-config/log-backend", NULL);
+    qdb_close(qdb);
+
+    if (!raw) {
         // feature not set
         backend.type = BACKEND_SYSLOG;
         return;
@@ -144,11 +104,13 @@ void open_log_backend(const char *ident) {
 
     if (strcmp(raw, "syslog") == 0) {
         backend.type = BACKEND_SYSLOG;
+        free(raw);
         return;
     }
 
     if (strcmp(raw, "stderr") == 0) {
         backend.type = BACKEND_STDERR;
+        free(raw);
         return;
     }
 
@@ -164,6 +126,7 @@ void open_log_backend(const char *ident) {
                    "falling back to syslog",
                    path, strerror(errno));
             backend.type = BACKEND_SYSLOG;
+            free(raw);
             return;
         }
 
@@ -172,14 +135,16 @@ void open_log_backend(const char *ident) {
 
         backend.type = BACKEND_FILE;
         backend.handle.file = f;
+        free(raw);
         return;
     }
 
     // Unknown value
     syslog(LOG_WARNING,
-           "qubes.Log: unrecognised log-backend feature '%s', "
+           "qubes.Log: unrecognised log-backend value '%s', "
            "falling back to syslog", raw);
     backend.type = BACKEND_SYSLOG;
+    free(raw);
 }
 
 /**
