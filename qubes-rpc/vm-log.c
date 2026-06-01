@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <regex.h>
 #include <errno.h>
+#include <qubesdb-client.h>
 #include <qubes/pure.h>
 
 #define MAX_LINE_SIZE 4096
@@ -89,23 +90,35 @@ int read_log_backend_feature(char *out, size_t size) {
         return 0;
     }
 
-    FILE *fp = popen("qubesdb-read /vm-config/log-backend 2>/dev/null", "r");
-    if (!fp) {
+    qdb_handle_t qdb = qdb_open(NULL);
+    if (!qdb) {
+        syslog(LOG_WARNING,
+           "qubes.Log: failed to read vm-config features from qubesdb."
+           MAX_BACKEND_STR - 1);
         return 0;
     }
 
-    char *result = fgets(out, (int) size, fp);
-    int status = pclose(fp);
+    char *value = qdb_read(qdb, "/vm-config/log-backend", NULL);
+    qdb_close(qdb);
 
-    if (!result || status != 0) {
-        out[0] = '\0';  // Ensure output is empty on failure
+    if (!value) {
+        syslog(LOG_WARNING,
+           "qubes.Log: failed to read log-backend feature."
+           MAX_BACKEND_STR - 1);
         return 0;
     }
 
-    // Strip trailing newline and carriage return
-    size_t len = strlen(out);
-    while (len > 0 && (out[len - 1] == '\n' || out[len - 1] == '\r'))
-        out[--len] = '\0';
+    size_t len = strlen(value);
+    if (len >= size) {
+        syslog(LOG_WARNING,
+           "qubes.Log: log-backend feature is too long (> %d), ignoring."
+           MAX_BACKEND_STR - 1);
+        free(value);
+        return 0;
+    }
+
+    memcpy(out, value, len + 1);
+    free(value);
 
     return len > 0;
 }
@@ -164,7 +177,7 @@ void open_log_backend(const char *ident) {
 
     // Unknown value
     syslog(LOG_WARNING,
-           "qubes-log: unrecognised log-backend value '%s', "
+           "qubes.Log: unrecognised log-backend feature '%s', "
            "falling back to syslog", raw);
     backend.type = BACKEND_SYSLOG;
 }
