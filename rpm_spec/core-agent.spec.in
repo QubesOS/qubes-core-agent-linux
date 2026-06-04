@@ -119,6 +119,7 @@ Vendor:     Invisible Things Lab
 License:    GPL-2.0-only
 URL:        https://www.qubes-os.org
 
+BuildRequires: qubes-db-devel
 Requires:   xdg-utils
 Requires:   qubes-utils >= 3.1.3
 Requires:   qubes-utils-libs >= 4.3.1
@@ -194,6 +195,7 @@ BuildRequires: desktop-file-utils
 BuildRequires: pandoc
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
+BuildRequires: qubes-db-devel
 BuildRequires: qubes-utils-devel >= 4.3.1
 BuildRequires: qubes-libvchan-%{?qubes_backend_vmm}%{?!qubes_backend_vmm:@BACKEND_VMM@}-devel
 BuildRequires: pam-devel
@@ -898,6 +900,7 @@ rm -f %{name}-%{version}
 %dir /etc/qubes-rpc
 %config(noreplace) /etc/qubes-rpc/qubes.ShowInTerminal
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
+%config(noreplace) /etc/qubes-rpc/qubes.Log
 %config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
 %config(noreplace) /etc/qubes-rpc/qubes.OpenURL
 %config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
@@ -1027,6 +1030,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qubes-fs-tree-check
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
+/usr/lib/qubes/vm-log
 /usr/lib/qubes/xdg-icon
 /usr/lib/qubes/update-proxy-configs
 /usr/lib/qubes/upgrades-installed-check
