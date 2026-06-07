@@ -91,11 +91,19 @@ Description: Qubes core agent
  This package includes various daemons necessary for qubes domU support,
  such as qrexec services.
 
+Package: qubes-core-agent-bookmark
+Architecture: any
+Replaces: qubes-core-agent (<< 4.0.0-1)
+Breaks: qubes-core-agent (<< 4.0.0-1)
+Description: Qubes integration for GUI bookmarks
+ GUI bookmarks for useful Qubes OS directories.
+
 Package: qubes-core-agent-nautilus
 Architecture: any
 Depends:
     ${pythonver:Depends}-nautilus,
     qubes-core-qrexec,
+    qubes-core-agent-bookmark,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for Nautilus
@@ -106,6 +114,7 @@ Architecture: any
 Depends:
     ${pythonver:Depends}-caja,
     qubes-core-qrexec,
+    qubes-core-agent-bookmark,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for Caja
@@ -116,6 +125,7 @@ Architecture: any
 Depends:
     thunar,
     qubes-core-qrexec,
+    qubes-core-agent-bookmark,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for Thunar
@@ -126,6 +136,7 @@ Architecture: any
 Depends:
     pcmanfm-qt,
     qubes-core-qrexec,
+    qubes-core-agent-bookmark,
 Replaces: qubes-core-agent (<< 4.0.0-1)
 Breaks: qubes-core-agent (<< 4.0.0-1)
 Description: Qubes integration for PCManFM-Qt
