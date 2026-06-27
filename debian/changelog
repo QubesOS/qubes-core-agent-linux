@@ -1,3 +1,10 @@
+qubes-core-agent (4.3.46-1) unstable; urgency=medium
+
+  * Fix issues found by shellcheck
+  * rpm: update unstable repo key to R4.3 version
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 27 Jun 2026 21:22:01 +0200
+
 qubes-core-agent (4.3.45-1) unstable; urgency=medium
 
   * Restart qubes-firewall on failure
