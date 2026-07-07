@@ -95,6 +95,7 @@ lib/systemd/system/org.cups.cupsd.path.d/30_qubes.conf
 lib/systemd/system/org.cups.cupsd.service.d/30_qubes.conf
 lib/systemd/system/org.cups.cupsd.socket.d/30_qubes.conf
 lib/systemd/system/polkit.service.d/30_qubes.conf
+lib/systemd/system/packagekit.service.d/30_qubes.conf
 lib/systemd/system/dev-xvdc1-swap.service
 lib/systemd/system/qubes-bind-dirs.service
 lib/systemd/system/qubes-early-vm-config.service
