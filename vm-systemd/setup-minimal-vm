@@ -38,7 +38,7 @@ disable_zram() {
     ln -nsf /dev/null /run/systemd/zram-generator.conf
     systemctl daemon-reload
     if command -v zramctl >/dev/null; then
-        zramctl -r zram0
+        zramctl -r zram0 || true # Elide unnecessary failure when no zram devices are setup.
     fi
 }
 
