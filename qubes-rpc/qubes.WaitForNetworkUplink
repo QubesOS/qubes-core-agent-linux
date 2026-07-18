@@ -11,8 +11,8 @@ fi
 
 i=0
 while test $i -le 10; do
-  if systemctl is-active --quiet "qubes-network-uplink@$iface.service"; then
-    ip link show "$iface" | grep "state UP" || exit 4
+  if systemctl is-active --quiet "qubes-network-uplink@$iface.service" &&
+      ip link show "$iface" | grep "state UP"; then
     exit 0
   fi
   sleep 0.3
