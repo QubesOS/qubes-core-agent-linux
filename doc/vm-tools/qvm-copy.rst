@@ -16,25 +16,6 @@ OPTIONS
     Don't display progress info
 
 
-=================
-qvm-copy-to-vm(1)
-=================
-For use in scripting; for interactive use, use qvm-copy.
-
-NAME
-====
-qvm-copy-to-vm - copy specified files to specified destination VM. Deprecated outside of dom0.
-
-SYNOPSIS
-========
-| qvm-copy-to-vm [--without-progress] dest_vmname file [file]+
-
-OPTIONS
-=======
---without-progress
-    Don't display progress info
-
-
 AUTHORS
 =======
 | Joanna Rutkowska <joanna at invisiblethingslab dot com>
