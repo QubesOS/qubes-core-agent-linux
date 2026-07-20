@@ -1,10 +1,14 @@
+.. program:: qvm-move
+
 ===========
 qvm-move(1)
 ===========
 
 NAME
 ====
-qvm-move - move specified files to a destination VM. Prompt user to select a destination VM. Does not work in dom0.
+qvm-move - move specified files to a destination VM. Prompt user to select a destination VM. 
+
+.. warning:: Does not work in dom0.
 
 SYNOPSIS
 ========
@@ -12,7 +16,8 @@ SYNOPSIS
 
 OPTIONS
 =======
---without-progress
+.. option:: --without-progress
+
     Don't display progress info
 
 
