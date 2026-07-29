@@ -1,0 +1,2 @@
+pam_qubes_admin_authz.so
+qubes-admin-authzd
