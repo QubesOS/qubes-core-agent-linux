@@ -60,6 +60,7 @@ SYSTEM_DROPINS += abrtd.service
 SYSTEM_DROPINS += bluetooth.service
 SYSTEM_DROPINS += systemd-nsresourced.service
 SYSTEM_DROPINS += systemd-nsresourced.socket
+SYSTEM_DROPINS += packagekit.service
 
 SYSTEM_DROPINS_NETWORKING := NetworkManager.service NetworkManager-wait-online.service
 SYSTEM_DROPINS_NETWORKING += tinyproxy.service
