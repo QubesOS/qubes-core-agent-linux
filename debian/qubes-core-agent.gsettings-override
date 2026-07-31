@@ -3,3 +3,6 @@ theme='slider'
 
 [org.freedesktop.ibus.panel]
 show-icon-on-systray=false
+
+[org.gnome.software]
+allow-updates=false
