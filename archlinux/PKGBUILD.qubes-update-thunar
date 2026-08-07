@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+uca_file=/etc/xdg/Thunar/uca.xml
+
+if [ -f "$uca_file" ]; then
+    cp -p "$uca_file" "$uca_file.bak"
+    #shellcheck disable=SC2016
+    sed -i '$e cat /usr/lib/qubes/uca_qubes.xml' "$uca_file"
+fi
