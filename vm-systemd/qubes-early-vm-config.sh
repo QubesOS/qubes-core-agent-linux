@@ -4,16 +4,18 @@
 # It happens after local-fs.target is reached
 # but before sysinit.target is reached.
 
-for rc in /rw/config/rc.local-early.d/*.rc /rw/config/rc.local-early; do
-    [ -f "$rc" ] || continue
-    [ -x "$rc" ] || continue
-    "$rc"
-done
-unset rc
-
 # Source Qubes library.
 # shellcheck source=init/functions
 . /usr/lib/qubes/init/functions
+
+if ! is_custom_persist_enabled; then
+    for rc in /rw/config/rc.local-early.d/*.rc /rw/config/rc.local-early; do
+        [ -f "$rc" ] || continue
+        [ -x "$rc" ] || continue
+        "$rc"
+    done
+    unset rc
+fi
 
 # Set the hostname
 if ! is_protected_file /etc/hostname ; then
