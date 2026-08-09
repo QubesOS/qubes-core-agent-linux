@@ -1,3 +1,10 @@
+qubes-core-agent (4.3.47-1) unstable; urgency=medium
+
+  * Better wait for network uplink
+  * Disable /rw/config/rc.local-early if custom-persist is enabled
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 09 Aug 2026 04:23:57 +0200
+
 qubes-core-agent (4.3.46-1) unstable; urgency=medium
 
   * Fix issues found by shellcheck
