@@ -175,7 +175,7 @@ install-systemd: install-init
 
 	# Install user services
 	install -d $(DESTDIR)$(USER_DROPIN_DIR)
-	install -m 0644 vm-systemd/user/open-urls-in-dvm.service $(DESTDIR)$(USER_DROPIN_DIR)
+	install -m 0644 vm-systemd/user/open-urls-in-dispvm.service $(DESTDIR)$(USER_DROPIN_DIR)
 
 .PHONY: install-sysvinit
 install-sysvinit: install-init
