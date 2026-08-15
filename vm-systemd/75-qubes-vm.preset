@@ -119,7 +119,6 @@ enable dev-xvdc1-swap.service
 enable NetworkManager.service
 enable NetworkManager-dispatcher.service
 enable qubes-setup-minimal-vm.service
-enable open-urls-in-dispvm.service
 
 # Disable useless Xen services in Qubes VM
 disable xenstored.service

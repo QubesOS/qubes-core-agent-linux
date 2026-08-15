@@ -40,6 +40,7 @@ clean:
 # Dropin Directory
 SYSTEM_DROPIN_DIR ?= /lib/systemd/system
 USER_DROPIN_DIR ?= /usr/lib/systemd/user
+USER_PRESET_DIR ?= $(LIBDIR)/systemd/user-preset
 
 SYSTEM_DROPINS := boot.automount chronyd.service crond.service
 SYSTEM_DROPINS += cups.service cups-browsed.service cups.path cups.socket ModemManager.service
@@ -176,6 +177,8 @@ install-systemd: install-init
 	# Install user services
 	install -d $(DESTDIR)$(USER_DROPIN_DIR)
 	install -m 0644 vm-systemd/user/open-urls-in-dispvm.service $(DESTDIR)$(USER_DROPIN_DIR)
+	install -d $(DESTDIR)$(USER_PRESET_DIR)
+	install -m 0644 vm-systemd/user-preset/75-qubes-open-in-dispvm.preset $(DESTDIR)$(USER_PRESET_DIR)/
 
 .PHONY: install-sysvinit
 install-sysvinit: install-init
