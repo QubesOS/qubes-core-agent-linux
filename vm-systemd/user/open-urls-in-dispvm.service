@@ -8,4 +8,4 @@ ConditionPathExists=/var/run/qubes-service/open-urls-in-dispvm
 ExecStart=xdg-mime default qvm-open-in-dvm.desktop x-scheme-handler/http x-scheme-handler/https
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=qubes-graphical-session.target
