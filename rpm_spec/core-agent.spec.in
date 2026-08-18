@@ -1302,9 +1302,11 @@ changed=
 if [ $1 -eq 1 ]
 then
     preset_units %{_presetdir}/%qubes_preset_file initial
+    preset_units %{_userpresetdir}/75-qubes-open-in-dispvm.preset initial --user
     changed=true
 else
     preset_units %{_presetdir}/%qubes_preset_file upgrade
+    preset_units %{_userpresetdir}/75-qubes-open-in-dispvm.preset upgrade --user
     changed=true
     # Upgrade path - now qubes-iptables is used instead
     for svc in iptables ip6tables

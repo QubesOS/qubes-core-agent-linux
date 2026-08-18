@@ -129,11 +129,13 @@ case "${1}" in
 
             # Systemd preload-all
             preset_units /lib/systemd/system-preset/75-qubes-vm.preset initial
+            preset_units /usr/lib/systemd/user-preset/75-qubes-open-in-dispvm.preset initial --user
 
             # Maybe install overridden serial.conf init script
             installSerialConf
         else
             preset_units /lib/systemd/system-preset/75-qubes-vm.preset upgrade
+            preset_units /usr/lib/systemd/user-preset/75-qubes-open-in-dispvm.preset upgrade --user
         fi
         systemctl reenable haveged || :
 
