@@ -120,6 +120,10 @@ tmpfs                   /etc/pacman.d/gnupg/private-keys-v1.d       ramfs   defa
     # Install systemd script allowing to automount /lib/modules
     install -m 644 "archlinux/PKGBUILD.qubes-ensure-lib-modules.service" "${pkgdir}/usr/lib/systemd/system/qubes-ensure-lib-modules.service"
 
+    # Adjust packagekitd path
+    sed -i -e s,/usr/libexec/packagekitd,/usr/lib/packagekitd, \
+       "${pkgdir}/usr/lib/systemd/system/packagekit.service.d/30_qubes.conf"
+
     # Install pacman hook to update desktop icons
     mkdir -p "${pkgdir}/usr/share/libalpm/hooks/"
     install -m 644 "archlinux/PKGBUILD.qubes-update-desktop-icons.hook" "${pkgdir}/usr/share/libalpm/hooks/qubes-update-desktop-icons.hook"
