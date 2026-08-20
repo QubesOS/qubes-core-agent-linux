@@ -30,7 +30,7 @@ usage() {
     (qvm-open-in-dvm|*/qvm-open-in-dvm)
         printf 'Usage: %s [--view-only] [--] filename\n' "$0" >&2
         ;;
-    (*) printf 'Usage: %s [--view-only] [--] vmname filename\n' "$0";;
+    (*) printf 'Usage: %s [--view-only] [--] [vmname] filename\n' "$0";;
     esac >&2
     exit "${1-2}"
 }
@@ -59,6 +59,16 @@ for i; do
     fi
 done
 set +u
+
+case $0 in
+(qvm-open-in-dvm|*/qvm-open-in-dvm) ;;
+(*)
+    if [ -n "${target+x}" ] && [ -z "${filename+x}" ]; then
+        filename="$target"
+        target=@default
+    fi
+    ;;
+esac
 
 if [ -z "$target" ] || [ -z "$filename" ]; then
     usage
