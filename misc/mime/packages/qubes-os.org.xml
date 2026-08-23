@@ -64,7 +64,10 @@ command to generate the output files.
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
   <mime-type type="application/qubes-untrusted-file">
     <comment>Untrusted file to open in a DispVM</comment>
-    <glob pattern="*" weight="100"/>
+    <!-- Filenames are non-empty, so "?*" remains a catch-all while avoiding
+         the empty-suffix bug in shared-mime-info:
+         https://gitlab.freedesktop.org/xdg/shared-mime-info/-/issues/230 -->
+    <glob pattern="?*" weight="100"/>
   </mime-type>
   <mime-type type="image/svg+xml">
     <comment>SVG image</comment>
