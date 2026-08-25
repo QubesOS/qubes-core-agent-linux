@@ -269,6 +269,11 @@ package_qubes-vm-thunar() {
         SYSTEM_DROPIN_DIR=/usr/lib/systemd/system \
         USER_DROPIN_DIR=/usr/lib/systemd/user \
         DIST=archlinux
+
+    install -D -m 755 "archlinux/PKGBUILD.qubes-update-thunar" \
+        "$pkgdir/usr/lib/qubes/update-thunar-actions"
+    install -D -m 644 "archlinux/PKGBUILD.qubes-update-thunar.hook" \
+        "$pkgdir/usr/share/libalpm/hooks/qubes-update-thunar.hook"
 }
 
 package_qubes-vm-nautilus() {

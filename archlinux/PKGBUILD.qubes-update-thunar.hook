@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = qubes-vm-thunar
+
+[Action]
+Description = Updating Thunar custom actions...
+When = PostTransaction
+Exec = /usr/lib/qubes/update-thunar-actions
