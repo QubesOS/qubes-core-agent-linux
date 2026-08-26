@@ -48,6 +48,7 @@ done < "$repodir/template.repo"
 if ! DNF=$(command -v dnf5 dnf dnf4 | head -1); then
     echo "ERROR: dnf command is missing, please use newer template for your UpdateVM to download templates." >&2
     echo "You can choose any Fedora version, Debian 11 (or newer), or any other based on those (like Whonix 16)." >&2
+    echo "DEBUG: PATH='$PATH', command output: '$(command -v dnf5 dnf dnf4)'"
     exit 1
 fi
 DNF5=false
