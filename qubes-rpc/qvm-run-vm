@@ -42,7 +42,7 @@ USAGE
 }
 
 
-if ! OPTS=$(getopt -o htd --long help,no-gui,dispvm -n "$0" -- "$@"); then
+if ! OPTS=$(getopt -o +htd --long help,no-gui,dispvm -n "$0" -- "$@"); then
     print_usage
     exit 1
 fi
