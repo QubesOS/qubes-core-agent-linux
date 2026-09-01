@@ -8,7 +8,6 @@ etc/qubes/qubes-antispoof.nft
 etc/sysctl.d/81-qubes.conf.optional
 etc/sysctl.d/82-qubes-minimal-sys-net.conf.optional
 etc/tinyproxy/tinyproxy-updates.conf
-etc/tinyproxy/updates-blacklist
 etc/udev/rules.d/99-qubes-network.rules
 etc/xen/scripts/vif-qubes-nat.sh
 etc/xen/scripts/vif-route-qubes
