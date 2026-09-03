@@ -8,8 +8,11 @@ qvm-open-in-vm - open a specified file or URL in a other VM
 
 SYNOPSIS
 ========
-| qvm-open-in-vm vmname filename
-| qvm-open-in-vm vmname URL
+| qvm-open-in-vm [vmname] filename
+| qvm-open-in-vm [vmname] URL
+
+If *vmname* is omitted, it defaults to ``@default`` and the qrexec policy
+decides which VM the file or URL is opened in.
 
 OPTIONS
 =======
