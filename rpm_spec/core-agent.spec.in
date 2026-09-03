@@ -941,6 +941,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.ResizeDisk
 %config(noreplace) /etc/qubes-rpc/qubes.StartApp
 %config(noreplace) /etc/qubes-rpc/qubes.PostInstall
+%config(noreplace) /etc/qubes-rpc/qubes.PostUpdate
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
 %config(noreplace) /etc/qubes/rpc-config/qubes.ConnectTCP
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenInVM
@@ -979,6 +980,8 @@ rm -f %{name}-%{version}
 %dir /etc/qubes/post-install.d
 /etc/qubes/post-install.d/README
 /etc/qubes/post-install.d/*.sh
+%dir /etc/qubes/post-update.d
+/etc/qubes/post-update.d/README
 %config(noreplace) /etc/profile.d/qt_x11_no_mitshm.sh
 %config(noreplace) /etc/profile.d/zqubes_disable_lesspipe.sh
 %config(noreplace) /etc/sudoers.d/qt_x11_no_mitshm
