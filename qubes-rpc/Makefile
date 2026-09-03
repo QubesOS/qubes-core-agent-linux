@@ -93,6 +93,7 @@ install:
 		qubes.ResizeDisk \
 		qubes.StartApp \
 		qubes.PostInstall \
+		qubes.PostUpdate \
 		qubes.GetDate \
 		qubes.ShowInTerminal \
 		qubes.TemplateSearch \
@@ -114,3 +115,5 @@ install:
 	install -d $(DESTDIR)/etc/qubes/post-install.d
 	install -t $(DESTDIR)$(QUBESCONFDIR)/post-install.d -m 0644 post-install.d/README
 	install -t $(DESTDIR)$(QUBESCONFDIR)/post-install.d post-install.d/*.sh
+	install -d $(DESTDIR)/etc/qubes/post-update.d
+	install -t $(DESTDIR)$(QUBESCONFDIR)/post-update.d -m 0644 post-update.d/README
