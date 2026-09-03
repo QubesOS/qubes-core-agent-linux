@@ -1,3 +1,5 @@
+.. program:: qvm-run-vm
+
 ==========
 qvm-run-vm
 ==========
@@ -12,7 +14,8 @@ SYNOPSIS
 
 OPTIONS
 =======
---dispvm
+.. option:: --dispvm
+
     Pass this option instead of vmname to start new DisposableVM
 
 AUTHORS

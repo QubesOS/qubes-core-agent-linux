@@ -1,3 +1,5 @@
+.. program:: qvm-open-in-dvm
+
 ===============
 qvm-open-in-dvm
 ===============
