@@ -141,6 +141,8 @@ usr/lib/systemd/user/at-spi-dbus-bus.service.d/30_qubes.conf
 usr/lib/systemd/user/gvfs-daemon.service.d/30_qubes.conf
 usr/lib/systemd/user/pipewire.service.d/40_minimal.conf
 usr/lib/systemd/user/wireplumber.service.d/30_qubes.conf
+usr/lib/systemd/user/open-urls-in-dispvm.service
+usr/lib/systemd/user-preset/75-qubes-open-in-dispvm.preset
 lib/udev/rules.d/50-qubes-mem-hotplug.rules
 usr/bin/qfile-unpacker
 usr/bin/qubes-desktop-run
