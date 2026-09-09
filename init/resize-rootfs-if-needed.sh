@@ -21,9 +21,22 @@ boot_data_size=$((203 * 2 * 1024))
 # because that can change dynamically over the filesystem's lifetime.
 # See QubesOS/qubes-core-agent-linux#146 and QubesOS/qubes-core-agent-linux#152
 # for more details
-ext4_block_count=$(dumpe2fs /dev/mapper/dmroot | grep '^Block count:' | sed -E 's/Block count:[[:space:]]+//')
-ext4_block_size=$(dumpe2fs /dev/mapper/dmroot | grep '^Block size:' | sed -E 's/Block size:[[:space:]]+//')
-rootfs_size=$((ext4_block_count * ext4_block_size / 512))
+rootfs_type=$(blkid --output value --match-tag TYPE /dev/mapper/dmroot)
+case "$rootfs_type" in
+    ext*)
+        ext4_block_count=$(dumpe2fs /dev/mapper/dmroot | grep '^Block count:' | sed -E 's/Block count:[[:space:]]+//')
+        ext4_block_size=$(dumpe2fs /dev/mapper/dmroot | grep '^Block size:' | sed -E 's/Block size:[[:space:]]+//')
+        rootfs_size=$((ext4_block_count * ext4_block_size / 512))
+        ;;
+    btrfs)
+        rootfs_size_bytes=$(btrfs filesystem usage --raw / | grep 'Device size:' | sed -E 's/Device size:[[:space:]]+//')
+        rootfs_size=$((rootfs_size_bytes / 512))
+        ;;
+    *)
+        echo "Unsupported filesystem $rootfs_type" >&2
+        exit 1
+        ;;
+esac
 # 5 MB in 512-byte units for some random extra bits
 size_margin=$((5 * 1024 * 2))
 if [ "$(cat $sysfs_xvda/size)" -lt \

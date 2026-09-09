@@ -35,4 +35,16 @@ case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
         exit 1
         ;;
 esac
-resize2fs /dev/mapper/dmroot
+fstype=$(blkid --output value --match-tag TYPE /dev/mapper/dmroot)
+case "$fstype" in
+    ext*)
+        resize2fs /dev/mapper/dmroot
+        ;;
+    btrfs)
+        btrfs filesystem resize max /
+        ;;
+    *)
+        echo "Unsupported filesystem $fstype" >&2
+        exit 1
+        ;;
+esac
