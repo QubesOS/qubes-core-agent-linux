@@ -20,7 +20,7 @@ void send_file(const char *fname, int view_only)
     size_t sendbuf_size = DVM_FILENAME_SIZE;
     int fd = open(fname, O_RDONLY);
     if (fd < 0)
-        gui_fatal("open %s", fname);
+        gui_fatal("open");
 
     _Static_assert(DVM_FILENAME_SIZE > sizeof(DVM_VIEW_ONLY_PREFIX),
             "DVM_FILENAME_SIZE > sizeof(DVM_VIEW_ONLY_PREFIX)");
@@ -58,7 +58,7 @@ int copy_and_return_nonemptiness(int tmpfd)
     return st.st_size > 0;
 }
 
-void recv_file_nowrite(const char *fname)
+void recv_file_nowrite(void)
 {
     char *tempfile;
     int tmpfd = -1;
@@ -72,9 +72,9 @@ void recv_file_nowrite(const char *fname)
         return;
     }
     gui_nonfatal(
-        "The file %s has been edited in a disposable qube and the modified content has been received, "
+        "The file has been edited in a disposable qube and the modified content has been received, "
         "but this file is in read-only directory and thus cannot be modified safely. The edited file has been "
-        "saved to %s", fname, tempfile);
+        "saved to %s", tempfile);
 }
 
 void actually_recv_file(const char *fname, const char *tempfile, int tmpfd)
@@ -95,7 +95,7 @@ void recv_file(const char *fname)
         tmpfd = mkstemp(tempfile);
     }
     if (tmpfd < 0)
-        recv_file_nowrite(fname);
+        recv_file_nowrite();
     else
         actually_recv_file(fname, tempfile, tmpfd);
 }
