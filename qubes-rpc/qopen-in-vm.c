@@ -91,7 +91,7 @@ void recv_file(const char *fname)
 {
     int tmpfd = -1;
     char *tempfile;
-    if (asprintf(&tempfile, "%s.XXXXXX", fname) != -1) {
+    if (asprintf(&tempfile, "%.248s.XXXXXX", fname) != -1) {
         tmpfd = mkstemp(tempfile);
     }
     if (tmpfd < 0)
