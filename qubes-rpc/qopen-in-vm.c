@@ -61,7 +61,6 @@ int copy_and_return_nonemptiness(int tmpfd)
 void recv_file_nowrite(const char *fname)
 {
     char *tempfile;
-    char *errmsg;
     int tmpfd = -1;
 
     if (asprintf(&tempfile, "/tmp/file_edited_in_dvm.XXXXXX") != -1)
@@ -72,11 +71,10 @@ void recv_file_nowrite(const char *fname)
         unlink(tempfile);
         return;
     }
-    if (asprintf(&errmsg,
-         "The file %s has been edited in a disposable qube and the modified content has been received, "
-         "but this file is in read-only directory and thus cannot be modified safely. The edited file has been "
-         "saved to %s", fname, tempfile) != -1)
-        gui_nonfatal(errmsg);
+    gui_nonfatal(
+        "The file %s has been edited in a disposable qube and the modified content has been received, "
+        "but this file is in read-only directory and thus cannot be modified safely. The edited file has been "
+        "saved to %s", fname, tempfile);
 }
 
 void actually_recv_file(const char *fname, const char *tempfile, int tmpfd)
