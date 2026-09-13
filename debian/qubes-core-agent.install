@@ -21,6 +21,7 @@ etc/qubes-rpc/qubes.Log
 etc/qubes-rpc/qubes.OpenInVM
 etc/qubes-rpc/qubes.OpenURL
 etc/qubes-rpc/qubes.PostInstall
+etc/qubes-rpc/qubes.PostUpdate
 etc/qubes-rpc/qubes.RegisterBackupLocation
 etc/qubes-rpc/qubes.ResizeDisk
 etc/qubes-rpc/qubes.RestoreById
@@ -47,6 +48,7 @@ etc/qubes/autostart/*
 etc/qubes/applications/*
 etc/qubes/post-install.d/README
 etc/qubes/post-install.d/*.sh
+etc/qubes/post-update.d/README
 etc/qubes/rpc-config/qubes.ConnectTCP
 etc/qubes/rpc-config/qubes.OpenInVM
 etc/qubes/rpc-config/qubes.OpenURL

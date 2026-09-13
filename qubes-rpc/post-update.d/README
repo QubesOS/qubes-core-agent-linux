@@ -1,0 +1,8 @@
+All executable files with `.sh` suffix in this directory will be executed as
+root by qubes-vm-update after the distribution package manager has finished in
+a TemplateVM or StandaloneVM, regardless of whether any package was installed,
+updated or removed. The updates proxy is available at this time. A failing
+script does not stop the others, but qubes-vm-update reports the failure.
+
+For actions that should only run when packages were actually installed or
+updated, use /etc/qubes/post-install.d instead.

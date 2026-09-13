@@ -93,6 +93,7 @@ install:
 		qubes.ResizeDisk \
 		qubes.StartApp \
 		qubes.PostInstall \
+		qubes.PostUpdate \
 		qubes.GetDate \
 		qubes.ShowInTerminal \
 		qubes.TemplateSearch \
@@ -106,11 +107,13 @@ install:
 	done
 	install -d $(DESTDIR)$(SYSCONFDIR)
 	install -t $(DESTDIR)$(SYSCONFDIR) -m 0644 qubes-suspend-module-blacklist
-	install -d $(DESTDIR)/etc/qubes/suspend-pre.d
+	install -d $(DESTDIR)$(QUBESCONFDIR)/suspend-pre.d
 	install -t $(DESTDIR)$(QUBESCONFDIR)/suspend-pre.d -m 0644 suspend-pre.d/README
-	install -d $(DESTDIR)/etc/qubes/suspend-post.d
+	install -d $(DESTDIR)$(QUBESCONFDIR)/suspend-post.d
 	install -t $(DESTDIR)$(QUBESCONFDIR)/suspend-post.d -m 0644 suspend-post.d/README
 	install -t $(DESTDIR)$(QUBESCONFDIR)/suspend-post.d suspend-post.d/*.sh
-	install -d $(DESTDIR)/etc/qubes/post-install.d
+	install -d $(DESTDIR)$(QUBESCONFDIR)/post-install.d
 	install -t $(DESTDIR)$(QUBESCONFDIR)/post-install.d -m 0644 post-install.d/README
 	install -t $(DESTDIR)$(QUBESCONFDIR)/post-install.d post-install.d/*.sh
+	install -d $(DESTDIR)$(QUBESCONFDIR)/post-update.d
+	install -t $(DESTDIR)$(QUBESCONFDIR)/post-update.d -m 0644 post-update.d/README
