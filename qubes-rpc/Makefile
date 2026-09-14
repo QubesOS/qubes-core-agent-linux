@@ -10,7 +10,7 @@ LN := ln -sf
 ifneq ($(DEBUG),0)
 DEBUG_FLAGS := -g
 endif
-CPPFLAGS := -I.
+CPPFLAGS += -I.
 CFLAGS := $(DEBUG_FLAGS) -O2 -Wall -Wextra -Werror -fPIC -pie $(CFLAGS)
 LDFLAGS := $(DEBUG_FLAGS) -pie $(LDFLAGS)
 LDLIBS := -lqubes-rpc-filecopy -lqubes-pure
