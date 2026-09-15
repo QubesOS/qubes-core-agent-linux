@@ -1,3 +1,23 @@
+qubes-core-agent (4.3.48-1) unstable; urgency=medium
+
+  [ Rudd-O ]
+  * Handle zramctl command failure gracefully
+  * Enhance zram device check in disable_zram function
+
+  [ besendorf ]
+  * misc: avoid malformed MIME cache for catch-all glob
+
+  [ Mickey Slaven ]
+  * qvm-run-vm: preserve command options
+
+  [ Marek Marczykowski-Górecki ]
+  * qopen-in-vm: Do not pass filename to the format string
+  * qopen-in-vm: limit filename length to mkstemp()
+  * qopen-in-vm: exclude file name in the error message
+  * Do not override CPPFLAGS
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 15 Sep 2026 17:21:30 +0200
+
 qubes-core-agent (4.3.47-1) unstable; urgency=medium
 
   * Better wait for network uplink
