@@ -10,7 +10,13 @@ set -e
 if [ -e /dev/xvdb ] ; then mount /rw ; fi
 /usr/lib/qubes/init/setup-rw.sh
 
-if is_custom_persist_enabled; then
+if is_fully_persistent; then
+  if is_custom_persist_enabled; then
+    echo "custom-persist does not support fully persistent VMs (TemplateVMs/StandaloneVMs), ignoring" >&2
+  fi
+  mount_home=true
+  mount_usr_local=true
+elif is_custom_persist_enabled; then
   mount_home=false
   mount_usr_local=false
 
