@@ -1,9 +1,14 @@
+#include <asm-generic/errno.h>
 #define _GNU_SOURCE
 #include <grp.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pwd.h>
+#include <sys/file.h>
+#include <libgen.h>
+#include <errno.h>
+#include <stdbool.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
@@ -93,6 +98,22 @@ uid_t parse_uid(const char *user)
             errno != 0 || *end != '\0' || uid != u)
         gui_fatal("Invalid user ID argument");
     return uid;
+}
+
+bool is_mounted(const char *abs_path, int parent_fd)
+{
+    struct statx stx_self, stx_parent;
+
+    if (statx(AT_FDCWD, abs_path, 0, STATX_MNT_ID, &stx_self))
+      gui_fatal("statx for directory failed");
+    
+    if (statx(parent_fd, "", AT_EMPTY_PATH, STATX_MNT_ID, &stx_parent))
+      gui_fatal("statx for parent directory failed");
+
+    if (!(stx_self.stx_mask & STATX_MNT_ID))
+        gui_fatal("STATX_MNT_ID not populated, kernel may not support it");
+
+    return (stx_self.stx_mnt_id != stx_parent.stx_mnt_id);
 }
 
 int main(int argc, char ** argv)
@@ -200,11 +221,63 @@ int main(int argc, char ** argv)
         mkdir(incoming_dir, 0700);
     }
 
+    char *incoming_dir_abs_path = realpath(incoming_dir, NULL);
+
+    if (incoming_dir_abs_path == NULL)
+      gui_fatal("Could not resolve absolute path to directory %s", incoming_dir);
+    
     if (chdir(incoming_dir))
         gui_fatal("Error chdir to %s", incoming_dir);
 
-    if (mount(".", ".", NULL, MS_BIND | MS_NODEV | MS_NOEXEC | MS_NOSUID, NULL) < 0)
-        gui_fatal("Failed to mount a directory %s", incoming_dir);
+    int incoming_dir_fd = open(incoming_dir_abs_path, O_RDONLY);
+
+    if (incoming_dir_fd < 0)
+        gui_fatal("Failed to open directory %s", incoming_dir);
+
+    int incoming_dir_parent_fd = openat(incoming_dir_fd, "..", O_RDONLY);
+
+    if (incoming_dir_parent_fd < 0)
+        gui_fatal("Failed to open parent directory");
+
+    if (flock(incoming_dir_fd, LOCK_EX | LOCK_NB) == 0) {
+      if (is_mounted(incoming_dir_abs_path, incoming_dir_parent_fd)) {
+          if (flock(incoming_dir_fd, LOCK_SH) < 0)
+            gui_fatal("Failed to downgrade lock on directory %s", incoming_dir);
+      } else {
+          if (mount(incoming_dir_abs_path, incoming_dir_abs_path, NULL,MS_BIND | MS_NODEV | MS_NOEXEC | MS_NOSUID, NULL) < 0)
+            gui_fatal("Failed to mount a directory %s", incoming_dir);
+          if (flock(incoming_dir_fd, LOCK_SH) < 0)
+            gui_fatal("Failed to downgrade lock on directory %s", incoming_dir);
+      }
+    } else {
+        if (errno != EWOULDBLOCK)
+          gui_fatal("Could not acquire lock on directory %s", incoming_dir);
+
+        for (;;) {
+          if (flock(incoming_dir_fd, LOCK_SH) < 0)
+            gui_fatal("Failed to acquire shared lock on directory %s", incoming_dir);
+
+          if (is_mounted(incoming_dir_abs_path, incoming_dir_parent_fd))
+            break;
+
+          if (flock(incoming_dir_fd, LOCK_UN) < 0)
+            gui_fatal("Failed to release lock on directory %s", incoming_dir);
+
+          if (flock(incoming_dir_fd, LOCK_EX | LOCK_NB) == 0) {
+            if (is_mounted(incoming_dir_abs_path, incoming_dir_parent_fd)) {
+                if (flock(incoming_dir_fd, LOCK_SH) < 0)
+                    gui_fatal("Failed to downgrade lock on directory %s", incoming_dir);
+            } else {
+                if (mount(incoming_dir_abs_path, incoming_dir_abs_path, NULL,MS_BIND | MS_NODEV | MS_NOEXEC | MS_NOSUID, NULL) < 0)
+                    gui_fatal("Failed to mount a directory %s", incoming_dir);
+                if (flock(incoming_dir_fd, LOCK_SH) < 0)
+                    gui_fatal("Failed to downgrade lock on directory %s", incoming_dir);
+              }
+            break;
+          } else if (errno != EWOULDBLOCK)
+              gui_fatal("Failed to acquire lock on directory %s", incoming_dir);
+        }
+      }
 
     /* parse the input in unprivileged child process, parent will hold root
      * access to unmount incoming dir */
@@ -234,8 +307,21 @@ int main(int argc, char ** argv)
     if (waitpid(pid, &ret, 0) < 0) {
         gui_fatal("Failed to wait for child process");
     }
-    if (umount2(".", MNT_DETACH) < 0)
+
+    if (flock(incoming_dir_fd, LOCK_UN) < 0)
+      gui_fatal("Failed to release lock on directory %s", incoming_dir);
+
+    if (flock(incoming_dir_fd, LOCK_EX) < 0)
+      gui_fatal("Failed to acquire lock on directory %s", incoming_dir);
+
+    if (is_mounted(incoming_dir_abs_path, incoming_dir_parent_fd)) {
+      if (umount2(incoming_dir_abs_path, MNT_DETACH) < 0)
         gui_fatal("Cannot umount incoming directory");
+    }
+
+    close(incoming_dir_fd);
+    close(incoming_dir_parent_fd);
+
     if (!WIFEXITED(ret)) {
         gui_fatal("Child process exited abnormally");
     }
