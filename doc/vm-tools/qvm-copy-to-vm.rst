@@ -1,0 +1,29 @@
+.. program:: qvm-copy-to-vm
+
+=================
+qvm-copy-to-vm(1)
+=================
+For use in scripting; for interactive use, use qvm-copy.
+
+NAME
+====
+qvm-copy-to-vm - copy specified files to specified destination VM. 
+
+.. warning:: Deprecated outside of dom0.
+
+SYNOPSIS
+========
+| qvm-copy-to-vm [--without-progress] dest_vmname file [file]+
+
+OPTIONS
+=======
+.. option:: --without-progress
+
+    Don't display progress info
+
+
+AUTHORS
+=======
+| Joanna Rutkowska <joanna at invisiblethingslab dot com>
+| Rafal Wojtczuk <rafal at invisiblethingslab dot com>
+| Marek Marczykowski <marmarek at invisiblethingslab dot com>
