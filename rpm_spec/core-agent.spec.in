@@ -474,8 +474,18 @@ make -C doc manpages
 set -e
 user=$(qubesdb-read /default-user) || user=user
 groupadd --force --system --gid 98 qubes
-id -u -- "$user" >/dev/null 2>&1 ||
-  useradd --user-group --create-home --shell /bin/bash -- "$user"
+if ! id -u -- "$user" >/dev/null 2>&1; then
+  if [ "$user" != user ] && id -u user >/dev/null 2>&1; then
+    # Rename stock account instead of adding a new one
+    if [ -d /home/user ] && ! [ -e "/home/$user" ]; then
+      mv -T /home/user "/home/$user"
+    fi
+    usermod -l "$user" -d "/home/$user" -- user
+    groupmod -n "$user" -- user 2>/dev/null || :
+  else
+    useradd --user-group --create-home --shell /bin/bash -- "$user"
+  fi
+fi
 usermod -a -L --groups qubes -- "$user"
 
 if [ "$1" !=  1 ] ; then

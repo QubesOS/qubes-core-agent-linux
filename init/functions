@@ -253,6 +253,45 @@ initialize_home() {
     done
 }
 
+setup_default_user() {
+    # Rename login account to /default-user and move its home
+    local home_root="$1"
+    local user from uid old dir
+
+    user=$(qubesdb-read /default-user 2>/dev/null) || return 0
+    case "$user" in
+        (''|root) return 0 ;; # root has its home in /root
+        (-*|*[!A-Za-z0-9._-]*)
+            echo "setup_default_user: invalid default user '$user'" >&2
+            return 0 ;;
+    esac
+
+    if ! getent passwd -- "$user" >/dev/null; then
+        # Login account is the only member of group 'qubes'
+        from=$(getent group qubes | cut -d: -f4)
+        case "$from" in (''|*,*) from=user ;; esac
+        getent passwd -- "$from" >/dev/null || return 0
+        echo "setup_default_user: renaming account '$from' to '$user'" >&2
+        usermod -l "$user" -d "/home/$user" -- "$from" || return 0
+        groupmod -n "$user" -- "$from" 2>/dev/null || :
+    fi
+
+    # Previous home is the only directory owned by its uid
+    [ -e "$home_root/$user" ] && return 0
+    uid=$(id -u -- "$user") || return 0
+    old=""
+    for dir in "$home_root"/*; do
+        [ -d "$dir" ] || continue
+        [ "$(stat -c %u -- "$dir")" = "$uid" ] || continue
+        [ -n "$old" ] && return 0
+        old=$dir
+    done
+    if [ -n "$old" ]; then
+        echo "setup_default_user: moving '$old' to '$home_root/$user'" >&2
+        mv -T -- "$old" "$home_root/$user"
+    fi
+}
+
 disable_persistent_home() {
     echo "Disabling persistent /home"
     touch /var/run/qubes/disable_persistent_home_dir
