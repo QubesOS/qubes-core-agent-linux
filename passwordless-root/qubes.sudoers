@@ -1,4 +1,4 @@
 Defaults !requiretty
-%qubes ALL=(ALL) ROLE=unconfined_r TYPE=unconfined_t NOPASSWD: ALL
+%qubes ALL=(ALL) ROLE=unconfined_r TYPE=unconfined_t ALL
 
 # vim: ft=sudoers
