@@ -9,7 +9,7 @@ set -euf
 DEFAULT_ENABLED_NETVM="network-manager qubes-network qubes-update-check qubes-updates-proxy meminfo-writer qubes-firewall software-rendering"
 DEFAULT_ENABLED_PROXYVM="qubes-network qubes-firewall qubes-update-check meminfo-writer software-rendering"
 DEFAULT_ENABLED_APPVM="qubes-update-check meminfo-writer tracker evolution-data-server software-rendering"
-DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup software-rendering"
+DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup software-rendering open-urls-in-dispvm"
 DEFAULT_ENABLED="meminfo-writer software-rendering"
 
 # Wait for xenbus initialization

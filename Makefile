@@ -40,6 +40,7 @@ clean:
 # Dropin Directory
 SYSTEM_DROPIN_DIR ?= /lib/systemd/system
 USER_DROPIN_DIR ?= /usr/lib/systemd/user
+USER_PRESET_DIR ?= $(LIBDIR)/systemd/user-preset
 
 SYSTEM_DROPINS := boot.automount chronyd.service crond.service
 SYSTEM_DROPINS += cups.service cups-browsed.service cups.path cups.socket ModemManager.service
@@ -153,6 +154,7 @@ SYSTEMD_CORE_SERVICES := $(filter-out $(SYSTEMD_NETWORK_SERVICES) $(SYSTEMD_SELI
 
 .PHONY: install-systemd
 install-systemd: install-init
+	# Install system services
 	install -d $(DESTDIR)$(SYSLIBDIR)/systemd/system{,-preset} \
 		$(DESTDIR)$(LIBDIR)/qubes/init \
 		$(DESTDIR)$(SYSLIBDIR)/modules-load.d \
@@ -171,6 +173,12 @@ install-systemd: install-init
 	install -m 0755 vm-systemd/user-environment-generators/30-qubes.sh $(DESTDIR)$(SYSLIBDIR)/systemd/user-environment-generators/30-qubes.sh
 	install -m 0644 vm-systemd/usr-local.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0755 vm-systemd/setup-minimal-vm $(DESTDIR)$(LIBDIR)/qubes/setup-minimal-vm
+
+	# Install user services
+	install -d $(DESTDIR)$(USER_DROPIN_DIR)
+	install -m 0644 vm-systemd/user/open-urls-in-dispvm.service $(DESTDIR)$(USER_DROPIN_DIR)
+	install -d $(DESTDIR)$(USER_PRESET_DIR)
+	install -m 0644 vm-systemd/user-preset/75-qubes-open-in-dispvm.preset $(DESTDIR)$(USER_PRESET_DIR)/
 
 .PHONY: install-sysvinit
 install-sysvinit: install-init
