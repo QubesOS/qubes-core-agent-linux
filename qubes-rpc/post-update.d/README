@@ -3,6 +3,8 @@ root by qubes-vm-update after the distribution package manager has finished in
 a TemplateVM or StandaloneVM, regardless of whether any package was installed,
 updated or removed. The updates proxy is available at this time. A failing
 script does not stop the others, but qubes-vm-update reports the failure.
+A script that changed something exits with 10, so qubes-vm-update reports the
+qube as updated even if the package manager had no updates.
 
 For actions that should only run when packages were actually installed or
 updated, use /etc/qubes/post-install.d instead.
