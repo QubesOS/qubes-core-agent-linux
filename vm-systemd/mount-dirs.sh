@@ -30,6 +30,12 @@ else
 fi
 
 if $mount_home; then
+  setup_default_user "/rw/home"
+else
+  setup_default_user "/home"
+fi
+
+if $mount_home; then
   initialize_home "/rw/home" ifneeded
   under_systemd || mount -o noauto,bind,defaults,nosuid,nodev /rw/home /home
 else

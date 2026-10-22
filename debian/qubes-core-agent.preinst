@@ -44,9 +44,18 @@ if [ "$1" = "install" ] ; then
     # --------------------------------------------------------------------------
     # User add / modifications
     # --------------------------------------------------------------------------
-    id -u -- "$user" >/dev/null 2>&1 || {
-        useradd --user-group --create-home --shell /bin/bash -- "$user"
-    }
+    if ! id -u -- "$user" >/dev/null 2>&1; then
+        if [ "$user" != user ] && id -u user >/dev/null 2>&1; then
+            # Rename stock account instead of adding a new one
+            if [ -d /home/user ] && ! [ -e "/home/$user" ]; then
+                mv -T /home/user "/home/$user"
+            fi
+            usermod -l "$user" -d "/home/$user" -- user
+            groupmod -n "$user" -- user 2>/dev/null || :
+        else
+            useradd --user-group --create-home --shell /bin/bash -- "$user"
+        fi
+    fi
     id -u 'tinyproxy' >/dev/null 2>&1 || {
         useradd --user-group --system --no-create-home --home /run/tinyproxy --shell /bin/false tinyproxy
     }
@@ -70,7 +79,7 @@ if [ "$1" = "upgrade" ] ; then
             fi
         fi
     fi
-    ## Allow passwordless login for user "user" (when using 'sudo xl console').
+    ## Allow passwordless login for default user (when using 'sudo xl console').
     ## https://github.com/QubesOS/qubes-issues/issues/1130
     if grep -q "^$user:!:" /etc/shadow ; then
         passwd --delete -- "$user" >/dev/null || true
