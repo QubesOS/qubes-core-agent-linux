@@ -38,7 +38,7 @@ build() {
     # Fix for archlinux sbindir
     sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
 
-    for dir in qubes-rpc misc; do
+    for dir in qubes-rpc misc passwordless-root; do
         make -C "$dir" VERSION=${pkgver}
     done
 }

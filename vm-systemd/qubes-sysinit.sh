@@ -64,6 +64,13 @@ for i in $services; do
     fi
 done
 
+authz_mode="$(qubesdb-read --default '' /qubes-admin-authz-mode)"
+if [ -n "$authz_mode" ]; then
+    echo "$authz_mode" > /run/qubes-admin-authzd.conf
+else
+    rm -f /run/qubes-admin-authzd.conf
+fi
+
 # Prepare environment for other services
 echo > /run/qubes-service-environment
 
