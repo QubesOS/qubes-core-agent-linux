@@ -20,11 +20,20 @@
 #
 #
 
-# run every hook even if one fails, but still report the failure
+# must match EXIT.OK_POST_UPDATE_CHANGES in qubes-vm-update's agent
+exit_code_for_changes=10
+
+# run every hook even if one fails; a failure outranks reported changes
 status=0
 for script in /etc/qubes/post-update.d/*.sh; do
     if [ -x "$script" ]; then
-        "$script" || status=1
+        "$script"
+        script_status=$?
+        if [ "$script_status" -eq "$exit_code_for_changes" ]; then
+            [ "$status" -eq 0 ] && status=$exit_code_for_changes
+        elif [ "$script_status" -ne 0 ]; then
+            status=1
+        fi
     fi
 done
 exit $status
