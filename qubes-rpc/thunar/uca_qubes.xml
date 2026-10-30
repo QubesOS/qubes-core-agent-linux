@@ -64,6 +64,7 @@
 	<command>/usr/lib/qubes/qvm-actions.sh opendvm %F</command>
 	<description></description>
 	<patterns>*</patterns>
+	<directories/>
 	<audio-files/>
 	<image-files/>
 	<other-files/>
@@ -77,6 +78,7 @@
 	<command>/usr/lib/qubes/qvm-actions.sh viewdvm %F</command>
 	<description></description>
 	<patterns>*</patterns>
+	<directories/>
 	<audio-files/>
 	<image-files/>
 	<other-files/>

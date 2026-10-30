@@ -65,6 +65,7 @@ class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
     def on_menu_item_clicked(self, menu, files, view_only=False):
         '''Called when user chooses files though Nautilus context menu.
         '''
+        file_paths = []
         for file_obj in files:
             file_location = file_obj.get_location()
             file_uri = file_location.get_uri()
@@ -84,11 +85,14 @@ class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
                     file_path = target_uri[7:]
                 except GLib.GError:
                     return
+            file_paths.append(file_path)
 
-            command = ['/usr/bin/qvm-open-in-dvm']
-            if view_only:
-                command.append('--view-only')
-            command.append(file_path)
+        # several files are opened in the same disposable
+        command = ['/usr/bin/qvm-open-in-dvm']
+        if view_only:
+            command.append('--view-only')
+        command.append('--')
+        command.extend(file_paths)
 
-            pid = GLib.spawn_async(command)[0]
-            GLib.spawn_close_pid(pid)
+        pid = GLib.spawn_async(command)[0]
+        GLib.spawn_close_pid(pid)
