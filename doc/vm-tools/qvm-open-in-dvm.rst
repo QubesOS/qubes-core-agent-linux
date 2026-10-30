@@ -4,15 +4,23 @@ qvm-open-in-dvm
 
 NAME
 ====
-qvm-open-in-dvm - open a specified file or URL in a disposable VM
+qvm-open-in-dvm - open files, directories or a URL in a disposable VM
 
 SYNOPSIS
 ========
-| qvm-open-in-dvm filename
+| qvm-open-in-dvm [--view-only] filename
 | qvm-open-in-dvm URL
+| qvm-open-in-dvm file|directory...
+
+Several files, or a directory, are opened in the same disposable VM, see
+qvm-open-in-vm(1).
 
 OPTIONS
 =======
+
+--view-only
+    Do not send changes back. Always the case when opening several files or a
+    directory.
 
 
 NOTES

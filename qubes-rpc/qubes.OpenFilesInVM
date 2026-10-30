@@ -1,0 +1,27 @@
+#!/bin/sh --
+# Receive files and directories sent by qvm-open-in-vm and open them; changes
+# are not sent back
+set -eu
+
+case ${1-} in
+('') arg=;;
+(allow-all-names) arg=--allow-all-names;;
+(*) printf 'Unexpected argument %s\n' "$1" >&2; exit 1;;
+esac
+
+# qfile-unpacker is allowed to write only in ~/QubesIncoming
+incoming=$HOME/QubesIncoming/$QREXEC_REMOTE_DOMAIN
+mkdir -p -- "$incoming"
+dir=$(mktemp -d -- "$incoming/open-XXXXXX")
+# shellcheck disable=SC2086
+/usr/lib/qubes/qfile-unpacker $arg -- '' "$dir"
+# signal to applications that changes are not saved
+find "$dir" -type f -exec chmod a-w -- {} +
+
+set +eu
+if [ -r /etc/profile.d/qubes-session.sh ]; then
+    # shellcheck disable=SC1091
+    . /etc/profile.d/qubes-session.sh
+fi
+
+exec /usr/lib/qubes/qubes-open-files "$dir" </dev/null 2>>/tmp/mimeopen.log
