@@ -19,6 +19,7 @@ etc/qubes-rpc/qubes.GetImageRGBA
 etc/qubes-rpc/qubes.InstallUpdatesGUI
 etc/qubes-rpc/qubes.Log
 etc/qubes-rpc/qubes.OpenInVM
+etc/qubes-rpc/qubes.OpenFilesInVM
 etc/qubes-rpc/qubes.OpenURL
 etc/qubes-rpc/qubes.PostInstall
 etc/qubes-rpc/qubes.PostUpdate
@@ -51,6 +52,7 @@ etc/qubes/post-install.d/*.sh
 etc/qubes/post-update.d/README
 etc/qubes/rpc-config/qubes.ConnectTCP
 etc/qubes/rpc-config/qubes.OpenInVM
+etc/qubes/rpc-config/qubes.OpenFilesInVM
 etc/qubes/rpc-config/qubes.OpenURL
 etc/qubes/rpc-config/qubes.SelectFile
 etc/qubes/rpc-config/qubes.SelectDirectory
@@ -187,6 +189,7 @@ usr/lib/qubes/qfile-agent
 usr/lib/qubes/qfile-unpacker
 usr/lib/qubes/qubes-fs-tree-check
 usr/lib/qubes/qopen-in-vm
+usr/lib/qubes/qubes-open-files
 usr/lib/qubes/qubes-sync-clock
 usr/lib/qubes/qrun-in-vm
 usr/lib/qubes/qubes-trigger-sync-appmenus.sh

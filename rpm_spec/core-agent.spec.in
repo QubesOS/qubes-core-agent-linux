@@ -914,6 +914,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.Filecopy
 %config(noreplace) /etc/qubes-rpc/qubes.Log
 %config(noreplace) /etc/qubes-rpc/qubes.OpenInVM
+%config(noreplace) /etc/qubes-rpc/qubes.OpenFilesInVM
 %config(noreplace) /etc/qubes-rpc/qubes.OpenURL
 %config(noreplace) /etc/qubes-rpc/qubes.GetAppmenus
 %config(noreplace) /etc/qubes-rpc/qubes.ConnectTCP
@@ -945,6 +946,7 @@ rm -f %{name}-%{version}
 %config(noreplace) /etc/qubes-rpc/qubes.GetDate
 %config(noreplace) /etc/qubes/rpc-config/qubes.ConnectTCP
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenInVM
+%config(noreplace) /etc/qubes/rpc-config/qubes.OpenFilesInVM
 %config(noreplace) /etc/qubes/rpc-config/qubes.OpenURL
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectFile
 %config(noreplace) /etc/qubes/rpc-config/qubes.SelectDirectory
@@ -1043,6 +1045,7 @@ rm -f %{name}-%{version}
 /usr/lib/qubes/qvm-move-to-vm.kde
 /usr/lib/qubes/qvm-service-wrapper
 /usr/lib/qubes/qubes-fs-tree-check
+/usr/lib/qubes/qubes-open-files
 /usr/lib/qubes/tar2qfile
 /usr/lib/qubes/vm-file-editor
 /usr/lib/qubes/vm-log

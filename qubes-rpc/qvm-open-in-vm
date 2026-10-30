@@ -23,14 +23,17 @@
 # we use “is this variable set” a lot, and use variables that we haven’t set, so
 # unset these variables first, to ensure that values from the environment don’t
 # cause problems.
-unset qopen_opts target filename seen_dashdash i
+unset qopen_opts target filename seen_dashdash i nargs service status error
 
 usage() {
     case $0 in
     (qvm-open-in-dvm|*/qvm-open-in-dvm)
-        printf 'Usage: %s [--view-only] [--] filename\n' "$0" >&2
+        printf 'Usage: %s [--view-only] [--] filename\n' "$0"
+        printf '       %s [--] file|directory...\n' "$0"
         ;;
-    (*) printf 'Usage: %s [--view-only] [--] [vmname] filename\n' "$0";;
+    (*) printf 'Usage: %s [--view-only] [--] [vmname] filename\n' "$0"
+        printf '       %s [--] vmname file|directory...\n' "$0"
+        ;;
     esac >&2
     exit "${1-2}"
 }
@@ -41,6 +44,8 @@ case $0 in
     exit 2;;
 esac
 
+# move the non-option arguments to "$@"
+nargs=$#
 for i; do
     if [ -z "$seen_dashdash" ]; then
         case $i in
@@ -50,47 +55,78 @@ for i; do
         (-*) usage;;
         esac
     fi
-    if [ -z "${target+x}" ]; then
-        target="$i"
-    elif [ -z "${filename+x}" ]; then
-        filename="$i"
-    else
-        usage
-    fi
+    set -- "$@" "$i"
 done
-set +u
+shift "$nargs"
 
 case $0 in
 (qvm-open-in-dvm|*/qvm-open-in-dvm) ;;
 (*)
-    if [ -n "${target+x}" ] && [ -z "${filename+x}" ]; then
-        filename="$target"
+    if [ "$#" -ge 2 ]; then
+        target=$1
+        shift
+    else
         target=@default
     fi
     ;;
 esac
 
-if [ -z "$target" ] || [ -z "$filename" ]; then
+if [ -z "$target" ] || [ "$#" -eq 0 ]; then
     usage
 fi
 
-if [ -d "$filename" ]; then
-    printf 'Error! "%s" is a directory.\n' "$filename"
-    usage
-elif [ ! -f "$filename" ]; then
-    expr "@$filename" : '@[A-Za-z][A-Za-z0-9+]*://'>/dev/null
-    # shellcheck disable=SC2181
-    if [ $? -ne 0 ]; then
-        printf 'Error! "%s" is not a valid file or URL.\n' "$filename"
-        usage
+if [ "$#" -eq 1 ] && [ ! -d "$1" ]; then
+    filename=$1
+    if [ ! -f "$filename" ]; then
+        expr "@$filename" : '@[A-Za-z][A-Za-z0-9+]*://'>/dev/null
+        # shellcheck disable=SC2181
+        if [ $? -ne 0 ]; then
+            printf 'Error! "%s" is not a valid file or URL.\n' "$filename"
+            usage
+        fi
     fi
+else
+    # several files or a directory: copy them, they are opened read-only and
+    # changes are not sent back
+    nargs=$#
+    for i; do
+        if [ ! -e "$i" ]; then
+            printf 'Error! "%s" is not a valid file or directory.\n' "$i"
+            usage
+        fi
+        # like qvm-copy, "dir/" would be sent with an empty name
+        while [ "$i" != / ] && [ "${i%/}" != "$i" ]; do
+            i=${i%/}
+        done
+        set -- "$@" "$i"
+    done
+    shift "$nargs"
+    service=qubes.OpenFilesInVM
+    error=$(/usr/lib/qubes/qubes-fs-tree-check --allow-symlinks \
+        --allow-directories --machine -- "$@" 2>&1 >/dev/null)
+    status=$?
+    case $status in
+    (0) ;;
+    (2) service=qubes.OpenFilesInVM+allow-all-names;;
+    (*)
+        printf '%s\n' "$error" >&2
+        # started from a file manager, nobody sees stderr
+        if [ ! -t 2 ]; then
+            if command -v notify-send >/dev/null; then
+                notify-send -- "Cannot open in qube" "$error"
+            elif command -v zenity >/dev/null; then
+                zenity --notification --text "Cannot open in qube: $error"
+            fi
+        fi
+        exit "$status";;
+    esac
 fi
 
 prompt_text='Are you sure you want to create another disposable VM?'
 case $target in
 (@dispvm|@dispvm:*)
     case ${QREXEC_SERVICE_FULL_NAME-} in
-    (qubes.OpenInVM+*|qubes.OpenURL+*)
+    (qubes.OpenInVM+*|qubes.OpenURL+*|qubes.OpenFilesInVM+*)
         if [ -f /usr/bin/zenity ]; then
             zenity --question "--text=$prompt_text" || exit "$?"
         elif [ -f /usr/bin/kdialog ]; then
@@ -103,6 +139,14 @@ case $target in
     esac
     ;;
 esac
+
+if [ -n "$service" ]; then
+    # keep the connection open until the remote side is done with the files
+    # shellcheck disable=SC2016
+    exec /usr/lib/qubes/qrexec-client-vm -- "$target" "$service" \
+        /bin/sh -c '"$0" -- "$@" && exec cat >/dev/null' \
+        /usr/lib/qubes/qfile-agent "$@" >/dev/null 2>&1 </dev/null
+fi
 
 expr "@$filename" : '@[A-Za-z][A-Za-z0-9+]*://'>/dev/null
 # shellcheck disable=SC2016

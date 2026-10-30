@@ -1,0 +1,103 @@
+#!/usr/bin/python3 --
+#
+# The Qubes OS Project, http://www.qubes-os.org
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+'''Open the files received by qubes.OpenFilesInVM and wait until they are
+closed.
+
+Files are grouped by default application, and each application is started
+once with all its files. If a directory was received, or a file has no
+default application, the file manager is started instead.
+'''
+
+import os
+import shutil
+import subprocess
+import sys
+
+from gi.repository import Gio  # pylint: disable=import-error
+
+
+def default_app(path):
+    '''Return the default application for path, or None'''
+    try:
+        info = Gio.File.new_for_path(path).query_info(
+            Gio.FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
+            Gio.FileQueryInfoFlags.NONE, None)
+    except Exception:  # pylint: disable=broad-except
+        return None
+    app = Gio.AppInfo.get_default_for_type(info.get_content_type(), False)
+    if app is None or not getattr(app, 'get_filename', None) \
+            or not app.get_filename():
+        return None
+    return app
+
+
+def error(message):
+    print(message, file=sys.stderr)
+    if shutil.which('zenity'):
+        subprocess.call(['zenity', '--error', '--text', message],
+            stdout=subprocess.DEVNULL)
+    elif shutil.which('kdialog'):
+        subprocess.call(['kdialog', '--sorry', message],
+            stdout=subprocess.DEVNULL)
+
+
+def main(argv):
+    if len(argv) != 2:
+        print('Usage: {} DIRECTORY'.format(argv[0]), file=sys.stderr)
+        return 2
+    dirname = argv[1]
+    paths = sorted(os.path.join(dirname, name) for name in os.listdir(dirname))
+
+    # desktop file -> paths
+    groups = {}
+    show_dir = None
+    if len(paths) == 1 and os.path.isdir(paths[0]):
+        show_dir = paths[0]
+    for path in paths:
+        if show_dir:
+            break
+        app = None if os.path.isdir(path) else default_app(path)
+        if app is None:
+            show_dir = dirname
+        else:
+            groups.setdefault(app.get_filename(), []).append(path)
+
+    if show_dir:
+        app = default_app(show_dir)
+        if app is None:
+            error('No file manager found to open {}'.format(show_dir))
+            return 1
+        groups = {app.get_filename(): [show_dir]}
+
+    processes = []
+    for desktop_file, group in groups.items():
+        uris = [Gio.File.new_for_path(path).get_uri() for path in group]
+        # waits until the application exits
+        processes.append(subprocess.Popen(
+            ['/usr/bin/qubes-desktop-run', desktop_file] + uris,
+            stdout=sys.stderr))
+    for process in processes:
+        process.wait()
+    # launch() stops waiting when the first process exits, for example when
+    # an application started once per file hands the file over to its first
+    # instance, so like qubes-open, also wait for any process using the files.
+    # Like there, a hand-over to an instance started earlier (e.g. Thunar
+    # --daemon) is not seen.
+    subprocess.call(['pidwait', '-A', '-f', dirname.replace('.', '[.]')])
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
