@@ -226,7 +226,12 @@ Requires: (%{name}-selinux if selinux-policy)
 %endif
 # Ensure that gnome-keyring is always available, so that changing
 # TemplateVMs doesn't break stuff that uses the secrets portal.
+%if 0%{?fedora} < 45
 Requires: (gnome-keyring if xdg-desktop-portal)
+%else
+# Fedora 45+ uses oo7 instead of gnome-keyring
+Requires: (oo7-daemon if xdg-desktop-portal)
+%endif
 
 %description
 The Qubes core files for installation inside a Qubes VM.
