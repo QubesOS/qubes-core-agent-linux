@@ -127,6 +127,8 @@ Requires:   gawk
 Requires:   sed
 Requires:   util-linux
 Requires:   e2fsprogs
+# dmsetup, for ephemeral-storage
+Requires:   device-mapper
 Requires:   hostname
 # for Qubes Manager VM updater
 Requires:   xterm
