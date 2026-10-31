@@ -1,6 +1,10 @@
 #!/bin/sh
 
-dev=/dev/xvdb
+# Source Qubes library.
+# shellcheck source=init/functions
+. /usr/lib/qubes/init/functions
+
+dev=$(private_device)
 
 if mountpoint -q /rw ; then
     # This means /rw is mounted now.
