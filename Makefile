@@ -24,11 +24,13 @@ all:
 ifeq ($(ENABLE_SELINUX),1)
 	$(MAKE) -C selinux -f /usr/share/selinux/devel/Makefile -- $(selinux_policies)
 endif
+	$(MAKE) -C passwordless-root
 
 clean:
 	make -C misc clean
 	make -C qubes-rpc clean
 	make -C doc clean
+	make -C passwordless-root clean
 	rm -rf qubesagent/*.pyc qubesagent/__pycache__
 	rm -rf test-packages/__pycache__
 	rm -rf test-packages/qubesagent.egg-info
