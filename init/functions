@@ -83,6 +83,40 @@ is_rwonly_persistent() {
     [ "$(qubesdb-read /qubes-vm-persistence)" = "rw-only" ]
 }
 
+has_ephemeral_storage() {
+    # The private volume (xvdb) is read-only, its changes go to xvde, which
+    # dom0 encrypts with an ephemeral key.
+    [ "$(qubesdb-read /qubes-ephemeral-storage 2>/dev/null)" = "1" ]
+}
+
+private_device() {
+    # Device to mount on /rw
+    if has_ephemeral_storage; then
+        echo /dev/mapper/snapshot-private
+    else
+        echo /dev/xvdb
+    fi
+}
+
+setup_private_snapshot() {
+    # Non-persistent snapshot of xvdb with the changes on xvde. Device-mapper
+    # devices named snapshot-* are not exported to dom0.
+    local count=100
+    if [ -e /dev/mapper/snapshot-private ]; then
+        return
+    fi
+    while ! [ -b /dev/xvde ]; do
+        if [ "$count" = "0" ]; then
+            echo "Private device management: /dev/xvde not found" >&2
+            return 1
+        fi
+        sleep 0.1
+        count=$(( count - 1 ))
+    done
+    dmsetup create snapshot-private --table \
+        "0 $(blockdev --getsz /dev/xvdb) snapshot /dev/xvdb /dev/xvde N 16"
+}
+
 is_updateable() {
     [ "$(qubesdb-read /qubes-vm-updateable)" = "True" ]
 }

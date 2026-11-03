@@ -6,11 +6,14 @@
 
 set -e
 
-dev=/dev/xvdb
+if has_ephemeral_storage; then
+    setup_private_snapshot
+fi
+dev=$(private_device)
 max_size=10485760  # check at most 10 MiB
 
 if [ -e "$dev" ] ; then
-    # The private /dev/xvdb device is present.
+    # The private device is present.
 
     # check if private.img (xvdb) is empty - all zeros
     private_size=$(( $(blockdev --getsz "$dev") * 512))
