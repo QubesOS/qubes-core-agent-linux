@@ -20,7 +20,7 @@ else
     eval "set -- $args"
     "$@" && sync
   else
-    echo "Invalid command $COMMAND"
+    echo "Invalid command $COMMAND" >&2
     exit 1
   fi
 fi
