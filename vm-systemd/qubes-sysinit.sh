@@ -6,11 +6,11 @@ set -euf
 . /usr/lib/qubes/init/functions
 
 # List of services enabled by default (in case of absence of qubesdb entry)
-DEFAULT_ENABLED_NETVM="network-manager qubes-network qubes-update-check qubes-updates-proxy meminfo-writer qubes-firewall software-rendering"
-DEFAULT_ENABLED_PROXYVM="qubes-network qubes-firewall qubes-update-check meminfo-writer software-rendering"
-DEFAULT_ENABLED_APPVM="qubes-update-check meminfo-writer tracker evolution-data-server software-rendering"
-DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup software-rendering open-urls-in-dispvm"
-DEFAULT_ENABLED="meminfo-writer software-rendering"
+DEFAULT_ENABLED_NETVM="network-manager qubes-network qubes-update-check qubes-updates-proxy meminfo-writer qubes-firewall"
+DEFAULT_ENABLED_PROXYVM="qubes-network qubes-firewall qubes-update-check meminfo-writer"
+DEFAULT_ENABLED_APPVM="qubes-update-check meminfo-writer tracker evolution-data-server"
+DEFAULT_ENABLED_TEMPLATEVM="$DEFAULT_ENABLED_APPVM updates-proxy-setup open-urls-in-dispvm"
+DEFAULT_ENABLED="meminfo-writer"
 
 # Wait for xenbus initialization
 while [ ! -e /dev/xen/xenbus ]; do
@@ -37,6 +37,23 @@ TemplateVM) DEFAULT_ENABLED=$DEFAULT_ENABLED_TEMPLATEVM; touch /run/qubes/this-i
 DispVM) :;;
 *) echo "Bad VM type $vm_type!" >&2; exit 1;;
 esac
+
+# Add software-rendering, unless some GPU is attached
+gpu_present=
+for dev in /sys/bus/pci/devices/*; do
+    [ -d "$dev" ] || continue
+    devclass="$(cat "$dev/class")"
+    if [ "$devclass" = "${devclass#0x03}" ]; then
+        continue
+    fi
+    if [ "$(cat "$dev/vendor"):$(cat "$dev/device")" = "0x1234:0x1111" ]; then
+        continue
+    fi
+    gpu_present=1
+done
+if [ -z "$gpu_present" ]; then
+    DEFAULT_ENABLED="$DEFAULT_ENABLED software-rendering"
+fi
 
 persistence=$(qubesdb-read /qubes-vm-persistence)
 case $persistence in
