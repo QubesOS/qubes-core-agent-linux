@@ -5,6 +5,7 @@
 [Desktop Entry]
 Version=1.0
 Name=QubesOS Edit In DisposableVM
+Name[he]=עריכה ב-qube זמני
 Exec=/usr/bin/qvm-open-in-dvm -- %u
 Terminal=false
 Type=Application
