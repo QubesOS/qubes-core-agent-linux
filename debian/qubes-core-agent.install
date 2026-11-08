@@ -213,6 +213,7 @@ usr/share/keyrings/qubes-archive-keyring-4.3.gpg
 usr/share/keyrings/qubes-ubuntu-archive-keyring.gpg
 usr/share/keyrings/qubes-ubuntu-archive-keyring-4.3.gpg
 usr/share/kservices5/ServiceMenus/*.desktop
+usr/share/locale/*/LC_MESSAGES/qubes-core-agent-linux.mo
 usr/share/applications/*.desktop
 usr/share/applications/defaults.list
 usr/share/man/man1/qvm-*

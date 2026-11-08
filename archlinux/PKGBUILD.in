@@ -12,6 +12,7 @@ makedepends=(
     make
 
     desktop-file-utils
+    gettext
     libx11
     lsb-release
     pandoc
@@ -109,6 +110,7 @@ package_qubes-vm-core() {
     make -C qubes-rpc DESTDIR="$pkgdir" install
     make -C qubes-rpc/kde DESTDIR="$pkgdir" install
     make -C filesystem DESTDIR="$pkgdir" install
+    make -C po DESTDIR="$pkgdir" install
 
     # Adjust fstab for Arch
     mv "$pkgdir/etc/fstab" "$pkgdir/etc/fstab.qubes"

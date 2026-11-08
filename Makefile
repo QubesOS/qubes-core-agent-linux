@@ -29,6 +29,7 @@ clean:
 	make -C misc clean
 	make -C qubes-rpc clean
 	make -C doc clean
+	make -C po clean
 	rm -rf qubesagent/*.pyc qubesagent/__pycache__
 	rm -rf test-packages/__pycache__
 	rm -rf test-packages/qubesagent.egg-info
