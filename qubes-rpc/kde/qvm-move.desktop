@@ -7,4 +7,5 @@ X-KDE-ServiceTypes=KonqPopupMenu/Plugin,inode/directory,all/allfiles
 Exec=/usr/lib/qubes/qvm-move-to-vm.kde %U
 Icon=kget
 Name=Move to other qube
+Name[he]=העברה ל-qube אחר
 

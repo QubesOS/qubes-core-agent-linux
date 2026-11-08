@@ -21,6 +21,11 @@
 
 set -e -o pipefail
 
+export TEXTDOMAIN=qubes-core-agent-linux
+if ! type gettext >/dev/null 2>&1; then
+    gettext() { printf '%s' "$1"; }
+fi
+
 set_qdbus() {
     for cmd in qdbus qdbus-qt{6,5}; do
         type "$cmd" >&2 || continue
@@ -76,10 +81,10 @@ else
 fi
 
 if [[ ${0##*/} == qvm-move-to-vm.* ]]; then
-    description="Moving files..."
+    description=$(gettext 'Moving files...')
     trap '[[ $? == 0 ]] && rm -rf -- "$@"' EXIT
 else
-    description="Copying files..."
+    description=$(gettext 'Copying files...')
 fi
 
 if [[ $size == 0 ]]; then

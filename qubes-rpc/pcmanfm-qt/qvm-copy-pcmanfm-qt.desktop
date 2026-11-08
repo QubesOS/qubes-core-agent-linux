@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Action
 Name=Copy to other qube
+Name[he]=העתקה ל-qube אחר
 Icon=stock_folder-copy
 Profiles=on_item;
 

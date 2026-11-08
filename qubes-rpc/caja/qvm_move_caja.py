@@ -1,6 +1,9 @@
+import gettext
 import subprocess
 
 from gi.repository import Caja, GObject
+
+_ = gettext.translation('qubes-core-agent-linux', fallback=True).gettext
 
 
 class MoveToAppvmItemExtension(GObject.GObject, Caja.MenuProvider):
@@ -16,7 +19,7 @@ class MoveToAppvmItemExtension(GObject.GObject, Caja.MenuProvider):
             return
 
         menu_item = Caja.MenuItem(name='QubesMenuProvider::MoveToAppvm',
-                                  label='Move to other qube...',
+                                  label=_('Move to other qube...'),
                                   tip='',
                                   icon='')
 

@@ -192,6 +192,7 @@ Requires(pre): shadow
 Requires(pre): qubes-db
 BuildRequires: gcc
 BuildRequires: desktop-file-utils
+BuildRequires: gettext
 BuildRequires: pandoc
 BuildRequires: xen-devel
 BuildRequires: libX11-devel
@@ -523,6 +524,7 @@ make -C qubes-rpc/kde DESTDIR=$RPM_BUILD_ROOT install-kde5
 make -C qubes-rpc/nautilus DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/thunar DESTDIR=$RPM_BUILD_ROOT install
 make -C qubes-rpc/bookmark DESTDIR=$RPM_BUILD_ROOT install
+make -C po DESTDIR=$RPM_BUILD_ROOT install
 
 %if 0%{?fedora} >= 41
 make -C package-managers PYTHON=%{__python3} DESTDIR=$RPM_BUILD_ROOT install install-dnf5
@@ -1079,6 +1081,7 @@ rm -f %{name}-%{version}
 /usr/share/applications/qubes-open-file-manager.desktop
 /usr/share/applications/qvm-open-in-dvm.desktop
 /usr/share/applications/defaults.list
+%{_datadir}/locale/*/LC_MESSAGES/qubes-core-agent-linux.mo
 /usr/share/qubes/serial.conf
 /usr/share/qubes/marker-vm
 /usr/share/glib-2.0/schemas/20_org.gnome.settings-daemon.plugins.updates.qubes.gschema.override

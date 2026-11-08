@@ -1,5 +1,8 @@
+import gettext
 import os.path
 from gi.repository import Nautilus, GObject, GLib, Gio
+
+_ = gettext.translation('qubes-core-agent-linux', fallback=True).gettext
 
 
 class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
@@ -48,14 +51,14 @@ class OpenInDvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
                 return
 
         menu_item1 = Nautilus.MenuItem(name='QubesMenuProvider::OpenInDvm',
-                                      label='Edit in disposable qube',
+                                      label=_('Edit in disposable qube'),
                                       tip='',
                                       icon='')
 
         menu_item1.connect('activate', self.on_menu_item_clicked, files)
 
         menu_item2 = Nautilus.MenuItem(name='QubesMenuProvider::ViewInDvm',
-                                      label='View in disposable qube',
+                                      label=_('View in disposable qube'),
                                       tip='',
                                       icon='')
 

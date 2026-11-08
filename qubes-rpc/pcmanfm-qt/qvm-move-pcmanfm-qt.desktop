@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Action
 Name=Move to other qube
+Name[he]=העברה ל-qube אחר
 Icon=stock_folder-move
 Profiles=on_item;
 

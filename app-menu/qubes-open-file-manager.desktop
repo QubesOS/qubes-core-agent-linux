@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Open File Manager
+Name[he]=פתיחת מנהל הקבצים
 Exec=xdg-open .
 Icon=system-file-manager
 Type=Application

@@ -1,5 +1,19 @@
 #!/bin/bash
 
+export TEXTDOMAIN=qubes-core-agent-linux
+if ! type gettext >/dev/null 2>&1; then
+    gettext() { printf '%s' "$1"; }
+fi
+
+# Print a translated printf format string with arguments
+# shellcheck disable=SC2059
+tr_printf() {
+    local fmt
+    fmt=$(gettext "$1")
+    shift
+    printf "$fmt" "$@"
+}
+
 # Check if at least two arguments are provided: actions + file(s)
 if [ "$#" -le 1 ]; then
     echo "Not enough arguments provided. Aborting..."
@@ -35,14 +49,14 @@ case "$action" in
         do
             if [ -d "$file" ];
             then
-                zenity --notification --text "Directory $file found, cannot open directories in other VMs." --timeout 3 &
+                zenity --notification --text "$(tr_printf 'Directory %s found, cannot open directories in other VMs.' "$file")" --timeout 3 &
                 exit 1
             fi
         done
         for file in "$@"
         do
             #shellcheck disable=SC2016
-            qvm-open-in-vm '@default' "$file" | zenity --notification --text "Opening $file in qube..." --timeout 3 &
+            qvm-open-in-vm '@default' "$file" | zenity --notification --text "$(tr_printf 'Opening %s in qube...' "$file")" --timeout 3 &
         done
         ;;
     opendvm)
@@ -50,13 +64,13 @@ case "$action" in
         do
             if [ -d "$file" ];
             then
-                zenity --notification --text "Directory $file found, cannot open directories in other VMs." --timeout 3 &
+                zenity --notification --text "$(tr_printf 'Directory %s found, cannot open directories in other VMs.' "$file")" --timeout 3 &
                 exit 1
             fi
         done
         for file in "$@"
         do
-            qvm-open-in-dvm "$file" | zenity --notification --text "Opening $file in disposable qube..." --timeout 3 &
+            qvm-open-in-dvm "$file" | zenity --notification --text "$(tr_printf 'Opening %s in disposable qube...' "$file")" --timeout 3 &
         done
         ;;
     viewdvm)
@@ -64,13 +78,13 @@ case "$action" in
         do
             if [ -d "$file" ];
             then
-                zenity --notification --text "Directory $file found, cannot open directories in other VMs." --timeout 3 &
+                zenity --notification --text "$(tr_printf 'Directory %s found, cannot open directories in other VMs.' "$file")" --timeout 3 &
                 exit 1
             fi
         done
         for file in "$@"
         do
-            qvm-open-in-dvm --view-only "$file" | zenity --notification --text "Opening $file in disposable qube..." --timeout 3 &
+            qvm-open-in-dvm --view-only "$file" | zenity --notification --text "$(tr_printf 'Opening %s in disposable qube...' "$file")" --timeout 3 &
         done
         ;;
     *)
