@@ -99,6 +99,10 @@ fi
 
 qvm-features-request supported-service.meminfo-writer=1
 
+if command -v dmsetup >/dev/null; then
+    qvm-features-request supported-feature.ephemeral-storage=1
+fi
+
 if [ -e /etc/xdg/autostart/blueman.desktop ]; then
     qvm-features-request supported-service.blueman=1
 fi
