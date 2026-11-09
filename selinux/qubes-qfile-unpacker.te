@@ -31,16 +31,17 @@ allow { sysadm_usertype staff_usertype unconfined_usertype initrc_domain } qubes
 allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertype initrc_domain privfd }:fd use;
 
 # ioctl isn't strictly needed, but it is harmless and could be helpful later
-allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertype initrc_domain privfd }:unix_stream_socket { read write ioctl };
+allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertype initrc_domain privfd }:unix_stream_socket { getattr read write ioctl };
 allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertype initrc_domain }:fifo_file rw_inherited_fifo_file_perms;
 
 # to create ~/QubesIncoming
 allow qubes_qfile_unpacker_t { user_home_dir_t admin_home_t }:dir { add_name search write };
-allow qubes_qfile_unpacker_t qubes_unpacked_file_t:dir { add_name search write create getattr mounton open read setattr lock};
+allow qubes_qfile_unpacker_t qubes_unpacked_file_t:dir { add_name remove_name search write create getattr mounton open read setattr lock};
 type_transition { sysadm_usertype staff_usertype unconfined_usertype initrc_domain qubes_qfile_unpacker_t } { user_home_dir_t admin_home_t }:dir qubes_unpacked_file_t "QubesIncoming";
-allow qubes_qfile_unpacker_t qubes_unpacked_file_t:file { append create getattr link open setattr write };
+# rename and unlink: to replace an existing file, if the user chooses to
+allow qubes_qfile_unpacker_t qubes_unpacked_file_t:file { append create getattr link open rename setattr unlink write };
 dontaudit qubes_qfile_unpacker_t { user_home_t admin_home_t }:file read;
-allow qubes_qfile_unpacker_t qubes_unpacked_file_t:lnk_file { create getattr setattr };
+allow qubes_qfile_unpacker_t qubes_unpacked_file_t:lnk_file { create getattr rename setattr unlink };
 
 allow qubes_qfile_unpacker_t self:capability { setgid setuid sys_admin sys_chroot };
 allow qubes_qfile_unpacker_t user_tmp_t:fifo_file write;

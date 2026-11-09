@@ -21,7 +21,7 @@
 
 set -e -o pipefail
 
-unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_BYTES service scriptdir ignore_symlinks
+unset PROGRESS_TYPE OPERATION_TYPE TARGET_TYPE MIN_ARGS FILECOPY_TOTAL_BYTES service scriptdir ignore_symlinks no_conflict_dialog
 
 # Determine the operation to be performed
 case ${0##*/} in
@@ -41,15 +41,17 @@ esac
 
 usage () {
     if [ "$TARGET_TYPE" = "vm" ]; then
-        echo "usage: $0 [--without-progress] [--ignore-symlinks] destination_qube_name FILE [FILE ...]"
+        echo "usage: $0 [--without-progress] [--ignore-symlinks] [--no-conflict-dialog] destination_qube_name FILE [FILE ...]"
     else
-        echo "usage: $0 [--without-progress] [--ignore-symlinks] FILE [FILE ...]"
+        echo "usage: $0 [--without-progress] [--ignore-symlinks] [--no-conflict-dialog] FILE [FILE ...]"
     fi
     echo 'Options:
     --no-ignore-symlinks   Do not ignore symbolic links (default).
     --ignore-symlinks      Ignore symbolic links.
     --with-progress        Show a progress indicator (default).
     --without-progress     Do not show a progress indicator.
+    --no-conflict-dialog   If a file already exists in the destination qube,
+                           fail instead of asking there what to do.
     -h, --help             Show this message and exit.
     --                     Stop searching for options.
 
@@ -77,6 +79,7 @@ while [ "$#" -gt 0 ]; do
         (--with-progress) export PROGRESS_TYPE=console; shift;;
         (--ignore-symlinks) ignore_symlinks="--ignore-symlinks"; shift;;
         (--no-ignore-symlinks) unset ignore_symlinks; shift;;
+        (--no-conflict-dialog) no_conflict_dialog=1; shift;;
         (-h|--help) usage 0;;
         (--) shift; break;;
         (-*) usage 1;;
@@ -105,6 +108,13 @@ else
     status=$?
     if [[ "$status" -ne 2 ]]; then exit "$status"; fi
     service=qubes.Filecopy+allow-all-names
+fi
+if [[ -n "$no_conflict_dialog" ]]; then
+    if [[ "$service" != qubes.Filecopy ]]; then
+        echo "--no-conflict-dialog cannot be used with these file names" >&2
+        exit 1
+    fi
+    service=qubes.Filecopy+no-conflict-dialog
 fi
 if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_BYTES; fi
 
