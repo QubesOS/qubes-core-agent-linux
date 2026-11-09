@@ -3,9 +3,14 @@ if [ -f /usr/lib/qubes/qvm_bookmark.sh ]
 then
   /usr/lib/qubes/qvm_bookmark.sh >/dev/null 2>&1 </dev/null
 fi
+dialog=/usr/lib/qubes/qfile-conflict-dialog
 case $1 in
 ('') arg=;;
 (allow-all-names) arg=--allow-all-names;;
+(no-conflict-dialog) arg='' dialog='';;
 (*) printf 'Unexpected argument %s\n' "$1" >&2; exit 1;;
 esac
+if [ -n "$dialog" ] && [ -x "$dialog" ]; then
+  exec "$dialog" /usr/lib/qubes/qfile-unpacker $arg
+fi
 exec /usr/lib/qubes/qfile-unpacker $arg

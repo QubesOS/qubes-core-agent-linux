@@ -63,7 +63,7 @@ install:
 		prepare-suspend resize-rootfs \
 		qfile-agent qopen-in-vm qrun-in-vm qubes-sync-clock \
 		tar2qfile vm-file-editor xdg-icon qvm-template-repo-query \
-		qubes-fs-tree-check vm-log
+		qubes-fs-tree-check vm-log qfile-conflict-dialog
 	# Install qfile-unpacker as SUID, because it will fail to receive
 	# files from other vm.
 	install -t $(DESTDIR)$(QUBESLIBDIR) -m 4755 qfile-unpacker

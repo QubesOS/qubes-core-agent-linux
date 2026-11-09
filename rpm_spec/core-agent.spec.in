@@ -1037,6 +1037,7 @@ rm -f %{name}-%{version}
 %dir /usr/lib/qubes
 /usr/lib/qubes/prepare-suspend
 /usr/lib/qubes/qfile-agent
+/usr/lib/qubes/qfile-conflict-dialog
 %attr(4755,root,root) /usr/lib/qubes/qfile-unpacker
 %attr(4755,root,root) %_bindir/qfile-unpacker
 /usr/lib/qubes/qopen-in-vm
