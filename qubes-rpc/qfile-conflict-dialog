@@ -163,8 +163,6 @@ def main():
     for fd in (0, 1, 2):
         os.dup2(null, fd)
     os.close(null)
-    if "DISPLAY" not in os.environ:
-        os.environ["DISPLAY"] = ":0"
     try:
         serve(ours, os.environ.get("QREXEC_REMOTE_DOMAIN", ""))
     finally:

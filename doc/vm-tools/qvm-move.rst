@@ -23,8 +23,7 @@ OPTIONS
 
 --no-conflict-dialog
     If a file already exists in the destination VM, fail instead of asking
-    there what to do. Not available when some file names are only accepted
-    with the qubes.Filecopy+allow-all-names service
+    there what to do.
 
 
 =================
@@ -47,8 +46,7 @@ OPTIONS
 
 --no-conflict-dialog
     If a file already exists in the destination VM, fail instead of asking
-    there what to do. Not available when some file names are only accepted
-    with the qubes.Filecopy+allow-all-names service
+    there what to do.
 
 
 AUTHORS

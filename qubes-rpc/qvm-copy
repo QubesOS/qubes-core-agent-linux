@@ -110,11 +110,7 @@ else
     service=qubes.Filecopy+allow-all-names
 fi
 if [[ -n "$no_conflict_dialog" ]]; then
-    if [[ "$service" != qubes.Filecopy ]]; then
-        echo "--no-conflict-dialog cannot be used with these file names" >&2
-        exit 1
-    fi
-    service=qubes.Filecopy+no-conflict-dialog
+    service=$service+no-conflict-dialog
 fi
 if [[ "$PROGRESS_TYPE" = 'console' ]]; then export FILECOPY_TOTAL_BYTES; fi
 

@@ -126,6 +126,7 @@ class TestFilecopy(unittest.TestCase):
         with open(fn_dst, 'rb') as f: self.assertEqual(f.read(), b'foo')
 
     def test_20_conflict_no_handler(self):
+        """Without a handler, an existing file stops the copy with EEXIST"""
         self._write(self.source, 'a', 'new')
         self._write(self.incoming, 'a', 'old')
         env = os.environ.copy()
@@ -140,6 +141,7 @@ class TestFilecopy(unittest.TestCase):
         self.assertEqual(self._read('a'), 'old')
 
     def test_21_conflict_overwrite(self):
+        """Replace overwrites the existing file and the copy goes on"""
         self._write(self.source, 'a', 'new')
         self._write(self.source, 'b', 'new b')
         self._write(self.incoming, 'a', 'old')
@@ -152,6 +154,7 @@ class TestFilecopy(unittest.TestCase):
         self.assertEqual(sorted(os.listdir(self.incoming)), ['a', 'b'])
 
     def test_22_conflict_skip(self):
+        """Skip keeps the old file and ends with ECANCELED"""
         self._write(self.source, 'a', 'new')
         self._write(self.source, 'b', 'new b')
         self._write(self.incoming, 'a', 'old')
@@ -161,6 +164,7 @@ class TestFilecopy(unittest.TestCase):
         self.assertEqual(self._read('b'), 'new b')
 
     def test_23_conflict_rename(self):
+        """Save as asks again for a taken or invalid name"""
         self._write(self.source, 'a.tar.gz', 'new')
         self._write(self.incoming, 'a.tar.gz', 'old')
         self._write(self.incoming, 'taken', 'other')
@@ -174,6 +178,7 @@ class TestFilecopy(unittest.TestCase):
         self.assertEqual(self._read('new'), 'new')
 
     def test_24_conflict_abort(self):
+        """Stop ends the copy with EEXIST, old file kept"""
         self._write(self.source, 'a', 'new')
         self._write(self.incoming, 'a', 'old')
         agent, unpacker, stderr, _ = self._conflict_filecopy(['a'], 'a')
@@ -181,6 +186,7 @@ class TestFilecopy(unittest.TestCase):
         self.assertEqual(self._read('a'), 'old')
 
     def test_25_conflict_symlink(self):
+        """An existing symlink can be replaced too"""
         self._write(self.source, 'd/target', 'new')
         os.symlink('target', os.path.join(self.source, 'd', 'link'))
         self._write(self.incoming, 'd/target', 'old')
@@ -194,12 +200,21 @@ class TestFilecopy(unittest.TestCase):
         self.assertEqual(self._read('d/target'), 'new')
 
     def test_26_conflict_directory_in_the_way(self):
+        """A directory in the way can only be skipped, not replaced"""
         self._write(self.source, 'a', 'new')
         os.mkdir(os.path.join(self.incoming, 'a'))
         agent, unpacker, stderr, requests = self._conflict_filecopy(
             ['s'], 'a')
         self.assertEqual((agent, unpacker), (1, errno.ECANCELED), stderr)
         self.assertEqual([r[:2] for r in requests], [['0', 'a']])
+        self.assertTrue(os.path.isdir(os.path.join(self.incoming, 'a')))
+
+    def test_27_conflict_directory_overwrite_aborts(self):
+        """Replace answered for a directory in the way stops the copy"""
+        self._write(self.source, 'a', 'new')
+        os.mkdir(os.path.join(self.incoming, 'a'))
+        agent, unpacker, stderr, _ = self._conflict_filecopy(['o'], 'a')
+        self.assertEqual((agent, unpacker), (1, errno.EEXIST), stderr)
         self.assertTrue(os.path.isdir(os.path.join(self.incoming, 'a')))
 
 

@@ -38,10 +38,10 @@ allow qubes_qfile_unpacker_t { sysadm_usertype staff_usertype unconfined_usertyp
 allow qubes_qfile_unpacker_t { user_home_dir_t admin_home_t }:dir { add_name search write };
 allow qubes_qfile_unpacker_t qubes_unpacked_file_t:dir { add_name remove_name search write create getattr mounton open read setattr lock};
 type_transition { sysadm_usertype staff_usertype unconfined_usertype initrc_domain qubes_qfile_unpacker_t } { user_home_dir_t admin_home_t }:dir qubes_unpacked_file_t "QubesIncoming";
-# rename and unlink: to replace an existing file, if the user chooses to
-allow qubes_qfile_unpacker_t qubes_unpacked_file_t:file { append create getattr link open rename setattr unlink write };
+# unlink: to replace an existing file, if the user chooses to
+allow qubes_qfile_unpacker_t qubes_unpacked_file_t:file { append create getattr link open setattr unlink write };
 dontaudit qubes_qfile_unpacker_t { user_home_t admin_home_t }:file read;
-allow qubes_qfile_unpacker_t qubes_unpacked_file_t:lnk_file { create getattr rename setattr unlink };
+allow qubes_qfile_unpacker_t qubes_unpacked_file_t:lnk_file { create getattr setattr unlink };
 
 allow qubes_qfile_unpacker_t self:capability { setgid setuid sys_admin sys_chroot };
 allow qubes_qfile_unpacker_t user_tmp_t:fifo_file write;
