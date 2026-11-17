@@ -1,6 +1,7 @@
 import logging
 import operator
 import re
+import subprocess
 from io import BytesIO
 from unittest import TestCase
 from unittest.mock import patch, Mock
@@ -395,6 +396,37 @@ class TestNftablesWorker(TestCase, WorkerCommon):
             '  }\n'
             '}\n'
         ])
+
+    @patch('subprocess.Popen')
+    def test_run_nft_cleanup(self, mock_popen):
+        process = mock_popen.return_value
+        process.communicate.return_value = (b'', None)
+        process.returncode = 0
+        self.obj.run_nft = super(NftablesWorker, self.obj).run_nft
+
+        self.obj.cleanup()
+
+        mock_popen.assert_called_once_with(
+            ['nft', '-f', '/dev/stdin'], stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        process.communicate.assert_called_once_with(
+            b'delete table ip qubes-firewall\n'
+            b'delete table ip6 qubes-firewall\n')
+
+    @patch('subprocess.Popen')
+    def test_run_nft_cleanup_errors(self, mock_popen):
+        process = mock_popen.return_value
+        self.obj.run_nft = super(NftablesWorker, self.obj).run_nft
+        for returncode, output in (
+                (1, b'Operation not permitted'),
+                (1, b'No such file or directory'),
+                (-signal.SIGTERM, b'')):
+            with self.subTest(returncode=returncode, output=output):
+                process.returncode = returncode
+                process.communicate.return_value = (output, None)
+                with self.assertRaises(qubesagent.firewall.RuleApplyError) as err:
+                    self.obj.cleanup()
+                self.assertIn(str(output), str(err.exception))
 
     def test_009_update_connected_ips_empty(self):
         self.obj.qdb.entries['/connected-ips'] = b''
