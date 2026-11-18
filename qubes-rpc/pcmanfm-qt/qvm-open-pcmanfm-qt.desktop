@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Action
 Name=Open in other qube
+Name[he]=פתיחה ב-qube אחר
 Icon=document-open
 Profiles=on_item;
 

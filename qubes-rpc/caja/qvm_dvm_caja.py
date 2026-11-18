@@ -1,7 +1,10 @@
+import gettext
 import os
 from subprocess import Popen
 
 from gi.repository import Caja, GObject
+
+_ = gettext.translation('qubes-core-agent-linux', fallback=True).gettext
 
 
 class OpenInDvmItemExtension(GObject.GObject, Caja.MenuProvider):
@@ -18,14 +21,14 @@ class OpenInDvmItemExtension(GObject.GObject, Caja.MenuProvider):
             return
 
         menu_item1 = Caja.MenuItem(name='QubesMenuProvider::OpenInDvm',
-                                   label='Edit in disposable qube',
+                                   label=_('Edit in disposable qube'),
                                    tip='',
                                    icon='')
 
         menu_item1.connect('activate', self.on_menu_item_clicked, files)
 
         menu_item2 = Caja.MenuItem(name='QubesMenuProvider::ViewInDvm',
-                                   label='View in disposable qube',
+                                   label=_('View in disposable qube'),
                                    tip='',
                                    icon='')
 

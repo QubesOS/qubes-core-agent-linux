@@ -1,5 +1,8 @@
+import gettext
 import os.path
 from gi.repository import Nautilus, GObject, GLib, Gio
+
+_ = gettext.translation('qubes-core-agent-linux', fallback=True).gettext
 
 class CopyToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
     '''Copy file(s) to AppVM.
@@ -46,7 +49,7 @@ class CopyToAppvmItemExtension(GObject.GObject, Nautilus.MenuProvider):
                 return
 
         menu_item = Nautilus.MenuItem(name='QubesMenuProvider::CopyToAppvm',
-                                      label='Copy to other qube...',
+                                      label=_('Copy to other qube...'),
                                       tip='',
                                       icon='')
 

@@ -1,0 +1,65 @@
+# Translation template for qubes-core-agent-linux.
+# This file is distributed under the same license as the qubes-core-agent-linux package.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: qubes-core-agent-linux\n"
+"Report-Msgid-Bugs-To: https://github.com/QubesOS/qubes-issues/issues\n"
+"POT-Creation-Date: 2026-11-08 02:34+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: package-managers/qubes-download-dom0-updates.sh:129
+msgid "No new updates available"
+msgstr ""
+
+#: qubes-rpc/caja/qvm_copy_caja.py:22
+#: qubes-rpc/nautilus/qvm_copy_nautilus.py:52
+msgid "Copy to other qube..."
+msgstr ""
+
+#: qubes-rpc/caja/qvm_dvm_caja.py:24 qubes-rpc/nautilus/qvm_dvm_nautilus.py:54
+msgid "Edit in disposable qube"
+msgstr ""
+
+#: qubes-rpc/caja/qvm_dvm_caja.py:31 qubes-rpc/nautilus/qvm_dvm_nautilus.py:61
+msgid "View in disposable qube"
+msgstr ""
+
+#: qubes-rpc/caja/qvm_move_caja.py:22
+#: qubes-rpc/nautilus/qvm_move_nautilus.py:52
+msgid "Move to other qube..."
+msgstr ""
+
+#: qubes-rpc/qvm-actions.sh:52 qubes-rpc/qvm-actions.sh:67
+#: qubes-rpc/qvm-actions.sh:81
+#, c-format
+msgid "Directory %s found, cannot open directories in other VMs."
+msgstr ""
+
+#: qubes-rpc/qvm-actions.sh:59
+#, c-format
+msgid "Opening %s in qube..."
+msgstr ""
+
+#: qubes-rpc/qvm-actions.sh:73 qubes-rpc/qvm-actions.sh:87
+#, c-format
+msgid "Opening %s in disposable qube..."
+msgstr ""
+
+#: qubes-rpc/qvm-copy-to-vm.gnome:84
+msgid "Moving files..."
+msgstr ""
+
+#: qubes-rpc/qvm-copy-to-vm.gnome:87
+msgid "Copying files..."
+msgstr ""
+
+#: qubes-rpc/qvm-open-in-vm:93
+msgid "Are you sure you want to create another disposable VM?"
+msgstr ""

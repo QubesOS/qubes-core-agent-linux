@@ -2,6 +2,7 @@
 Version=1.0
 Encoding=UTF-8
 Name=Start nm-applet depending on NetworkManager state
+Name[he]=הפעלת nm-applet לפי מצב NetworkManager
 Exec=/usr/lib/qubes/show-hide-nm-applet.sh
 Terminal=false
 Type=Application

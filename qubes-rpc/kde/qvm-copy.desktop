@@ -7,4 +7,5 @@ X-KDE-ServiceTypes=KonqPopupMenu/Plugin,inode/directory,all/allfiles
 Exec=/usr/lib/qubes/qvm-copy-to-vm.kde %U
 Icon=kget
 Name=Copy to other qube
+Name[he]=העתקה ל-qube אחר
 
