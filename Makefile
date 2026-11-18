@@ -171,6 +171,7 @@ install-systemd: install-init
 	install -m 0644 vm-systemd/30_resolved-no-mdns-or-llmnr.conf $(DESTDIR)$(SYSLIBDIR)/systemd/resolved.conf.d/
 	install -m 0644 vm-systemd/home.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0755 vm-systemd/user-environment-generators/30-qubes.sh $(DESTDIR)$(SYSLIBDIR)/systemd/user-environment-generators/30-qubes.sh
+	install -m 0755 vm-systemd/user-environment-generators/99-qubes-app-dispvm.sh $(DESTDIR)$(SYSLIBDIR)/systemd/user-environment-generators/99-qubes-app-dispvm.sh
 	install -m 0644 vm-systemd/usr-local.mount $(DESTDIR)$(SYSLIBDIR)/systemd/system/
 	install -m 0755 vm-systemd/setup-minimal-vm $(DESTDIR)$(LIBDIR)/qubes/setup-minimal-vm
 

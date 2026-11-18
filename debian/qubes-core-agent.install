@@ -10,6 +10,7 @@ etc/fstab
 etc/needrestart/conf.d/50_qubes.conf
 etc/profile.d/qt_x11_no_mitshm.sh
 etc/profile.d/zqubes_disable_lesspipe.sh
+etc/profile.d/zqubes_app_dispvm.sh
 etc/qubes-rpc/qubes.ShowInTerminal
 etc/qubes-rpc/qubes.Backup
 etc/qubes-rpc/qubes.DetachPciDevice
@@ -128,6 +129,7 @@ lib/systemd/resolved.conf.d/30_resolved-no-mdns-or-llmnr.conf
 lib/systemd/system/home.mount
 lib/systemd/system/usr-local.mount
 lib/systemd/user-environment-generators/30-qubes.sh
+lib/systemd/user-environment-generators/99-qubes-app-dispvm.sh
 usr/lib/sysctl.d/20-qubes-core.conf
 usr/lib/systemd/user/tracker-extract-3.service.d/30_qubes.conf
 usr/lib/systemd/user/tracker-miner-fs-3.service.d/30_qubes.conf
