@@ -7,7 +7,11 @@
 set -e
 
 /usr/lib/qubes/init/setup-rwdev.sh
-if [ -e /dev/xvdb ] ; then mount /rw ; fi
+if has_ephemeral_storage; then
+  mount -o nosuid,nodev "$(private_device)" /rw
+elif [ -e /dev/xvdb ] ; then
+  mount /rw
+fi
 /usr/lib/qubes/init/setup-rw.sh
 
 if is_fully_persistent; then
