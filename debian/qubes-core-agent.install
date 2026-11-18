@@ -184,6 +184,7 @@ usr/lib/qubes/init/setup-rw.sh
 usr/lib/qubes/init/setup-rwdev.sh
 usr/lib/qubes/prepare-suspend
 usr/lib/qubes/qfile-agent
+usr/lib/qubes/qfile-conflict-dialog
 usr/lib/qubes/qfile-unpacker
 usr/lib/qubes/qubes-fs-tree-check
 usr/lib/qubes/qopen-in-vm

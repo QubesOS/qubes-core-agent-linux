@@ -3,9 +3,17 @@ if [ -f /usr/lib/qubes/qvm_bookmark.sh ]
 then
   /usr/lib/qubes/qvm_bookmark.sh >/dev/null 2>&1 </dev/null
 fi
+dialog=/usr/lib/qubes/qfile-conflict-dialog
+# flags joined with "+", in this order, so that policies can match them
 case $1 in
 ('') arg=;;
 (allow-all-names) arg=--allow-all-names;;
+(no-conflict-dialog) arg='' dialog='';;
+(allow-all-names+no-conflict-dialog) arg=--allow-all-names dialog='';;
 (*) printf 'Unexpected argument %s\n' "$1" >&2; exit 1;;
 esac
+# DISPLAY is unset without the GUI agent; an existing file then stops the copy
+if [ -n "$DISPLAY" ] && [ -n "$dialog" ] && [ -x "$dialog" ]; then
+  exec "$dialog" /usr/lib/qubes/qfile-unpacker $arg
+fi
 exec /usr/lib/qubes/qfile-unpacker $arg

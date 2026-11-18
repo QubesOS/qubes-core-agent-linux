@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
+#include <sys/socket.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
@@ -26,6 +27,7 @@
 #include <libqubes-rpc-filecopy.h>
 
 #define INCOMING_DIR_NAME "QubesIncoming"
+#define CONFLICT_REQUEST_SIZE (MAX_PATH_LENGTH + 2 * NAME_MAX + 256)
 
 static char *prepare_creds_return_dir(uid_t uid, uid_t myuid)
 {
@@ -74,6 +76,7 @@ enum {
     opt_allow_unsafe_symlinks,
     opt_no_allow_unsafe_characters,
     opt_no_allow_unsafe_symlinks,
+    opt_conflict_fd,
 };
 
 const struct option opts[] = {
@@ -81,10 +84,49 @@ const struct option opts[] = {
     { "allow-all-names", no_argument, NULL, opt_allow_unsafe_characters },
     { "no-allow-unsafe-symlinks", no_argument, NULL, opt_no_allow_unsafe_symlinks },
     { "allow-unsafe-symlinks", no_argument, NULL, opt_allow_unsafe_symlinks },
+    { "conflict-fd", required_argument, NULL, opt_conflict_fd },
     { "verbose", no_argument, NULL, 'v' },
     { "wait-for-space", required_argument, NULL, 'w' },
     { NULL, 0, NULL, 0 },
 };
+
+/* socket to qfile-conflict-dialog, which asks the user what to do with existing files */
+static int conflict_fd = -1;
+
+static enum conflict_action ask_conflict(const char *untrusted_name,
+        int can_overwrite, char *new_name, size_t new_name_size,
+        const char *error)
+{
+    static char buf[CONFLICT_REQUEST_SIZE];
+    int len;
+    ssize_t n;
+
+    len = snprintf(buf, sizeof(buf), "%d%c%s%c%s%c%s", can_overwrite, 0,
+                   untrusted_name, 0, new_name, 0, error ? error : "");
+    if (len < 0 || (size_t)len >= sizeof(buf))
+        return CONFLICT_ABORT;
+    if (send(conflict_fd, buf, (size_t)len + 1, 0) != len + 1)
+        return CONFLICT_ABORT;
+    n = recv(conflict_fd, buf, sizeof(buf) - 1, 0);
+    if (n < 1)
+        return CONFLICT_ABORT;
+    buf[n] = '\0';
+    switch (buf[0]) {
+    case 'o':
+        return CONFLICT_OVERWRITE;
+    case 's':
+        return CONFLICT_SKIP;
+    case 'r':
+        if (n < 2 || buf[1] != '\0')
+            return CONFLICT_ABORT;
+        /* an empty name makes the library ask again */
+        if ((size_t)snprintf(new_name, new_name_size, "%s", buf + 2) >= new_name_size)
+            new_name[0] = '\0';
+        return CONFLICT_RENAME;
+    default:
+        return CONFLICT_ABORT;
+    }
+}
 
 uid_t parse_uid(const char *user)
 {
@@ -200,6 +242,17 @@ int main(int argc, char ** argv)
             case 'w':
                 set_wait_for_space_str(optarg);
                 break;
+            case opt_conflict_fd: {
+                char *end;
+                long fd;
+                errno = 0;
+                fd = strtol(optarg, &end, 10);
+                if (errno || *end || fd < 3 || fd > INT_MAX ||
+                        fcntl((int)fd, F_SETFD, FD_CLOEXEC) < 0)
+                    errx(1, "Invalid --conflict-fd value %s", optarg);
+                conflict_fd = (int)fd;
+                break;
+            }
             }
         }
     }
@@ -302,8 +355,12 @@ int main(int argc, char ** argv)
                 perror("setuid");
                 exit(1);
             }
+            if (conflict_fd >= 0)
+                register_conflict_handler(ask_conflict);
             return do_unpack_ext(flags);
     }
+    if (conflict_fd >= 0)
+        close(conflict_fd);
     if (waitpid(pid, &ret, 0) < 0) {
         gui_fatal("Failed to wait for child process");
     }
