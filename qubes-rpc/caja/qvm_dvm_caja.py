@@ -37,21 +37,24 @@ class OpenInDvmItemExtension(GObject.GObject, Caja.MenuProvider):
     def on_menu_item_clicked(self, menu, files, view_only=False):
         '''Called when user chooses files though Caja context menu.
         '''
+        file_paths = []
         for file_obj in files:
 
             # Check if file still exists
             if file_obj.is_gone():
                 return
 
-            gio_file = file_obj.get_location()
+            file_paths.append(file_obj.get_location().get_path())
 
-            # Use subprocess.DEVNULL in python >= 3.3
-            devnull = open(os.devnull, 'wb')
-            command = ['nohup', '/usr/bin/qvm-open-in-dvm']
-            if view_only:
-                command.append('--view-only')
-            command.append(gio_file.get_path())
+        # several files are opened in the same disposable
+        # Use subprocess.DEVNULL in python >= 3.3
+        devnull = open(os.devnull, 'wb')
+        command = ['nohup', '/usr/bin/qvm-open-in-dvm']
+        if view_only:
+            command.append('--view-only')
+        command.append('--')
+        command.extend(file_paths)
 
-            # Use Popen instead of subprocess.call to spawn the process
-            Popen(command, stdout=devnull, stderr=devnull)
-            devnull.close()
+        # Use Popen instead of subprocess.call to spawn the process
+        Popen(command, stdout=devnull, stderr=devnull)
+        devnull.close()
