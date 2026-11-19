@@ -56,7 +56,6 @@ SYSTEM_DROPINS += sysinit.target
 ifeq ($(ENABLE_SELINUX),1)
 SYSTEM_DROPINS += selinux-autorelabel.target selinux-autorelabel.service
 endif
-SYSTEM_DROPINS += polkit.service
 SYSTEM_DROPINS += abrtd.service
 SYSTEM_DROPINS += bluetooth.service
 SYSTEM_DROPINS += systemd-nsresourced.service
