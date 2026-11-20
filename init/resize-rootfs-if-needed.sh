@@ -32,5 +32,6 @@ if [ "$(cat $sysfs_xvda/size)" -lt \
    exit 0
 fi
 
-# resize needed, do it
-/usr/lib/qubes/resize-rootfs
+# resize needed, do it as a detached process to break the wait cycle identified
+# in qubes-issues#11211
+( /usr/lib/qubes/resize-rootfs & )
