@@ -2,6 +2,12 @@
 
 set -e
 
+# If underlying root device is read-only, don't do anything
+if [ "$(blockdev --getro /dev/xvda)" -eq "1" ]; then
+    echo "xvda is read-only, not resizing" >&2
+    exit 0
+fi
+
 dm_major=$(printf %x "$(grep device-mapper /proc/devices | cut -f 1 -d ' ')")
 case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
     ca:0)
