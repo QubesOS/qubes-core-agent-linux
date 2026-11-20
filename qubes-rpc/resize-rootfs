@@ -79,4 +79,19 @@ case "$(stat -Lc %t:%T "$ROOTDEV")" in
         exit 1
         ;;
 esac
-resize2fs /dev/mapper/dmroot
+
+fstype=$(blkid -o value -s TYPE "$ROOTDEV")
+case "$fstype" in
+  ext[234])
+    resize2fs "$ROOTDEV"
+    ;;
+  btrfs)
+    btrfs filesystem resize max /
+    ;;
+  xfs)
+    xfs_growfs /
+    ;;
+  *)
+    echo "Resizig not implemented for filesystem type ${fstype}" >&2
+    ;;
+esac
