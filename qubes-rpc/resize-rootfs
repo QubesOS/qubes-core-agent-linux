@@ -41,11 +41,20 @@ case "$(stat -Lc %t:%T "$ROOTDEV")" in
             echo ',+' | sfdisk --no-reread --no-tell-kernel -q -N 3 "$DEV"
             # and reload partition table; prefer partprobe over blockdev
             # --rereadpt, as it works on mounted partitions
-            partprobe "$DEV"
-            udevadm settle
+            # On debian, partprobe is patched to do a udevadm settle which can
+            # cause a wait loop, see qubes-issues#11211. The debian patch passes
+            # "udevadm settle" to a system() call. There is no way to set the
+            # timeout parameter from environment variables. So hook the udevadm
+            # command path resolution to run a script that proxies to the
+            # udevadm adding a --timeout parameter if using the settle command.
+            # shellcheck disable=SC1117,SC2016
+            echo "$(command -v udevadm)" '"$@" $([ "$1" = "settle" ] && echo --timeout=0)' > /run/qubes/udevadm
+            chmod +x /run/qubes/udevadm
+            PATH="/run/qubes:$PATH" partprobe "$DEV"
             while ! verify_partitions_synced "$DEV"; do
                 sleep 1
             done
+            rm -f /run/qubes/udevadm
             # Use block device directly to avoid potential dangling symlinks
             ROOTDEV="$DEV"3
         fi
