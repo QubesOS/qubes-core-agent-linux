@@ -172,7 +172,6 @@ usr/lib/qubes/init/mount-dirs.sh
 usr/lib/qubes/init/qubes-early-vm-config.sh
 usr/lib/qubes/init/qubes-random-seed.sh
 usr/lib/qubes/init/qubes-sysinit.sh
-usr/lib/qubes/init/resize-rootfs-if-needed.sh
 usr/lib/qubes/init/setup-rw.sh
 usr/lib/qubes/init/setup-rwdev.sh
 usr/lib/qubes/prepare-suspend
