@@ -17,7 +17,7 @@ start()
 
 	echo -n $"Adjusting root filesystem size:"
 	# shellcheck disable=SC2015
-	/usr/lib/qubes/init/resize-rootfs-if-needed.sh && success || failure
+	/usr/lib/qubes/resize-rootfs && success || failure
 	echo
 
 	echo -n $"Setting up Qubes persistent file systems:"
