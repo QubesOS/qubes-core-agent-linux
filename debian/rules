@@ -37,7 +37,8 @@ override_dh_fixperms:
 	dh_fixperms -a -Xqfile-unpacker
 
 override_dh_systemd_start:
-	dh_systemd_start --no-restart-on-upgrade
+	dh_systemd_start --package=qubes-core-agent-passwordless-root --restart-after-upgrade
+	dh_systemd_start --remaining-packages --no-restart-after-upgrade
 
 override_dh_install:
 	if [ "$(DISTRIBUTION)" = "Ubuntu" ]; then \
