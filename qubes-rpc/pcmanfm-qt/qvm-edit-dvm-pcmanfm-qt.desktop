@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Action
 Name=View in disposable qube
+Name[he]=צפייה ב-qube זמני
 Icon=document-open
 Profiles=on_item;
 

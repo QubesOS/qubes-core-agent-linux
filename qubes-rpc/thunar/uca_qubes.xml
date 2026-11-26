@@ -1,6 +1,7 @@
 <action>
 	<icon>stock_folder-copy</icon>
 	<name>Copy to Other Qube…</name>
+	<name xml:lang="he">העתקה ל-qube אחר…</name>
 	<unique-id>1507455450991127-4</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh copy %F</command>
 	<description></description>
@@ -15,6 +16,7 @@
 <action>
 	<icon>stock_folder-move</icon>
 	<name>Move to Other Qube…</name>
+	<name xml:lang="he">העברה ל-qube אחר…</name>
 	<unique-id>1507455437157027-3</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh move %F</command>
 	<description></description>
@@ -29,6 +31,7 @@
 <action>
 	<icon>document-open</icon>
 	<name>Open in Other Qube…</name>
+	<name xml:lang="he">פתיחה ב-qube אחר…</name>
 	<unique-id>1507455471075266-5</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh openvm %F</command>
 	<description></description>
@@ -42,6 +45,7 @@
 <action>
 	<icon>gtk-convert</icon>
 	<name>Convert in Disposable Qube</name>
+	<name xml:lang="he">המרה ב-qube זמני</name>
 	<unique-id>1507455488971315-6</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh pdf %F</command>
 	<description></description>
@@ -51,6 +55,7 @@
 <action>
 	<icon>gtk-convert</icon>
 	<name>Convert in Disposable Qube</name>
+	<name xml:lang="he">המרה ב-qube זמני</name>
 	<unique-id>1507455503129941-7</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh img %F</command>
 	<description></description>
@@ -60,6 +65,7 @@
 <action>
 	<icon>document-open</icon>
 	<name>Edit in Disposable Qube</name>
+	<name xml:lang="he">עריכה ב-qube זמני</name>
 	<unique-id>1507455559234996-8</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh opendvm %F</command>
 	<description></description>
@@ -73,6 +79,7 @@
 <action>
 	<icon>document-open</icon>
 	<name>View in Disposable Qube</name>
+	<name xml:lang="he">צפייה ב-qube זמני</name>
 	<unique-id>1507455559234997-9</unique-id>
 	<command>/usr/lib/qubes/qvm-actions.sh viewdvm %F</command>
 	<description></description>

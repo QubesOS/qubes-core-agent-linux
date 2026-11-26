@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Run Terminal
+Name[he]=הפעלת מסוף
 Exec=qubes-run-terminal
 Icon=utilities-terminal
 Type=Application

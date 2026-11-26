@@ -86,7 +86,11 @@ elif [ ! -f "$filename" ]; then
     fi
 fi
 
-prompt_text='Are you sure you want to create another disposable VM?'
+if ! command -v gettext >/dev/null 2>&1; then
+    gettext () { printf '%s' "$1"; }
+fi
+prompt_text=$(TEXTDOMAIN=qubes-core-agent-linux \
+    gettext 'Are you sure you want to create another disposable VM?')
 case $target in
 (@dispvm|@dispvm:*)
     case ${QREXEC_SERVICE_FULL_NAME-} in

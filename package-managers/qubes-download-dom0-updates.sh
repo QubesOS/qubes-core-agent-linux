@@ -122,7 +122,11 @@ if [ ${#PKGLIST[@]} -eq 0 ] && [ "$CHECK_ONLY" = "1" ]; then
     else
         echo "No new updates available"
         if [ "$GUI" = 1 ]; then
-            zenity --info --text="No new updates available"
+            if ! type gettext >/dev/null 2>&1; then
+                gettext() { printf '%s' "$1"; }
+            fi
+            zenity --info --text="$(TEXTDOMAIN=qubes-core-agent-linux \
+                gettext 'No new updates available')"
         fi
         exit 0
     fi
