@@ -333,13 +333,17 @@ class FirewallWorker(object):
     @staticmethod
     def dns_addresses(family=None):
         with open('/etc/resolv.conf') as resolv:
-            for line in resolv.readlines():
-                line = line.strip()
-                if line.startswith('nameserver'):
-                    if line.count('.') == 3 and (family or 4) == 4:
-                        yield line.split(' ')[1]
-                    elif line.count(':') and (family or 6) == 6:
-                        yield line.split(' ')[1]
+            for line in resolv:
+                tokens = line.split()
+                if len(tokens) < 2 or tokens[0] != 'nameserver':
+                    continue
+                # nft sets reject a zone index, like "fe80::1%wlan0"
+                try:
+                    addr = ipaddress.ip_address(tokens[1].split('%')[0])
+                except ValueError:
+                    continue
+                if family in (None, addr.version):
+                    yield str(addr)
 
     def main(self):
         self.terminate_requested = False
