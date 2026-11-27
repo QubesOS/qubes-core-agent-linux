@@ -58,7 +58,7 @@ install:
 	$(LN) qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-copy-to-vm.kde
 	$(LN) qvm-copy-to-vm.gnome $(DESTDIR)$(QUBESLIBDIR)/qvm-move-to-vm.kde
 	install -t $(DESTDIR)$(QUBESLIBDIR) \
-		prepare-suspend resize-rootfs \
+		prepare-suspend resize-private resize-rootfs \
 		qfile-agent qopen-in-vm qrun-in-vm qubes-sync-clock \
 		tar2qfile vm-file-editor xdg-icon qvm-template-repo-query \
 		qubes-fs-tree-check

@@ -7,10 +7,10 @@ if mountpoint -q /rw ; then
     echo "Checking /rw" >&2
 
     echo "Private device size management: enlarging $dev" >&2
-    if content=$(resize2fs "$dev" 2>&1) ; then
-        echo "Private device size management: resize2fs of $dev succeeded" >&2
+    if content=$(/usr/lib/qubes/resize-private 2>&1) ; then
+        echo "Private device size management: resize of $dev succeeded" >&2
     else
-        echo "Private device size management: resize2fs $dev failed:" >&2
+        echo "Private device size management: resize of $dev failed:" >&2
         echo "$content" >&2
     fi
     if [ -d /sys/fs/selinux ]; then

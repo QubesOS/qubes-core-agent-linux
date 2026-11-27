@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+
+dev=/dev/xvdb
+
+fstype=$(blkid -o value -s TYPE "$dev")
+case "$fstype" in
+    ext[234])
+        resize2fs "$dev"
+        exit
+        ;;
+    btrfs|xfs)
+        ;;
+    *)
+        echo "Resizing $fstype filesystem not supported, resize it manually" >&2
+        exit 1
+        ;;
+esac
+
+# btrfs and xfs can only grow while mounted
+if ! mnt=$(findmnt -n -f -o TARGET --source "$dev"); then
+    echo "$dev is not mounted, cannot resize $fstype filesystem" >&2
+    exit 1
+fi
+
+if [ "$fstype" = btrfs ]; then
+    devid=$(btrfs inspect-internal dump-super "$dev" | awk '$1 == "dev_item.devid" { print $2 }')
+    btrfs filesystem resize "$devid:max" "$mnt"
+else
+    xfs_growfs "$mnt"
+fi
