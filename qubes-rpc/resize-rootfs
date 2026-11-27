@@ -2,18 +2,62 @@
 
 set -e
 
+ROOTDEV=/dev/mapper/dmroot
+DEV=$(readlink -e "$ROOTDEV")
+DEV=${DEV%%[0-9]}
+
+# If underlying root device is read-only, don't do anything
+if [ "$(blockdev --getro "$DEV")" -eq "1" ]; then
+    echo "$DEV is read-only, not resizing" >&2
+    exit 0
+fi
+
+verify_partitions_synced() {
+    # TODO: cache sfdisk output
+    sfdisk -l "$1" |
+      grep "^$1" |
+      while read -r pdev _ _ sz _; do
+        [ "$sz" -eq "$(blockdev --getsz "$pdev")" ] || return 1
+      done
+}
+
 dm_major=$(printf %x "$(grep device-mapper /proc/devices | cut -f 1 -d ' ')")
-case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
+case "$(stat -Lc %t:%T "$ROOTDEV")" in
     ca:0)
         # nothing needed, xvda used directly
         ;;
     ca:3)
-        # resize partition table itself and xda3 partition
-        echo ',+' | sfdisk --no-reread --no-tell-kernel -q -N 3 /dev/xvda
-        # and reload partition table; prefer partprobe over blockdev
-        # --rereadpt, as it works on mounted partitions
-        partprobe /dev/xvda
-        udevadm settle
+        # Check to see if the size of all the partitions added together is around
+        # the same size as the parent block device
+        last_part_sec=$(sfdisk -l "$DEV" | tail -n1 | (read -r _ _ E _ _; echo "$E"))
+        gpt_hdr_sz=34
+        # If the disk size is greater than the last partition sector + GPT
+        # header size, then there is emplty space after the last partition
+        # and the partitios should be resized.
+        if [ "$(blockdev --getsz "$DEV")" -gt $((last_part_sec + gpt_hdr_sz)) ]; then
+            echo "Partitions need resizing" >&2
+
+            # Resize partition table itself and xda3 partition
+            echo ',+' | sfdisk --no-reread --no-tell-kernel -q -N 3 "$DEV"
+            # and reload partition table; prefer partprobe over blockdev
+            # --rereadpt, as it works on mounted partitions
+            # On debian, partprobe is patched to do a udevadm settle which can
+            # cause a wait loop, see qubes-issues#11211. The debian patch passes
+            # "udevadm settle" to a system() call. There is no way to set the
+            # timeout parameter from environment variables. So hook the udevadm
+            # command path resolution to run a script that proxies to the
+            # udevadm adding a --timeout parameter if using the settle command.
+            # shellcheck disable=SC1117,SC2016
+            echo "$(command -v udevadm)" '"$@" $([ "$1" = "settle" ] && echo --timeout=0)' > /run/qubes/udevadm
+            chmod +x /run/qubes/udevadm
+            PATH="/run/qubes:$PATH" partprobe "$DEV"
+            while ! verify_partitions_synced "$DEV"; do
+                sleep 1
+            done
+            rm -f /run/qubes/udevadm
+            # Use block device directly to avoid potential dangling symlinks
+            ROOTDEV="$DEV"3
+        fi
         ;;
     ca:*)
         echo "Unsupported partition layout, resize it manually" >&2
@@ -35,4 +79,19 @@ case "$(stat -Lc %t:%T /dev/mapper/dmroot)" in
         exit 1
         ;;
 esac
-resize2fs /dev/mapper/dmroot
+
+fstype=$(blkid -o value -s TYPE "$ROOTDEV")
+case "$fstype" in
+  ext[234])
+    resize2fs "$ROOTDEV"
+    ;;
+  btrfs)
+    btrfs filesystem resize max /
+    ;;
+  xfs)
+    xfs_growfs /
+    ;;
+  *)
+    echo "Resizig not implemented for filesystem type ${fstype}" >&2
+    ;;
+esac

@@ -10,7 +10,7 @@ Before=local-fs.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/lib/qubes/init/resize-rootfs-if-needed.sh
+ExecStart=/usr/lib/qubes/resize-rootfs
 # There is no need for an ExecStop because systemd
 # cleans up mount units in the right order, killing
 # processes as needed.
