@@ -3,7 +3,7 @@ import operator
 import re
 from io import BytesIO
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, mock_open
 
 import qubesagent.firewall
 
@@ -532,6 +532,26 @@ class TestFirewallWorker(TestCase):
             ('udp', '10.139.1.1', '53'),
             ('tcp', '1.1.1.1', '443')
         })
+
+    def test_dns_addresses(self):
+        """resolv.conf nameservers are split by family, zone index dropped."""
+        resolv = (
+            '# comment\n'
+            'search example.com\n'
+            'nameserver 1.1.1.1\n'
+            'nameserver\t2001:db8::1\n'
+            'nameserver fe80::1%wls6\n'
+            'nameserver not-an-ip\n'
+        )
+        dns_addresses = qubesagent.firewall.FirewallWorker.dns_addresses
+        with patch('builtins.open', mock_open(read_data=resolv)):
+            self.assertEqual(list(dns_addresses(4)), ['1.1.1.1'])
+        with patch('builtins.open', mock_open(read_data=resolv)):
+            self.assertEqual(list(dns_addresses(6)),
+                             ['2001:db8::1', 'fe80::1'])
+        with patch('builtins.open', mock_open(read_data=resolv)):
+            self.assertEqual(list(dns_addresses()),
+                             ['1.1.1.1', '2001:db8::1', 'fe80::1'])
 
     def test_is_blocked(self):
         dns_servers_ipv4 = list(self.obj.dns_addresses(4))
